@@ -1,0 +1,13 @@
+#EXTM3U
+#PLAYLIST:Road Trip
+#EXTINF:215,Ola Brine - Harbour Lights
+#EXTALB:Coastline
+music\Ola Brine\01 Harbour Lights.mp3
+
+#EXTINF:-1 tvg-id="x",Tam Reed - Tin Roof Rain
+file:///C:/Music/Tam%20Reed/Tin%20Roof%20Rain.flac
+#EXTINF:241,Ola Brine - Gulls at Dawn
+https://music.youtube.com/watch?v=hArb0urL1te&list=RDAMVM
+# a comment
+02 - Salt Wind.ogg
+https://open.spotify.com/intl-de/track/0harbourLights00000001?si=abc

@@ -88,6 +88,7 @@ func (a *App) Start() {
 	a.watchRooms()
 	a.downloads.Start()
 	a.startLocalFiles()
+	a.resumeImport()
 	go a.keepYTDLPCurrent()
 }
 

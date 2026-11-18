@@ -23710,6 +23710,114 @@ func (msgs Messages) PlayerWaiting(line string) string {
 	return Catalog.Format(msgs.locale, "playerWaiting", map[string]any{"line": line})
 }
 
+// PlaylistExportCsv says "CSV, for spreadsheets"
+// in the language the app shows.
+//
+// A kind of file in the system's dialog that saves a list of songs.
+func PlaylistExportCsv() string { return In(i18n.Locale()).PlaylistExportCsv() }
+
+// PlaylistExportCsv says "CSV, for spreadsheets"
+// in the language of msgs.
+//
+// A kind of file in the system's dialog that saves a list of songs.
+func (msgs Messages) PlaylistExportCsv() string {
+	return Catalog.Format(msgs.locale, "playlistExportCsv", nil)
+}
+
+// PlaylistExportDialog says "Export {name}"
+// in the language the app shows.
+//
+// The title of the system's dialog that saves a list of songs to a file.
+// {name} is the list's name.
+func PlaylistExportDialog(name string) string { return In(i18n.Locale()).PlaylistExportDialog(name) }
+
+// PlaylistExportDialog says "Export {name}"
+// in the language of msgs.
+//
+// The title of the system's dialog that saves a list of songs to a file.
+// {name} is the list's name.
+func (msgs Messages) PlaylistExportDialog(name string) string {
+	return Catalog.Format(msgs.locale, "playlistExportDialog", map[string]any{"name": name})
+}
+
+// PlaylistExportJson says "JSON"
+// in the language the app shows.
+//
+// A kind of file in the system's dialog that saves a list of songs.
+func PlaylistExportJson() string { return In(i18n.Locale()).PlaylistExportJson() }
+
+// PlaylistExportJson says "JSON"
+// in the language of msgs.
+//
+// A kind of file in the system's dialog that saves a list of songs.
+func (msgs Messages) PlaylistExportJson() string {
+	return Catalog.Format(msgs.locale, "playlistExportJson", nil)
+}
+
+// PlaylistExportLibrary says "Export the library…"
+// in the language the app shows.
+//
+// A command of the command palette, in the Library group: it saves every
+// mix and Liked songs in one CSV, M3U8 or JSON file.
+func PlaylistExportLibrary() string { return In(i18n.Locale()).PlaylistExportLibrary() }
+
+// PlaylistExportLibrary says "Export the library…"
+// in the language of msgs.
+//
+// A command of the command palette, in the Library group: it saves every
+// mix and Liked songs in one CSV, M3U8 or JSON file.
+func (msgs Messages) PlaylistExportLibrary() string {
+	return Catalog.Format(msgs.locale, "playlistExportLibrary", nil)
+}
+
+// PlaylistExportLibraryName says "MixMusic library"
+// in the language the app shows.
+//
+// The name the system's dialog suggests for the file of Export the
+// library…, and what the toast says it exported.
+func PlaylistExportLibraryName() string { return In(i18n.Locale()).PlaylistExportLibraryName() }
+
+// PlaylistExportLibraryName says "MixMusic library"
+// in the language of msgs.
+//
+// The name the system's dialog suggests for the file of Export the
+// library…, and what the toast says it exported.
+func (msgs Messages) PlaylistExportLibraryName() string {
+	return Catalog.Format(msgs.locale, "playlistExportLibraryName", nil)
+}
+
+// PlaylistExportList says "Export the list…"
+// in the language the app shows.
+//
+// An item of the More menu of a mix, a playlist or an album, and a button
+// on Liked songs: it saves the list of its songs as a CSV, M3U8 or JSON
+// file.
+func PlaylistExportList() string { return In(i18n.Locale()).PlaylistExportList() }
+
+// PlaylistExportList says "Export the list…"
+// in the language of msgs.
+//
+// An item of the More menu of a mix, a playlist or an album, and a button
+// on Liked songs: it saves the list of its songs as a CSV, M3U8 or JSON
+// file.
+func (msgs Messages) PlaylistExportList() string {
+	return Catalog.Format(msgs.locale, "playlistExportList", nil)
+}
+
+// PlaylistExportM3u says "M3U8 playlist"
+// in the language the app shows.
+//
+// A kind of file in the system's dialog that saves a list of songs.
+func PlaylistExportM3u() string { return In(i18n.Locale()).PlaylistExportM3u() }
+
+// PlaylistExportM3u says "M3U8 playlist"
+// in the language of msgs.
+//
+// A kind of file in the system's dialog that saves a list of songs.
+func (msgs Messages) PlaylistExportM3u() string {
+	return Catalog.Format(msgs.locale, "playlistExportM3u", nil)
+}
+
 // PlaylistGapCantPlay says "{n, plural, one {# of this {noun, select, mix {mix} playlist {playlist} other {list}}'s items can't play here: {kinds…"
 // in the language the app shows.
 func PlaylistGapCantPlay(n int, noun string, kinds string) string {
@@ -23772,6 +23880,1456 @@ func PlaylistGapShort(n int, noun string, count int) string {
 // in the language of msgs.
 func (msgs Messages) PlaylistGapShort(n int, noun string, count int) string {
 	return Catalog.Format(msgs.locale, "playlistGapShort", map[string]any{"n": n, "noun": noun, "count": count})
+}
+
+// PlaylistImportAskMessage says "The import under way stops, and what it found goes."
+// in the language the app shows.
+//
+// The message of the dialog that asks before an import starts in place of
+// one under way.
+func PlaylistImportAskMessage() string { return In(i18n.Locale()).PlaylistImportAskMessage() }
+
+// PlaylistImportAskMessage says "The import under way stops, and what it found goes."
+// in the language of msgs.
+//
+// The message of the dialog that asks before an import starts in place of
+// one under way.
+func (msgs Messages) PlaylistImportAskMessage() string {
+	return Catalog.Format(msgs.locale, "playlistImportAskMessage", nil)
+}
+
+// PlaylistImportAskOk says "Start the new one"
+// in the language the app shows.
+//
+// The button of the dialog that asks before an import starts in place of
+// one under way.
+func PlaylistImportAskOk() string { return In(i18n.Locale()).PlaylistImportAskOk() }
+
+// PlaylistImportAskOk says "Start the new one"
+// in the language of msgs.
+//
+// The button of the dialog that asks before an import starts in place of
+// one under way.
+func (msgs Messages) PlaylistImportAskOk() string {
+	return Catalog.Format(msgs.locale, "playlistImportAskOk", nil)
+}
+
+// PlaylistImportAskTitle says "Start a new import?"
+// in the language the app shows.
+//
+// The title of the dialog that asks before an import starts in place of one
+// under way.
+func PlaylistImportAskTitle() string { return In(i18n.Locale()).PlaylistImportAskTitle() }
+
+// PlaylistImportAskTitle says "Start a new import?"
+// in the language of msgs.
+//
+// The title of the dialog that asks before an import starts in place of one
+// under way.
+func (msgs Messages) PlaylistImportAskTitle() string {
+	return Catalog.Format(msgs.locale, "playlistImportAskTitle", nil)
+}
+
+// PlaylistImportChoose says "Choose files…"
+// in the language the app shows.
+//
+// A button on the page that imports playlists: it opens the system's dialog
+// to choose files.
+func PlaylistImportChoose() string { return In(i18n.Locale()).PlaylistImportChoose() }
+
+// PlaylistImportChoose says "Choose files…"
+// in the language of msgs.
+//
+// A button on the page that imports playlists: it opens the system's dialog
+// to choose files.
+func (msgs Messages) PlaylistImportChoose() string {
+	return Catalog.Format(msgs.locale, "playlistImportChoose", nil)
+}
+
+// PlaylistImportColumn says "Column {n}"
+// in the language the app shows.
+//
+// What screen readers say of the drop-down that chooses what a column of a
+// table holds, on the page that imports playlists.
+func PlaylistImportColumn(n int) string { return In(i18n.Locale()).PlaylistImportColumn(n) }
+
+// PlaylistImportColumn says "Column {n}"
+// in the language of msgs.
+//
+// What screen readers say of the drop-down that chooses what a column of a
+// table holds, on the page that imports playlists.
+func (msgs Messages) PlaylistImportColumn(n int) string {
+	return Catalog.Format(msgs.locale, "playlistImportColumn", map[string]any{"n": n})
+}
+
+// PlaylistImportColumnsHint says "MixMusic doesn't know the columns of {name}. Choose what each one holds:"
+// in the language the app shows.
+//
+// On the page that imports playlists, above the first rows of a table whose
+// columns' names MixMusic doesn't know. {name} is the file's name.
+func PlaylistImportColumnsHint(name string) string {
+	return In(i18n.Locale()).PlaylistImportColumnsHint(name)
+}
+
+// PlaylistImportColumnsHint says "MixMusic doesn't know the columns of {name}. Choose what each one holds:"
+// in the language of msgs.
+//
+// On the page that imports playlists, above the first rows of a table whose
+// columns' names MixMusic doesn't know. {name} is the file's name.
+func (msgs Messages) PlaylistImportColumnsHint(name string) string {
+	return Catalog.Format(msgs.locale, "playlistImportColumnsHint", map[string]any{"name": name})
+}
+
+// PlaylistImportColumnsNeed says "Choose the column of the titles, or one of links or IDs, to continue."
+// in the language the app shows.
+//
+// On the page that imports playlists, under the columns of a table, while
+// none holds what names the songs.
+func PlaylistImportColumnsNeed() string { return In(i18n.Locale()).PlaylistImportColumnsNeed() }
+
+// PlaylistImportColumnsNeed says "Choose the column of the titles, or one of links or IDs, to continue."
+// in the language of msgs.
+//
+// On the page that imports playlists, under the columns of a table, while
+// none holds what names the songs.
+func (msgs Messages) PlaylistImportColumnsNeed() string {
+	return Catalog.Format(msgs.locale, "playlistImportColumnsNeed", nil)
+}
+
+// PlaylistImportCommand says "Import a playlist…"
+// in the language the app shows.
+//
+// A command of the command palette, in the Library group: it opens the page
+// that imports playlists.
+func PlaylistImportCommand() string { return In(i18n.Locale()).PlaylistImportCommand() }
+
+// PlaylistImportCommand says "Import a playlist…"
+// in the language of msgs.
+//
+// A command of the command palette, in the Library group: it opens the page
+// that imports playlists.
+func (msgs Messages) PlaylistImportCommand() string {
+	return Catalog.Format(msgs.locale, "playlistImportCommand", nil)
+}
+
+// PlaylistImportContinue says "Continue"
+// in the language the app shows.
+//
+// A button on the page that imports playlists, once the user named a
+// table's columns, or picked the lists to import.
+func PlaylistImportContinue() string { return In(i18n.Locale()).PlaylistImportContinue() }
+
+// PlaylistImportContinue says "Continue"
+// in the language of msgs.
+//
+// A button on the page that imports playlists, once the user named a
+// table's columns, or picked the lists to import.
+func (msgs Messages) PlaylistImportContinue() string {
+	return Catalog.Format(msgs.locale, "playlistImportContinue", nil)
+}
+
+// PlaylistImportCounts says "Found {found} · To check {check} · In your library already {library} · Not found {missing}"
+// in the language the app shows.
+//
+// On the page that imports playlists, above the songs to review.
+func PlaylistImportCounts(found int, check int, library int, missing int) string {
+	return In(i18n.Locale()).PlaylistImportCounts(found, check, library, missing)
+}
+
+// PlaylistImportCounts says "Found {found} · To check {check} · In your library already {library} · Not found {missing}"
+// in the language of msgs.
+//
+// On the page that imports playlists, above the songs to review.
+func (msgs Messages) PlaylistImportCounts(found int, check int, library int, missing int) string {
+	return Catalog.Format(msgs.locale, "playlistImportCounts", map[string]any{"found": found, "check": check, "library": library, "missing": missing})
+}
+
+// PlaylistImportCut says "The files hold more songs than an import takes: only the first {count} were read."
+// in the language the app shows.
+//
+// On the page that imports playlists, when the files held more songs than
+// MixMusic imports at once.
+func PlaylistImportCut(count int) string { return In(i18n.Locale()).PlaylistImportCut(count) }
+
+// PlaylistImportCut says "The files hold more songs than an import takes: only the first {count} were read."
+// in the language of msgs.
+//
+// On the page that imports playlists, when the files held more songs than
+// MixMusic imports at once.
+func (msgs Messages) PlaylistImportCut(count int) string {
+	return Catalog.Format(msgs.locale, "playlistImportCut", map[string]any{"count": count})
+}
+
+// PlaylistImportDataHelp says "How to download your data from Spotify or Google"
+// in the language the app shows.
+//
+// A link on the page that imports playlists, to the docs.
+func PlaylistImportDataHelp() string { return In(i18n.Locale()).PlaylistImportDataHelp() }
+
+// PlaylistImportDataHelp says "How to download your data from Spotify or Google"
+// in the language of msgs.
+//
+// A link on the page that imports playlists, to the docs.
+func (msgs Messages) PlaylistImportDataHelp() string {
+	return Catalog.Format(msgs.locale, "playlistImportDataHelp", nil)
+}
+
+// PlaylistImportDo says "Import {count, plural, one {# song} other {# songs}}"
+// in the language the app shows.
+//
+// The button that ends an import: it adds the songs ticked where the user
+// chose.
+func PlaylistImportDo(count int) string { return In(i18n.Locale()).PlaylistImportDo(count) }
+
+// PlaylistImportDo says "Import {count, plural, one {# song} other {# songs}}"
+// in the language of msgs.
+//
+// The button that ends an import: it adds the songs ticked where the user
+// chose.
+func (msgs Messages) PlaylistImportDo(count int) string {
+	return Catalog.Format(msgs.locale, "playlistImportDo", map[string]any{"count": count})
+}
+
+// PlaylistImportDoneLiked says "Liked {count, plural, one {# song} other {# songs}}"
+// in the language the app shows.
+//
+// A toast, once an import added its songs to Liked songs.
+func PlaylistImportDoneLiked(count int) string {
+	return In(i18n.Locale()).PlaylistImportDoneLiked(count)
+}
+
+// PlaylistImportDoneLiked says "Liked {count, plural, one {# song} other {# songs}}"
+// in the language of msgs.
+//
+// A toast, once an import added its songs to Liked songs.
+func (msgs Messages) PlaylistImportDoneLiked(count int) string {
+	return Catalog.Format(msgs.locale, "playlistImportDoneLiked", map[string]any{"count": count})
+}
+
+// PlaylistImportDoneMix says "Added {count, plural, one {# song} other {# songs}} to {mix}"
+// in the language the app shows.
+//
+// A toast, once an import added its songs to a mix. {mix} is the mix's
+// name.
+func PlaylistImportDoneMix(count int, mix string) string {
+	return In(i18n.Locale()).PlaylistImportDoneMix(count, mix)
+}
+
+// PlaylistImportDoneMix says "Added {count, plural, one {# song} other {# songs}} to {mix}"
+// in the language of msgs.
+//
+// A toast, once an import added its songs to a mix. {mix} is the mix's
+// name.
+func (msgs Messages) PlaylistImportDoneMix(count int, mix string) string {
+	return Catalog.Format(msgs.locale, "playlistImportDoneMix", map[string]any{"count": count, "mix": mix})
+}
+
+// PlaylistImportDoneMixes says "Added {count, plural, one {# song} other {# songs}} to {mixes, plural, one {# mix} other {# mixes}}"
+// in the language the app shows.
+//
+// A toast, once an import added its songs to several mixes, one of each
+// list.
+func PlaylistImportDoneMixes(count int, mixes int) string {
+	return In(i18n.Locale()).PlaylistImportDoneMixes(count, mixes)
+}
+
+// PlaylistImportDoneMixes says "Added {count, plural, one {# song} other {# songs}} to {mixes, plural, one {# mix} other {# mixes}}"
+// in the language of msgs.
+//
+// A toast, once an import added its songs to several mixes, one of each
+// list.
+func (msgs Messages) PlaylistImportDoneMixes(count int, mixes int) string {
+	return Catalog.Format(msgs.locale, "playlistImportDoneMixes", map[string]any{"count": count, "mixes": mixes})
+}
+
+// PlaylistImportErrArchiveFiles says "the archive holds more than 1,000 files"
+// in the language the app shows.
+//
+// Why a ZIP file couldn't be imported, in the {error} of
+// playlistImportFailed.
+func PlaylistImportErrArchiveFiles() string { return In(i18n.Locale()).PlaylistImportErrArchiveFiles() }
+
+// PlaylistImportErrArchiveFiles says "the archive holds more than 1,000 files"
+// in the language of msgs.
+//
+// Why a ZIP file couldn't be imported, in the {error} of
+// playlistImportFailed.
+func (msgs Messages) PlaylistImportErrArchiveFiles() string {
+	return Catalog.Format(msgs.locale, "playlistImportErrArchiveFiles", nil)
+}
+
+// PlaylistImportErrArchiveTooBig says "the archive is bigger than 100 MB"
+// in the language the app shows.
+//
+// Why a ZIP file couldn't be imported, in the {error} of
+// playlistImportFailed.
+func PlaylistImportErrArchiveTooBig() string {
+	return In(i18n.Locale()).PlaylistImportErrArchiveTooBig()
+}
+
+// PlaylistImportErrArchiveTooBig says "the archive is bigger than 100 MB"
+// in the language of msgs.
+//
+// Why a ZIP file couldn't be imported, in the {error} of
+// playlistImportFailed.
+func (msgs Messages) PlaylistImportErrArchiveTooBig() string {
+	return Catalog.Format(msgs.locale, "playlistImportErrArchiveTooBig", nil)
+}
+
+// PlaylistImportErrNoSongs says "it holds no songs"
+// in the language the app shows.
+//
+// Why a file couldn't be imported, in the {error} of playlistImportFailed.
+func PlaylistImportErrNoSongs() string { return In(i18n.Locale()).PlaylistImportErrNoSongs() }
+
+// PlaylistImportErrNoSongs says "it holds no songs"
+// in the language of msgs.
+//
+// Why a file couldn't be imported, in the {error} of playlistImportFailed.
+func (msgs Messages) PlaylistImportErrNoSongs() string {
+	return Catalog.Format(msgs.locale, "playlistImportErrNoSongs", nil)
+}
+
+// PlaylistImportErrNotAList says "it isn't a list of songs MixMusic reads"
+// in the language the app shows.
+//
+// Why a file couldn't be imported, in the {error} of playlistImportFailed.
+func PlaylistImportErrNotAList() string { return In(i18n.Locale()).PlaylistImportErrNotAList() }
+
+// PlaylistImportErrNotAList says "it isn't a list of songs MixMusic reads"
+// in the language of msgs.
+//
+// Why a file couldn't be imported, in the {error} of playlistImportFailed.
+func (msgs Messages) PlaylistImportErrNotAList() string {
+	return Catalog.Format(msgs.locale, "playlistImportErrNotAList", nil)
+}
+
+// PlaylistImportErrNotDataDownload says "the archive is no data download of Spotify or Google"
+// in the language the app shows.
+//
+// Why a ZIP file couldn't be imported, in the {error} of
+// playlistImportFailed.
+func PlaylistImportErrNotDataDownload() string {
+	return In(i18n.Locale()).PlaylistImportErrNotDataDownload()
+}
+
+// PlaylistImportErrNotDataDownload says "the archive is no data download of Spotify or Google"
+// in the language of msgs.
+//
+// Why a ZIP file couldn't be imported, in the {error} of
+// playlistImportFailed.
+func (msgs Messages) PlaylistImportErrNotDataDownload() string {
+	return Catalog.Format(msgs.locale, "playlistImportErrNotDataDownload", nil)
+}
+
+// PlaylistImportErrTooBig says "it's bigger than 50 MB"
+// in the language the app shows.
+//
+// Why a file couldn't be imported, in the {error} of playlistImportFailed.
+func PlaylistImportErrTooBig() string { return In(i18n.Locale()).PlaylistImportErrTooBig() }
+
+// PlaylistImportErrTooBig says "it's bigger than 50 MB"
+// in the language of msgs.
+//
+// Why a file couldn't be imported, in the {error} of playlistImportFailed.
+func (msgs Messages) PlaylistImportErrTooBig() string {
+	return Catalog.Format(msgs.locale, "playlistImportErrTooBig", nil)
+}
+
+// PlaylistImportFailed says "Couldn't import {name}: {error}"
+// in the language the app shows.
+//
+// A toast, when a file the user chose to import couldn't be read. {name} is
+// the file's name; {error} is why, as playlistImportErrNoSongs.
+func PlaylistImportFailed(name string, error string) string {
+	return In(i18n.Locale()).PlaylistImportFailed(name, error)
+}
+
+// PlaylistImportFailed says "Couldn't import {name}: {error}"
+// in the language of msgs.
+//
+// A toast, when a file the user chose to import couldn't be read. {name} is
+// the file's name; {error} is why, as playlistImportErrNoSongs.
+func (msgs Messages) PlaylistImportFailed(name string, error string) string {
+	return Catalog.Format(msgs.locale, "playlistImportFailed", map[string]any{"name": name, "error": error})
+}
+
+// PlaylistImportFailedSeveral says "Couldn't import {n, plural, one {# file} other {# files}}, the first {name}: {error}"
+// in the language the app shows.
+//
+// A toast, when several files the user chose to import couldn't be read.
+// {name} is the first's name; {error} is why.
+func PlaylistImportFailedSeveral(n int, name string, error string) string {
+	return In(i18n.Locale()).PlaylistImportFailedSeveral(n, name, error)
+}
+
+// PlaylistImportFailedSeveral says "Couldn't import {n, plural, one {# file} other {# files}}, the first {name}: {error}"
+// in the language of msgs.
+//
+// A toast, when several files the user chose to import couldn't be read.
+// {name} is the first's name; {error} is why.
+func (msgs Messages) PlaylistImportFailedSeveral(n int, name string, error string) string {
+	return Catalog.Format(msgs.locale, "playlistImportFailedSeveral", map[string]any{"n": n, "name": name, "error": error})
+}
+
+// PlaylistImportFieldAlbum says "Album"
+// in the language the app shows.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// the songs' albums.
+func PlaylistImportFieldAlbum() string { return In(i18n.Locale()).PlaylistImportFieldAlbum() }
+
+// PlaylistImportFieldAlbum says "Album"
+// in the language of msgs.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// the songs' albums.
+func (msgs Messages) PlaylistImportFieldAlbum() string {
+	return Catalog.Format(msgs.locale, "playlistImportFieldAlbum", nil)
+}
+
+// PlaylistImportFieldArtists says "Artists"
+// in the language the app shows.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// the songs' artists.
+func PlaylistImportFieldArtists() string { return In(i18n.Locale()).PlaylistImportFieldArtists() }
+
+// PlaylistImportFieldArtists says "Artists"
+// in the language of msgs.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// the songs' artists.
+func (msgs Messages) PlaylistImportFieldArtists() string {
+	return Catalog.Format(msgs.locale, "playlistImportFieldArtists", nil)
+}
+
+// PlaylistImportFieldDuration says "Length"
+// in the language the app shows.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// the songs' lengths.
+func PlaylistImportFieldDuration() string { return In(i18n.Locale()).PlaylistImportFieldDuration() }
+
+// PlaylistImportFieldDuration says "Length"
+// in the language of msgs.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// the songs' lengths.
+func (msgs Messages) PlaylistImportFieldDuration() string {
+	return Catalog.Format(msgs.locale, "playlistImportFieldDuration", nil)
+}
+
+// PlaylistImportFieldIsrc says "ISRC"
+// in the language the app shows.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// the recordings' ISRC codes.
+func PlaylistImportFieldIsrc() string { return In(i18n.Locale()).PlaylistImportFieldIsrc() }
+
+// PlaylistImportFieldIsrc says "ISRC"
+// in the language of msgs.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// the recordings' ISRC codes.
+func (msgs Messages) PlaylistImportFieldIsrc() string {
+	return Catalog.Format(msgs.locale, "playlistImportFieldIsrc", nil)
+}
+
+// PlaylistImportFieldNone says "Leave out"
+// in the language the app shows.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// nothing MixMusic reads.
+func PlaylistImportFieldNone() string { return In(i18n.Locale()).PlaylistImportFieldNone() }
+
+// PlaylistImportFieldNone says "Leave out"
+// in the language of msgs.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// nothing MixMusic reads.
+func (msgs Messages) PlaylistImportFieldNone() string {
+	return Catalog.Format(msgs.locale, "playlistImportFieldNone", nil)
+}
+
+// PlaylistImportFieldPlaylist says "Playlist"
+// in the language the app shows.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// the name of the playlist each song is in.
+func PlaylistImportFieldPlaylist() string { return In(i18n.Locale()).PlaylistImportFieldPlaylist() }
+
+// PlaylistImportFieldPlaylist says "Playlist"
+// in the language of msgs.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// the name of the playlist each song is in.
+func (msgs Messages) PlaylistImportFieldPlaylist() string {
+	return Catalog.Format(msgs.locale, "playlistImportFieldPlaylist", nil)
+}
+
+// PlaylistImportFieldSpotifyUri says "Spotify URI"
+// in the language the app shows.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// Spotify's URIs of the tracks, as spotify:track:…
+func PlaylistImportFieldSpotifyUri() string { return In(i18n.Locale()).PlaylistImportFieldSpotifyUri() }
+
+// PlaylistImportFieldSpotifyUri says "Spotify URI"
+// in the language of msgs.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// Spotify's URIs of the tracks, as spotify:track:…
+func (msgs Messages) PlaylistImportFieldSpotifyUri() string {
+	return Catalog.Format(msgs.locale, "playlistImportFieldSpotifyUri", nil)
+}
+
+// PlaylistImportFieldTitle says "Title"
+// in the language the app shows.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// the songs' titles.
+func PlaylistImportFieldTitle() string { return In(i18n.Locale()).PlaylistImportFieldTitle() }
+
+// PlaylistImportFieldTitle says "Title"
+// in the language of msgs.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// the songs' titles.
+func (msgs Messages) PlaylistImportFieldTitle() string {
+	return Catalog.Format(msgs.locale, "playlistImportFieldTitle", nil)
+}
+
+// PlaylistImportFieldUrl says "Link"
+// in the language the app shows.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// links to the songs.
+func PlaylistImportFieldUrl() string { return In(i18n.Locale()).PlaylistImportFieldUrl() }
+
+// PlaylistImportFieldUrl says "Link"
+// in the language of msgs.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// links to the songs.
+func (msgs Messages) PlaylistImportFieldUrl() string {
+	return Catalog.Format(msgs.locale, "playlistImportFieldUrl", nil)
+}
+
+// PlaylistImportFieldVideoId says "YouTube video ID"
+// in the language the app shows.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// the IDs of YouTube videos.
+func PlaylistImportFieldVideoId() string { return In(i18n.Locale()).PlaylistImportFieldVideoId() }
+
+// PlaylistImportFieldVideoId says "YouTube video ID"
+// in the language of msgs.
+//
+// An option of the drop-down that chooses what a column of a table holds:
+// the IDs of YouTube videos.
+func (msgs Messages) PlaylistImportFieldVideoId() string {
+	return Catalog.Format(msgs.locale, "playlistImportFieldVideoId", nil)
+}
+
+// PlaylistImportFilesAll says "All files"
+// in the language the app shows.
+//
+// A kind of file in the system's dialog that chooses the files to import:
+// any file.
+func PlaylistImportFilesAll() string { return In(i18n.Locale()).PlaylistImportFilesAll() }
+
+// PlaylistImportFilesAll says "All files"
+// in the language of msgs.
+//
+// A kind of file in the system's dialog that chooses the files to import:
+// any file.
+func (msgs Messages) PlaylistImportFilesAll() string {
+	return Catalog.Format(msgs.locale, "playlistImportFilesAll", nil)
+}
+
+// PlaylistImportFilesDialog says "Choose the playlists to import"
+// in the language the app shows.
+//
+// The title of the system's dialog that chooses the files to import.
+func PlaylistImportFilesDialog() string { return In(i18n.Locale()).PlaylistImportFilesDialog() }
+
+// PlaylistImportFilesDialog says "Choose the playlists to import"
+// in the language of msgs.
+//
+// The title of the system's dialog that chooses the files to import.
+func (msgs Messages) PlaylistImportFilesDialog() string {
+	return Catalog.Format(msgs.locale, "playlistImportFilesDialog", nil)
+}
+
+// PlaylistImportFilesPlaylists says "Playlists and data downloads"
+// in the language the app shows.
+//
+// A kind of file in the system's dialog that chooses the files to import:
+// CSV, TSV, M3U, M3U8, JSON, text and ZIP.
+func PlaylistImportFilesPlaylists() string { return In(i18n.Locale()).PlaylistImportFilesPlaylists() }
+
+// PlaylistImportFilesPlaylists says "Playlists and data downloads"
+// in the language of msgs.
+//
+// A kind of file in the system's dialog that chooses the files to import:
+// CSV, TSV, M3U, M3U8, JSON, text and ZIP.
+func (msgs Messages) PlaylistImportFilesPlaylists() string {
+	return Catalog.Format(msgs.locale, "playlistImportFilesPlaylists", nil)
+}
+
+// PlaylistImportHaltErrors says "3 searches in a row failed: {error}"
+// in the language the app shows.
+//
+// Why looking for the songs of an import stopped, under
+// playlistImportHaltTitle. {error} is the last failure, often the system's
+// or the service's own words.
+func PlaylistImportHaltErrors(error string) string {
+	return In(i18n.Locale()).PlaylistImportHaltErrors(error)
+}
+
+// PlaylistImportHaltErrors says "3 searches in a row failed: {error}"
+// in the language of msgs.
+//
+// Why looking for the songs of an import stopped, under
+// playlistImportHaltTitle. {error} is the last failure, often the system's
+// or the service's own words.
+func (msgs Messages) PlaylistImportHaltErrors(error string) string {
+	return Catalog.Format(msgs.locale, "playlistImportHaltErrors", map[string]any{"error": error})
+}
+
+// PlaylistImportHaltQuit says "MixMusic quit while it looked for the songs"
+// in the language the app shows.
+//
+// Why looking for the songs of an import stopped, under
+// playlistImportHaltTitle, before it goes on.
+func PlaylistImportHaltQuit() string { return In(i18n.Locale()).PlaylistImportHaltQuit() }
+
+// PlaylistImportHaltQuit says "MixMusic quit while it looked for the songs"
+// in the language of msgs.
+//
+// Why looking for the songs of an import stopped, under
+// playlistImportHaltTitle, before it goes on.
+func (msgs Messages) PlaylistImportHaltQuit() string {
+	return Catalog.Format(msgs.locale, "playlistImportHaltQuit", nil)
+}
+
+// PlaylistImportHaltRate says "YouTube Music asks MixMusic to slow down: try again in a few minutes"
+// in the language the app shows.
+//
+// Why looking for the songs of an import stopped, under
+// playlistImportHaltTitle.
+func PlaylistImportHaltRate() string { return In(i18n.Locale()).PlaylistImportHaltRate() }
+
+// PlaylistImportHaltRate says "YouTube Music asks MixMusic to slow down: try again in a few minutes"
+// in the language of msgs.
+//
+// Why looking for the songs of an import stopped, under
+// playlistImportHaltTitle.
+func (msgs Messages) PlaylistImportHaltRate() string {
+	return Catalog.Format(msgs.locale, "playlistImportHaltRate", nil)
+}
+
+// PlaylistImportHaltTitle says "Looking for the songs stopped"
+// in the language the app shows.
+//
+// The title of the panel on the page that imports playlists, when looking
+// for the songs stopped on its own; why follows, as playlistImportHaltRate.
+func PlaylistImportHaltTitle() string { return In(i18n.Locale()).PlaylistImportHaltTitle() }
+
+// PlaylistImportHaltTitle says "Looking for the songs stopped"
+// in the language of msgs.
+//
+// The title of the panel on the page that imports playlists, when looking
+// for the songs stopped on its own; why follows, as playlistImportHaltRate.
+func (msgs Messages) PlaylistImportHaltTitle() string {
+	return Catalog.Format(msgs.locale, "playlistImportHaltTitle", nil)
+}
+
+// PlaylistImportHeaderRow says "The first row names the columns"
+// in the language the app shows.
+//
+// A check box on the page that imports playlists, while the user names a
+// table's columns.
+func PlaylistImportHeaderRow() string { return In(i18n.Locale()).PlaylistImportHeaderRow() }
+
+// PlaylistImportHeaderRow says "The first row names the columns"
+// in the language of msgs.
+//
+// A check box on the page that imports playlists, while the user names a
+// table's columns.
+func (msgs Messages) PlaylistImportHeaderRow() string {
+	return Catalog.Format(msgs.locale, "playlistImportHeaderRow", nil)
+}
+
+// PlaylistImportHistory says "Most played on Spotify"
+// in the language the app shows.
+//
+// The name of a list of Spotify's data download: the songs of the streaming
+// history the user heard for 30 seconds or more, the most played first. It
+// names the new mix too.
+func PlaylistImportHistory() string { return In(i18n.Locale()).PlaylistImportHistory() }
+
+// PlaylistImportHistory says "Most played on Spotify"
+// in the language of msgs.
+//
+// The name of a list of Spotify's data download: the songs of the streaming
+// history the user heard for 30 seconds or more, the most played first. It
+// names the new mix too.
+func (msgs Messages) PlaylistImportHistory() string {
+	return Catalog.Format(msgs.locale, "playlistImportHistory", nil)
+}
+
+// PlaylistImportInLibrary says "In your library"
+// in the language the app shows.
+//
+// On a song of an import, before the track found: the user's library has it
+// already.
+func PlaylistImportInLibrary() string { return In(i18n.Locale()).PlaylistImportInLibrary() }
+
+// PlaylistImportInLibrary says "In your library"
+// in the language of msgs.
+//
+// On a song of an import, before the track found: the user's library has it
+// already.
+func (msgs Messages) PlaylistImportInLibrary() string {
+	return Catalog.Format(msgs.locale, "playlistImportInLibrary", nil)
+}
+
+// PlaylistImportIntro says "Bring in a playlist from a CSV or TSV file, an M3U list, JSON, text of links or of “Artist - Title” lines, or the…"
+// in the language the app shows.
+//
+// On the page that imports playlists, before the user chose anything.
+func PlaylistImportIntro() string { return In(i18n.Locale()).PlaylistImportIntro() }
+
+// PlaylistImportIntro says "Bring in a playlist from a CSV or TSV file, an M3U list, JSON, text of links or of “Artist - Title” lines, or the…"
+// in the language of msgs.
+//
+// On the page that imports playlists, before the user chose anything.
+func (msgs Messages) PlaylistImportIntro() string {
+	return Catalog.Format(msgs.locale, "playlistImportIntro", nil)
+}
+
+// PlaylistImportLookAgain says "Look for them"
+// in the language the app shows.
+//
+// A button after playlistImportPending: it looks for the songs not looked
+// for yet.
+func PlaylistImportLookAgain() string { return In(i18n.Locale()).PlaylistImportLookAgain() }
+
+// PlaylistImportLookAgain says "Look for them"
+// in the language of msgs.
+//
+// A button after playlistImportPending: it looks for the songs not looked
+// for yet.
+func (msgs Messages) PlaylistImportLookAgain() string {
+	return Catalog.Format(msgs.locale, "playlistImportLookAgain", nil)
+}
+
+// PlaylistImportMatching says "Matching {done} of {total}…"
+// in the language the app shows.
+//
+// On the page that imports playlists, while MixMusic looks for the songs.
+func PlaylistImportMatching(done int, total int) string {
+	return In(i18n.Locale()).PlaylistImportMatching(done, total)
+}
+
+// PlaylistImportMatching says "Matching {done} of {total}…"
+// in the language of msgs.
+//
+// On the page that imports playlists, while MixMusic looks for the songs.
+func (msgs Messages) PlaylistImportMatching(done int, total int) string {
+	return Catalog.Format(msgs.locale, "playlistImportMatching", map[string]any{"done": done, "total": total})
+}
+
+// PlaylistImportMatchingNote says "MixMusic looks for 4 songs at a time, so that playback isn't held back. You can leave this page: the import goes on, …"
+// in the language the app shows.
+//
+// On the page that imports playlists, under the progress while MixMusic
+// looks for the songs.
+func PlaylistImportMatchingNote() string { return In(i18n.Locale()).PlaylistImportMatchingNote() }
+
+// PlaylistImportMatchingNote says "MixMusic looks for 4 songs at a time, so that playback isn't held back. You can leave this page: the import goes on, …"
+// in the language of msgs.
+//
+// On the page that imports playlists, under the progress while MixMusic
+// looks for the songs.
+func (msgs Messages) PlaylistImportMatchingNote() string {
+	return Catalog.Format(msgs.locale, "playlistImportMatchingNote", nil)
+}
+
+// PlaylistImportMissesDialog says "Save the songs not found"
+// in the language the app shows.
+//
+// The title of the system's dialog that saves the songs an import didn't
+// find.
+func PlaylistImportMissesDialog() string { return In(i18n.Locale()).PlaylistImportMissesDialog() }
+
+// PlaylistImportMissesDialog says "Save the songs not found"
+// in the language of msgs.
+//
+// The title of the system's dialog that saves the songs an import didn't
+// find.
+func (msgs Messages) PlaylistImportMissesDialog() string {
+	return Catalog.Format(msgs.locale, "playlistImportMissesDialog", nil)
+}
+
+// PlaylistImportMissesFile says "{name} - not found"
+// in the language the app shows.
+//
+// The name the system's dialog suggests for the file of the songs an import
+// didn't find. {name} is the list's name.
+func PlaylistImportMissesFile(name string) string {
+	return In(i18n.Locale()).PlaylistImportMissesFile(name)
+}
+
+// PlaylistImportMissesFile says "{name} - not found"
+// in the language of msgs.
+//
+// The name the system's dialog suggests for the file of the songs an import
+// didn't find. {name} is the list's name.
+func (msgs Messages) PlaylistImportMissesFile(name string) string {
+	return Catalog.Format(msgs.locale, "playlistImportMissesFile", map[string]any{"name": name})
+}
+
+// PlaylistImportMissesSaved says "Saved the songs not found to {file}"
+// in the language the app shows.
+//
+// A toast, once the songs an import didn't find were saved. {file} is the
+// file's name.
+func PlaylistImportMissesSaved(file string) string {
+	return In(i18n.Locale()).PlaylistImportMissesSaved(file)
+}
+
+// PlaylistImportMissesSaved says "Saved the songs not found to {file}"
+// in the language of msgs.
+//
+// A toast, once the songs an import didn't find were saved. {file} is the
+// file's name.
+func (msgs Messages) PlaylistImportMissesSaved(file string) string {
+	return Catalog.Format(msgs.locale, "playlistImportMissesSaved", map[string]any{"file": file})
+}
+
+// PlaylistImportMix says "The mix"
+// in the language the app shows.
+//
+// What screen readers say of the drop-down of the user's mixes, under A mix
+// of yours, on the page that imports playlists.
+func PlaylistImportMix() string { return In(i18n.Locale()).PlaylistImportMix() }
+
+// PlaylistImportMix says "The mix"
+// in the language of msgs.
+//
+// What screen readers say of the drop-down of the user's mixes, under A mix
+// of yours, on the page that imports playlists.
+func (msgs Messages) PlaylistImportMix() string {
+	return Catalog.Format(msgs.locale, "playlistImportMix", nil)
+}
+
+// PlaylistImportNoMixes says "You have no mixes yet."
+// in the language the app shows.
+//
+// Under A mix of yours, a choice of where the songs of an import go, when
+// the user has no mix.
+func PlaylistImportNoMixes() string { return In(i18n.Locale()).PlaylistImportNoMixes() }
+
+// PlaylistImportNoMixes says "You have no mixes yet."
+// in the language of msgs.
+//
+// Under A mix of yours, a choice of where the songs of an import go, when
+// the user has no mix.
+func (msgs Messages) PlaylistImportNoMixes() string {
+	return Catalog.Format(msgs.locale, "playlistImportNoMixes", nil)
+}
+
+// PlaylistImportNotFound says "Not found"
+// in the language the app shows.
+//
+// On a song of an import that MixMusic didn't find. Also a segment above
+// the songs to review, which shows those not found.
+func PlaylistImportNotFound() string { return In(i18n.Locale()).PlaylistImportNotFound() }
+
+// PlaylistImportNotFound says "Not found"
+// in the language of msgs.
+//
+// On a song of an import that MixMusic didn't find. Also a segment above
+// the songs to review, which shows those not found.
+func (msgs Messages) PlaylistImportNotFound() string {
+	return Catalog.Format(msgs.locale, "playlistImportNotFound", nil)
+}
+
+// PlaylistImportNotLookedFor says "Not looked for"
+// in the language the app shows.
+//
+// On a song of an import that MixMusic didn't look for yet, as when the
+// user stopped it.
+func PlaylistImportNotLookedFor() string { return In(i18n.Locale()).PlaylistImportNotLookedFor() }
+
+// PlaylistImportNotLookedFor says "Not looked for"
+// in the language of msgs.
+//
+// On a song of an import that MixMusic didn't look for yet, as when the
+// user stopped it.
+func (msgs Messages) PlaylistImportNotLookedFor() string {
+	return Catalog.Format(msgs.locale, "playlistImportNotLookedFor", nil)
+}
+
+// PlaylistImportOpen says "open"
+// in the language the app shows.
+//
+// The action of the toast that tells an import added its songs to a mix: it
+// opens the mix.
+func PlaylistImportOpen() string { return In(i18n.Locale()).PlaylistImportOpen() }
+
+// PlaylistImportOpen says "open"
+// in the language of msgs.
+//
+// The action of the toast that tells an import added its songs to a mix: it
+// opens the mix.
+func (msgs Messages) PlaylistImportOpen() string {
+	return Catalog.Format(msgs.locale, "playlistImportOpen", nil)
+}
+
+// PlaylistImportPasteButton says "Import the text"
+// in the language the app shows.
+//
+// The button under the box where the user pastes songs, on the page that
+// imports playlists.
+func PlaylistImportPasteButton() string { return In(i18n.Locale()).PlaylistImportPasteButton() }
+
+// PlaylistImportPasteButton says "Import the text"
+// in the language of msgs.
+//
+// The button under the box where the user pastes songs, on the page that
+// imports playlists.
+func (msgs Messages) PlaylistImportPasteButton() string {
+	return Catalog.Format(msgs.locale, "playlistImportPasteButton", nil)
+}
+
+// PlaylistImportPasteLabel says "Songs to import"
+// in the language the app shows.
+//
+// What screen readers say of the box on the page that imports playlists,
+// where the user pastes links or lines of songs.
+func PlaylistImportPasteLabel() string { return In(i18n.Locale()).PlaylistImportPasteLabel() }
+
+// PlaylistImportPasteLabel says "Songs to import"
+// in the language of msgs.
+//
+// What screen readers say of the box on the page that imports playlists,
+// where the user pastes links or lines of songs.
+func (msgs Messages) PlaylistImportPasteLabel() string {
+	return Catalog.Format(msgs.locale, "playlistImportPasteLabel", nil)
+}
+
+// PlaylistImportPastePlaceholder says "Paste links, or Artist - Title, one a line"
+// in the language the app shows.
+//
+// The hint in the empty box on the page that imports playlists, where the
+// user pastes songs.
+func PlaylistImportPastePlaceholder() string {
+	return In(i18n.Locale()).PlaylistImportPastePlaceholder()
+}
+
+// PlaylistImportPastePlaceholder says "Paste links, or Artist - Title, one a line"
+// in the language of msgs.
+//
+// The hint in the empty box on the page that imports playlists, where the
+// user pastes songs.
+func (msgs Messages) PlaylistImportPastePlaceholder() string {
+	return Catalog.Format(msgs.locale, "playlistImportPastePlaceholder", nil)
+}
+
+// PlaylistImportPastedName says "Imported songs"
+// in the language the app shows.
+//
+// The name of the new mix of songs the user pasted, which they can change
+// before importing.
+func PlaylistImportPastedName() string { return In(i18n.Locale()).PlaylistImportPastedName() }
+
+// PlaylistImportPastedName says "Imported songs"
+// in the language of msgs.
+//
+// The name of the new mix of songs the user pasted, which they can change
+// before importing.
+func (msgs Messages) PlaylistImportPastedName() string {
+	return Catalog.Format(msgs.locale, "playlistImportPastedName", nil)
+}
+
+// PlaylistImportPending says "{count, plural, one {# song wasn't} other {# songs weren't}} looked for yet."
+// in the language the app shows.
+//
+// On the page that imports playlists, above the songs to review, when the
+// user stopped before all were looked for.
+func PlaylistImportPending(count int) string { return In(i18n.Locale()).PlaylistImportPending(count) }
+
+// PlaylistImportPending says "{count, plural, one {# song wasn't} other {# songs weren't}} looked for yet."
+// in the language of msgs.
+//
+// On the page that imports playlists, above the songs to review, when the
+// user stopped before all were looked for.
+func (msgs Messages) PlaylistImportPending(count int) string {
+	return Catalog.Format(msgs.locale, "playlistImportPending", map[string]any{"count": count})
+}
+
+// PlaylistImportPickHint says "Choose the lists to import:"
+// in the language the app shows.
+//
+// On the page that imports playlists, above the lists the files held, as
+// the playlists of a data download.
+func PlaylistImportPickHint() string { return In(i18n.Locale()).PlaylistImportPickHint() }
+
+// PlaylistImportPickHint says "Choose the lists to import:"
+// in the language of msgs.
+//
+// On the page that imports playlists, above the lists the files held, as
+// the playlists of a data download.
+func (msgs Messages) PlaylistImportPickHint() string {
+	return Catalog.Format(msgs.locale, "playlistImportPickHint", nil)
+}
+
+// PlaylistImportPickList says "{name} · {count, plural, one {# song} other {# songs}}"
+// in the language the app shows.
+//
+// A check box of a list to import, on the page that imports playlists.
+// {name} is the list's name.
+func PlaylistImportPickList(name string, count int) string {
+	return In(i18n.Locale()).PlaylistImportPickList(name, count)
+}
+
+// PlaylistImportPickList says "{name} · {count, plural, one {# song} other {# songs}}"
+// in the language of msgs.
+//
+// A check box of a list to import, on the page that imports playlists.
+// {name} is the list's name.
+func (msgs Messages) PlaylistImportPickList(name string, count int) string {
+	return Catalog.Format(msgs.locale, "playlistImportPickList", map[string]any{"name": name, "count": count})
+}
+
+// PlaylistImportReplace says "Replace…"
+// in the language the app shows.
+//
+// A link on a song of an import: it searches for another track to import in
+// its place.
+func PlaylistImportReplace() string { return In(i18n.Locale()).PlaylistImportReplace() }
+
+// PlaylistImportReplace says "Replace…"
+// in the language of msgs.
+//
+// A link on a song of an import: it searches for another track to import in
+// its place.
+func (msgs Messages) PlaylistImportReplace() string {
+	return Catalog.Format(msgs.locale, "playlistImportReplace", nil)
+}
+
+// PlaylistImportReplaceNone says "Nothing found for {query}"
+// in the language the app shows.
+//
+// In the dialog that searches for another track to import in place of a
+// song, when the search found nothing.
+func PlaylistImportReplaceNone(query string) string {
+	return In(i18n.Locale()).PlaylistImportReplaceNone(query)
+}
+
+// PlaylistImportReplaceNone says "Nothing found for {query}"
+// in the language of msgs.
+//
+// In the dialog that searches for another track to import in place of a
+// song, when the search found nothing.
+func (msgs Messages) PlaylistImportReplaceNone(query string) string {
+	return Catalog.Format(msgs.locale, "playlistImportReplaceNone", map[string]any{"query": query})
+}
+
+// PlaylistImportReplaceTitle says "Replace {title}"
+// in the language the app shows.
+//
+// The title of the dialog that searches for another track to import in
+// place of a song. {title} is the song's title as its file names it.
+func PlaylistImportReplaceTitle(title string) string {
+	return In(i18n.Locale()).PlaylistImportReplaceTitle(title)
+}
+
+// PlaylistImportReplaceTitle says "Replace {title}"
+// in the language of msgs.
+//
+// The title of the dialog that searches for another track to import in
+// place of a song. {title} is the song's title as its file names it.
+func (msgs Messages) PlaylistImportReplaceTitle(title string) string {
+	return Catalog.Format(msgs.locale, "playlistImportReplaceTitle", map[string]any{"title": title})
+}
+
+// PlaylistImportReview says "Review what was found"
+// in the language the app shows.
+//
+// A button on the page that imports playlists, when looking for the songs
+// stopped: it shows what was found.
+func PlaylistImportReview() string { return In(i18n.Locale()).PlaylistImportReview() }
+
+// PlaylistImportReview says "Review what was found"
+// in the language of msgs.
+//
+// A button on the page that imports playlists, when looking for the songs
+// stopped: it shows what was found.
+func (msgs Messages) PlaylistImportReview() string {
+	return Catalog.Format(msgs.locale, "playlistImportReview", nil)
+}
+
+// PlaylistImportSaveMisses says "Save the songs not found…"
+// in the language the app shows.
+//
+// A button on the page that imports playlists: it saves the songs not found
+// as a CSV file.
+func PlaylistImportSaveMisses() string { return In(i18n.Locale()).PlaylistImportSaveMisses() }
+
+// PlaylistImportSaveMisses says "Save the songs not found…"
+// in the language of msgs.
+//
+// A button on the page that imports playlists: it saves the songs not found
+// as a CSV file.
+func (msgs Messages) PlaylistImportSaveMisses() string {
+	return Catalog.Format(msgs.locale, "playlistImportSaveMisses", nil)
+}
+
+// PlaylistImportShowAll says "All"
+// in the language the app shows.
+//
+// A segment above the songs to review, on the page that imports playlists:
+// it shows them all.
+func PlaylistImportShowAll() string { return In(i18n.Locale()).PlaylistImportShowAll() }
+
+// PlaylistImportShowAll says "All"
+// in the language of msgs.
+//
+// A segment above the songs to review, on the page that imports playlists:
+// it shows them all.
+func (msgs Messages) PlaylistImportShowAll() string {
+	return Catalog.Format(msgs.locale, "playlistImportShowAll", nil)
+}
+
+// PlaylistImportShowLabel says "Songs to show"
+// in the language the app shows.
+//
+// What screen readers say of the segments above the songs to review, on the
+// page that imports playlists.
+func PlaylistImportShowLabel() string { return In(i18n.Locale()).PlaylistImportShowLabel() }
+
+// PlaylistImportShowLabel says "Songs to show"
+// in the language of msgs.
+//
+// What screen readers say of the segments above the songs to review, on the
+// page that imports playlists.
+func (msgs Messages) PlaylistImportShowLabel() string {
+	return Catalog.Format(msgs.locale, "playlistImportShowLabel", nil)
+}
+
+// PlaylistImportSkipFile says "Skip this file"
+// in the language the app shows.
+//
+// A button on the page that imports playlists, while the user names a
+// table's columns: the file isn't imported.
+func PlaylistImportSkipFile() string { return In(i18n.Locale()).PlaylistImportSkipFile() }
+
+// PlaylistImportSkipFile says "Skip this file"
+// in the language of msgs.
+//
+// A button on the page that imports playlists, while the user names a
+// table's columns: the file isn't imported.
+func (msgs Messages) PlaylistImportSkipFile() string {
+	return Catalog.Format(msgs.locale, "playlistImportSkipFile", nil)
+}
+
+// PlaylistImportStop says "Stop and review"
+// in the language the app shows.
+//
+// A button on the page that imports playlists, while MixMusic looks for the
+// songs: it stops, and shows what was found.
+func PlaylistImportStop() string { return In(i18n.Locale()).PlaylistImportStop() }
+
+// PlaylistImportStop says "Stop and review"
+// in the language of msgs.
+//
+// A button on the page that imports playlists, while MixMusic looks for the
+// songs: it stops, and shows what was found.
+func (msgs Messages) PlaylistImportStop() string {
+	return Catalog.Format(msgs.locale, "playlistImportStop", nil)
+}
+
+// PlaylistImportSure says "Found"
+// in the language the app shows.
+//
+// On a song of an import, before the track found: MixMusic is sure it's the
+// song. Also a segment above the songs to review, which shows those found.
+func PlaylistImportSure() string { return In(i18n.Locale()).PlaylistImportSure() }
+
+// PlaylistImportSure says "Found"
+// in the language of msgs.
+//
+// On a song of an import, before the track found: MixMusic is sure it's the
+// song. Also a segment above the songs to review, which shows those found.
+func (msgs Messages) PlaylistImportSure() string {
+	return Catalog.Format(msgs.locale, "playlistImportSure", nil)
+}
+
+// PlaylistImportTextFailed says "Couldn't import the text: {error}"
+// in the language the app shows.
+//
+// A toast, when the text the user pasted to import holds no songs MixMusic
+// reads. {error} is why, as playlistImportErrNoSongs.
+func PlaylistImportTextFailed(error string) string {
+	return In(i18n.Locale()).PlaylistImportTextFailed(error)
+}
+
+// PlaylistImportTextFailed says "Couldn't import the text: {error}"
+// in the language of msgs.
+//
+// A toast, when the text the user pasted to import holds no songs MixMusic
+// reads. {error} is why, as playlistImportErrNoSongs.
+func (msgs Messages) PlaylistImportTextFailed(error string) string {
+	return Catalog.Format(msgs.locale, "playlistImportTextFailed", map[string]any{"error": error})
+}
+
+// PlaylistImportTick says "Import {title}"
+// in the language the app shows.
+//
+// What screen readers say of the check box of a song of an import, on the
+// page that imports playlists.
+func PlaylistImportTick(title string) string { return In(i18n.Locale()).PlaylistImportTick(title) }
+
+// PlaylistImportTick says "Import {title}"
+// in the language of msgs.
+//
+// What screen readers say of the check box of a song of an import, on the
+// page that imports playlists.
+func (msgs Messages) PlaylistImportTick(title string) string {
+	return Catalog.Format(msgs.locale, "playlistImportTick", map[string]any{"title": title})
+}
+
+// PlaylistImportTickAll says "Tick all found"
+// in the language the app shows.
+//
+// A button on the page that imports playlists: it ticks every song
+// something was found of.
+func PlaylistImportTickAll() string { return In(i18n.Locale()).PlaylistImportTickAll() }
+
+// PlaylistImportTickAll says "Tick all found"
+// in the language of msgs.
+//
+// A button on the page that imports playlists: it ticks every song
+// something was found of.
+func (msgs Messages) PlaylistImportTickAll() string {
+	return Catalog.Format(msgs.locale, "playlistImportTickAll", nil)
+}
+
+// PlaylistImportTileAbout says "From a file, text, or your Spotify or Google data"
+// in the language the app shows.
+//
+// Under Import a playlist on its tile beside New mix in Library › Mixes.
+func PlaylistImportTileAbout() string { return In(i18n.Locale()).PlaylistImportTileAbout() }
+
+// PlaylistImportTileAbout says "From a file, text, or your Spotify or Google data"
+// in the language of msgs.
+//
+// Under Import a playlist on its tile beside New mix in Library › Mixes.
+func (msgs Messages) PlaylistImportTileAbout() string {
+	return Catalog.Format(msgs.locale, "playlistImportTileAbout", nil)
+}
+
+// PlaylistImportTitle says "Import a playlist"
+// in the language the app shows.
+//
+// The title of the page that imports playlists from files and text, of the
+// window while it shows, and of its tile beside New mix in Library ›
+// Mixes.
+func PlaylistImportTitle() string { return In(i18n.Locale()).PlaylistImportTitle() }
+
+// PlaylistImportTitle says "Import a playlist"
+// in the language of msgs.
+//
+// The title of the page that imports playlists from files and text, of the
+// window while it shows, and of its tile beside New mix in Library ›
+// Mixes.
+func (msgs Messages) PlaylistImportTitle() string {
+	return Catalog.Format(msgs.locale, "playlistImportTitle", nil)
+}
+
+// PlaylistImportToCheck says "To check"
+// in the language the app shows.
+//
+// On a song of an import, before the track found: close, but the user
+// should check it. Also a segment above the songs to review, which shows
+// those to check.
+func PlaylistImportToCheck() string { return In(i18n.Locale()).PlaylistImportToCheck() }
+
+// PlaylistImportToCheck says "To check"
+// in the language of msgs.
+//
+// On a song of an import, before the track found: close, but the user
+// should check it. Also a segment above the songs to review, which shows
+// those to check.
+func (msgs Messages) PlaylistImportToCheck() string {
+	return Catalog.Format(msgs.locale, "playlistImportToCheck", nil)
+}
+
+// PlaylistImportToLiked says "Liked songs"
+// in the language the app shows.
+//
+// A choice of where the songs of an import go.
+func PlaylistImportToLiked() string { return In(i18n.Locale()).PlaylistImportToLiked() }
+
+// PlaylistImportToLiked says "Liked songs"
+// in the language of msgs.
+//
+// A choice of where the songs of an import go.
+func (msgs Messages) PlaylistImportToLiked() string {
+	return Catalog.Format(msgs.locale, "playlistImportToLiked", nil)
+}
+
+// PlaylistImportToLikedAbout says "Liked on their service too, where you're signed in, as any like is."
+// in the language the app shows.
+//
+// Under Liked songs, a choice of where the songs of an import go.
+func PlaylistImportToLikedAbout() string { return In(i18n.Locale()).PlaylistImportToLikedAbout() }
+
+// PlaylistImportToLikedAbout says "Liked on their service too, where you're signed in, as any like is."
+// in the language of msgs.
+//
+// Under Liked songs, a choice of where the songs of an import go.
+func (msgs Messages) PlaylistImportToLikedAbout() string {
+	return Catalog.Format(msgs.locale, "playlistImportToLikedAbout", nil)
+}
+
+// PlaylistImportToMix says "A mix of yours"
+// in the language the app shows.
+//
+// A choice of where the songs of an import go.
+func PlaylistImportToMix() string { return In(i18n.Locale()).PlaylistImportToMix() }
+
+// PlaylistImportToMix says "A mix of yours"
+// in the language of msgs.
+//
+// A choice of where the songs of an import go.
+func (msgs Messages) PlaylistImportToMix() string {
+	return Catalog.Format(msgs.locale, "playlistImportToMix", nil)
+}
+
+// PlaylistImportToMixAbout says "The songs it holds already stay out."
+// in the language the app shows.
+//
+// Under A mix of yours, a choice of where the songs of an import go.
+func PlaylistImportToMixAbout() string { return In(i18n.Locale()).PlaylistImportToMixAbout() }
+
+// PlaylistImportToMixAbout says "The songs it holds already stay out."
+// in the language of msgs.
+//
+// Under A mix of yours, a choice of where the songs of an import go.
+func (msgs Messages) PlaylistImportToMixAbout() string {
+	return Catalog.Format(msgs.locale, "playlistImportToMixAbout", nil)
+}
+
+// PlaylistImportToNewMix says "A new mix"
+// in the language the app shows.
+//
+// A choice of where the songs of an import go.
+func PlaylistImportToNewMix() string { return In(i18n.Locale()).PlaylistImportToNewMix() }
+
+// PlaylistImportToNewMix says "A new mix"
+// in the language of msgs.
+//
+// A choice of where the songs of an import go.
+func (msgs Messages) PlaylistImportToNewMix() string {
+	return Catalog.Format(msgs.locale, "playlistImportToNewMix", nil)
+}
+
+// PlaylistImportToNewMixAbout says "Named as the list, in its order. A list imported before adds only what's new to its mix."
+// in the language the app shows.
+//
+// Under A new mix, a choice of where the songs of an import go.
+func PlaylistImportToNewMixAbout() string { return In(i18n.Locale()).PlaylistImportToNewMixAbout() }
+
+// PlaylistImportToNewMixAbout says "Named as the list, in its order. A list imported before adds only what's new to its mix."
+// in the language of msgs.
+//
+// Under A new mix, a choice of where the songs of an import go.
+func (msgs Messages) PlaylistImportToNewMixAbout() string {
+	return Catalog.Format(msgs.locale, "playlistImportToNewMixAbout", nil)
+}
+
+// PlaylistImportToNewMixes says "A new mix of each list"
+// in the language the app shows.
+//
+// A choice of where the songs of an import of several lists go.
+func PlaylistImportToNewMixes() string { return In(i18n.Locale()).PlaylistImportToNewMixes() }
+
+// PlaylistImportToNewMixes says "A new mix of each list"
+// in the language of msgs.
+//
+// A choice of where the songs of an import of several lists go.
+func (msgs Messages) PlaylistImportToNewMixes() string {
+	return Catalog.Format(msgs.locale, "playlistImportToNewMixes", nil)
+}
+
+// PlaylistImportTooManyFiles says "MixMusic imports {count, plural, one {# file} other {# files}} at once at most"
+// in the language the app shows.
+//
+// A toast, when the user chose or dropped more files to import than
+// MixMusic takes at once.
+func PlaylistImportTooManyFiles(count int) string {
+	return In(i18n.Locale()).PlaylistImportTooManyFiles(count)
+}
+
+// PlaylistImportTooManyFiles says "MixMusic imports {count, plural, one {# file} other {# files}} at once at most"
+// in the language of msgs.
+//
+// A toast, when the user chose or dropped more files to import than
+// MixMusic takes at once.
+func (msgs Messages) PlaylistImportTooManyFiles(count int) string {
+	return Catalog.Format(msgs.locale, "playlistImportTooManyFiles", map[string]any{"count": count})
+}
+
+// PlaylistImportUntickAll says "Untick all"
+// in the language the app shows.
+//
+// A button on the page that imports playlists: it unticks every song.
+func PlaylistImportUntickAll() string { return In(i18n.Locale()).PlaylistImportUntickAll() }
+
+// PlaylistImportUntickAll says "Untick all"
+// in the language of msgs.
+//
+// A button on the page that imports playlists: it unticks every song.
+func (msgs Messages) PlaylistImportUntickAll() string {
+	return Catalog.Format(msgs.locale, "playlistImportUntickAll", nil)
+}
+
+// PlaylistImportWhere says "Where they go"
+// in the language the app shows.
+//
+// What screen readers say of the choices of where the songs of an import
+// go, on the page that imports playlists.
+func PlaylistImportWhere() string { return In(i18n.Locale()).PlaylistImportWhere() }
+
+// PlaylistImportWhere says "Where they go"
+// in the language of msgs.
+//
+// What screen readers say of the choices of where the songs of an import
+// go, on the page that imports playlists.
+func (msgs Messages) PlaylistImportWhere() string {
+	return Catalog.Format(msgs.locale, "playlistImportWhere", nil)
+}
+
+// PlaylistImportYourLibrary says "Your Library"
+// in the language the app shows.
+//
+// The name of a list of a data download: the songs of the user's library on
+// Spotify or YouTube Music. It names the new mix too.
+func PlaylistImportYourLibrary() string { return In(i18n.Locale()).PlaylistImportYourLibrary() }
+
+// PlaylistImportYourLibrary says "Your Library"
+// in the language of msgs.
+//
+// The name of a list of a data download: the songs of the user's library on
+// Spotify or YouTube Music. It names the new mix too.
+func (msgs Messages) PlaylistImportYourLibrary() string {
+	return Catalog.Format(msgs.locale, "playlistImportYourLibrary", nil)
 }
 
 // PlaylistReadCut says "MixMusic shows and plays the first {max, plural, one {# track} other {# tracks}} of a {noun, select, mix {mix} playli…"

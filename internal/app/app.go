@@ -224,6 +224,8 @@ type App struct {
 	presence presence
 	// overlay serves what plays to the overlays of streams (overlay.go).
 	overlay overlayHost
+	// imports is the import of playlists under way (playlistimport.go).
+	imports importState
 	// assistants serves the AI assistants of this computer (assistant.go).
 	assistants assistantHost
 	// watchtime reports the listening to YouTube Music's episodes to the

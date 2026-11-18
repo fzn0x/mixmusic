@@ -619,6 +619,7 @@ func (s *shell) collectionMenu(title string, tracks []media.Track, rawURL string
 				})
 			}
 			s.editAlbumOf(m, source, tracks)
+			s.exportListItem(m, title, tracks)
 		}
 		if importID != "" && m.Item(locales.CollectionCopyIntoMix()).Chosen() {
 			s.importPlaylist(importID)

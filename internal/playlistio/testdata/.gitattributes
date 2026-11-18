@@ -1,0 +1,3 @@
+# The fixtures keep their bytes: the line ends and the encodings of the
+# files of other programs are what the tests read.
+* -text

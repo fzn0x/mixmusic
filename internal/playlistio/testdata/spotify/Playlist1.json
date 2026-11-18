@@ -1,0 +1,29 @@
+{
+  "playlists": [
+    {
+      "name": "Sea Songs",
+      "lastModifiedDate": "2025-03-01",
+      "items": [
+        {
+          "track": {"trackName": "Harbour Lights", "artistName": "Ola Brine", "albumName": "Coastline", "trackUri": "spotify:track:0harbourLights00000001"},
+          "episode": null, "localTrack": null, "addedDate": "2025-01-01"
+        },
+        {
+          "track": null, "episode": {"episodeName": "A Show", "showName": "Talks", "episodeUri": "spotify:episode:x"},
+          "localTrack": null, "addedDate": "2025-01-02"
+        },
+        {
+          "track": null, "episode": null,
+          "localTrack": {"uri": "spotify:local:Tam+Reed:Rooftops:Tin+Roof+Rain:198"}, "addedDate": "2025-01-03"
+        }
+      ],
+      "description": null,
+      "numberOfFollowers": 0
+    },
+    {
+      "name": "Empty",
+      "lastModifiedDate": "2025-03-02",
+      "items": []
+    }
+  ]
+}

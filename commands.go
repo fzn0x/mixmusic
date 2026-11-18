@@ -86,6 +86,8 @@ func (s *shell) commands() []command {
 			s.notes = append(s.notes, notice(locales.CmdAddonsReloaded()))
 		}},
 		{"settings.openFile", locales.CmdSettingsOpenFile(), "", locales.CmdGroupSettings(), s.openSettingsFile},
+		{"library.importPlaylist", locales.PlaylistImportCommand(), "", locales.RailLibrary(), s.openImport},
+		{"library.exportLibrary", locales.PlaylistExportLibrary(), "", locales.RailLibrary(), s.exportLibrary},
 	}
 	cmds = append(cmds, s.backupCommands()...)
 	cmds = append(cmds, s.themeCommands...)

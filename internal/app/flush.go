@@ -31,6 +31,7 @@ func (a *App) Close() {
 	a.stopScrobbling()
 	a.stopMemory()
 	a.stopLyricsTiming()
+	a.stopImport()
 	a.stopOverlay()
 	a.flush()
 }

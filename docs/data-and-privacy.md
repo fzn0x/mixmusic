@@ -122,6 +122,10 @@ AppImage or archive copy's.
 - `now-playing/`, on Linux: the cover of what plays, for the desktop's
   media controls.
 - `matches.json`: the YouTube Music recordings found for Spotify tracks.
+- `import.json`: the [import of playlists](import-export.md) under way, which
+  goes on after a restart, and the mix each list you imported went to.
+- `import-matches.json`: the songs [imports](import-export.md) found by
+  searching, kept 90 days, 20,000 at most.
 - `loudness.json`: how loud YouTube measured the tracks you played.
 - `ai-labels.json`: the videos YouTube labels as made with AI, kept 30
   days, while you skip them.

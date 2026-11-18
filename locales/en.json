@@ -7342,6 +7342,39 @@
       }
     }
   },
+  "playlistExportCsv": "CSV, for spreadsheets",
+  "@playlistExportCsv": {
+    "description": "A kind of file in the system's dialog that saves a list of songs."
+  },
+  "playlistExportDialog": "Export {name}",
+  "@playlistExportDialog": {
+    "description": "The title of the system's dialog that saves a list of songs to a file. {name} is the list's name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistExportJson": "JSON",
+  "@playlistExportJson": {
+    "description": "A kind of file in the system's dialog that saves a list of songs."
+  },
+  "playlistExportLibrary": "Export the library…",
+  "@playlistExportLibrary": {
+    "description": "A command of the command palette, in the Library group: it saves every mix and Liked songs in one CSV, M3U8 or JSON file."
+  },
+  "playlistExportLibraryName": "MixMusic library",
+  "@playlistExportLibraryName": {
+    "description": "The name the system's dialog suggests for the file of Export the library…, and what the toast says it exported."
+  },
+  "playlistExportList": "Export the list…",
+  "@playlistExportList": {
+    "description": "An item of the More menu of a mix, a playlist or an album, and a button on Liked songs: it saves the list of its songs as a CSV, M3U8 or JSON file."
+  },
+  "playlistExportM3u": "M3U8 playlist",
+  "@playlistExportM3u": {
+    "description": "A kind of file in the system's dialog that saves a list of songs."
+  },
   "playlistGapCantPlay": "{n, plural, one {# of this {noun, select, mix {mix} playlist {playlist} other {list}}'s items can't play here: {kinds}.} other {# of this {noun, select, mix {mix} playlist {playlist} other {list}}'s items can't play here: {kinds}.}}",
   "@playlistGapCantPlay": {
     "placeholders": {
@@ -7401,6 +7434,501 @@
         "type": "int"
       }
     }
+  },
+  "playlistImportAskMessage": "The import under way stops, and what it found goes.",
+  "@playlistImportAskMessage": {
+    "description": "The message of the dialog that asks before an import starts in place of one under way."
+  },
+  "playlistImportAskOk": "Start the new one",
+  "@playlistImportAskOk": {
+    "description": "The button of the dialog that asks before an import starts in place of one under way."
+  },
+  "playlistImportAskTitle": "Start a new import?",
+  "@playlistImportAskTitle": {
+    "description": "The title of the dialog that asks before an import starts in place of one under way."
+  },
+  "playlistImportChoose": "Choose files…",
+  "@playlistImportChoose": {
+    "description": "A button on the page that imports playlists: it opens the system's dialog to choose files."
+  },
+  "playlistImportColumn": "Column {n}",
+  "@playlistImportColumn": {
+    "description": "What screen readers say of the drop-down that chooses what a column of a table holds, on the page that imports playlists.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "playlistImportColumnsHint": "MixMusic doesn't know the columns of {name}. Choose what each one holds:",
+  "@playlistImportColumnsHint": {
+    "description": "On the page that imports playlists, above the first rows of a table whose columns' names MixMusic doesn't know. {name} is the file's name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistImportColumnsNeed": "Choose the column of the titles, or one of links or IDs, to continue.",
+  "@playlistImportColumnsNeed": {
+    "description": "On the page that imports playlists, under the columns of a table, while none holds what names the songs."
+  },
+  "playlistImportCommand": "Import a playlist…",
+  "@playlistImportCommand": {
+    "description": "A command of the command palette, in the Library group: it opens the page that imports playlists."
+  },
+  "playlistImportContinue": "Continue",
+  "@playlistImportContinue": {
+    "description": "A button on the page that imports playlists, once the user named a table's columns, or picked the lists to import."
+  },
+  "playlistImportCounts": "Found {found} · To check {check} · In your library already {library} · Not found {missing}",
+  "@playlistImportCounts": {
+    "description": "On the page that imports playlists, above the songs to review.",
+    "placeholders": {
+      "found": {
+        "type": "int"
+      },
+      "check": {
+        "type": "int"
+      },
+      "library": {
+        "type": "int"
+      },
+      "missing": {
+        "type": "int"
+      }
+    }
+  },
+  "playlistImportCut": "The files hold more songs than an import takes: only the first {count} were read.",
+  "@playlistImportCut": {
+    "description": "On the page that imports playlists, when the files held more songs than MixMusic imports at once.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playlistImportDataHelp": "How to download your data from Spotify or Google",
+  "@playlistImportDataHelp": {
+    "description": "A link on the page that imports playlists, to the docs."
+  },
+  "playlistImportDo": "Import {count, plural, one {# song} other {# songs}}",
+  "@playlistImportDo": {
+    "description": "The button that ends an import: it adds the songs ticked where the user chose.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playlistImportDoneLiked": "Liked {count, plural, one {# song} other {# songs}}",
+  "@playlistImportDoneLiked": {
+    "description": "A toast, once an import added its songs to Liked songs.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playlistImportDoneMix": "Added {count, plural, one {# song} other {# songs}} to {mix}",
+  "@playlistImportDoneMix": {
+    "description": "A toast, once an import added its songs to a mix. {mix} is the mix's name.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "mix": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistImportDoneMixes": "Added {count, plural, one {# song} other {# songs}} to {mixes, plural, one {# mix} other {# mixes}}",
+  "@playlistImportDoneMixes": {
+    "description": "A toast, once an import added its songs to several mixes, one of each list.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "mixes": {
+        "type": "int"
+      }
+    }
+  },
+  "playlistImportErrArchiveFiles": "the archive holds more than 1,000 files",
+  "@playlistImportErrArchiveFiles": {
+    "description": "Why a ZIP file couldn't be imported, in the {error} of playlistImportFailed."
+  },
+  "playlistImportErrArchiveTooBig": "the archive is bigger than 100 MB",
+  "@playlistImportErrArchiveTooBig": {
+    "description": "Why a ZIP file couldn't be imported, in the {error} of playlistImportFailed."
+  },
+  "playlistImportErrNoSongs": "it holds no songs",
+  "@playlistImportErrNoSongs": {
+    "description": "Why a file couldn't be imported, in the {error} of playlistImportFailed."
+  },
+  "playlistImportErrNotAList": "it isn't a list of songs MixMusic reads",
+  "@playlistImportErrNotAList": {
+    "description": "Why a file couldn't be imported, in the {error} of playlistImportFailed."
+  },
+  "playlistImportErrNotDataDownload": "the archive is no data download of Spotify or Google",
+  "@playlistImportErrNotDataDownload": {
+    "description": "Why a ZIP file couldn't be imported, in the {error} of playlistImportFailed."
+  },
+  "playlistImportErrTooBig": "it's bigger than 50 MB",
+  "@playlistImportErrTooBig": {
+    "description": "Why a file couldn't be imported, in the {error} of playlistImportFailed."
+  },
+  "playlistImportFailed": "Couldn't import {name}: {error}",
+  "@playlistImportFailed": {
+    "description": "A toast, when a file the user chose to import couldn't be read. {name} is the file's name; {error} is why, as playlistImportErrNoSongs.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistImportFailedSeveral": "Couldn't import {n, plural, one {# file} other {# files}}, the first {name}: {error}",
+  "@playlistImportFailedSeveral": {
+    "description": "A toast, when several files the user chose to import couldn't be read. {name} is the first's name; {error} is why.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistImportFieldAlbum": "Album",
+  "@playlistImportFieldAlbum": {
+    "description": "An option of the drop-down that chooses what a column of a table holds: the songs' albums."
+  },
+  "playlistImportFieldArtists": "Artists",
+  "@playlistImportFieldArtists": {
+    "description": "An option of the drop-down that chooses what a column of a table holds: the songs' artists."
+  },
+  "playlistImportFieldDuration": "Length",
+  "@playlistImportFieldDuration": {
+    "description": "An option of the drop-down that chooses what a column of a table holds: the songs' lengths."
+  },
+  "playlistImportFieldIsrc": "ISRC",
+  "@playlistImportFieldIsrc": {
+    "description": "An option of the drop-down that chooses what a column of a table holds: the recordings' ISRC codes."
+  },
+  "playlistImportFieldNone": "Leave out",
+  "@playlistImportFieldNone": {
+    "description": "An option of the drop-down that chooses what a column of a table holds: nothing MixMusic reads."
+  },
+  "playlistImportFieldPlaylist": "Playlist",
+  "@playlistImportFieldPlaylist": {
+    "description": "An option of the drop-down that chooses what a column of a table holds: the name of the playlist each song is in."
+  },
+  "playlistImportFieldSpotifyUri": "Spotify URI",
+  "@playlistImportFieldSpotifyUri": {
+    "description": "An option of the drop-down that chooses what a column of a table holds: Spotify's URIs of the tracks, as spotify:track:…"
+  },
+  "playlistImportFieldTitle": "Title",
+  "@playlistImportFieldTitle": {
+    "description": "An option of the drop-down that chooses what a column of a table holds: the songs' titles."
+  },
+  "playlistImportFieldUrl": "Link",
+  "@playlistImportFieldUrl": {
+    "description": "An option of the drop-down that chooses what a column of a table holds: links to the songs."
+  },
+  "playlistImportFieldVideoId": "YouTube video ID",
+  "@playlistImportFieldVideoId": {
+    "description": "An option of the drop-down that chooses what a column of a table holds: the IDs of YouTube videos."
+  },
+  "playlistImportFilesAll": "All files",
+  "@playlistImportFilesAll": {
+    "description": "A kind of file in the system's dialog that chooses the files to import: any file."
+  },
+  "playlistImportFilesDialog": "Choose the playlists to import",
+  "@playlistImportFilesDialog": {
+    "description": "The title of the system's dialog that chooses the files to import."
+  },
+  "playlistImportFilesPlaylists": "Playlists and data downloads",
+  "@playlistImportFilesPlaylists": {
+    "description": "A kind of file in the system's dialog that chooses the files to import: CSV, TSV, M3U, M3U8, JSON, text and ZIP."
+  },
+  "playlistImportHaltErrors": "3 searches in a row failed: {error}",
+  "@playlistImportHaltErrors": {
+    "description": "Why looking for the songs of an import stopped, under playlistImportHaltTitle. {error} is the last failure, often the system's or the service's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistImportHaltQuit": "MixMusic quit while it looked for the songs",
+  "@playlistImportHaltQuit": {
+    "description": "Why looking for the songs of an import stopped, under playlistImportHaltTitle, before it goes on."
+  },
+  "playlistImportHaltRate": "YouTube Music asks MixMusic to slow down: try again in a few minutes",
+  "@playlistImportHaltRate": {
+    "description": "Why looking for the songs of an import stopped, under playlistImportHaltTitle."
+  },
+  "playlistImportHaltTitle": "Looking for the songs stopped",
+  "@playlistImportHaltTitle": {
+    "description": "The title of the panel on the page that imports playlists, when looking for the songs stopped on its own; why follows, as playlistImportHaltRate."
+  },
+  "playlistImportHeaderRow": "The first row names the columns",
+  "@playlistImportHeaderRow": {
+    "description": "A check box on the page that imports playlists, while the user names a table's columns."
+  },
+  "playlistImportHistory": "Most played on Spotify",
+  "@playlistImportHistory": {
+    "description": "The name of a list of Spotify's data download: the songs of the streaming history the user heard for 30 seconds or more, the most played first. It names the new mix too."
+  },
+  "playlistImportInLibrary": "In your library",
+  "@playlistImportInLibrary": {
+    "description": "On a song of an import, before the track found: the user's library has it already."
+  },
+  "playlistImportIntro": "Bring in a playlist from a CSV or TSV file, an M3U list, JSON, text of links or of “Artist - Title” lines, or the archive of your data from Spotify or Google. Choose up to 100 files, or drop them on the window.",
+  "@playlistImportIntro": {
+    "description": "On the page that imports playlists, before the user chose anything."
+  },
+  "playlistImportLookAgain": "Look for them",
+  "@playlistImportLookAgain": {
+    "description": "A button after playlistImportPending: it looks for the songs not looked for yet."
+  },
+  "playlistImportMatching": "Matching {done} of {total}…",
+  "@playlistImportMatching": {
+    "description": "On the page that imports playlists, while MixMusic looks for the songs.",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "playlistImportMatchingNote": "MixMusic looks for 4 songs at a time, so that playback isn't held back. You can leave this page: the import goes on, even after a restart.",
+  "@playlistImportMatchingNote": {
+    "description": "On the page that imports playlists, under the progress while MixMusic looks for the songs."
+  },
+  "playlistImportMissesDialog": "Save the songs not found",
+  "@playlistImportMissesDialog": {
+    "description": "The title of the system's dialog that saves the songs an import didn't find."
+  },
+  "playlistImportMissesFile": "{name} - not found",
+  "@playlistImportMissesFile": {
+    "description": "The name the system's dialog suggests for the file of the songs an import didn't find. {name} is the list's name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistImportMissesSaved": "Saved the songs not found to {file}",
+  "@playlistImportMissesSaved": {
+    "description": "A toast, once the songs an import didn't find were saved. {file} is the file's name.",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistImportMix": "The mix",
+  "@playlistImportMix": {
+    "description": "What screen readers say of the drop-down of the user's mixes, under A mix of yours, on the page that imports playlists."
+  },
+  "playlistImportNoMixes": "You have no mixes yet.",
+  "@playlistImportNoMixes": {
+    "description": "Under A mix of yours, a choice of where the songs of an import go, when the user has no mix."
+  },
+  "playlistImportNotFound": "Not found",
+  "@playlistImportNotFound": {
+    "description": "On a song of an import that MixMusic didn't find. Also a segment above the songs to review, which shows those not found."
+  },
+  "playlistImportNotLookedFor": "Not looked for",
+  "@playlistImportNotLookedFor": {
+    "description": "On a song of an import that MixMusic didn't look for yet, as when the user stopped it."
+  },
+  "playlistImportOpen": "open",
+  "@playlistImportOpen": {
+    "description": "The action of the toast that tells an import added its songs to a mix: it opens the mix."
+  },
+  "playlistImportPasteButton": "Import the text",
+  "@playlistImportPasteButton": {
+    "description": "The button under the box where the user pastes songs, on the page that imports playlists."
+  },
+  "playlistImportPasteLabel": "Songs to import",
+  "@playlistImportPasteLabel": {
+    "description": "What screen readers say of the box on the page that imports playlists, where the user pastes links or lines of songs."
+  },
+  "playlistImportPastePlaceholder": "Paste links, or Artist - Title, one a line",
+  "@playlistImportPastePlaceholder": {
+    "description": "The hint in the empty box on the page that imports playlists, where the user pastes songs."
+  },
+  "playlistImportPastedName": "Imported songs",
+  "@playlistImportPastedName": {
+    "description": "The name of the new mix of songs the user pasted, which they can change before importing."
+  },
+  "playlistImportPending": "{count, plural, one {# song wasn't} other {# songs weren't}} looked for yet.",
+  "@playlistImportPending": {
+    "description": "On the page that imports playlists, above the songs to review, when the user stopped before all were looked for.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playlistImportPickHint": "Choose the lists to import:",
+  "@playlistImportPickHint": {
+    "description": "On the page that imports playlists, above the lists the files held, as the playlists of a data download."
+  },
+  "playlistImportPickList": "{name} · {count, plural, one {# song} other {# songs}}",
+  "@playlistImportPickList": {
+    "description": "A check box of a list to import, on the page that imports playlists. {name} is the list's name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playlistImportReplace": "Replace…",
+  "@playlistImportReplace": {
+    "description": "A link on a song of an import: it searches for another track to import in its place."
+  },
+  "playlistImportReplaceNone": "Nothing found for {query}",
+  "@playlistImportReplaceNone": {
+    "description": "In the dialog that searches for another track to import in place of a song, when the search found nothing.",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistImportReplaceTitle": "Replace {title}",
+  "@playlistImportReplaceTitle": {
+    "description": "The title of the dialog that searches for another track to import in place of a song. {title} is the song's title as its file names it.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistImportReview": "Review what was found",
+  "@playlistImportReview": {
+    "description": "A button on the page that imports playlists, when looking for the songs stopped: it shows what was found."
+  },
+  "playlistImportSaveMisses": "Save the songs not found…",
+  "@playlistImportSaveMisses": {
+    "description": "A button on the page that imports playlists: it saves the songs not found as a CSV file."
+  },
+  "playlistImportShowAll": "All",
+  "@playlistImportShowAll": {
+    "description": "A segment above the songs to review, on the page that imports playlists: it shows them all."
+  },
+  "playlistImportShowLabel": "Songs to show",
+  "@playlistImportShowLabel": {
+    "description": "What screen readers say of the segments above the songs to review, on the page that imports playlists."
+  },
+  "playlistImportSkipFile": "Skip this file",
+  "@playlistImportSkipFile": {
+    "description": "A button on the page that imports playlists, while the user names a table's columns: the file isn't imported."
+  },
+  "playlistImportStop": "Stop and review",
+  "@playlistImportStop": {
+    "description": "A button on the page that imports playlists, while MixMusic looks for the songs: it stops, and shows what was found."
+  },
+  "playlistImportSure": "Found",
+  "@playlistImportSure": {
+    "description": "On a song of an import, before the track found: MixMusic is sure it's the song. Also a segment above the songs to review, which shows those found."
+  },
+  "playlistImportTextFailed": "Couldn't import the text: {error}",
+  "@playlistImportTextFailed": {
+    "description": "A toast, when the text the user pasted to import holds no songs MixMusic reads. {error} is why, as playlistImportErrNoSongs.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistImportTick": "Import {title}",
+  "@playlistImportTick": {
+    "description": "What screen readers say of the check box of a song of an import, on the page that imports playlists.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistImportTickAll": "Tick all found",
+  "@playlistImportTickAll": {
+    "description": "A button on the page that imports playlists: it ticks every song something was found of."
+  },
+  "playlistImportTileAbout": "From a file, text, or your Spotify or Google data",
+  "@playlistImportTileAbout": {
+    "description": "Under Import a playlist on its tile beside New mix in Library › Mixes."
+  },
+  "playlistImportTitle": "Import a playlist",
+  "@playlistImportTitle": {
+    "description": "The title of the page that imports playlists from files and text, of the window while it shows, and of its tile beside New mix in Library › Mixes."
+  },
+  "playlistImportToCheck": "To check",
+  "@playlistImportToCheck": {
+    "description": "On a song of an import, before the track found: close, but the user should check it. Also a segment above the songs to review, which shows those to check."
+  },
+  "playlistImportToLiked": "Liked songs",
+  "@playlistImportToLiked": {
+    "description": "A choice of where the songs of an import go."
+  },
+  "playlistImportToLikedAbout": "Liked on their service too, where you're signed in, as any like is.",
+  "@playlistImportToLikedAbout": {
+    "description": "Under Liked songs, a choice of where the songs of an import go."
+  },
+  "playlistImportToMix": "A mix of yours",
+  "@playlistImportToMix": {
+    "description": "A choice of where the songs of an import go."
+  },
+  "playlistImportToMixAbout": "The songs it holds already stay out.",
+  "@playlistImportToMixAbout": {
+    "description": "Under A mix of yours, a choice of where the songs of an import go."
+  },
+  "playlistImportToNewMix": "A new mix",
+  "@playlistImportToNewMix": {
+    "description": "A choice of where the songs of an import go."
+  },
+  "playlistImportToNewMixAbout": "Named as the list, in its order. A list imported before adds only what's new to its mix.",
+  "@playlistImportToNewMixAbout": {
+    "description": "Under A new mix, a choice of where the songs of an import go."
+  },
+  "playlistImportToNewMixes": "A new mix of each list",
+  "@playlistImportToNewMixes": {
+    "description": "A choice of where the songs of an import of several lists go."
+  },
+  "playlistImportTooManyFiles": "MixMusic imports {count, plural, one {# file} other {# files}} at once at most",
+  "@playlistImportTooManyFiles": {
+    "description": "A toast, when the user chose or dropped more files to import than MixMusic takes at once.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playlistImportUntickAll": "Untick all",
+  "@playlistImportUntickAll": {
+    "description": "A button on the page that imports playlists: it unticks every song."
+  },
+  "playlistImportWhere": "Where they go",
+  "@playlistImportWhere": {
+    "description": "What screen readers say of the choices of where the songs of an import go, on the page that imports playlists."
+  },
+  "playlistImportYourLibrary": "Your Library",
+  "@playlistImportYourLibrary": {
+    "description": "The name of a list of a data download: the songs of the user's library on Spotify or YouTube Music. It names the new mix too."
   },
   "playlistReadCut": "MixMusic shows and plays the first {max, plural, one {# track} other {# tracks}} of a {noun, select, mix {mix} playlist {playlist} other {list}}: this one has more.",
   "@playlistReadCut": {

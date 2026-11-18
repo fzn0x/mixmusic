@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -26,6 +27,10 @@ type github struct {
 	filesDown, pageDown, apiDown, taggedDown bool
 	// badSum publishes a checksum that isn't the program's.
 	badSum bool
+	// fails are what latest/download answers for the program before the
+	// program, in turn: a status such as 502, or cut for a download
+	// broken off halfway.
+	fails []int
 
 	// clock is the clock of the tries, whose waits pass at once.
 	clock *fakeClock
@@ -33,6 +38,9 @@ type github struct {
 	mu    sync.Mutex
 	asked []string
 }
+
+// cut, among github's fails, breaks the program's download off halfway.
+const cut = 0
 
 func newGitHub(t *testing.T, g *github) *github {
 	t.Helper()
@@ -50,10 +58,21 @@ func newGitHub(t *testing.T, g *github) *github {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		g.mu.Lock()
 		g.asked = append(g.asked, r.Method+" "+r.URL.Path)
-		g.mu.Unlock()
+		fail := -1
 		p := r.URL.Path
+		if p == "/latest/download/yt-dlp_linux" && len(g.fails) > 0 {
+			fail, g.fails = g.fails[0], g.fails[1:]
+		}
+		g.mu.Unlock()
 		files, tagged := strings.TrimPrefix(p, "/latest/download/"), strings.TrimPrefix(p, "/download/2026.09.01/")
 		switch {
+		case fail == cut:
+			w.Header().Set("Content-Length", strconv.Itoa(len(g.program)))
+			w.Write(g.program[:len(g.program)/2])
+			w.(http.Flusher).Flush()
+			panic(http.ErrAbortHandler)
+		case fail > 0:
+			w.WriteHeader(fail)
 		case p == "/latest" && g.pageDown, p == "/api" && g.apiDown,
 			files != p && g.filesDown, tagged != p && g.taggedDown:
 			w.WriteHeader(http.StatusGatewayTimeout)
@@ -91,6 +110,19 @@ func (g *github) askedFor(prefix string) bool {
 		_, p, _ := strings.Cut(a, " ")
 		return strings.HasPrefix(p, prefix)
 	})
+}
+
+// times tells how many times a request's path was path.
+func (g *github) times(path string) int {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	n := 0
+	for _, a := range g.asked {
+		if _, p, _ := strings.Cut(a, " "); p == path {
+			n++
+		}
+	}
+	return n
 }
 
 // installed returns what MixMusic installed as its yt-dlp, or "".
@@ -167,13 +199,16 @@ func TestInstallFailsEverywhere(t *testing.T) {
 }
 
 // TestInstallMismatchStays: a program that doesn't match its checksum
-// isn't downloaded again from elsewhere.
+// isn't downloaded again, there or from elsewhere.
 func TestInstallMismatchStays(t *testing.T) {
 	g := newGitHub(t, &github{badSum: true})
 	m := New(t.TempDir())
 	err := m.InstallYTDLP(context.Background(), nil)
 	if err == nil || !strings.Contains(err.Error(), "does not match") {
 		t.Errorf("InstallYTDLP = %v, want a checksum that doesn't match", err)
+	}
+	if n := g.times("/latest/download/yt-dlp_linux"); n != 1 || len(g.clock.waits) != 0 {
+		t.Errorf("the program was asked %d times, with waits %v; want once", n, g.clock.waits)
 	}
 	if g.askedFor("/download/") || g.askedFor("/api") || slices.Contains(g.asked, "HEAD /latest") {
 		t.Errorf("asked elsewhere after a checksum that didn't match: %q", g.asked)

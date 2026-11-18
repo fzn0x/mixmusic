@@ -1,8 +1,9 @@
 package app
 
 // Casting: the cast devices on the network, which MixMusic looks for by
-// mDNS (internal/cast), and the player's streams played on one of them in
-// the engine's place (castOut), which fetches their audio from MixMusic
+// mDNS (internal/cast), beside the DLNA renderers and FCast receivers
+// (castkinds.go), and the player's streams played on one of them in the
+// engine's place (castOut), which fetches their audio from MixMusic
 // (castServer). Spotify tracks that play on a Spotify device stay there.
 
 import (
@@ -41,8 +42,10 @@ var (
 type CastDevice struct {
 	ID string
 	// Name is the name the user gave it, which tells its room, as
-	// "Living Room TV"; Model what it is, as "Google Nest Mini".
+	// "Living Room TV"; Model what it is, as "Google Nest Mini", or "" when
+	// it tells nothing (ModelOf).
 	Name, Model string
+	Kind        CastKind
 }
 
 // castState is the app's casting: the devices found, and the one the
@@ -66,14 +69,24 @@ type castState struct {
 
 type castFound struct {
 	device cast.Device
-	seen   time.Time
+	// far is a DLNA renderer or an FCast receiver, in device's place.
+	far  farDevice
+	seen time.Time
+}
+
+// shown is the device found as the windows show it.
+func (f castFound) shown() CastDevice {
+	if f.far != nil {
+		return f.far.castDevice()
+	}
+	return castDeviceOf(f.device)
 }
 
 // casting is a cast under way.
 type casting struct {
 	device  CastDevice
 	out     *castOut
-	session *cast.Session
+	session castLink
 	server  *castServer
 }
 
@@ -117,7 +130,10 @@ func (a *App) browseCast() {
 		browse = func(ctx context.Context) ([]cast.Device, error) { return cast.Browse(ctx, cast.BrowseOptions{}) }
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	farc := make(chan []farDevice, 1)
+	go func() { farc <- a.browseFar(ctx) }()
 	devices, err := browse(ctx)
+	far := <-farc
 	cancel()
 	if err != nil {
 		log.Printf("mixmusic: looking for cast devices: %v", err)
@@ -130,6 +146,9 @@ func (a *App) browseCast() {
 	}
 	for _, d := range devices {
 		c.found[d.ID] = castFound{device: d, seen: now}
+	}
+	for _, d := range far {
+		c.found[d.castDevice().ID] = castFound{far: d, seen: now}
 	}
 	for id, f := range c.found {
 		if now.Sub(f.seen) > castForget && (c.active == nil || c.active.device.ID != id) {
@@ -148,7 +167,7 @@ func (a *App) browseCast() {
 func (c *castState) list() bool {
 	shown := make([]CastDevice, 0, len(c.found))
 	for _, f := range c.found {
-		shown = append(shown, castDeviceOf(f.device))
+		shown = append(shown, f.shown())
 	}
 	slices.SortFunc(shown, func(x, y CastDevice) int {
 		if n := strings.Compare(strings.ToLower(x.Name), strings.ToLower(y.Name)); n != 0 {
@@ -264,7 +283,7 @@ func (a *App) castTo(ctx context.Context, id string) error {
 		c.mu.Unlock()
 		return errors.New(locales.CastAlreadyConnecting())
 	}
-	d := castDeviceOf(f.device)
+	d := f.shown()
 	c.starting = &d
 	c.mu.Unlock()
 	a.notifyCast("")
@@ -277,16 +296,16 @@ func (a *App) castTo(ctx context.Context, id string) error {
 
 	out := newCastOut(castEvents{a, nil})
 	out.events = castEvents{a, out}
-	session, err := cast.Open(ctx, f.device, cast.SessionOptions{
-		OnMedia: out.onMedia,
-		OnVolume: func(v cast.Volume) {
+	session, err := a.openCast(ctx, f, castHooks{
+		media: out.onMedia,
+		volume: func(v cast.Volume) {
 			out.onVolume(v, func(level float64, muted bool) {
 				if a.castOn(out) {
 					gp.OutputVolume(level, muted)
 				}
 			})
 		},
-		OnEnd: func(err error) { a.castEnded(out, err) },
+		end: func(err error) { a.castEnded(out, err) },
 	})
 	if err != nil {
 		log.Printf("mixmusic: connecting to a cast device: %v", err)
@@ -294,14 +313,18 @@ func (a *App) castTo(ctx context.Context, id string) error {
 		if errors.As(err, &ne) || errors.Is(err, context.DeadlineExceeded) {
 			return errors.New(locales.CastCouldntConnect(d.Name))
 		}
-		return errors.New(locales.CastCouldntCast(d.Name, err.Error()))
+		return errors.New(locales.CastCouldntCast(d.Name, castWhy(err)))
 	}
-	server, err := serveToCast(localIP(session.LocalAddr()), session.RemoteIP(), a.proxy)
+	server, err := serveCast(localIP(session.LocalAddr()), session.RemoteIP(), a.proxy, f.far != nil && f.far.dlna())
 	if err != nil {
 		session.Close(true)
 		return errors.New(locales.CastCouldntServe(d.Name, err.Error()))
 	}
 	out.served, out.fetched, out.contentType, out.native = server.url, server.fetched.Load, a.castContentType, a.setNative
+	out.upNext = upNextOf(a)
+	if f.far != nil {
+		f.far.attach(a, session, server, out, d.Name)
+	}
 	out.start(session)
 
 	cur := &casting{device: d, out: out, session: session, server: server}
@@ -315,7 +338,7 @@ func (a *App) castTo(ctx context.Context, id string) error {
 	if prev != nil {
 		prev.end(true)
 	}
-	log.Printf("mixmusic: casting to a %s", d.Model)
+	log.Printf("mixmusic: casting to a %s", englishModel(d))
 	return nil
 }
 

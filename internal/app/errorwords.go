@@ -25,9 +25,11 @@ func worded(text, said string, err error) error {
 // wordedLater is worded, whose words say gives when the windows show it, in
 // the language of then: for an error a state keeps, which the windows show
 // later.
-func wordedLater(text string, say func() string, err error) error { return &wordedError{text, say, err} }
-func (e *wordedError) Error() string            { return e.text }
-func (e *wordedError) Unwrap() error            { return e.err }
+func wordedLater(text string, say func() string, err error) error {
+	return &wordedError{text, say, err}
+}
+func (e *wordedError) Error() string { return e.text }
+func (e *wordedError) Unwrap() error { return e.err }
 
 // ErrorWords is err as the windows show it: the words of the first error
 // of its chain that MixMusic says in the interface's language, alone; or,
@@ -52,7 +54,7 @@ func ErrorWords(err error) string {
 
 // ownErrors are MixMusic's errors WordsOf has words for, besides the
 // worded ones.
-var ownErrors = []error{errListenBrainzToken, errPlainRemote, errSpotifyEpisode, errSpotifyShows}
+var ownErrors = []error{errListenBrainzToken, errPlainRemote, errSpotifyEpisode, errSpotifyShows, errNotCover, errNoLogs}
 
 // WordsOf is err itself, not the errors it wraps, as the windows show it,
 // when MixMusic says it in the interface's language: the words of a worded
@@ -71,6 +73,10 @@ func WordsOf(err error) (string, bool) {
 		return locales.PodcastsSpotifyOnly(locales.PodcastsSettingsPlayback()), true
 	case errSpotifyShows:
 		return locales.PodcastsSpotifySignIn(), true
+	case errNotCover:
+		return locales.MixCoverNotImage(), true
+	case errNoLogs:
+		return locales.AboutNoLogs(), true
 	}
 	return "", false
 }

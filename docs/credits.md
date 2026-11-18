@@ -51,6 +51,16 @@ of its own.
   equalizer's filters, the compressor of volume levelling and the
   visualizer's analyser are ports of its biquad, DynamicsCompressor and
   AnalyserNode, so MixMusic sounds as its web player did.
+- **[AutoEq](https://github.com/jaakkopasanen/AutoEq)**, by Jaakko
+  Pasanen and its contributors, under the MIT license: the profiles that
+  [Headphones](playing-music.md#headphones) corrects the sound of a model
+  with, each made from the measurements of the source it names, which
+  the list and the setting credit. MixMusic ships none of them: it downloads AutoEq's list
+  and the profiles you pick from GitHub. Its files are in the format of
+  **[Equalizer APO](https://sourceforge.net/projects/equalizerapo/)**,
+  whose ParametricEQ.txt MixMusic reads as it does.
+- **Robert Bristow-Johnson's Audio EQ Cookbook**, whose shelves of a Q
+  and low-pass and high-pass filters play the corrections of headphones.
 - **[go-mp3](https://github.com/hajimehoshi/go-mp3)**, by Hajime Hoshi
   and its authors, a port of PDMP3, which decodes the MP3 files on your
   computer, and **[jfreymuth/vorbis](https://github.com/jfreymuth/vorbis)**,

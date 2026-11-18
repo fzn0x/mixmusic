@@ -82,13 +82,14 @@ In order:
    other.
 5. **The preamp and the equalizer** shape the sound.
 6. **Stereo width and crossfeed**, on stereo, then **mono and balance**.
-7. **Volume levelling**, when it's on, squeezes loud and quiet moments
+7. **The correction of your headphones**, when one is chosen.
+8. **Volume levelling**, when it's on, squeezes loud and quiet moments
    closer together.
-8. **The volume** of the slider.
-9. **The analyser** reads what you hear, for the visualizer and plugins.
-10. **The output** plays it on your device.
+9. **The volume** of the slider.
+10. **The analyser** reads what you hear, for the visualizer and plugins.
+11. **The output** plays it on your device.
 
-Steps 5 and 7 to 9 are ports of Chromium's Web Audio, the biquad filters,
+Steps 5 and 8 to 10 are ports of Chromium's Web Audio, the biquad filters,
 DynamicsCompressor and AnalyserNode of Blink, which MixMusic used while it
 ran in a web view, before 0.5.0. They match Chromium sample for sample, so
 MixMusic sounds as it did. Pausing and playing fade over 5 ms, so that
@@ -262,6 +263,58 @@ effects off has the equalizer glide flat, and width and crossfeed to
 neutral, keeping their settings. Each stage glides to a new setting with
 the volume's time constant, 20 ms, and is skipped once it rests at
 neutral, so that the samples come out as they went in.
+
+### Headphones
+
+**Headphones**, in Settings › Playback › Equalizer, corrects the sound of
+your headphones with a profile of
+[AutoEq](https://github.com/jaakkopasanen/AutoEq) or a ParametricEQ.txt
+file (#616). It runs as a stage of its own after balance, on every
+channel, the six of 5.1 too, whether the equalizer and Sound effects are
+on or not.
+
+- **The preamp**, in dB, then **up to 20 filters**, in order, each with
+  its own frequency, gain and Q: peaking (PK), the equalizer's own
+  filter; low and high shelves (LSC and HSC), half way at their
+  frequency, of the Audio EQ Cookbook's with a Q of their own, a Q of
+  0.707 being the equalizer's shelves; and low-pass and high-pass (LP
+  and HP), the cookbook's, which fall 12 dB an octave.
+- **None**, the default, skips the stage: the samples come out as they
+  went in.
+- **A new correction**, as from None to a profile or from one profile to
+  another, plays beside the one before for the volume's glide, 20 ms of
+  time constant, about a quarter of a second in all, the new one fading in
+  as the other fades out, so that it doesn't click. A change asked for
+  meanwhile follows once it ends.
+
+The list is AutoEq's `results/INDEX.md`, on raw.githubusercontent.com:
+fetched the first time the list opens, kept in the data folder's
+`autoeq`, and checked again a week later at the earliest, with its ETag,
+for which GitHub sends it again only once it changed. A profile's
+ParametricEQ.txt is fetched when it is picked, and kept beside it, never
+fetched again. The correction chosen is kept in `settings.json`, under
+`equalizer.headphones`, with its filters, so that it plays without the
+network. Nothing else is sent, and no key is needed. MixMusic ships no
+profile: each comes from AutoEq when you ask for it.
+
+A ParametricEQ.txt, AutoEq's or one of Import file…, is read strictly:
+
+- `Preamp: -6.1 dB` lines, which add up, and filters, as
+  `Filter 1: ON PK Fc 105 Hz Gain 5.5 dB Q 0.70`, whose number may be left
+  out and whose parameters may come in any order. Filters that are `OFF`,
+  or of the type `None`, blank lines, and comments, from `#`, are left
+  out. PEQ reads as PK, and LPQ and HPQ as LP and HP.
+- A frequency from 1 Hz to 22,000 Hz, a gain, and the preamp, from -30 dB
+  to +30 dB, and a Q from 0.01 to 100. LP and HP may leave out their Q,
+  0.707 then, and take no gain.
+- A decimal comma reads as a point, and a frequency of three decimals, as
+  `1.000`, in thousands, as Equalizer APO reads them.
+- Any other line, as Equalizer APO's `Channel:` or `Device:`, which
+  change what the filters after them do; another type of filter, as the
+  shelves set by their corner, LS and HS, band-pass, notch, all-pass or
+  IIR; a width in octaves, `BW Oct`, or a slope, as `LSC 12 dB`; more
+  than 20 filters, or none: each stops the file, which changes nothing,
+  and says which line, and why.
 
 ## Crossfade and the next track
 

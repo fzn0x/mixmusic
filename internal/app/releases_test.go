@@ -61,7 +61,7 @@ func newReleaseApp(t *testing.T, dir string, f *fakeReleases, now *time.Time) *A
 	if err != nil {
 		t.Fatal(err)
 	}
-	a := &App{opts: Options{CacheDir: dir}, library: lib, youtube: youtube.New(), spotify: spotify.NewClient(spotify.NewAuth("client"))}
+	a := &App{opts: Options{CacheDir: dir}, library: lib, settings: testSettings(t), youtube: youtube.New(), spotify: spotify.NewClient(spotify.NewAuth("client"))}
 	a.releases.read = f.read
 	a.releases.now = func() time.Time { return *now }
 	return a

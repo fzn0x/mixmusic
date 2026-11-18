@@ -140,7 +140,7 @@ func (c *Catalog) LocalShelves() []media.Shelf {
 		}
 		shelves = append(shelves, media.Shelf{Title: locales.HomeShelfRecent(), Source: media.SourceLocal, Items: items, Key: "recent"})
 	}
-	if playlists := c.a.library.Playlists(); len(playlists) > 0 {
+	if playlists := c.a.sortedMixes(); len(playlists) > 0 {
 		items := make([]media.Item, len(playlists))
 		for i := range playlists {
 			items[i] = media.Item{Kind: media.ItemPlaylist, Playlist: &playlists[i]}

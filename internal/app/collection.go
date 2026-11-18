@@ -89,8 +89,9 @@ func (c *Collection) SetDisliked(ctx context.Context, track media.Track, dislike
 	return nil
 }
 
-// Playlists returns the playlists made in MixMusic, without their tracks.
-func (c *Collection) Playlists() []media.Playlist { return c.a.library.Playlists() }
+// Playlists returns the playlists made in MixMusic, without their tracks,
+// as the user sorted them in the Library, the pinned ones first.
+func (c *Collection) Playlists() []media.Playlist { return c.a.sortedMixes() }
 
 // localID returns the library's ID of a playlist made in MixMusic.
 func localID(id string) (string, error) {
@@ -229,15 +230,24 @@ func (c *Collection) SpotifyLikedTracks(ctx context.Context, offset int) (TrackP
 // SpotifyPlaylists returns the playlists the user made or follows on
 // Spotify.
 func (c *Collection) SpotifyPlaylists(ctx context.Context) ([]media.Playlist, error) {
-	return c.a.spotify.MyPlaylists(ctx, c.a.spotifyUserID(ctx))
+	account := c.a.listAccount(ctx, media.SourceSpotify)
+	ps, err := c.a.spotify.MyPlaylists(ctx, c.a.spotifyUserID(ctx))
+	keepListed(c.a, ctx, media.SourceSpotify, library.MarkPlaylist, account, ps, err, playlistMark)
+	return ps, err
 }
 
 // SpotifyAlbums returns the albums the user saved on Spotify.
 func (c *Collection) SpotifyAlbums(ctx context.Context) ([]media.Album, error) {
-	return c.a.spotify.SavedAlbums(ctx)
+	account := c.a.listAccount(ctx, media.SourceSpotify)
+	albums, err := c.a.spotify.SavedAlbums(ctx)
+	keepListed(c.a, ctx, media.SourceSpotify, library.MarkAlbum, account, albums, err, albumMark)
+	return albums, err
 }
 
 // SpotifyArtists returns the artists the user follows on Spotify.
 func (c *Collection) SpotifyArtists(ctx context.Context) ([]media.Artist, error) {
-	return c.a.spotify.FollowedArtists(ctx)
+	account := c.a.listAccount(ctx, media.SourceSpotify)
+	artists, err := c.a.spotify.FollowedArtists(ctx)
+	keepListed(c.a, ctx, media.SourceSpotify, library.MarkArtist, account, artists, err, artistMark)
+	return artists, err
 }

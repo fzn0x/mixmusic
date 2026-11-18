@@ -2250,22 +2250,24 @@ func (msgs Messages) ArtistPlayFailed(artist string, error string) string {
 	return Catalog.Format(msgs.locale, "artistPlayFailed", map[string]any{"artist": artist, "error": error})
 }
 
-// ArtistPlayFirst says "Only the first {count} of {artist}'s {unit, select, releases {albums and singles} other {songs}} could be loaded: {er…"
+// ArtistPlayFirst says "{count, plural, one {Only the first of {artist}'s {unit, select, releases {albums and singles} other {songs}} could b…"
 // in the language the app shows.
 //
-// Toast when playing all of an artist's songs read only some. {unit} is
-// releases for Spotify's artists, read an album or single at a time, and
-// songs otherwise. {error} is why, often in the service's own words.
+// Toast when playing all of an artist's songs read only some, the first
+// {count}. {unit} is releases for Spotify's artists, read an album or
+// single at a time, and songs otherwise. {error} is why, often in the
+// service's own words. Give the forms your language needs for {count}.
 func ArtistPlayFirst(count int, artist string, unit string, error string) string {
 	return In(i18n.Locale()).ArtistPlayFirst(count, artist, unit, error)
 }
 
-// ArtistPlayFirst says "Only the first {count} of {artist}'s {unit, select, releases {albums and singles} other {songs}} could be loaded: {er…"
+// ArtistPlayFirst says "{count, plural, one {Only the first of {artist}'s {unit, select, releases {albums and singles} other {songs}} could b…"
 // in the language of msgs.
 //
-// Toast when playing all of an artist's songs read only some. {unit} is
-// releases for Spotify's artists, read an album or single at a time, and
-// songs otherwise. {error} is why, often in the service's own words.
+// Toast when playing all of an artist's songs read only some, the first
+// {count}. {unit} is releases for Spotify's artists, read an album or
+// single at a time, and songs otherwise. {error} is why, often in the
+// service's own words. Give the forms your language needs for {count}.
 func (msgs Messages) ArtistPlayFirst(count int, artist string, unit string, error string) string {
 	return Catalog.Format(msgs.locale, "artistPlayFirst", map[string]any{"count": count, "artist": artist, "unit": unit, "error": error})
 }
@@ -2284,22 +2286,24 @@ func (msgs Messages) ArtistPlayNoSongs(artist string) string {
 	return Catalog.Format(msgs.locale, "artistPlayNoSongs", map[string]any{"artist": artist})
 }
 
-// ArtistPlaySome says "Only {count} of {artist}'s {total} {unit, select, releases {albums and singles} other {songs}} could be loaded: {error}"
+// ArtistPlaySome says "{total, plural, one {Only {count} of {artist}'s # {unit, select, releases {albums and singles} other {songs}} could b…"
 // in the language the app shows.
 //
-// Toast when playing all of an artist's songs read only some of those the
-// service counts. {unit} is releases for Spotify's artists and songs
-// otherwise. {error} is why, often in the service's own words.
+// Toast when playing all of an artist's songs read only {count} of the
+// {total} the service counts. {unit} is releases for Spotify's artists and
+// songs otherwise. {error} is why, often in the service's own words. Give
+// the forms your language needs for {total}, which the noun follows.
 func ArtistPlaySome(count int, artist string, total int, unit string, error string) string {
 	return In(i18n.Locale()).ArtistPlaySome(count, artist, total, unit, error)
 }
 
-// ArtistPlaySome says "Only {count} of {artist}'s {total} {unit, select, releases {albums and singles} other {songs}} could be loaded: {error}"
+// ArtistPlaySome says "{total, plural, one {Only {count} of {artist}'s # {unit, select, releases {albums and singles} other {songs}} could b…"
 // in the language of msgs.
 //
-// Toast when playing all of an artist's songs read only some of those the
-// service counts. {unit} is releases for Spotify's artists and songs
-// otherwise. {error} is why, often in the service's own words.
+// Toast when playing all of an artist's songs read only {count} of the
+// {total} the service counts. {unit} is releases for Spotify's artists and
+// songs otherwise. {error} is why, often in the service's own words. Give
+// the forms your language needs for {total}, which the noun follows.
 func (msgs Messages) ArtistPlaySome(count int, artist string, total int, unit string, error string) string {
 	return Catalog.Format(msgs.locale, "artistPlaySome", map[string]any{"count": count, "artist": artist, "total": total, "unit": unit, "error": error})
 }
@@ -10418,18 +10422,18 @@ func (msgs Messages) FontNoticeWalnut() string {
 	return Catalog.Format(msgs.locale, "fontNoticeWalnut", nil)
 }
 
-// FormatBitDepth says "{bits}-bit"
+// FormatBitDepth says "{bits, plural, one {#-bit} other {#-bit}}"
 // in the language the app shows.
 //
 // A file's bit depth, as 24-bit, in the line of a copy's audio, as FLAC ·
-// 24-bit · 96 kHz.
+// 24-bit · 96 kHz. Give the forms your language needs for the number.
 func FormatBitDepth(bits int) string { return In(i18n.Locale()).FormatBitDepth(bits) }
 
-// FormatBitDepth says "{bits}-bit"
+// FormatBitDepth says "{bits, plural, one {#-bit} other {#-bit}}"
 // in the language of msgs.
 //
 // A file's bit depth, as 24-bit, in the line of a copy's audio, as FLAC ·
-// 24-bit · 96 kHz.
+// 24-bit · 96 kHz. Give the forms your language needs for the number.
 func (msgs Messages) FormatBitDepth(bits int) string {
 	return Catalog.Format(msgs.locale, "formatBitDepth", map[string]any{"bits": bits})
 }

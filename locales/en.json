@@ -510,9 +510,9 @@
       }
     }
   },
-  "artistPlayFirst": "Only the first {count} of {artist}'s {unit, select, releases {albums and singles} other {songs}} could be loaded: {error}",
+  "artistPlayFirst": "{count, plural, one {Only the first of {artist}'s {unit, select, releases {albums and singles} other {songs}} could be loaded: {error}} other {Only the first # of {artist}'s {unit, select, releases {albums and singles} other {songs}} could be loaded: {error}}}",
   "@artistPlayFirst": {
-    "description": "Toast when playing all of an artist's songs read only some. {unit} is releases for Spotify's artists, read an album or single at a time, and songs otherwise. {error} is why, often in the service's own words.",
+    "description": "Toast when playing all of an artist's songs read only some, the first {count}. {unit} is releases for Spotify's artists, read an album or single at a time, and songs otherwise. {error} is why, often in the service's own words. Give the forms your language needs for {count}.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -537,9 +537,9 @@
       }
     }
   },
-  "artistPlaySome": "Only {count} of {artist}'s {total} {unit, select, releases {albums and singles} other {songs}} could be loaded: {error}",
+  "artistPlaySome": "{total, plural, one {Only {count} of {artist}'s # {unit, select, releases {albums and singles} other {songs}} could be loaded: {error}} other {Only {count} of {artist}'s # {unit, select, releases {albums and singles} other {songs}} could be loaded: {error}}}",
   "@artistPlaySome": {
-    "description": "Toast when playing all of an artist's songs read only some of those the service counts. {unit} is releases for Spotify's artists and songs otherwise. {error} is why, often in the service's own words.",
+    "description": "Toast when playing all of an artist's songs read only {count} of the {total} the service counts. {unit} is releases for Spotify's artists and songs otherwise. {error} is why, often in the service's own words. Give the forms your language needs for {total}, which the noun follows.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -3172,9 +3172,9 @@
   "fontNoticeMaterial": "Roboto Flex, the Material themes' face",
   "fontNoticeMochi": "Quicksand, Mochi's face",
   "fontNoticeWalnut": "Archivo, the Walnut themes' headings' face",
-  "formatBitDepth": "{bits}-bit",
+  "formatBitDepth": "{bits, plural, one {#-bit} other {#-bit}}",
   "@formatBitDepth": {
-    "description": "A file's bit depth, as 24-bit, in the line of a copy's audio, as FLAC · 24-bit · 96 kHz.",
+    "description": "A file's bit depth, as 24-bit, in the line of a copy's audio, as FLAC · 24-bit · 96 kHz. Give the forms your language needs for the number.",
     "placeholders": {
       "bits": {
         "type": "int"

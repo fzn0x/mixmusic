@@ -356,7 +356,8 @@ func (c *Catalog) LyricsChoices(track media.Track) LyricsChoices {
 		picked = false
 	}
 	asked := c.knownAsked(track, set)
-	// shown is the answer whose lyrics show, of the source of key.
+	// shown is the source whose lyrics show, and shownKey the key of its
+	// answer: none for lyrics edited, or a file's.
 	shown, shownKey := "", ""
 	switch {
 	case picked && pick.Edited != nil:
@@ -463,8 +464,10 @@ func (c *Catalog) PickLyrics(track media.Track, pick LyricsPick, found *lyrics.L
 	ready := pick.Edited != nil
 	switch {
 	case pick.IsZero():
-		_, ready = c.a.lyricsMemo.get(track.ID + " " + lyricsSetup(set))
-		ready = ready || c.knownAsked(track, set) != nil
+		// The lookup's lyrics are kept, or the file's are read at once.
+		_, ready = c.a.lyricsMemo.get(askedKey(track, set))
+		_, file := c.knownAsked(track, set).shown()
+		ready = ready || file
 	case !ready:
 		ans, ok := c.answerOf(c.knownAsked(track, set), track, set, pick)
 		ready = ok && answerState(ans) != LyricsUnreachable

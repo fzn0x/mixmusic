@@ -115,7 +115,7 @@ func (pl *plugin) natives() *sobek.Object {
 	})
 	set("lyrics", func(v sobek.Value) sobek.Value {
 		t := track(v)
-		return pl.async(func(ctx context.Context) (any, error) { return svc.Catalog.Lyrics(ctx, t) })
+		return pl.async(func(ctx context.Context) (any, error) { return svc.Catalog.LyricsMoved(ctx, t) })
 	})
 
 	// The library. The player hears of a dislike at once, as the

@@ -163,6 +163,14 @@ export interface Lyrics {
    * of a song shown without their times with a longer music video of it.
    */
   note?: string;
+  /**
+   * How far the lyrics show moved, in milliseconds: earlier above 0, as an
+   * LRC [offset:] tag moves them, later below. It is the timing the user
+   * gave this song's lyrics, above them, and Settings' Lyrics timing of
+   * every song, added. The line sung is the last whose timeMs is at most
+   * positionMs + offsetMs; at another speed, Settings' part grows with it.
+   */
+  offsetMs: number;
 }
 
 export interface PlayerSnapshot {

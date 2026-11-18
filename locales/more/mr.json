@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "डाउनलोड",
   "downloadsReasonBadAudio": "मिळालेला ऑडिओ वाजू शकत नाही",
   "downloadsReasonDiskFull": "डिस्क भरली आहे",
+  "downloadsReasonExplicit": "हे एक्सप्लिसिट आहे, आणि तुमच्या सेटिंग्ज एक्सप्लिसिट सामग्री लपवतात",
   "downloadsReasonNeedsYTDLP": "त्यासाठी yt-dlp लागते, जे सेटिंग्ज › प्लेबॅक इंस्टॉल करते",
   "downloadsReasonNetwork": "नेटवर्क गेले",
   "downloadsReasonNoAudio": "YouTube कडे या ट्रॅकचा MixMusic वाजवू शकेल असा ऑडिओ नाही",

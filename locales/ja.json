@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "ダウンロード",
   "downloadsReasonBadAudio": "受信したオーディオを再生できません",
   "downloadsReasonDiskFull": "ディスクがいっぱいです",
+  "downloadsReasonExplicit": "この曲は露骨な表現を含み、設定でそのような内容は非表示になっています",
   "downloadsReasonNeedsYTDLP": "yt-dlpが必要です。「設定 › 再生」でインストールできます",
   "downloadsReasonNetwork": "ネットワークが切断されました",
   "downloadsReasonNoAudio": "YouTubeに、MixMusicで再生できるこの曲のオーディオがありません",

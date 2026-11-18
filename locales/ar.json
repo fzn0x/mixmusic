@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "التنزيلات",
   "downloadsReasonBadAudio": "الصوت الذي وصل لا يمكن تشغيله",
   "downloadsReasonDiskFull": "القرص ممتلئ",
+  "downloadsReasonExplicit": "الأغنية صريحة، وإعداداتك تخفي المحتوى الصريح",
   "downloadsReasonNeedsYTDLP": "تحتاج إلى yt-dlp، الذي تثبّته الإعدادات › التشغيل",
   "downloadsReasonNetwork": "انقطعت الشبكة",
   "downloadsReasonNoAudio": "لا يملك YouTube صوتًا لهذه الأغنية يستطيع MixMusic تشغيله",

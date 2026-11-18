@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Endirmələr",
   "downloadsReasonBadAudio": "gələn səs oxunmur",
   "downloadsReasonDiskFull": "disk doludur",
+  "downloadsReasonExplicit": "açıq-saçıqdır və ayarlarınız açıq-saçıq məzmunu gizlədir",
   "downloadsReasonNeedsYTDLP": "yt-dlp lazımdır, onu Ayarlar › Oxutma bölməsində quraşdırmaq olar",
   "downloadsReasonNetwork": "şəbəkə kəsildi",
   "downloadsReasonNoAudio": "YouTube'da bu mahnının MixMusic'in oxuda bildiyi səsi yoxdur",

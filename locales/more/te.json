@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "డౌన్‌లోడ్‌లు",
   "downloadsReasonBadAudio": "వచ్చిన ఆడియో ప్లే కాదు",
   "downloadsReasonDiskFull": "డిస్క్ నిండిపోయింది",
+  "downloadsReasonExplicit": "ఇది ఎక్స్‌ప్లిసిట్, మీ సెట్టింగ్‌లు ఎక్స్‌ప్లిసిట్ కంటెంట్‌ను దాచుతాయి",
   "downloadsReasonNeedsYTDLP": "దీనికి yt-dlp అవసరం, దాన్ని సెట్టింగ్‌లు › ప్లేబ్యాక్ ఇన్‌స్టాల్ చేస్తుంది",
   "downloadsReasonNetwork": "నెట్‌వర్క్ కనెక్షన్ పోయింది",
   "downloadsReasonNoAudio": "MixMusic ప్లే చేయగల ఈ ట్రాక్ ఆడియో YouTubeలో లేదు",

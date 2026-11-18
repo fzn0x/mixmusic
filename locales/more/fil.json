@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Mga download",
   "downloadsReasonBadAudio": "hindi ma-play ang dumating na audio",
   "downloadsReasonDiskFull": "puno ang disk",
+  "downloadsReasonExplicit": "explicit ito, at itinatago ng mga setting mo ang explicit na content",
   "downloadsReasonNeedsYTDLP": "kailangan nito ng yt-dlp, na ini-install ng Mga setting › Pag-playback",
   "downloadsReasonNetwork": "nawala ang network",
   "downloadsReasonNoAudio": "walang audio ng track na ito sa YouTube na pinapatugtog ng MixMusic",

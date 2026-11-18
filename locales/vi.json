@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Tải xuống",
   "downloadsReasonBadAudio": "âm thanh nhận được không phát được",
   "downloadsReasonDiskFull": "ổ đĩa đã đầy",
+  "downloadsReasonExplicit": "bài hát có nội dung nhạy cảm, và cài đặt của bạn ẩn nội dung nhạy cảm",
   "downloadsReasonNeedsYTDLP": "cần yt-dlp, có thể cài trong Cài đặt › Phát nhạc",
   "downloadsReasonNetwork": "mất kết nối mạng",
   "downloadsReasonNoAudio": "YouTube không có bản âm thanh nào của bài hát này mà MixMusic phát được",

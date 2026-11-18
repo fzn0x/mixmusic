@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "பதிவிறக்கங்கள்",
   "downloadsReasonBadAudio": "வந்த ஆடியோவை இயக்க முடியாது",
   "downloadsReasonDiskFull": "வட்டு நிரம்பியுள்ளது",
+  "downloadsReasonExplicit": "இது வெளிப்படையானது, உங்கள் அமைப்புகள் வெளிப்படையான உள்ளடக்கத்தை மறைக்கின்றன",
   "downloadsReasonNeedsYTDLP": "இதற்கு yt-dlp தேவை, அதை அமைப்புகள் › இயக்கம் நிறுவும்",
   "downloadsReasonNetwork": "நெட்வொர்க் துண்டிக்கப்பட்டது",
   "downloadsReasonNoAudio": "MixMusic இயக்கக்கூடிய இந்தப் பாடலின் ஆடியோ YouTube-இல் இல்லை",

@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Transferências",
   "downloadsReasonBadAudio": "o áudio recebido não pode ser reproduzido",
   "downloadsReasonDiskFull": "o disco está cheio",
+  "downloadsReasonExplicit": "a música é explícita, e as suas definições ocultam conteúdo explícito",
   "downloadsReasonNeedsYTDLP": "precisa do yt-dlp, que é instalado em Definições › Reprodução",
   "downloadsReasonNetwork": "a ligação à rede caiu",
   "downloadsReasonNoAudio": "o YouTube não tem áudio desta faixa que o MixMusic reproduza",

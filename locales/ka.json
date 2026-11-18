@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "ჩამოტვირთვები",
   "downloadsReasonBadAudio": "მიღებული აუდიო ვერ იკვრება",
   "downloadsReasonDiskFull": "დისკი სავსეა",
+  "downloadsReasonExplicit": "სიმღერა უხამსია, თქვენი პარამეტრები კი უხამს შიგთავსს მალავს",
   "downloadsReasonNeedsYTDLP": "საჭიროა yt-dlp, რომელსაც პარამეტრები › დაკვრა აინსტალირებს",
   "downloadsReasonNetwork": "ქსელი გაითიშა",
   "downloadsReasonNoAudio": "YouTube-ს ამ ტრეკის ისეთი აუდიო არ აქვს, რომელსაც MixMusic უკრავს",

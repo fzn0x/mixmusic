@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Descărcări",
   "downloadsReasonBadAudio": "audioul primit nu poate fi redat",
   "downloadsReasonDiskFull": "discul este plin",
+  "downloadsReasonExplicit": "piesa este explicită, iar setările tale ascund conținutul explicit",
   "downloadsReasonNeedsYTDLP": "are nevoie de yt-dlp, pe care îl instalează Setări › Redare",
   "downloadsReasonNetwork": "rețeaua a căzut",
   "downloadsReasonNoAudio": "YouTube nu are pentru această piesă audio pe care MixMusic să îl redea",

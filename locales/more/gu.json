@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "ડાઉનલોડ",
   "downloadsReasonBadAudio": "આવેલો ઑડિયો વાગી શકતો નથી",
   "downloadsReasonDiskFull": "ડિસ્ક ભરાઈ ગઈ છે",
+  "downloadsReasonExplicit": "તે એક્સપ્લિસિટ છે, અને તમારાં સેટિંગ એક્સપ્લિસિટ કન્ટેન્ટ છુપાવે છે",
   "downloadsReasonNeedsYTDLP": "તેને yt-dlp જોઈએ, જે સેટિંગ › પ્લેબૅક ઇન્સ્ટૉલ કરે છે",
   "downloadsReasonNetwork": "નેટવર્ક જતું રહ્યું",
   "downloadsReasonNoAudio": "YouTube પાસે આ ગીતનો એવો કોઈ ઑડિયો નથી જે MixMusic વગાડે",

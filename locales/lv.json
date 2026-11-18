@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Lejupielādes",
   "downloadsReasonBadAudio": "saņemto audio nevar atskaņot",
   "downloadsReasonDiskFull": "disks ir pilns",
+  "downloadsReasonExplicit": "dziesma ir vulgāra, un tavi iestatījumi slēpj vulgāru saturu",
   "downloadsReasonNeedsYTDLP": "vajadzīgs yt-dlp, ko instalē sadaļā Iestatījumi › Atskaņošana",
   "downloadsReasonNetwork": "pazuda tīkla savienojums",
   "downloadsReasonNoAudio": "pakalpojumā YouTube nav šīs dziesmas audio, ko MixMusic atskaņo",

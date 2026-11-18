@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Abubuwan zazzagewa",
   "downloadsReasonBadAudio": "sautin da ya zo ba zai iya kunnawa ba",
   "downloadsReasonDiskFull": "faifan ya cika",
+  "downloadsReasonExplicit": "waƙar ta batsa ce, kuma saitunanka suna ɓoye abun ciki na batsa",
   "downloadsReasonNeedsYTDLP": "yana buƙatar yt-dlp, wanda Saituna › Kunnawa take shigarwa",
   "downloadsReasonNetwork": "hanyar sadarwa ta katse",
   "downloadsReasonNoAudio": "YouTube ba shi da sautin wannan waƙa da MixMusic yake kunnawa",

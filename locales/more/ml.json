@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "ഡൗൺലോഡുകൾ",
   "downloadsReasonBadAudio": "ലഭിച്ച ഓഡിയോ പ്ലേ ചെയ്യാനാകില്ല",
   "downloadsReasonDiskFull": "ഡിസ്ക് നിറഞ്ഞിരിക്കുന്നു",
+  "downloadsReasonExplicit": "ഇത് എക്സ്പ്ലിസിറ്റ് ആണ്, നിങ്ങളുടെ ക്രമീകരണങ്ങൾ എക്സ്പ്ലിസിറ്റ് ഉള്ളടക്കം മറയ്ക്കുന്നു",
   "downloadsReasonNeedsYTDLP": "ഇതിന് yt-dlp ആവശ്യമാണ്, ക്രമീകരണങ്ങൾ › പ്ലേബാക്ക് അത് ഇൻസ്റ്റാൾ ചെയ്യുന്നു",
   "downloadsReasonNetwork": "നെറ്റ്‌വർക്ക് നഷ്ടപ്പെട്ടു",
   "downloadsReasonNoAudio": "MixMusic പ്ലേ ചെയ്യുന്ന ഈ പാട്ടിന്റെ ഓഡിയോ ഒന്നും YouTube-ൽ ഇല്ല",

@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "ডাউনলোড",
   "downloadsReasonBadAudio": "যে অডিও এসেছে তা বাজানো যায় না",
   "downloadsReasonDiskFull": "ডিস্ক ভরে গেছে",
+  "downloadsReasonExplicit": "এটি এক্সপ্লিসিট, আর আপনার সেটিংস এক্সপ্লিসিট কনটেন্ট লুকায়",
   "downloadsReasonNeedsYTDLP": "এর জন্য yt-dlp দরকার, যা সেটিংস › প্লেব্যাক থেকে ইনস্টল হয়",
   "downloadsReasonNetwork": "নেটওয়ার্ক চলে গেছে",
   "downloadsReasonNoAudio": "YouTube-এ এই গানের এমন কোনো অডিও নেই যা MixMusic বাজাতে পারে",

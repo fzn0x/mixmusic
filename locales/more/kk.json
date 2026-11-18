@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Жүктеп алулар",
   "downloadsReasonBadAudio": "келген дыбысты ойнату мүмкін емес",
   "downloadsReasonDiskFull": "диск толы",
+  "downloadsReasonExplicit": "ол әдепсіз, ал параметрлеріңіз әдепсіз мазмұнды жасырады",
   "downloadsReasonNeedsYTDLP": "оған yt-dlp керек, оны Параметрлер › Ойнату бөлімі орнатады",
   "downloadsReasonNetwork": "желі үзілді",
   "downloadsReasonNoAudio": "YouTube-та бұл тректің MixMusic ойната алатын дыбысы жоқ",

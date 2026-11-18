@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Pobrane",
   "downloadsReasonBadAudio": "otrzymanego dźwięku nie da się odtworzyć",
   "downloadsReasonDiskFull": "dysk jest pełny",
+  "downloadsReasonExplicit": "utwór zawiera treści dla dorosłych, a twoje ustawienia je ukrywają",
   "downloadsReasonNeedsYTDLP": "wymaga yt-dlp, które instaluje się w Ustawienia › Odtwarzanie",
   "downloadsReasonNetwork": "połączenie zostało przerwane",
   "downloadsReasonNoAudio": "YouTube nie ma dźwięku tego utworu, który MixMusic odtwarza",

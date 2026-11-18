@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Nedlastinger",
   "downloadsReasonBadAudio": "lyden som kom, kan ikke spilles av",
   "downloadsReasonDiskFull": "disken er full",
+  "downloadsReasonExplicit": "den er eksplisitt, og innstillingene dine skjuler eksplisitt innhold",
   "downloadsReasonNeedsYTDLP": "den trenger yt-dlp, som Innstillinger › Avspilling installerer",
   "downloadsReasonNetwork": "nettverket forsvant",
   "downloadsReasonNoAudio": "YouTube har ingen lyd for denne låten som MixMusic kan spille av",

@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Allalaadimised",
   "downloadsReasonBadAudio": "saadud heli ei saa mängida",
   "downloadsReasonDiskFull": "ketas on täis",
+  "downloadsReasonExplicit": "lugu on vulgaarne ja sinu seaded peidavad vulgaarse sisu",
   "downloadsReasonNeedsYTDLP": "vaja on yt-dlp-d, mille paigaldab Seaded › Esitus",
   "downloadsReasonNetwork": "võrguühendus katkes",
   "downloadsReasonNoAudio": "YouTube'is pole selle loo heli, mida MixMusic mängida saaks",

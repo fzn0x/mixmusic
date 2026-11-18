@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Téléchargements",
   "downloadsReasonBadAudio": "l’audio reçu ne peut pas être lu",
   "downloadsReasonDiskFull": "le disque est plein",
+  "downloadsReasonExplicit": "le titre est explicite, et vos réglages masquent le contenu explicite",
   "downloadsReasonNeedsYTDLP": "yt-dlp est nécessaire, et Réglages › Lecture l’installe",
   "downloadsReasonNetwork": "la connexion a été perdue",
   "downloadsReasonNoAudio": "YouTube n’a aucun audio de ce titre que MixMusic puisse lire",

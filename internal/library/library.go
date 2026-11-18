@@ -79,6 +79,10 @@ type Data struct {
 	// their order from then on.
 	Folders         []Folder `json:"folders,omitempty"`
 	FoldersArranged bool     `json:"foldersArranged,omitempty"`
+
+	// Tags are the user's tags, in their order, each with what it's on,
+	// by ID (tags.go).
+	Tags []Tag `json:"tags,omitempty"`
 }
 
 // Library is the user's library, kept in a file, and the log of every
@@ -96,8 +100,10 @@ type Library struct {
 	// marks holds the IDs of what is pinned and hidden, as disliked does
 	// of the disliked tracks.
 	marks atomic.Pointer[markIndex]
-	// folders keeps the folders as they listed last (folders.go).
+	// folders keeps the folders as they listed last (folders.go), and
+	// tags the tags (tags.go).
 	folders folderMemo
+	tags    tagMemo
 }
 
 // Open opens the library kept at path, and the play log beside it.
@@ -283,7 +289,8 @@ func (l *Library) UpdatePlaylist(id, title, description string) error {
 	})
 }
 
-// DeletePlaylist deletes a playlist, its pin and its place in a folder.
+// DeletePlaylist deletes a playlist, its pin, its place in a folder and
+// its tags.
 func (l *Library) DeletePlaylist(id string) error {
 	err := l.file.Update(func(d *Data) error {
 		n := len(d.Playlists)
@@ -294,6 +301,7 @@ func (l *Library) DeletePlaylist(id string) error {
 		mid := media.ID(media.SourceLocal, id)
 		d.Pins = slices.DeleteFunc(d.Pins, func(m Mark) bool { return m.ID == mid })
 		d.Folders = unfiled(d.Folders, mid)
+		d.Tags = untagged(d.Tags, mid)
 		return nil
 	})
 	l.indexMarks()

@@ -151,8 +151,8 @@ func (l *Library) IsHidden(id string) bool {
 	return false
 }
 
-// SetHidden hides an item of a service's library, which unpins it and
-// takes it out of its folder, or shows it again.
+// SetHidden hides an item of a service's library, which unpins it, takes
+// it out of its folder and its tags off, or shows it again.
 func (l *Library) SetHidden(m Mark, hidden bool) error {
 	err := l.file.Update(func(d *Data) error {
 		i := slices.IndexFunc(d.Hidden, func(x Mark) bool { return x.ID == m.ID })
@@ -167,6 +167,7 @@ func (l *Library) SetHidden(m Mark, hidden bool) error {
 		if hidden {
 			d.Pins = slices.DeleteFunc(d.Pins, func(x Mark) bool { return x.ID == m.ID })
 			d.Folders = unfiled(d.Folders, m.ID)
+			d.Tags = untagged(d.Tags, m.ID)
 		}
 		return nil
 	})
@@ -175,12 +176,13 @@ func (l *Library) SetHidden(m Mark, hidden bool) error {
 }
 
 // KeepListed takes a whole list of a service's library: its items of
-// kind, of source, as account lists them. The pins, hidden items and
-// playlists in folders of that kind and source seen under account that
-// it lacks go, unless keep keeps them, as the artists the user follows in
-// MixMusic; those it holds take its titles, and account if they had none.
-// A folder left without a playlist goes. A list that came in part, or of
-// another account, must not come here.
+// kind, of source, as account lists them. The pins, hidden items, and
+// playlists in folders and items tagged, of that kind and source seen
+// under account that it lacks go, unless keep keeps them, as the artists
+// the user follows in MixMusic; those it holds take its titles, and
+// account if they had none. A folder left without a playlist goes; a tag
+// on nothing stays. A list that came in part, or of another account, must
+// not come here.
 func (l *Library) KeepListed(source media.Source, kind, account string, listed []Mark, keep func(id string) bool) error {
 	if account == "" {
 		return nil
@@ -222,7 +224,8 @@ func (l *Library) KeepListed(source media.Source, kind, account string, listed [
 	}
 	d := l.file.Get()
 	filedChange := slices.ContainsFunc(d.Folders, func(f Folder) bool { return changed(f.Items) != nil })
-	if changed(d.Pins) == nil && changed(d.Hidden) == nil && !filedChange {
+	tagChange := slices.ContainsFunc(d.Tags, func(t Tag) bool { return changed(t.Items) != nil })
+	if changed(d.Pins) == nil && changed(d.Hidden) == nil && !filedChange && !tagChange {
 		return nil
 	}
 	err := l.file.Update(func(d *Data) error {
@@ -238,6 +241,11 @@ func (l *Library) KeepListed(source media.Source, kind, account string, listed [
 			}
 		}
 		d.Folders = withoutEmpty(d.Folders)
+		for i := range d.Tags {
+			if items := changed(d.Tags[i].Items); items != nil {
+				d.Tags[i].Items = items
+			}
+		}
 		return nil
 	})
 	l.indexMarks()

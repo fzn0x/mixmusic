@@ -23,7 +23,7 @@ func (Services) PrepareStream(context.Context, media.Track) (player.Source, erro
 	return player.Source{}, nil
 }
 
-func (Services) StreamFailure(media.Track) string { return "" }
+func (Services) StreamFailure(media.Track) error { return nil }
 
 func (Services) RecordPlay(media.Track) {}
 

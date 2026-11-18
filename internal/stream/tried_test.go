@@ -24,14 +24,14 @@ func TestResolveTellsBothSteps(t *testing.T) {
 		t.Fatalf("both failed: %v", err)
 	}
 	st, ok := err.(interface {
-		Steps() iter.Seq2[string, string]
+		Steps() iter.Seq2[string, error]
 	})
 	if !ok {
 		t.Fatalf("%T tells no steps", err)
 	}
 	var steps [][2]string
 	for what, why := range st.Steps() {
-		steps = append(steps, [2]string{what, why})
+		steps = append(steps, [2]string{what, why.Error()})
 	}
 	want := [][2]string{
 		{"YouTube's player API", "YouTube's player API answered LOGIN_REQUIRED: Sign in to confirm your age"},
@@ -39,6 +39,12 @@ func TestResolveTellsBothSteps(t *testing.T) {
 	}
 	if !slices.Equal(steps, want) {
 		t.Errorf("steps %q, want %q", steps, want)
+	}
+	// Each step's error is still of its kind, for the windows' words.
+	for what, why := range st.Steps() {
+		if what == "yt-dlp" && Reason(why) != ReasonPrivate {
+			t.Errorf("yt-dlp's step names the reason %q", Reason(why))
+		}
 	}
 	// Without the player API, the error of yt-dlp alone tells no steps.
 	r.Direct = nil

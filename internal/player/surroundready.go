@@ -140,7 +140,7 @@ func (p *Player) readySurround() {
 		cur, _ := p.s.Current()
 		if err != nil {
 			log.Printf("mixmusic: the 5.1 surround audio of %s can't play: %s; it plays in stereo", cur.Track.ID, err)
-			p.stereoFor(err.Error())
+			p.stereoFor(err)
 			return
 		}
 		p.readyURL = this.url
@@ -173,11 +173,11 @@ func (p *Player) toSurround() {
 }
 
 // stereoFor keeps the current entry in stereo, as its 5.1 surround audio
-// couldn't play, for why, and tells why once: until another entry, or
-// until 5.1 is turned on again.
-func (p *Player) stereoFor(why string) {
+// couldn't play, for why, and tells why once, in the windows' words: until
+// another entry, or until 5.1 is turned on again.
+func (p *Player) stereoFor(why error) {
 	cur, _ := p.s.Current()
 	p.tried("its 5.1 surround audio", why)
 	p.stereoOnly = true
-	p.notify(Notice{Message: locales.PlayerSurroundStereo(cur.Track.Title, strings.TrimSuffix(why, "."))})
+	p.notify(Notice{Message: locales.PlayerSurroundStereo(cur.Track.Title, strings.TrimSuffix(p.errorWords.say(why), "."))})
 }

@@ -41,28 +41,28 @@ type Step struct {
 	// What names the way, as "the stream", "yt-dlp", "the file" or
 	// "Spotify Connect".
 	What string
-	// Why is what went wrong, in the words of its error.
-	Why string
+	// Why is what went wrong, in the words of its error, in English, for
+	// the logs and the details' Copy; Said is as the windows said it then,
+	// in their language, for the details they show (#800).
+	Why, Said string
 	// Times is how many times in a row it failed so: 1 but for the tries
 	// of a stream again.
 	Times int
 }
 
 // stepped is an error that tells the steps it came of, in turn: what each
-// tried, and why it failed, the last its own. The resolver's error is one
-// when yt-dlp failed after YouTube's player API.
+// tried, and the error it failed with, the last its own. The resolver's
+// error is one when yt-dlp failed after YouTube's player API.
 type stepped interface {
 	error
-	Steps() iter.Seq2[string, string]
+	Steps() iter.Seq2[string, error]
 }
 
 // failing is what the player keeps of the tracks that couldn't play.
 type failing struct {
 	// tries are what the player tried of the current entry since it
-	// loaded, and awaited the error of the work whose answer the player
-	// takes in, while it does (await): they belong to its goroutine.
-	tries   tries
-	awaited error
+	// loaded: they belong to its goroutine.
+	tries tries
 
 	mu   sync.Mutex
 	kept []Failure // the latest, oldest first
@@ -103,49 +103,51 @@ func (p *Player) FailureOf(id int) (Failure, bool) {
 	return Failure{}, false
 }
 
-// tried keeps a step the player tried of the current entry: what, and why
-// it failed. An error the player awaited that tells its own steps, as the
-// resolver's, gives them in its place, and yt-dlp's error names it.
-func (p *Player) tried(what, why string) {
+// tried keeps a step the player tried of the current entry: what, and the
+// error it failed with, in its English and in the windows' words. An
+// error that tells its own steps, as the resolver's, gives them in its
+// place, and yt-dlp's error names it.
+func (p *Player) tried(what string, err error) {
 	cur, _ := p.s.Current()
 	t := &p.failed.tries
 	if t.token != p.loadToken || t.uid != cur.UID {
 		*t = tries{token: p.loadToken, uid: cur.UID}
 	}
-	t.told = why
+	t.told = err.Error()
 	var st stepped
-	if e := p.failed.awaited; e != nil && e.Error() == why && errors.As(e, &st) {
-		for what, why := range st.Steps() {
-			t.add(what, why)
+	if errors.As(err, &st) {
+		for what, err := range st.Steps() {
+			t.add(what, err.Error(), p.errorWords.say(err))
 		}
 		return
 	}
+	why, said := err.Error(), p.errorWords.say(err)
 	if rest, ok := strings.CutPrefix(why, "yt-dlp: "); ok {
-		what, why = "yt-dlp", rest
+		what, why, said = "yt-dlp", rest, strings.TrimPrefix(said, "yt-dlp: ")
 	}
-	t.add(what, why)
+	t.add(what, why, said)
 }
 
 // add keeps a step tried: as one more time of the last, when it is the
 // same.
-func (t *tries) add(what, why string) {
+func (t *tries) add(what, why, said string) {
 	if n := len(t.steps); n > 0 && t.steps[n-1].What == what && t.steps[n-1].Why == why {
 		t.steps[n-1].Times++
 		return
 	}
-	t.steps = append(t.steps, Step{What: what, Why: why, Times: 1})
+	t.steps = append(t.steps, Step{What: what, Why: why, Said: said, Times: 1})
 }
 
 // keepFailure keeps the current entry as a track that couldn't play, for
-// message, and returns the ID its notice names: what it tried, with
-// message as the last step's error unless that step told it already.
-func (p *Player) keepFailure(message string, stopped bool) int {
+// err, and returns the ID its notice names: what it tried, with err as the
+// last step's error unless that step told it already.
+func (p *Player) keepFailure(err error, stopped bool) int {
 	cur, ok := p.s.Current()
 	if !ok {
 		return 0
 	}
-	if t := p.failed.tries; t.token != p.loadToken || t.uid != cur.UID || t.told != message {
-		p.tried(p.way(cur), message)
+	if t := p.failed.tries; t.token != p.loadToken || t.uid != cur.UID || t.told != err.Error() {
+		p.tried(p.way(cur), err)
 	}
 	k := Failure{At: time.Now(), Track: cur.Track, Steps: slices.Clone(p.failed.tries.steps), Stopped: stopped}
 	if src := p.s.Source; src != nil && src.Track.ID != "" && src.Track.ID != cur.Track.ID {

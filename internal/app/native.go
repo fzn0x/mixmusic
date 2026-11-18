@@ -38,7 +38,7 @@ func (e engineEvents) to() audio.Events {
 
 func (e engineEvents) Time(position, duration time.Duration) { e.to().Time(position, duration) }
 func (e engineEvents) Ended()                                { e.to().Ended() }
-func (e engineEvents) Error(message string)                  { e.to().Error(message) }
+func (e engineEvents) Error(err error)                       { e.to().Error(err) }
 func (e engineEvents) Playing(playing bool)                  { e.to().Playing(playing) }
 func (e engineEvents) Buffering(buffering bool)              { e.to().Buffering(buffering) }
 
@@ -47,7 +47,7 @@ type noEvents struct{}
 
 func (noEvents) Time(time.Duration, time.Duration) {}
 func (noEvents) Ended()                            {}
-func (noEvents) Error(string)                      {}
+func (noEvents) Error(error)                       {}
 func (noEvents) Playing(bool)                      {}
 func (noEvents) Buffering(bool)                    {}
 

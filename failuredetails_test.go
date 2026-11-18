@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"iter"
 	"path/filepath"
 	"runtime"
@@ -22,23 +23,41 @@ import (
 )
 
 // bothFailed is the error of a stream neither YouTube's player API nor
-// yt-dlp found, as the resolver's tells its steps.
-type bothFailed struct{}
+// yt-dlp found, as the resolver's tells its steps: it reads as yt-dlp's.
+type bothFailed struct{ direct, ytdlp error }
 
-func (bothFailed) Error() string { return "this track is private" }
+func (e bothFailed) Error() string { return e.ytdlp.Error() }
+func (e bothFailed) Unwrap() error { return e.ytdlp }
 
-func (bothFailed) Steps() iter.Seq2[string, string] {
-	return func(yield func(string, string) bool) {
-		_ = yield("YouTube's player API", "YouTube's player API answered LOGIN_REQUIRED: Sign in to confirm your age") &&
-			yield("yt-dlp", "this track is private")
+func (e bothFailed) Steps() iter.Seq2[string, error] {
+	return func(yield func(string, error) bool) {
+		_ = yield("YouTube's player API", e.direct) && yield("yt-dlp", e.ytdlp)
 	}
 }
+
+// loginRequired is what YouTube's player API answers of a track for
+// adults, in YouTube's words.
+var loginRequired = errors.New("YouTube's player API answered LOGIN_REQUIRED: Sign in to confirm your age")
+
+// privateTrack is why the stream of a private track isn't found.
+var privateTrack = bothFailed{loginRequired, errors.New("this track is private")}
 
 // failingPlayer is the test player, whose tracks' streams aren't found.
 type failingPlayer struct{ testPlayer }
 
 func (failingPlayer) Prepare(context.Context, media.Track) (player.Source, error) {
-	return player.Source{}, bothFailed{}
+	return player.Source{}, privateTrack
+}
+
+// failingWith is the test player, whose tracks' streams aren't found, for
+// err.
+type failingWith struct {
+	testPlayer
+	err error
+}
+
+func (p failingWith) Prepare(context.Context, media.Track) (player.Source, error) {
+	return player.Source{}, p.err
 }
 
 // brokenTrack is a track that can't play.
@@ -49,7 +68,13 @@ var brokenTrack = media.Track{ID: "yt:broken", Source: media.SourceYouTube, Titl
 // once brokenTrack failed, with its notice.
 func failedShell(t *testing.T) (*shell, *ui.Tester) {
 	t.Helper()
-	s := newTestShellWith(t, nil, func(a *app.App) player.Services { return failingPlayer{testPlayer{a: a}} }, player.Saved{})
+	return failedShellOf(t, privateTrack)
+}
+
+// failedShellOf is failedShell, whose tracks can't play for err.
+func failedShellOf(t *testing.T, err error) (*shell, *ui.Tester) {
+	t.Helper()
+	s := newTestShellWith(t, nil, func(a *app.App) player.Services { return failingWith{testPlayer{a: a}, err} }, player.Saved{})
 	s.main = true
 	t.Cleanup(s.p.Notices(func(n player.Notice) { s.update(func() { s.notes = append(s.notes, n) }) }))
 	tt := tester(t, s)

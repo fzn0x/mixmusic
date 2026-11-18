@@ -33,7 +33,9 @@ const maxChannels = 6
 type Events interface {
 	Time(position, duration time.Duration)
 	Ended()
-	Error(message string)
+	// Error tells why the stream can't play, as the error says it: the
+	// player says it in the windows' words.
+	Error(err error)
 	Playing(playing bool)
 	Buffering(buffering bool)
 }
@@ -313,7 +315,7 @@ func (e *Engine) Play() error {
 		e.paused = true
 		e.mu.Unlock()
 		e.events.Playing(false)
-		e.events.Error(err.Error())
+		e.events.Error(err)
 		return err
 	}
 	if wasPaused {
@@ -807,7 +809,7 @@ func (e *Engine) report() {
 	if outFailure != nil {
 		e.stopOutput()
 		e.events.Playing(false)
-		e.events.Error(ErrNoOutput.Error())
+		e.events.Error(ErrNoOutput)
 		return
 	}
 	if d != nil && (playing || ended || time.Duration(e.lastTime.Load()) != position) {
@@ -825,7 +827,7 @@ func (e *Engine) report() {
 	switch {
 	case failed:
 		e.events.Playing(false)
-		e.events.Error(failure.Error())
+		e.events.Error(failure)
 	case ended:
 		e.events.Playing(false)
 		e.events.Ended()

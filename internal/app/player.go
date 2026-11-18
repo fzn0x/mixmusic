@@ -225,14 +225,15 @@ func (p *Player) learnLoudness(videoID string) {
 }
 
 // StreamFailure tells why the audio of a track, the recording PrepareStream
-// returned, failed to load: in plain words, or "" when its audio arrived,
-// and the engine could not play it.
-func (p *Player) StreamFailure(track media.Track) string {
+// returned, failed to load: in plain words, which the windows say in their
+// language, or nil when its audio arrived, and the engine could not play
+// it.
+func (p *Player) StreamFailure(track media.Track) error {
 	_, videoID, err := media.ParseID(track.ID)
 	if err != nil {
-		return ""
+		return nil
 	}
-	return p.a.proxy.Failure(videoID)
+	return p.a.proxy.Fault(videoID)
 }
 
 // ForgetMatch drops the YouTube Music recording found for a Spotify track,

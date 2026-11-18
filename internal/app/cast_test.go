@@ -167,7 +167,7 @@ func (h *heardEvents) add(format string, args ...any) {
 
 func (h *heardEvents) Time(p, d time.Duration) { h.add("time") }
 func (h *heardEvents) Ended()                  { h.add("ended") }
-func (h *heardEvents) Error(m string)          { h.add("error %s", m) }
+func (h *heardEvents) Error(err error)         { h.add("error %s", err) }
 func (h *heardEvents) Playing(p bool)          { h.add("playing %v", p) }
 func (h *heardEvents) Buffering(b bool)        { h.add("buffering %v", b) }
 

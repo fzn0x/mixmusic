@@ -1,6 +1,7 @@
 package player
 
 import (
+	"errors"
 	"slices"
 	"testing"
 	"time"
@@ -67,10 +68,10 @@ func TestFailedTrackNotCounted(t *testing.T) {
 	// failed, and again for its one try.
 	h.wait("a loaded", func(p *Player) bool { return p.loaded })
 	h.p.Time(0, 0)
-	h.p.Error("the stream failed")
+	h.p.Error(errors.New("the stream failed"))
 	h.wait("a tried", func(p *Player) bool { return retries(h, "a") == 1 && p.loaded })
 	h.p.Time(0, 0)
-	h.p.Error("the stream failed")
+	h.p.Error(errors.New("the stream failed"))
 	h.wait("b playing", playing("b"))
 	h.noneCounted("as it started")
 	h.p.Time(2*time.Second, 0)

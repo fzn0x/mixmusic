@@ -290,8 +290,8 @@ type Services interface {
 	// YouTube Music.
 	Prepare(ctx context.Context, track media.Track) (Source, error)
 	PrepareStream(ctx context.Context, track media.Track) (Source, error)
-	// StreamFailure tells why the stream of track failed, or "".
-	StreamFailure(track media.Track) string
+	// StreamFailure tells why the stream of track failed, or nil.
+	StreamFailure(track media.Track) error
 	// RecordPlay counts a play of track.
 	RecordPlay(track media.Track)
 	// Radio returns tracks like track.
@@ -403,7 +403,7 @@ type retryState struct {
 	from time.Duration
 	// why is why the stream stopped, before the last try, and dur the
 	// longest it told it was, until then.
-	why string
+	why error
 	dur time.Duration
 }
 
@@ -789,12 +789,7 @@ func (p *Player) notify(n Notice) { p.notices = append(p.notices, n) }
 func await[T any](p *Player, work func(ctx context.Context) (T, error), then func(T, error)) {
 	go func() {
 		v, err := work(p.ctx)
-		p.do(func() {
-			// A failure it tells of may tell its steps (tried).
-			p.failed.awaited = err
-			then(v, err)
-			p.failed.awaited = nil
-		})
+		p.do(func() { then(v, err) })
 	}()
 }
 

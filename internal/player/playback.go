@@ -255,7 +255,7 @@ func (p *Player) switchAudio(on bool) {
 // fallBackToStereo plays the current entry's stereo audio from where its
 // 5.1 audio stopped, as that failed, and tells why once: until another
 // entry, or until 5.1 is turned on again, it plays in stereo.
-func (p *Player) fallBackToStereo(why string) {
+func (p *Player) fallBackToStereo(why error) {
 	cur, _ := p.s.Current()
 	log.Printf("mixmusic: the 5.1 surround audio of %s stopped at %s: %s; playing it in stereo", cur.Track.ID, p.s.Position.Round(time.Second), why)
 	p.stereoFor(why)
@@ -397,7 +397,7 @@ func (p *Player) playAt(i int, start time.Duration, autoplay bool) {
 		case src.Mode == ModeSpotify && p.here != nil:
 			p.playOnDevice(token, entry, src, start, autoplay, p.here)
 		case src.Mode == ModeSpotify:
-			p.fellBack("Spotify can't play inside MixMusic on this computer")
+			p.fellBack(errSpotifyNotHere)
 			p.streamInstead(token, entry, start, autoplay)
 		default:
 			p.loadStream(src, start, autoplay)
@@ -446,7 +446,7 @@ func (p *Player) playOnDevice(token int, entry Item, src Source, start time.Dura
 		// A device that can't be reached for want of the network waits for
 		// it: YouTube Music needs it too.
 		p.checkOnline(func() { p.wait(start, autoplay) }, func() {
-			p.fellBack(err.Error())
+			p.fellBack(err)
 			p.streamInstead(token, entry, start, autoplay)
 		})
 	})
@@ -509,35 +509,31 @@ func (p *Player) stopStream() {
 	p.stream.Stop()
 }
 
-// fellBack tells why a Spotify track plays from YouTube Music instead, once
-// for each reason.
-func (p *Player) fellBack(why string) {
+// fellBack tells why a Spotify track plays from YouTube Music instead, in
+// the windows' words, once for each reason.
+func (p *Player) fellBack(why error) {
 	p.tried(p.spotifyWay(), why)
-	if p.warned[why] {
+	if p.warned[why.Error()] {
 		return
 	}
 	if p.warned == nil {
 		p.warned = map[string]bool{}
 	}
-	p.warned[why] = true
+	p.warned[why.Error()] = true
 	p.notify(Notice{
-		Message:  locales.PlayerFromYouTubeInstead(strings.TrimSuffix(why, ".")),
+		Message:  locales.PlayerFromYouTubeInstead(strings.TrimSuffix(p.errorWords.say(why), ".")),
 		Error:    true,
 		Settings: true,
 	})
 }
 
-// fail tells that a track can't play, and moves on after a moment: to the
-// next track, or to a radio when it was the last. After maxFailures in a
-// row it stops, as nothing seems to play.
-func (p *Player) fail(message string) { p.failSaid(message, message) }
-
-// failWith fails for err, whose notice says it as the windows do, in
-// their words: its log and its details keep its English.
-func (p *Player) failWith(err error) { p.failSaid(err.Error(), p.errorWords.say(err)) }
-
-// failSaid fails for message, which the notice says as said.
-func (p *Player) failSaid(message, said string) {
+// failWith tells that a track can't play, for err, and moves on after a
+// moment: to the next track, or to a radio when it was the last. After
+// maxFailures in a row it stops, as nothing seems to play. Its notice
+// says err as the windows do, in their words: its log and the state keep
+// its English.
+func (p *Player) failWith(err error) {
+	message, said := err.Error(), p.errorWords.say(err)
 	cur, ok := p.s.Current()
 	p.askedAt = time.Time{}
 	p.unsounded = false
@@ -563,7 +559,7 @@ func (p *Player) failSaid(message, said string) {
 		// goes, and the details last until MixMusic closes.
 		log.Printf("mixmusic: couldn't play %s: %s", cur.Track.ID, message)
 	}
-	p.notify(Notice{Message: why, Error: true, Failure: p.keepFailure(message, stop)})
+	p.notify(Notice{Message: why, Error: true, Failure: p.keepFailure(err, stop)})
 	if stop {
 		return
 	}
@@ -575,20 +571,19 @@ func (p *Player) failSaid(message, said string) {
 	})
 }
 
-// onStreamError takes in a stream the engine can't play on, and tries it
-// again where it stopped.
-func (p *Player) onStreamError(message string) {
+// onStreamError takes in a stream the engine can't play on, for err, and
+// tries it again where it stopped.
+func (p *Player) onStreamError(err error) {
 	if _, ok := p.s.Current(); !ok || !p.loaded {
 		return // of a stream a load, or a try, took over from
 	}
 	// The engine tells that the stream can't play; the stream tells why, as
 	// when YouTube refused it.
-	why := ""
+	why := err
 	if src := p.s.Source; src != nil && src.Mode == ModeStream {
-		why = p.svc.StreamFailure(src.Track)
-	}
-	if why == "" {
-		why = message
+		if failure := p.svc.StreamFailure(src.Track); failure != nil {
+			why = failure
+		}
 	}
 	// 5.1 audio that fails, as one YouTube serves in a way the decoder
 	// can't decode, gives way to the stereo audio at once.
@@ -621,7 +616,7 @@ func (p *Player) onStreamError(message string) {
 // counts as one. A track that plays without the network is tried once, at
 // once, as one that never played: a file that is gone, or can't be read,
 // isn't read a moment later either.
-func (p *Player) retryStream(why string) {
+func (p *Player) retryStream(why error) {
 	entry, _ := p.s.Current()
 	r := &p.retry
 	p.tried(again(p.way(entry), r.n), why)
@@ -631,7 +626,7 @@ func (p *Player) retryStream(why string) {
 		tries = len(retryWaits)
 	}
 	if r.n >= tries {
-		p.fail(why)
+		p.failWith(why)
 		return
 	}
 	if waits {
@@ -657,7 +652,7 @@ func (p *Player) retryStream(why string) {
 			}
 			if err != nil {
 				if !p.offline(err, at, autoplay) {
-					p.retryStream(err.Error())
+					p.retryStream(err)
 				}
 				return
 			}
@@ -1160,8 +1155,8 @@ func (p *Player) endsNear(at time.Duration) bool {
 	return dur == 0 || at >= dur-retryHold
 }
 
-// Error takes in a stream that failed.
-func (p *Player) Error(message string) { p.do(func() { p.onStreamError(message) }) }
+// Error takes in a stream that failed, for err.
+func (p *Player) Error(err error) { p.do(func() { p.onStreamError(err) }) }
 
 // Playing takes in the stream playing or pausing.
 func (p *Player) Playing(playing bool) { p.do(func() { p.onPlaying(playing) }) }

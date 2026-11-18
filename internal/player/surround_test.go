@@ -1,6 +1,7 @@
 package player
 
 import (
+	"errors"
 	"slices"
 	"strings"
 	"testing"
@@ -112,7 +113,7 @@ func TestSurroundFallsBackToStereo(t *testing.T) {
 	h.p.PlayTracks(tracks("a", "b"), 0)
 	h.wait("a playing", playing("a"))
 	h.p.Time(12*time.Second, 200*time.Second)
-	h.p.Error("the audio could not be decoded (ac3: invalid data)")
+	h.p.Error(errors.New("the audio could not be decoded (ac3: invalid data)"))
 	h.wait("a in stereo", func(p *Player) bool { return h.stream.lastLoad() == "load url:yt:a 12s true" })
 	h.wait("a playing", playing("a"))
 	told := false
@@ -123,7 +124,7 @@ func TestSurroundFallsBackToStereo(t *testing.T) {
 		t.Errorf("notices %+v", h.notices())
 	}
 	// A stereo stream that fails is tried again as before, in stereo.
-	h.p.Error("the network failed while loading the audio")
+	h.p.Error(errors.New("the network failed while loading the audio"))
 	h.wait("a tried again", func(p *Player) bool { return strings.HasPrefix(h.stream.lastLoad(), "load url:yt:a?retry=") })
 	h.p.Next()
 	h.wait("b playing", playing("b"))
@@ -169,11 +170,11 @@ func TestSurroundAtSpeed(t *testing.T) {
 	// Each audio a loads sounds a millisecond on, and the next loads from
 	// there.
 	h.wait("a sounding in 5.1", func(p *Player) bool { return p.s.Position > 12001*time.Millisecond })
-	h.p.Error("the audio could not be decoded (ac3: invalid data)")
+	h.p.Error(errors.New("the audio could not be decoded (ac3: invalid data)"))
 	h.wait("a in stereo", func(p *Player) bool { return h.stream.lastLoad() == "load url:yt:a 12.002s true speed 2" })
 	h.wait("a playing", playing("a"))
 	h.wait("a sounding in stereo again", func(p *Player) bool { return p.s.Position > 12002*time.Millisecond })
-	h.p.Error("the network failed while loading the audio")
+	h.p.Error(errors.New("the network failed while loading the audio"))
 	h.wait("a tried again", func(p *Player) bool {
 		got := h.stream.lastLoad()
 		return strings.HasPrefix(got, "load url:yt:a?retry=") && strings.HasSuffix(got, " 12.003s true speed 2")

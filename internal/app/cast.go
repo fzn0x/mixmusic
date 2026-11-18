@@ -400,6 +400,6 @@ func (e castEvents) to() audio.Events {
 
 func (e castEvents) Time(position, duration time.Duration) { e.to().Time(position, duration) }
 func (e castEvents) Ended()                                { e.to().Ended() }
-func (e castEvents) Error(message string)                  { e.to().Error(message) }
+func (e castEvents) Error(err error)                       { e.to().Error(err) }
 func (e castEvents) Playing(playing bool)                  { e.to().Playing(playing) }
 func (e castEvents) Buffering(buffering bool)              { e.to().Buffering(buffering) }

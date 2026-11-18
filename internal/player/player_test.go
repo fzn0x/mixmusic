@@ -85,10 +85,13 @@ func (f *fakeServices) PrepareStream(_ context.Context, t media.Track) (Source, 
 	return streamOf(t), nil
 }
 
-func (f *fakeServices) StreamFailure(media.Track) string {
+func (f *fakeServices) StreamFailure(media.Track) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	return f.failure
+	if f.failure == "" {
+		return nil
+	}
+	return errors.New(f.failure)
 }
 
 func (f *fakeServices) RecordPlay(t media.Track) {
@@ -904,7 +907,7 @@ func TestStreamError(t *testing.T) {
 		t.Errorf("retried with %q", got)
 	}
 	// The next fails, with why the stream tells, and moves on.
-	h.p.Error("the stream failed")
+	h.p.Error(errors.New("the stream failed"))
 	h.wait("b playing", playing("b"))
 	n := h.notices()
 	if len(n) != 1 || n[0].Message != "Couldn't play Song a: YouTube refused it" || !n[0].Error {
@@ -943,10 +946,10 @@ func TestFailuresStopInTheEngine(t *testing.T) {
 	for i, id := range []string{"a", "b", "c"} {
 		h.wait(id+" loaded", func(p *Player) bool { return p.s.Index == i && p.loaded && p.s.Error == "" })
 		h.p.Time(0, 0)
-		h.p.Error("the stream failed")
+		h.p.Error(errors.New("the stream failed"))
 		h.wait(id+" tried", func(p *Player) bool { return h.stream.count("load url:yt:"+id+"?retry=") == 1 && p.loaded })
 		h.p.Time(0, 0)
-		h.p.Error("the stream failed")
+		h.p.Error(errors.New("the stream failed"))
 	}
 	h.wait("three failures", func(p *Player) bool { return p.failures == maxFailures })
 	time.Sleep(10 * failDelay)

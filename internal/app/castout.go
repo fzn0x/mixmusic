@@ -170,7 +170,7 @@ func videoOf(rawURL string) (videoID string, surround bool, err error) {
 func (o *castOut) Load(rawURL string, cue audio.Cue) error {
 	videoID, surround, err := videoOf(rawURL)
 	if err != nil {
-		go o.events.Error(err.Error())
+		go o.events.Error(err)
 		return nil
 	}
 	u, _ := url.Parse(rawURL)
@@ -234,7 +234,7 @@ func (o *castOut) load(gen int, m cast.Media, speed float64) {
 		if err != nil {
 			o.idle = true
 			o.mu.Unlock()
-			o.events.Error(o.loadFailure(err, o.fetched() > before))
+			o.events.Error(errors.New(o.loadFailure(err, o.fetched() > before)))
 			return
 		}
 		o.media = st.Session
@@ -464,7 +464,7 @@ func (o *castOut) take(st cast.MediaStatus) {
 		o.events.Ended()
 		return
 	case failed:
-		o.events.Error("The cast device stopped playing this track's audio")
+		o.events.Error(errors.New("The cast device stopped playing this track's audio"))
 		return
 	}
 	if tellBuffering {

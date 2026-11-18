@@ -154,7 +154,7 @@ func (s playerServices) PrepareStream(ctx context.Context, t media.Track) (playe
 	return playerSource(src), err
 }
 
-func (s playerServices) StreamFailure(t media.Track) string { return (&Player{s.a}).StreamFailure(t) }
+func (s playerServices) StreamFailure(t media.Track) error { return (&Player{s.a}).StreamFailure(t) }
 
 func (s playerServices) RecordPlay(t media.Track) {
 	if err := (&Collection{s.a}).RecordPlay(t); err != nil {

@@ -414,7 +414,7 @@ func TestEngineFollowsAtAPartThatEnds(t *testing.T) {
 // allocating: on the audio thread.
 func TestEngineFollowAllocs(t *testing.T) {
 	e := &Engine{
-		eq: newEqualizer(), sound: newSound(), corr: newCorrection(), comp: newCompressor(), master: newSmoother(1, glide), an: newAnalyser(),
+		eq: newEqualizer(), echo: newEcho(), verb: newReverb(), sound: newSound(), corr: newCorrection(), comp: newCompressor(), master: newSmoother(1, glide), an: newAnalyser(),
 		bus: 2, notify: make(chan struct{}, 1), events: newRecorder(),
 	}
 	ended, next := newRing(0, 2), newRing(0, 2)

@@ -5,8 +5,11 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"sync/atomic"
 	"testing"
+
+	"github.com/egoist/mygo/i18n"
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/youtube"
@@ -85,5 +88,34 @@ func TestEpisodeDetailsFail(t *testing.T) {
 	song.Episode = nil
 	if _, err := c.EpisodeDetails(context.Background(), song); !errors.Is(err, ErrNoEpisodeDetails) || asks.Load() != 2 {
 		t.Errorf("a song: %v", err)
+	}
+}
+
+// TestEpisodeDetailsWords says each failure of an episode's details in
+// the interface's language, in en-XA, and keeps the English for the logs.
+func TestEpisodeDetailsWords(t *testing.T) {
+	was := i18n.Locale()
+	i18n.SetLocaleFunc(func() string { return "en-XA" })
+	t.Cleanup(func() { i18n.SetLocaleFunc(func() string { return was }) })
+	song := anEpisode
+	song.Episode = nil
+	for _, run := range []struct {
+		what   string
+		status int
+		body   string
+		track  media.Track
+	}{
+		{"no details", http.StatusOK, `{"contents": {}}`, anEpisode},
+		{"a failure", http.StatusServiceUnavailable, "", anEpisode},
+		{"a song", http.StatusOK, detailsPage, song},
+	} {
+		c, _ := detailsCatalog(t, status(run.status, run.body))
+		_, err := c.EpisodeDetails(context.Background(), run.track)
+		if got := ErrorWords(err); !strings.HasPrefix(got, "[") {
+			t.Errorf("%s says %q, which no catalog translates", run.what, got)
+		}
+		if err != nil && strings.Contains(err.Error(), "[") {
+			t.Errorf("%s: the log says %q", run.what, err.Error())
+		}
 	}
 }

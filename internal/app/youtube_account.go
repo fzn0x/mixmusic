@@ -244,8 +244,10 @@ type YouTubeAccount struct {
 	// Premium is set once YouTube Music told that the account has
 	// YouTube Music Premium, which YouTube Premium gives too.
 	Premium bool `json:"premium,omitempty"`
-	// Error tells why the account could not be read, if it could not.
+	// Error tells why the account could not be read, if it could not, and
+	// Fault is that error, which the windows say in their language.
 	Error string `json:"error,omitempty"`
+	Fault error  `json:"-"`
 }
 
 // openYouTube signs the YouTube client in with the session kept, if any.
@@ -281,7 +283,7 @@ func (a *App) watchYouTube() {
 	// again.
 	a.youtube.OnRejected = func() {
 		a.mu.Lock()
-		a.youtubeMe, a.profileErrs.youtube = nil, ""
+		a.youtubeMe, a.profileErrs.youtube = nil, nil
 		a.mu.Unlock()
 		notify()
 	}
@@ -297,7 +299,7 @@ func (a *App) youtubeAccount(ctx context.Context) YouTubeAccount {
 	if me == nil {
 		acct, err := a.youtube.Account(ctx)
 		if err != nil {
-			return YouTubeAccount{SignedIn: true, Error: err.Error()}
+			return YouTubeAccount{SignedIn: true, Error: err.Error(), Fault: err}
 		}
 		me = &acct
 		a.mu.Lock()
@@ -368,7 +370,7 @@ func (a *App) youtubeSignIn(ctx context.Context, cookies []*http.Cookie) (Accoun
 	a.youtube.SetCookies(nil) // no account or channel of a session before
 	a.youtube.SetCookies(cookies)
 	a.mu.Lock()
-	a.youtubeMe, a.profileErrs.youtube = nil, ""
+	a.youtubeMe, a.profileErrs.youtube = nil, nil
 	a.mu.Unlock()
 	// Nor the refusals of the audio found as the account before (#578).
 	a.resolver.ForgetRefusals()
@@ -426,7 +428,7 @@ func windowSession() ([]*http.Cookie, error) {
 func (s *Accounts) YouTubeLogout(ctx context.Context) error {
 	s.a.youtube.SetCookies(nil)
 	s.a.mu.Lock()
-	s.a.youtubeMe, s.a.profileErrs.youtube = nil, ""
+	s.a.youtubeMe, s.a.profileErrs.youtube = nil, nil
 	s.a.mu.Unlock()
 	err := s.a.youtubeStore.Clear()
 	if s.a.settings.Get().YouTubeChannel != "" {

@@ -31,12 +31,39 @@ func ErrorWords(err error) string {
 		return ""
 	case errors.As(err, &w):
 		return w.said
-	case errors.Is(err, errListenBrainzToken):
-		return locales.ListenBrainzSettingsTokenRefused()
-	case errors.Is(err, errPlainRemote):
-		return locales.ListenBrainzSettingsPlainRemote()
+	}
+	for _, known := range ownErrors {
+		if errors.Is(err, known) {
+			said, _ := WordsOf(known)
+			return said
+		}
 	}
 	return err.Error()
+}
+
+// ownErrors are MixMusic's errors WordsOf has words for, besides the
+// worded ones.
+var ownErrors = []error{errListenBrainzToken, errPlainRemote, errSpotifyEpisode, errSpotifyShows}
+
+// WordsOf is err itself, not the errors it wraps, as the windows show it,
+// when MixMusic says it in the interface's language: the words of a worded
+// error, or the message of one of ownErrors. The windows' errorText asks it
+// of each error of a chain.
+func WordsOf(err error) (string, bool) {
+	if w, ok := err.(*wordedError); ok {
+		return w.said, true
+	}
+	switch err {
+	case errListenBrainzToken:
+		return locales.ListenBrainzSettingsTokenRefused(), true
+	case errPlainRemote:
+		return locales.ListenBrainzSettingsPlainRemote(), true
+	case errSpotifyEpisode:
+		return locales.PodcastsSpotifyOnly(locales.PodcastsSettingsPlayback()), true
+	case errSpotifyShows:
+		return locales.PodcastsSpotifySignIn(), true
+	}
+	return "", false
 }
 
 // What needs a webview, which needWebView names.

@@ -10,6 +10,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // ErrNoEpisodeDetails is why an episode has no details to show: its
@@ -26,7 +27,7 @@ func (c *Catalog) EpisodeDetails(ctx context.Context, t media.Track) (media.Epis
 	}
 	source, id, err := media.ParseID(t.ID)
 	if err != nil || !t.IsEpisode() {
-		return media.EpisodeDetails{}, detailsError{"This track isn't a podcast's episode.", ErrNoEpisodeDetails}
+		return media.EpisodeDetails{}, worded("This track isn't a podcast's episode.", locales.EpisodeDetailsNotEpisode(), ErrNoEpisodeDetails)
 	}
 	var d media.EpisodeDetails
 	switch source {
@@ -34,7 +35,7 @@ func (c *Catalog) EpisodeDetails(ctx context.Context, t media.Track) (media.Epis
 		d, err = c.a.youtube.EpisodeDetails(ctx, id)
 	case media.SourceSpotify:
 		if !c.a.spotify.SignedIn() {
-			return media.EpisodeDetails{}, detailsError{"Sign in to Spotify in Settings › Accounts to see this episode's details.", errSpotifyShows}
+			return media.EpisodeDetails{}, worded("Sign in to Spotify in Settings › Accounts to see this episode's details.", locales.EpisodeDetailsSpotifySignIn(), errSpotifyShows)
 		}
 		d, err = c.a.spotify.EpisodeDetails(ctx, id)
 	default:
@@ -42,10 +43,10 @@ func (c *Catalog) EpisodeDetails(ctx context.Context, t media.Track) (media.Epis
 	}
 	switch {
 	case noDetails(err):
-		return media.EpisodeDetails{}, detailsError{"No details found for this episode.", errors.Join(ErrNoEpisodeDetails, err)}
+		return media.EpisodeDetails{}, worded("No details found for this episode.", locales.EpisodeDetailsNone(), errors.Join(ErrNoEpisodeDetails, err))
 	case err != nil:
 		log.Printf("mixmusic: the details of %s: %v", t.ID, err)
-		return media.EpisodeDetails{}, detailsError{"The episode's details can't be loaded right now. Check your connection, or try again in a moment.", err}
+		return media.EpisodeDetails{}, worded("The episode's details can't be loaded right now. Check your connection, or try again in a moment.", locales.EpisodeDetailsFailed(), err)
 	}
 	d.Chapters = media.ChaptersOf(d.Description)
 	c.a.episodeDetails.put(t.ID, d)
@@ -60,12 +61,3 @@ func noDetails(err error) bool {
 	return errors.Is(err, youtube.ErrNotFound) || errors.Is(err, ErrNoEpisodeDetails) ||
 		errors.As(err, &yt) && yt.Status == http.StatusNotFound || errors.As(err, &sp) && sp.Status == http.StatusNotFound
 }
-
-// detailsError is an error of EpisodeDetails, in the interface's words.
-type detailsError struct {
-	text string
-	err  error
-}
-
-func (e detailsError) Error() string { return e.text }
-func (e detailsError) Unwrap() error { return e.err }

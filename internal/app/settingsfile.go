@@ -326,7 +326,7 @@ func (a *App) settingsChanged(prev, s settings.Settings, outside bool) {
 	if prev.YouTubeChannel != s.YouTubeChannel {
 		// The profile is the former channel's.
 		a.mu.Lock()
-		a.youtubeMe, a.profileErrs.youtube = nil, ""
+		a.youtubeMe, a.profileErrs.youtube = nil, nil
 		a.mu.Unlock()
 	}
 	a.apply(s)

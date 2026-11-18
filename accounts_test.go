@@ -9,7 +9,9 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // TestRefreshKeepsAccounts goes on showing the accounts while the shell
@@ -57,6 +59,32 @@ func TestRefusedSpotifySignOut(t *testing.T) {
 	click(t, s, tt, "sign out")
 	if s.asking == nil || s.asking.title != "sign out of Spotify" {
 		t.Errorf("signing out asks %+v", s.asking)
+	}
+}
+
+// TestAccountFaultsInTheLanguage says why Spotify's and YouTube Music's
+// profiles couldn't be read in en-XA, from the error itself rather than
+// its English.
+func TestAccountFaultsInTheLanguage(t *testing.T) {
+	s := newTestShell(t)
+	tt := testerOf(t, s, 1280, 1800)
+	tt.SetLocale("en-XA")
+	usePseudoLocale(t)
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{
+		Spotify: app.SpotifyAccount{SignedIn: true, Error: spotify.ErrSignInExpired.Error(), Fault: spotify.ErrSignInExpired},
+		YouTube: app.YouTubeAccount{SignedIn: true, Error: youtube.ErrSessionRejected.Error(), Fault: youtube.ErrSessionRejected},
+	}}
+	show(s, tt, "/settings/accounts")
+	texts := strings.Join(tt.Texts(), " | ")
+	for _, want := range []string{locales.ErrorSpotifySignInAgain(), locales.ErrorYouTubeSessionRejected()} {
+		if !strings.Contains(texts, want) {
+			t.Errorf("the accounts don't say %q: %q", want, tt.Texts())
+		}
+	}
+	for _, english := range []string{spotify.ErrSignInExpired.Error(), youtube.ErrSessionRejected.Error()} {
+		if strings.Contains(texts, english) {
+			t.Errorf("the accounts show the English %q", english)
+		}
 	}
 }
 

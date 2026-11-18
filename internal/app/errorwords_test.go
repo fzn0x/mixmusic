@@ -29,7 +29,8 @@ func TestErrorWords(t *testing.T) {
 		}
 	}
 	errs = append(errs, errListenBrainzToken, fmt.Errorf("connecting: %w", errPlainRemote),
-		worded("connect to Last.fm first", locales.AccountSettingsLastfmConnectFirst(), nil))
+		worded("connect to Last.fm first", locales.AccountSettingsLastfmConnectFirst(), nil),
+		errSpotifyEpisode, fmt.Errorf("opening: %w", errSpotifyShows))
 	for _, err := range errs {
 		if got := ErrorWords(err); !bracketed(got) {
 			t.Errorf("%v says %q, which no catalog translates", err, got)
@@ -40,6 +41,14 @@ func TestErrorWords(t *testing.T) {
 	}
 	if got := ErrorWords(errors.New("dial tcp: refused")); got != "dial tcp: refused" {
 		t.Errorf("an error of no words says %q", got)
+	}
+	// WordsOf says an error itself, not the ones it wraps, for the windows'
+	// errorText to keep the words around it.
+	if got, ok := WordsOf(webViewMissing(webViewSpotify, "windows")); !ok || !bracketed(got) {
+		t.Errorf("a missing webview says %q, %v", got, ok)
+	}
+	if got, ok := WordsOf(fmt.Errorf("opening: %w", errSpotifyShows)); ok {
+		t.Errorf("an error that wraps a worded one says %q", got)
 	}
 	if got := webViewMissing(webViewVideos, "linux").Error(); !strings.HasPrefix(got, "Showing music videos needs WebKitGTK") {
 		t.Errorf("the log says %q", got)

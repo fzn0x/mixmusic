@@ -106,6 +106,9 @@ func (s *shell) page(c *ui.Context, r *ui.Route) {
 		s.libraryPage(c, "")
 	case r.Match("/library/{tab}"):
 		s.libraryPage(c, r.Param("tab"))
+	case r.Match(importPagePath):
+		r.Title(locales.PlaylistImportTitle())
+		s.importPage(c)
 	case r.Match("/now-playing"):
 		s.nowPlayingPage(c)
 	case r.Match("/remote/{id}"):

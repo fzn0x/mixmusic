@@ -304,9 +304,9 @@ func (s *shell) openMusicFiles() {
 }
 
 // dropFiles plays the music files dropped on the window, and those of the
-// folders dropped, from its goroutine.
+// folders dropped, from its goroutine, and imports the playlists dropped.
 func (s *shell) dropFiles(e *mygo.FileDropEvent) {
-	paths := append([]string{}, e.Paths...)
+	paths := s.dropPlaylists(append([]string{}, e.Paths...))
 	go s.playFiles(paths)
 }
 

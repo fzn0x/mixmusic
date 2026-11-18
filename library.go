@@ -158,6 +158,8 @@ func (s *shell) mixTiles(c *ui.Context) {
 // layout, and in the layouts of cards a card as the mixes' beside it, a
 // plus where their covers are. It returns whether it was clicked.
 func (s *shell) newMixTile(c *ui.Context) bool {
+	// Import a playlist goes beside it (playlistimport.go).
+	defer s.importTile(c)
 	k := &s.lk
 	about := k.sentence(locales.LibraryNewMixAbout())
 	t := s.buttonBase(c.Key("new-mix-tile")).Width(k.tileWidth()).Shrink(0).Column().AlignItems(ui.Start).Label(locales.RailNewMix()).Cursor(ui.CursorPointer)

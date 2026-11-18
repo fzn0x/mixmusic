@@ -326,6 +326,9 @@ type shell struct {
 	// exports is whether the tracks selected have any to export
 	// (export.go).
 	exports exportMemo
+	// imports is what the page that imports playlists keeps
+	// (playlistimport.go).
+	imports importView
 	// listTops are where the track lists and the shelves were in the frame
 	// before, by key.
 	listTops map[string]float32

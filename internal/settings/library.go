@@ -66,6 +66,16 @@ type Library struct {
 	// user closed, by the IDs library.json gives them: the others show
 	// what they hold.
 	CollapsedFolders []string `json:"collapsedFolders"`
+	// TagFilter are the tags the Library's chips chose, by the IDs
+	// library.json gives them: Library › Mixes and Library › Tags show
+	// what has them. None shows all.
+	TagFilter []string `json:"tagFilter"`
+	// TagsMatchAll shows only what has every tag of TagFilter, rather
+	// than any of them.
+	TagsMatchAll bool `json:"tagsMatchAll"`
+	// TagFilters shows the row of the tags' chips above Library › Mixes:
+	// off, the mixes show unfiltered.
+	TagFilters bool `json:"tagFilters"`
 }
 
 // SidebarPlace is where an entry of the sidebar's Your mixes that isn't a
@@ -94,7 +104,7 @@ const (
 // come.
 func defaultLibrary() Library {
 	return Library{MixesSort: MixesByOrder, PlaylistsSort: PlaylistsByService, LibraryTabs: []Arranged{}, SidebarPlaces: []SidebarPlace{},
-		CollapsedFolders: []string{}}
+		CollapsedFolders: []string{}, TagFilter: []string{}, TagFilters: true}
 }
 
 // clean is l with the sorts of d in place of those unknown, and the tabs
@@ -118,5 +128,6 @@ func (l Library) clean(d Library) Library {
 	}
 	l.SidebarPlaces = places
 	l.CollapsedFolders = cleanFolderIDs(l.CollapsedFolders)
+	l.TagFilter = cleanTagIDs(l.TagFilter)
 	return l
 }

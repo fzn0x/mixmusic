@@ -89,6 +89,12 @@
   "collapsedFolders": [
     "4f1c2a9e7b3d5a60"
   ],
+  "tagFilter": [
+    "9b2e4d6f8a1c3e50",
+    "1a3c5e7f9b2d4f60"
+  ],
+  "tagsMatchAll": true,
+  "tagFilters": false,
   "spotifyPlayback": "match",
   "spotifyDevice": "device-1",
   "quality": "saver",

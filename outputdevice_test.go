@@ -323,7 +323,7 @@ func TestOutputButtonKeepsTheVolume(t *testing.T) {
 // Playback › Sound, from the system's default and the devices.
 func TestOutputDeviceSetting(t *testing.T) {
 	s := outputShell(t, func() []app.OutputDevice {
-		return []app.OutputDevice{{ID: "hp", Name: "Headphones"}, {ID: "sp", Name: "Speakers", Default: true}}
+		return []app.OutputDevice{{ID: "hp", Name: "USB headphones"}, {ID: "sp", Name: "Speakers", Default: true}}
 	})
 	tt := testerOf(t, s, 1280, 3200)
 	show(s, tt, "/settings/playback")
@@ -332,8 +332,8 @@ func TestOutputDeviceSetting(t *testing.T) {
 		t.Fatalf("no output device row: %q", tt.Texts())
 	}
 	click(t, s, tt, "System default · Speakers")
-	click(t, s, tt, "Headphones")
-	if got := s.svc.Preferences.Get().OutputDevice; got != (settings.OutputDevice{ID: "hp", Name: "Headphones"}) {
+	click(t, s, tt, "USB headphones")
+	if got := s.svc.Preferences.Get().OutputDevice; got != (settings.OutputDevice{ID: "hp", Name: "USB headphones"}) {
 		t.Errorf("the settings keep %+v", got)
 	}
 }

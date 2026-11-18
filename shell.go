@@ -61,6 +61,7 @@ func (s *shell) view(c *ui.Context) {
 	s.lyricStage(c)
 	s.palette(c)
 	s.coverDialog(c)
+	s.headphonesDialog(c)
 	s.updateOffer(c)
 	s.backupDialogs(c)
 	s.audioAsAccountOffer(c)

@@ -161,6 +161,7 @@ The other rows of Settings › Appearance › Colour and type:
 | **Text size** | Makes the text alone larger or smaller, from 85% to 130%. |
 | **Density** | Comfortable, or compact, which fits more rows on the screen: rows, the sidebar and the player bar take less room. |
 | **Icons only in the sidebar** | Shows the sidebar's pages as icons. A narrow window does this too, until you unfold the sidebar there. |
+| **Show tag filters** | Shows the row of your [tags](library.md#tags) above Library › Mixes, which shows the mixes of the tags you choose. On at first. Library › Tags keeps its row. |
 | **Wavy progress bar** | Draws the played part of the seek bar, in the player bar and on the now playing page, and of the mini player's progress line, as a gentle wave that moves along while music plays and eases flat when you pause. Seeking works as with the straight bar. Off at first. A live stream's bar stays straight. |
 
 The zoom has keys of its own:

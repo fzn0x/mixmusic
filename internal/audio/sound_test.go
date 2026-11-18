@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-// noise is n frames of ch channels of noise, from -1 to 1.
-func noise(n, ch int, seed uint64) []float32 {
+// soundNoise is n frames of ch channels of noise, from -1 to 1.
+func soundNoise(n, ch int, seed uint64) []float32 {
 	r := rand.New(rand.NewPCG(seed, 1))
 	buf := make([]float32, n*ch)
 	for i := range buf {
@@ -30,8 +30,8 @@ func soundTone(n, ch int, hz float64, amp [maxChannels]float64, from int) []floa
 	return buf
 }
 
-// run passes buf through f a quantum at a time, as the engine does.
-func run(f *sound, buf []float32, ch int) []float32 {
+// runSound passes buf through f a quantum at a time, as the engine does.
+func runSound(f *sound, buf []float32, ch int) []float32 {
 	out := slices.Clone(buf)
 	for i := 0; i < len(out); i += ch * quantum {
 		f.process(out[i:min(i+ch*quantum, len(out))], ch)
@@ -39,7 +39,7 @@ func run(f *sound, buf []float32, ch int) []float32 {
 	return out
 }
 
-// settled is a sound at s, its glides done.
+// settledSound is a sound at s, its glides done.
 func settledSound(s Sound) *sound {
 	f := newSound()
 	f.set(s)
@@ -49,23 +49,24 @@ func settledSound(s Sound) *sound {
 	return f
 }
 
-var neutral = Sound{Width: 1}
+// neutralSound has every stage do nothing.
+var neutralSound = Sound{Width: 1}
 
 // TestSoundNeutralIsSkipped leaves every sample as it was while each stage
 // is neutral, at first and once a change glided back, on two channels and
 // on six.
 func TestSoundNeutralIsSkipped(t *testing.T) {
 	for _, ch := range []int{2, 6} {
-		in := noise(20*quantum, ch, 1)
-		if got := run(newSound(), in, ch); !slices.Equal(got, in) {
+		in := soundNoise(20*quantum, ch, 1)
+		if got := runSound(newSound(), in, ch); !slices.Equal(got, in) {
 			t.Errorf("%d channels: a new sound changed the samples", ch)
 		}
 		f := newSound()
 		f.set(Sound{Balance: -0.4, Mono: true, Crossfeed: 0.8, Width: 1.6})
-		run(f, noise(20*quantum, ch, 2), ch)
-		f.set(neutral)
-		run(f, noise(Rate, ch, 3), ch) // a second: fifty time constants
-		if got := run(f, in, ch); !slices.Equal(got, in) {
+		runSound(f, soundNoise(20*quantum, ch, 2), ch)
+		f.set(neutralSound)
+		runSound(f, soundNoise(Rate, ch, 3), ch) // a second: fifty time constants
+		if got := runSound(f, in, ch); !slices.Equal(got, in) {
 			t.Errorf("%d channels: back at neutral, the stages still change the samples", ch)
 		}
 	}
@@ -80,8 +81,8 @@ func TestSoundBalance(t *testing.T) {
 		gl, gr  float32
 	}{{1, 0, 1}, {-1, 1, 0}, {0.25, 0.75, 1}, {-0.6, 1, 0.4}} {
 		for _, ch := range []int{2, 6} {
-			in := noise(4*quantum, ch, 4)
-			got := run(settledSound(Sound{Balance: c.balance, Width: 1}), in, ch)
+			in := soundNoise(4*quantum, ch, 4)
+			got := runSound(settledSound(Sound{Balance: c.balance, Width: 1}), in, ch)
 			for i := range got {
 				want := in[i]
 				switch i % ch {
@@ -102,8 +103,8 @@ func TestSoundBalance(t *testing.T) {
 // the bass channel of 5.1 as they were.
 func TestSoundMono(t *testing.T) {
 	for _, ch := range []int{2, 6} {
-		in := noise(4*quantum, ch, 5)
-		got := run(settledSound(Sound{Mono: true, Width: 1}), in, ch)
+		in := soundNoise(4*quantum, ch, 5)
+		got := runSound(settledSound(Sound{Mono: true, Width: 1}), in, ch)
 		n := 1
 		if ch == 6 {
 			n = 2
@@ -138,9 +139,9 @@ func TestSoundGlides(t *testing.T) {
 			steady[i], steady[i+1] = 0.9, 0.2
 		}
 		f.set(Sound{Crossfeed: 1e-9, Width: 1})
-		run(f, steady, 2)
+		runSound(f, steady, 2)
 		f.set(s)
-		got := run(f, steady, 2)
+		got := runSound(f, steady, 2)
 		for c := range 2 {
 			last := steady[c]
 			for i := c; i < len(got); i += 2 {
@@ -159,9 +160,9 @@ func TestSoundGlides(t *testing.T) {
 // TestSoundWidth scales the side signal by the width, and, above 100%, the
 // mid signal down by as much, so that no sample can go past full scale.
 func TestSoundWidth(t *testing.T) {
-	in := noise(Rate/10, 2, 6)
+	in := soundNoise(Rate/10, 2, 6)
 	for _, w := range []float64{0, 0.5, 1.5, 2} {
-		got := run(settledSound(Sound{Width: w}), in, 2)
+		got := runSound(settledSound(Sound{Width: w}), in, 2)
 		gm, gs := 1.0, w
 		if w > 1 {
 			gm, gs = 1/w, 1
@@ -184,7 +185,7 @@ func TestSoundWidth(t *testing.T) {
 	for i := 0; i < len(side); i += 2 {
 		side[i], side[i+1] = 1, -1
 	}
-	if got := run(settledSound(Sound{Width: 2}), side, 2); slices.Max(got) > 1 || slices.Min(got) < -1 {
+	if got := runSound(settledSound(Sound{Width: 2}), side, 2); slices.Max(got) > 1 || slices.Min(got) < -1 {
 		t.Errorf("a side signal at full scale, twice as wide, goes from %v to %v", slices.Min(got), slices.Max(got))
 	}
 }
@@ -195,14 +196,14 @@ func TestSoundWidth(t *testing.T) {
 // the notes go up.
 func TestSoundCrossfeed(t *testing.T) {
 	centre := soundTone(Rate/10, 2, 440, [maxChannels]float64{0.7, 0.7}, 0)
-	if got := run(settledSound(Sound{Crossfeed: 1, Width: 1}), centre, 2); !slices.Equal(got, centre) {
+	if got := runSound(settledSound(Sound{Crossfeed: 1, Width: 1}), centre, 2); !slices.Equal(got, centre) {
 		t.Error("crossfeed changed a sound in the middle")
 	}
 
 	// An impulse on the left reaches the right no sooner than the delay.
 	impulse := make([]float32, 2*quantum)
 	impulse[0] = 1
-	got := run(settledSound(Sound{Crossfeed: 1, Width: 1}), impulse, 2)
+	got := runSound(settledSound(Sound{Crossfeed: 1, Width: 1}), impulse, 2)
 	first := -1
 	for f := range quantum {
 		if got[2*f+1] != 0 {
@@ -217,7 +218,7 @@ func TestSoundCrossfeed(t *testing.T) {
 	// A tone on the left alone: the right's level against the left's.
 	feed := func(amount, hz float64) float64 {
 		in := soundTone(Rate/2, 2, hz, [maxChannels]float64{0.5, 0}, 0)
-		got := run(settledSound(Sound{Crossfeed: amount, Width: 1}), in, 2)
+		got := runSound(settledSound(Sound{Crossfeed: amount, Width: 1}), in, 2)
 		var l, r float64
 		for i := len(got) / 2; i < len(got); i += 2 { // past the start
 			l += float64(got[i]) * float64(got[i])
@@ -239,8 +240,8 @@ func TestSoundCrossfeed(t *testing.T) {
 // TestSoundWidthAndCrossfeedOnStereoAlone skips width and crossfeed on 5.1,
 // whose channels play from speakers of their own.
 func TestSoundWidthAndCrossfeedOnStereoAlone(t *testing.T) {
-	in := noise(8*quantum, 6, 7)
-	if got := run(settledSound(Sound{Crossfeed: 1, Width: 2}), in, 6); !slices.Equal(got, in) {
+	in := soundNoise(8*quantum, 6, 7)
+	if got := runSound(settledSound(Sound{Crossfeed: 1, Width: 2}), in, 6); !slices.Equal(got, in) {
 		t.Error("width and crossfeed changed six channels")
 	}
 }

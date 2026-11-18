@@ -9273,7 +9273,7 @@
       }
     }
   },
-  "remoteOlderModes": "MixMusic on {name} is older: update it there to move what plays there here, and to change its shuffle, repeat, mute, likes and output device from here.",
+  "remoteOlderModes": "MixMusic on {name} is older: update it there to bring its music here, and to set its shuffle, repeat, mute, like and output device from this computer.",
   "@remoteOlderModes": {
     "description": "Under the remote control page of the computer named {name}, whose MixMusic is older than this one's, and can't move what plays there to this computer, nor take shuffle, repeat, mute, like and the output device from here.",
     "placeholders": {

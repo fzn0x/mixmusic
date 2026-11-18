@@ -28504,7 +28504,7 @@ func (msgs Messages) RemoteNoteWrongCode(name string) string {
 	return Catalog.Format(msgs.locale, "remoteNoteWrongCode", map[string]any{"name": name})
 }
 
-// RemoteOlderModes says "MixMusic on {name} is older: update it there to move what plays there here, and to change its shuffle, repeat, mute, …"
+// RemoteOlderModes says "MixMusic on {name} is older: update it there to bring its music here, and to set its shuffle, repeat, mute, like and …"
 // in the language the app shows.
 //
 // Under the remote control page of the computer named {name}, whose
@@ -28513,7 +28513,7 @@ func (msgs Messages) RemoteNoteWrongCode(name string) string {
 // from here.
 func RemoteOlderModes(name string) string { return In(i18n.Locale()).RemoteOlderModes(name) }
 
-// RemoteOlderModes says "MixMusic on {name} is older: update it there to move what plays there here, and to change its shuffle, repeat, mute, …"
+// RemoteOlderModes says "MixMusic on {name} is older: update it there to bring its music here, and to set its shuffle, repeat, mute, like and …"
 // in the language of msgs.
 //
 // Under the remote control page of the computer named {name}, whose

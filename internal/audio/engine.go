@@ -88,7 +88,9 @@ type Engine struct {
 	surround    bool
 	outChannels int
 	eq          *equalizer
-	sound       *sound // the stages after the equalizer (sound.go)
+	echo        *echo   // echo.go
+	verb        *reverb // reverb.go
+	sound       *sound  // the stages after the equalizer (sound.go)
 	corr        *correction
 	comp        *compressor
 	master      smoother
@@ -131,6 +133,8 @@ func NewEngine(open Opener, start OutputStarter, events Events) *Engine {
 		events: events,
 		paused: true,
 		eq:     newEqualizer(),
+		echo:   newEcho(),
+		verb:   newReverb(),
 		sound:  newSound(),
 		corr:   newCorrection(),
 		comp:   newCompressor(),
@@ -392,6 +396,9 @@ func (e *Engine) Seek(t time.Duration) {
 	}
 	if d != nil {
 		e.reported.ended, e.reported.failed = nil, nil
+		// The echo's and the reverb's tails fade out, so that what was
+		// heard before doesn't ring on where the track plays from now.
+		e.echo.cut, e.verb.cut = true, true
 	}
 	e.mu.Unlock()
 	if d != nil {
@@ -544,6 +551,9 @@ func (e *Engine) ensureOutput() error {
 	}
 	e.mu.Lock()
 	e.out, e.outChannels = out, channels
+	// The output stopped, as playback stopped or a pause lasted: the
+	// echo's and the reverb's tails are gone, and don't sound again.
+	e.echo.stale, e.verb.stale = true, true
 	e.mu.Unlock()
 	return nil
 }
@@ -608,6 +618,7 @@ func (e *Engine) render(out []float32, channels int) {
 		// had beyond those both have.
 		e.pending = nil
 		e.eq.forget(min(e.bus, channels))
+		e.echo.stale, e.verb.stale = true, true
 		e.sound.forget()
 		e.corr.forget(min(e.bus, channels))
 		e.comp.forget(min(e.bus, channels))
@@ -625,10 +636,9 @@ func (e *Engine) render(out []float32, channels int) {
 }
 
 // renderQuantum renders a quantum of the bus's channels into quantumBuf:
-// the decks mixed, each at its loudness, through the equalizer and the
-// stages after it (sound.go), the compressor, the volume, and into the
-// analyser. A stereo deck plays on the front left and right of six
-// channels; a surround deck is mixed down to two as its stream asks.
+// the decks mixed, each at its loudness, then shaped (shape). A stereo
+// deck plays on the front left and right of six channels; a surround deck
+// is mixed down to two as its stream asks.
 func (e *Engine) renderQuantum() {
 	ch := e.bus
 	buf := e.quantumBuf[:ch*quantum]
@@ -705,12 +715,23 @@ func (e *Engine) renderQuantum() {
 			}
 		}
 	}
-	if sounding {
+	e.shape(buf, ch)
+	// The output stays on while the echo's or the reverb's tail sounds.
+	if sounding || e.echo.ringing() || e.verb.ringing() {
 		e.silentFor = 0
 	} else {
 		e.silentFor += quantum
 	}
+}
+
+// shape runs a quantum of the decks' mix, of ch channels interleaved,
+// through the equalizer, the echo, the reverb and the stages after them
+// (sound.go), the correction of headphones, the compressor, the volume,
+// and into the analyser.
+func (e *Engine) shape(buf []float32, ch int) {
 	e.eq.process(buf, ch)
+	e.echo.process(buf, ch)
+	e.verb.process(buf, ch)
 	e.sound.process(buf, ch)
 	e.corr.process(buf, ch)
 	if e.normalize {

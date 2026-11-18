@@ -801,6 +801,19 @@
       }
     }
   },
+  "assistantsToastSleep": "An AI assistant set the sleep timer: {what}",
+  "@assistantsToastSleep": {
+    "description": "Toast when an AI assistant started the sleep timer, or added minutes to it. {what} is sleepInMinutes, sleepAtTrackEnd, sleepAfterTracks or sleepAtQueueEnd.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "assistantsToastSleepOff": "An AI assistant turned the sleep timer off",
+  "@assistantsToastSleepOff": {
+    "description": "Toast when an AI assistant cancelled the sleep timer."
+  },
   "assistantsToastVolume": "An AI assistant set the volume to {percent}%",
   "@assistantsToastVolume": {
     "description": "Toast when an AI assistant set the volume, from 0 to 100.",
@@ -1024,6 +1037,31 @@
     }
   },
   "cmdSettingsOpenFile": "Open the settings file",
+  "cmdSleepCancel": "Sleep timer: cancel",
+  "@cmdSleepCancel": {
+    "description": "A command of the command palette, which takes a shortcut in Settings › Shortcuts, and a global one: the sleep timer ends, and the music plays on."
+  },
+  "cmdSleepLast": "Sleep timer: last length",
+  "@cmdSleepLast": {
+    "description": "A command of the command palette, which takes a shortcut in Settings › Shortcuts, and a global one: it starts the sleep timer for the length chosen last."
+  },
+  "cmdSleepMinutes": "Sleep timer: {minutes, plural, one {# minute} other {# minutes}}",
+  "@cmdSleepMinutes": {
+    "description": "A command of the command palette, which takes a shortcut in Settings › Shortcuts: it starts the sleep timer for that long.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "cmdSleepQueue": "Sleep timer: end of the queue",
+  "@cmdSleepQueue": {
+    "description": "A command of the command palette, which takes a shortcut in Settings › Shortcuts: the music stops at the end of the queue."
+  },
+  "cmdSleepTrack": "Sleep timer: end of this track",
+  "@cmdSleepTrack": {
+    "description": "A command of the command palette, which takes a shortcut in Settings › Shortcuts: the music stops at the end of the track that plays."
+  },
   "cmdSpeedAt": "{kind, select, podcasts {Podcasts} other {Songs}} play at {speed}",
   "@cmdSpeedAt": {
     "placeholders": {
@@ -8020,6 +8058,266 @@
   },
   "skipPartsSwitchLabel": "Skip the parts SponsorBlock marks",
   "skipPartsTitle": "Skip the parts SponsorBlock marks",
+  "sleepAdd": "+{minutes} min",
+  "@sleepAdd": {
+    "description": "A button of the sleep timer's menu while the timer runs, and an item of its submenus: the music stops that many minutes later. Keep it short.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "sleepAfterTracks": "the music stops after {count, plural, one {# track} other {# tracks}}",
+  "@sleepAfterTracks": {
+    "description": "A piece of the sleep timer's toasts (sleepTimerOn, assistantsToastSleep), for a timer that stops at the end of a few tracks, the one that plays first: from 2 to 20.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sleepAfterTracksItem": "After {count, plural, one {# track} other {# tracks}}",
+  "@sleepAfterTracksItem": {
+    "description": "An item of the sleep timer's menu: the music stops at the end of a few tracks, the one that plays first, from 2 to 20, which the buttons beside it (sleepFewerTracks, sleepMoreTracks) change.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sleepAtQueueEnd": "the music stops at the end of the queue",
+  "@sleepAtQueueEnd": {
+    "description": "A piece of the sleep timer's toasts (sleepTimerOn, assistantsToastSleep), for a timer that stops at the end of the queue, before the songs autoplay adds."
+  },
+  "sleepAtTrackEnd": "the music stops at the end of this track",
+  "@sleepAtTrackEnd": {
+    "description": "A piece of the sleep timer's toasts (sleepTimerOn, assistantsToastSleep), for a timer that stops at the end of the track that plays."
+  },
+  "sleepBedtimeByDay": "By day of the week",
+  "@sleepBedtimeByDay": {
+    "description": "A choice of Window (sleepBedtimeWhen), in Settings › Playback › Sleep timer: a window for each day, each with its own switch."
+  },
+  "sleepBedtimeDayLabel": "Window of {day}",
+  "@sleepBedtimeDayLabel": {
+    "description": "The label, for screen readers, of the switch of a day's window of the night, in Settings › Playback › Sleep timer. {day} is a day of the week.",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "sleepBedtimeDesc": "Music that starts playing inside the window below starts the timer, at the length you chose last: {minutes, plural, one {# minute} other {# minutes}}.",
+  "@sleepBedtimeDesc": {
+    "description": "The description of Start the sleep timer by itself (sleepBedtimeTitle), in Settings › Playback › Sleep timer.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "sleepBedtimeEndLabel": "End of the window of {day}",
+  "@sleepBedtimeEndLabel": {
+    "description": "The label, for screen readers, of the menu of the time a window of the night ends, in Settings › Playback › Sleep timer. {day} is a day of the week, or Every day (sleepBedtimeEveryDay).",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "sleepBedtimeEveryDay": "Every day",
+  "@sleepBedtimeEveryDay": {
+    "description": "A choice of Window (sleepBedtimeWhen), in Settings › Playback › Sleep timer, and the title of the row of that window's times."
+  },
+  "sleepBedtimeHint": "A window that ends before it starts ends the next morning. Cancel the timer inside a window, and it stays off until the window ends.",
+  "@sleepBedtimeHint": {
+    "description": "A hint under the windows of the night in Settings › Playback › Sleep timer."
+  },
+  "sleepBedtimeStartLabel": "Start of the window of {day}",
+  "@sleepBedtimeStartLabel": {
+    "description": "The label, for screen readers, of the menu of the time a window of the night starts, in Settings › Playback › Sleep timer. {day} is a day of the week, or Every day (sleepBedtimeEveryDay).",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "sleepBedtimeTitle": "Start the sleep timer by itself",
+  "@sleepBedtimeTitle": {
+    "description": "A switch of Settings › Playback › Sleep timer: the timer starts by itself as music starts playing inside the window of the night set below it."
+  },
+  "sleepBedtimeTo": "to",
+  "@sleepBedtimeTo": {
+    "description": "Between the start and the end of a window of the night, in Settings › Playback › Sleep timer, as in 22:00 to 06:00. Only this word shows, between two menus of times."
+  },
+  "sleepBedtimeWhen": "Window",
+  "@sleepBedtimeWhen": {
+    "description": "A setting of Settings › Playback › Sleep timer, under Start the sleep timer by itself: whether the window of the night is the same every day (sleepBedtimeEveryDay) or one for each day of the week (sleepBedtimeByDay)."
+  },
+  "sleepCancel": "Cancel",
+  "@sleepCancel": {
+    "description": "A button of the sleep timer's menu while the timer runs, and an item of its submenus: the timer ends, and the music plays on."
+  },
+  "sleepEndOfQueue": "End of the queue",
+  "@sleepEndOfQueue": {
+    "description": "An item of the sleep timer's menu, and of its submenus: the music stops at the end of the queue, before the songs autoplay adds."
+  },
+  "sleepEndOfTrack": "End of this track",
+  "@sleepEndOfTrack": {
+    "description": "An item of the sleep timer's menu, and of its submenus: the music stops at the end of the track that plays."
+  },
+  "sleepFadeDesc": "Before the sleep timer stops the music, it fades out over this time. Your volume stays where it is.",
+  "@sleepFadeDesc": {
+    "description": "The description of Fade out (sleepFadeTitle), in Settings › Playback › Sleep timer."
+  },
+  "sleepFadeOff": "Off",
+  "@sleepFadeOff": {
+    "description": "A choice of Fade out (sleepFadeTitle), in Settings › Playback › Sleep timer: no fade."
+  },
+  "sleepFadeSeconds": "{seconds} s",
+  "@sleepFadeSeconds": {
+    "description": "A choice of Fade out (sleepFadeTitle), in Settings › Playback › Sleep timer: a number of seconds, abbreviated.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "sleepFadeTitle": "Fade out",
+  "@sleepFadeTitle": {
+    "description": "A setting of Settings › Playback › Sleep timer: how long the music fades out before the timer stops it."
+  },
+  "sleepFewerTracks": "Fewer tracks",
+  "@sleepFewerTracks": {
+    "description": "The label of the minus button beside After N tracks (sleepAfterTracksItem) in the sleep timer's menu."
+  },
+  "sleepFinish": "Let the track finish",
+  "@sleepFinish": {
+    "description": "A switch of the sleep timer's menu, and a setting of Settings › Playback › Sleep timer: when the time runs out, the music stops at the end of the track that plays."
+  },
+  "sleepFinishDesc": "When the time runs out, the music stops at the end of the track that plays, and fades out in its last seconds.",
+  "@sleepFinishDesc": {
+    "description": "The description of Let the track finish (sleepFinish), in Settings › Playback › Sleep timer."
+  },
+  "sleepInMinutes": "the music stops in {minutes, plural, one {# minute} other {# minutes}}",
+  "@sleepInMinutes": {
+    "description": "A piece of the sleep timer's toasts (sleepTimerOn, sleepTimerBedtime, assistantsToastSleep): how long the timer runs, in whole minutes.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "sleepMinutes": "{minutes, plural, one {# minute} other {# minutes}}",
+  "@sleepMinutes": {
+    "description": "An item of the sleep timer's menu, and of its submenu in the mini player's and the tray icon's menus: a length of the timer.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "sleepMinutesField": "Minutes",
+  "@sleepMinutesField": {
+    "description": "The placeholder of the field of the sleep timer's menu where the user types a length of the timer, in minutes."
+  },
+  "sleepMinutesFieldLabel": "Length of the sleep timer, in minutes",
+  "@sleepMinutesFieldLabel": {
+    "description": "The label, for screen readers, of the field of the sleep timer's menu where the user types a length of the timer."
+  },
+  "sleepMinutesInvalid": "A whole number of minutes, from 1 to {max}",
+  "@sleepMinutesInvalid": {
+    "description": "Under the field of minutes of the sleep timer's menu, when what the user typed isn't a length the timer takes.",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "sleepMoreTracks": "More tracks",
+  "@sleepMoreTracks": {
+    "description": "The label of the plus button beside After N tracks (sleepAfterTracksItem) in the sleep timer's menu."
+  },
+  "sleepStart": "Start",
+  "@sleepStart": {
+    "description": "The button beside the field of minutes in the sleep timer's menu, which starts the timer."
+  },
+  "sleepStopsAfterTracks": "Stops after {count, plural, one {# track} other {# tracks}}",
+  "@sleepStopsAfterTracks": {
+    "description": "The first line of the sleep timer's menu while the timer stops the music at the end of a few tracks: how many are left to end, the one that plays first, 2 or more.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sleepStopsAtQueue": "Stops at the end of the queue",
+  "@sleepStopsAtQueue": {
+    "description": "The first line of the sleep timer's menu while the timer stops the music at the end of the queue."
+  },
+  "sleepStopsAtTrack": "Stops at the end of this track",
+  "@sleepStopsAtTrack": {
+    "description": "The first line of the sleep timer's menu while the timer stops the music at the end of the track that plays."
+  },
+  "sleepStopsIn": "Stops in {time}",
+  "@sleepStopsIn": {
+    "description": "The first line of the sleep timer's menu while a timer of minutes runs. {time} is how long it runs on, as 12:34.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sleepTimerBedtime": "It's bedtime, so the sleep timer is on: {what}",
+  "@sleepTimerBedtime": {
+    "description": "Toast as the sleep timer starts by itself, as music starts playing inside the bedtime window the user set in Settings › Playback › Sleep timer. {what} is sleepInMinutes.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "sleepTimerEnded": "The sleep timer ran out with nothing playing",
+  "@sleepTimerEnded": {
+    "description": "Toast when the sleep timer's time ran out while the music was paused already: it ends."
+  },
+  "sleepTimerFinishing": "Time's up: the music stops at the end of this track",
+  "@sleepTimerFinishing": {
+    "description": "Toast when the sleep timer's time ran out while Let the track finish (sleepFinish) is on: the track that plays plays to its end."
+  },
+  "sleepTimerLeft": "Sleep timer: {time} left",
+  "@sleepTimerLeft": {
+    "description": "The label and tip of the moon button by the player while the sleep timer runs. {time} is how long it runs on, as 12:34 or 1:02:03.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sleepTimerOff": "Sleep timer off",
+  "@sleepTimerOff": {
+    "description": "Toast as the user cancels the sleep timer: the music plays on."
+  },
+  "sleepTimerOffAsleep": "Sleep timer off, as the computer went to sleep",
+  "@sleepTimerOffAsleep": {
+    "description": "Toast, seen once the computer wakes, when the computer going to sleep ended the sleep timer."
+  },
+  "sleepTimerOn": "Sleep timer on: {what}",
+  "@sleepTimerOn": {
+    "description": "Toast as the user starts the sleep timer, or adds minutes to it. {what} is sleepInMinutes, sleepAtTrackEnd, sleepAfterTracks or sleepAtQueueEnd.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "sleepTimerPaused": "The sleep timer paused the music",
+  "@sleepTimerPaused": {
+    "description": "Toast when the sleep timer stopped the music, after its time or at the end of a track or of the queue."
+  },
+  "sleepTimerTitle": "Sleep timer",
+  "@sleepTimerTitle": {
+    "description": "The moon button by the player, the title of its menu, of a submenu of the mini player's and the tray icon's menus, and of a group of Settings › Playback."
+  },
   "speedAt": "{speed}, at their own pitch.",
   "@speedAt": {
     "placeholders": {

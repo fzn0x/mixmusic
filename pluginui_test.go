@@ -102,7 +102,11 @@ func TestSleepTimer(t *testing.T) {
 	if !tt.HasText("Sleep timer: 45 minutes") {
 		t.Errorf("the palette doesn't find the plugin's command: %q", tt.Texts())
 	}
-	// Enter searches what was typed; Down reaches the command.
+	// Enter searches what was typed; Down reaches MixMusic's own sleep
+	// timer's command of the same name, which comes before the plugins'
+	// (#594), and Down again the plugin's.
+	tt.Key(0, ui.KeyDown)
+	tt.Frame()
 	tt.Key(0, ui.KeyDown)
 	tt.Frame()
 	tt.Key(0, ui.KeyEnter)

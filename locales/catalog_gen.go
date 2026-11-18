@@ -80,6 +80,22 @@ func (msgs Messages) AboutLicenses() string {
 	return Catalog.Format(msgs.locale, "aboutLicenses", nil)
 }
 
+// AboutNoLogs says "MixMusic keeps no log here"
+// in the language the app shows.
+//
+// Why the log's folder didn't open or memory use wasn't recorded, as a
+// toast: this copy of MixMusic keeps no log.
+func AboutNoLogs() string { return In(i18n.Locale()).AboutNoLogs() }
+
+// AboutNoLogs says "MixMusic keeps no log here"
+// in the language of msgs.
+//
+// Why the log's folder didn't open or memory use wasn't recorded, as a
+// toast: this copy of MixMusic keeps no log.
+func (msgs Messages) AboutNoLogs() string {
+	return Catalog.Format(msgs.locale, "aboutNoLogs", nil)
+}
+
 // AboutNoticeAac says "SharpJaad, which decodes AAC audio"
 // in the language the app shows.
 func AboutNoticeAac() string { return In(i18n.Locale()).AboutNoticeAac() }
@@ -7394,6 +7410,22 @@ func (msgs Messages) DownloadsMovedTo(folder string) string {
 	return Catalog.Format(msgs.locale, "downloadsMovedTo", map[string]any{"folder": folder})
 }
 
+// DownloadsNoFolder says "MixMusic keeps no downloads here"
+// in the language the app shows.
+//
+// Why the downloads' folder didn't open, as a toast: this copy of MixMusic
+// keeps no downloads.
+func DownloadsNoFolder() string { return In(i18n.Locale()).DownloadsNoFolder() }
+
+// DownloadsNoFolder says "MixMusic keeps no downloads here"
+// in the language of msgs.
+//
+// Why the downloads' folder didn't open, as a toast: this copy of MixMusic
+// keeps no downloads.
+func (msgs Messages) DownloadsNoFolder() string {
+	return Catalog.Format(msgs.locale, "downloadsNoFolder", nil)
+}
+
 // DownloadsNoMatch says "No download matches “{query}”."
 // in the language the app shows.
 func DownloadsNoMatch(query string) string { return In(i18n.Locale()).DownloadsNoMatch(query) }
@@ -9568,6 +9600,20 @@ func ExportMenu() string { return In(i18n.Locale()).ExportMenu() }
 // in the language of msgs.
 func (msgs Messages) ExportMenu() string {
 	return Catalog.Format(msgs.locale, "exportMenu", nil)
+}
+
+// ExportNotOnComputer says "this track isn't downloaded, nor on this computer"
+// in the language the app shows.
+//
+// Why a track didn't export, in the {error} of exportFailed.
+func ExportNotOnComputer() string { return In(i18n.Locale()).ExportNotOnComputer() }
+
+// ExportNotOnComputer says "this track isn't downloaded, nor on this computer"
+// in the language of msgs.
+//
+// Why a track didn't export, in the {error} of exportFailed.
+func (msgs Messages) ExportNotOnComputer() string {
+	return Catalog.Format(msgs.locale, "exportNotOnComputer", nil)
 }
 
 // ExportOnlyDownloaded says "Only tracks downloaded or on this computer export"
@@ -12790,6 +12836,24 @@ func (msgs Messages) LocalTagsBadImage(error string) string {
 	return Catalog.Format(msgs.locale, "localTagsBadImage", map[string]any{"error": error})
 }
 
+// LocalTagsCantChange says "MixMusic can't change {file}: {error}"
+// in the language the app shows.
+//
+// Why a song's tags didn't change, as a toast. {file} is the file's name;
+// {error} is why.
+func LocalTagsCantChange(file string, error string) string {
+	return In(i18n.Locale()).LocalTagsCantChange(file, error)
+}
+
+// LocalTagsCantChange says "MixMusic can't change {file}: {error}"
+// in the language of msgs.
+//
+// Why a song's tags didn't change, as a toast. {file} is the file's name;
+// {error} is why.
+func (msgs Messages) LocalTagsCantChange(file string, error string) string {
+	return Catalog.Format(msgs.locale, "localTagsCantChange", map[string]any{"file": file, "error": error})
+}
+
 // LocalTagsChooseCoverTitle says "Choose a cover"
 // in the language the app shows.
 //
@@ -12816,6 +12880,24 @@ func LocalTagsChooseImage() string { return In(i18n.Locale()).LocalTagsChooseIma
 // Button that chooses a cover image. Lowercase.
 func (msgs Messages) LocalTagsChooseImage() string {
 	return Catalog.Format(msgs.locale, "localTagsChooseImage", nil)
+}
+
+// LocalTagsCouldntSave says "couldn't save {file}: {error}"
+// in the language the app shows.
+//
+// Why a song's tags weren't saved, in the Edit info dialog and its toast.
+// {file} is the file's name; {error} is why.
+func LocalTagsCouldntSave(file string, error string) string {
+	return In(i18n.Locale()).LocalTagsCouldntSave(file, error)
+}
+
+// LocalTagsCouldntSave says "couldn't save {file}: {error}"
+// in the language of msgs.
+//
+// Why a song's tags weren't saved, in the Edit info dialog and its toast.
+// {file} is the file's name; {error} is why.
+func (msgs Messages) LocalTagsCouldntSave(file string, error string) string {
+	return Catalog.Format(msgs.locale, "localTagsCouldntSave", map[string]any{"file": file, "error": error})
 }
 
 // LocalTagsCover says "Cover"
@@ -13080,6 +13162,22 @@ func LocalTagsNone() string { return In(i18n.Locale()).LocalTagsNone() }
 // No cover. Shown in the Cover row.
 func (msgs Messages) LocalTagsNone() string {
 	return Catalog.Format(msgs.locale, "localTagsNone", nil)
+}
+
+// LocalTagsNotOnComputer says "this song isn't a file on this computer"
+// in the language the app shows.
+//
+// Why a song's tags didn't change, as a toast: it isn't one of the files on
+// this computer.
+func LocalTagsNotOnComputer() string { return In(i18n.Locale()).LocalTagsNotOnComputer() }
+
+// LocalTagsNotOnComputer says "this song isn't a file on this computer"
+// in the language of msgs.
+//
+// Why a song's tags didn't change, as a toast: it isn't one of the files on
+// this computer.
+func (msgs Messages) LocalTagsNotOnComputer() string {
+	return Catalog.Format(msgs.locale, "localTagsNotOnComputer", nil)
 }
 
 // LocalTagsRemoveCover says "remove the cover"
@@ -15184,6 +15282,40 @@ func (msgs Messages) MarketplaceWarningAsks(permissions string) string {
 	return Catalog.Format(msgs.locale, "marketplaceWarningAsks", map[string]any{"permissions": permissions})
 }
 
+// MemoryCantRecord says "can't record memory use: {error}"
+// in the language the app shows.
+//
+// Why recording memory use didn't start, as a toast, in Settings › About.
+// {error} is the system's own words.
+func MemoryCantRecord(error string) string { return In(i18n.Locale()).MemoryCantRecord(error) }
+
+// MemoryCantRecord says "can't record memory use: {error}"
+// in the language of msgs.
+//
+// Why recording memory use didn't start, as a toast, in Settings › About.
+// {error} is the system's own words.
+func (msgs Messages) MemoryCantRecord(error string) string {
+	return Catalog.Format(msgs.locale, "memoryCantRecord", map[string]any{"error": error})
+}
+
+// MemoryCantSaveProfile says "can't save a heap profile: {error}"
+// in the language the app shows.
+//
+// Why a heap profile wasn't saved, as a toast, in Settings › About.
+// {error} is the system's own words.
+func MemoryCantSaveProfile(error string) string {
+	return In(i18n.Locale()).MemoryCantSaveProfile(error)
+}
+
+// MemoryCantSaveProfile says "can't save a heap profile: {error}"
+// in the language of msgs.
+//
+// Why a heap profile wasn't saved, as a toast, in Settings › About.
+// {error} is the system's own words.
+func (msgs Messages) MemoryCantSaveProfile(error string) string {
+	return Catalog.Format(msgs.locale, "memoryCantSaveProfile", map[string]any{"error": error})
+}
+
 // MemoryHeapAbout says "Saves where MixMusic's Go code holds memory now, as heap-<time>.pprof beside memory.log. The newest five are kept."
 // in the language the app shows.
 func MemoryHeapAbout() string { return In(i18n.Locale()).MemoryHeapAbout() }
@@ -15736,6 +15868,22 @@ func (msgs Messages) MixCoverCancel() string {
 	return Catalog.Format(msgs.locale, "mixCoverCancel", nil)
 }
 
+// MixCoverCantRead says "couldn't read the image: {error}"
+// in the language the app shows.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed.
+// {error} is the system's own words.
+func MixCoverCantRead(error string) string { return In(i18n.Locale()).MixCoverCantRead(error) }
+
+// MixCoverCantRead says "couldn't read the image: {error}"
+// in the language of msgs.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed.
+// {error} is the system's own words.
+func (msgs Messages) MixCoverCantRead(error string) string {
+	return Catalog.Format(msgs.locale, "mixCoverCantRead", map[string]any{"error": error})
+}
+
 // MixCoverChange says "Change cover…"
 // in the language the app shows.
 func MixCoverChange() string { return In(i18n.Locale()).MixCoverChange() }
@@ -15788,6 +15936,22 @@ func (msgs Messages) MixCoverFailed(title string, error string) string {
 	return Catalog.Format(msgs.locale, "mixCoverFailed", map[string]any{"title": title, "error": error})
 }
 
+// MixCoverGifTooLarge says "the GIF is too large for a cover: choose one of fewer or smaller frames"
+// in the language the app shows.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// moving image is too large.
+func MixCoverGifTooLarge() string { return In(i18n.Locale()).MixCoverGifTooLarge() }
+
+// MixCoverGifTooLarge says "the GIF is too large for a cover: choose one of fewer or smaller frames"
+// in the language of msgs.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// moving image is too large.
+func (msgs Messages) MixCoverGifTooLarge() string {
+	return Catalog.Format(msgs.locale, "mixCoverGifTooLarge", nil)
+}
+
 // MixCoverImages says "Images"
 // in the language the app shows.
 func MixCoverImages() string { return In(i18n.Locale()).MixCoverImages() }
@@ -15806,6 +15970,22 @@ func MixCoverIntro(title string) string { return In(i18n.Locale()).MixCoverIntro
 // in the language of msgs.
 func (msgs Messages) MixCoverIntro(title string) string {
 	return Catalog.Format(msgs.locale, "mixCoverIntro", map[string]any{"title": title})
+}
+
+// MixCoverNotImage says "a cover is a PNG, JPEG, GIF or WebP image"
+// in the language the app shows.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// file chosen isn't such an image.
+func MixCoverNotImage() string { return In(i18n.Locale()).MixCoverNotImage() }
+
+// MixCoverNotImage says "a cover is a PNG, JPEG, GIF or WebP image"
+// in the language of msgs.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// file chosen isn't such an image.
+func (msgs Messages) MixCoverNotImage() string {
+	return Catalog.Format(msgs.locale, "mixCoverNotImage", nil)
 }
 
 // MixCoverSongs says "use the songs' covers"
@@ -15836,6 +16016,72 @@ func MixCoverTitle() string { return In(i18n.Locale()).MixCoverTitle() }
 // in the language of msgs.
 func (msgs Messages) MixCoverTitle() string {
 	return Catalog.Format(msgs.locale, "mixCoverTitle", nil)
+}
+
+// MixCoverTooLarge says "the image is too large for a cover: choose one under 40 MB"
+// in the language the app shows.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// file is too large.
+func MixCoverTooLarge() string { return In(i18n.Locale()).MixCoverTooLarge() }
+
+// MixCoverTooLarge says "the image is too large for a cover: choose one under 40 MB"
+// in the language of msgs.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// file is too large.
+func (msgs Messages) MixCoverTooLarge() string {
+	return Catalog.Format(msgs.locale, "mixCoverTooLarge", nil)
+}
+
+// MixCoverTooManyPixels says "the image is too large for a cover"
+// in the language the app shows.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// image has too many pixels.
+func MixCoverTooManyPixels() string { return In(i18n.Locale()).MixCoverTooManyPixels() }
+
+// MixCoverTooManyPixels says "the image is too large for a cover"
+// in the language of msgs.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// image has too many pixels.
+func (msgs Messages) MixCoverTooManyPixels() string {
+	return Catalog.Format(msgs.locale, "mixCoverTooManyPixels", nil)
+}
+
+// MixCoverTrackFailed says "couldn't get the cover of {title}: {error}"
+// in the language the app shows.
+//
+// Why a mix's cover didn't change to a song's, in the {error} of
+// mixCoverFailed. {title} is the song's title; {error} is why.
+func MixCoverTrackFailed(title string, error string) string {
+	return In(i18n.Locale()).MixCoverTrackFailed(title, error)
+}
+
+// MixCoverTrackFailed says "couldn't get the cover of {title}: {error}"
+// in the language of msgs.
+//
+// Why a mix's cover didn't change to a song's, in the {error} of
+// mixCoverFailed. {title} is the song's title; {error} is why.
+func (msgs Messages) MixCoverTrackFailed(title string, error string) string {
+	return Catalog.Format(msgs.locale, "mixCoverTrackFailed", map[string]any{"title": title, "error": error})
+}
+
+// MixCoverTrackNone says "{title} has no cover"
+// in the language the app shows.
+//
+// Why a mix's cover didn't change to a song's, in the {error} of
+// mixCoverFailed. {title} is the song's title.
+func MixCoverTrackNone(title string) string { return In(i18n.Locale()).MixCoverTrackNone(title) }
+
+// MixCoverTrackNone says "{title} has no cover"
+// in the language of msgs.
+//
+// Why a mix's cover didn't change to a song's, in the {error} of
+// mixCoverFailed. {title} is the song's title.
+func (msgs Messages) MixCoverTrackNone(title string) string {
+	return Catalog.Format(msgs.locale, "mixCoverTrackNone", map[string]any{"title": title})
 }
 
 // MixCoverUse says "Use the cover of {title}"
@@ -18286,6 +18532,26 @@ func PlaylistReadPartialFirst(n int, noun string, error string) string {
 // in the language of msgs.
 func (msgs Messages) PlaylistReadPartialFirst(n int, noun string, error string) string {
 	return Catalog.Format(msgs.locale, "playlistReadPartialFirst", map[string]any{"n": n, "noun": noun, "error": error})
+}
+
+// PlaylistReadPartialNamed says "Only {n, plural, one {# track} other {# tracks}} of {title} could be loaded: {error}"
+// in the language the app shows.
+//
+// Toast when playing or downloading a whole playlist read only some of its
+// tracks. {title} is the playlist's name; {error} is why, often in the
+// service's own words.
+func PlaylistReadPartialNamed(n int, title string, error string) string {
+	return In(i18n.Locale()).PlaylistReadPartialNamed(n, title, error)
+}
+
+// PlaylistReadPartialNamed says "Only {n, plural, one {# track} other {# tracks}} of {title} could be loaded: {error}"
+// in the language of msgs.
+//
+// Toast when playing or downloading a whole playlist read only some of its
+// tracks. {title} is the playlist's name; {error} is why, often in the
+// service's own words.
+func (msgs Messages) PlaylistReadPartialNamed(n int, title string, error string) string {
+	return Catalog.Format(msgs.locale, "playlistReadPartialNamed", map[string]any{"n": n, "title": title, "error": error})
 }
 
 // PlaylistReadPartialOf says "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count, plural, one {# track} other {# …"

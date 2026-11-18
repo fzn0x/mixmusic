@@ -11,6 +11,10 @@
   },
   "aboutHide": "hide",
   "aboutLicenses": "Licenses",
+  "aboutNoLogs": "MixMusic keeps no log here",
+  "@aboutNoLogs": {
+    "description": "Why the log's folder didn't open or memory use wasn't recorded, as a toast: this copy of MixMusic keeps no log."
+  },
   "aboutNoticeAac": "SharpJaad, which decodes AAC audio",
   "aboutNoticeIpadic": "The IPA dictionary (mecab-ipadic), which romaji downloads the first time it's turned on",
   "aboutNoticeKagome": "kagome, which reads the kanji of Japanese lyrics for their romaji",
@@ -2232,6 +2236,10 @@
       }
     }
   },
+  "downloadsNoFolder": "MixMusic keeps no downloads here",
+  "@downloadsNoFolder": {
+    "description": "Why the downloads' folder didn't open, as a toast: this copy of MixMusic keeps no downloads."
+  },
   "downloadsNoMatch": "No download matches “{query}”.",
   "@downloadsNoMatch": {
     "placeholders": {
@@ -2869,6 +2877,10 @@
     "description": "The title of the dialog that chooses the folder tracks are exported to."
   },
   "exportMenu": "Export…",
+  "exportNotOnComputer": "this track isn't downloaded, nor on this computer",
+  "@exportNotOnComputer": {
+    "description": "Why a track didn't export, in the {error} of exportFailed."
+  },
   "exportOnlyDownloaded": "Only tracks downloaded or on this computer export",
   "exportSelected": "Export the selected tracks",
   "exportShow": "show",
@@ -3961,6 +3973,18 @@
       }
     }
   },
+  "localTagsCantChange": "MixMusic can't change {file}: {error}",
+  "@localTagsCantChange": {
+    "description": "Why a song's tags didn't change, as a toast. {file} is the file's name; {error} is why.",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "localTagsChooseCoverTitle": "Choose a cover",
   "@localTagsChooseCoverTitle": {
     "description": "Title of the file dialog that picks a cover."
@@ -3968,6 +3992,18 @@
   "localTagsChooseImage": "choose an image…",
   "@localTagsChooseImage": {
     "description": "Button that chooses a cover image. Lowercase."
+  },
+  "localTagsCouldntSave": "couldn't save {file}: {error}",
+  "@localTagsCouldntSave": {
+    "description": "Why a song's tags weren't saved, in the Edit info dialog and its toast. {file} is the file's name; {error} is why.",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "localTagsCover": "Cover",
   "localTagsDisc": "Disc",
@@ -4062,6 +4098,10 @@
   "localTagsNone": "None",
   "@localTagsNone": {
     "description": "No cover. Shown in the Cover row."
+  },
+  "localTagsNotOnComputer": "this song isn't a file on this computer",
+  "@localTagsNotOnComputer": {
+    "description": "Why a song's tags didn't change, as a toast: it isn't one of the files on this computer."
   },
   "localTagsRemoveCover": "remove the cover",
   "@localTagsRemoveCover": {
@@ -4526,6 +4566,24 @@
       }
     }
   },
+  "memoryCantRecord": "can't record memory use: {error}",
+  "@memoryCantRecord": {
+    "description": "Why recording memory use didn't start, as a toast, in Settings › About. {error} is the system's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryCantSaveProfile": "can't save a heap profile: {error}",
+  "@memoryCantSaveProfile": {
+    "description": "Why a heap profile wasn't saved, as a toast, in Settings › About. {error} is the system's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "memoryHeapAbout": "Saves where MixMusic's Go code holds memory now, as heap-<time>.pprof beside memory.log. The newest five are kept.",
   "memoryHeapTitle": "Heap profile",
   "memoryOpenLogs": "open logs folder",
@@ -4714,6 +4772,15 @@
   },
   "miniWindowTitle": "MixMusic mini player",
   "mixCoverCancel": "cancel",
+  "mixCoverCantRead": "couldn't read the image: {error}",
+  "@mixCoverCantRead": {
+    "description": "Why a mix's cover didn't change, in the {error} of mixCoverFailed. {error} is the system's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "mixCoverChange": "Change cover…",
   "mixCoverChanged": "Changed the cover of {title}",
   "@mixCoverChanged": {
@@ -4743,6 +4810,10 @@
       }
     }
   },
+  "mixCoverGifTooLarge": "the GIF is too large for a cover: choose one of fewer or smaller frames",
+  "@mixCoverGifTooLarge": {
+    "description": "Why a mix's cover didn't change, in the {error} of mixCoverFailed: the moving image is too large."
+  },
   "mixCoverImages": "Images",
   "mixCoverIntro": "Choose an image, a PNG, JPEG, GIF or WebP, or the cover of one of the songs of {title}. It shows cut to a square.",
   "@mixCoverIntro": {
@@ -4751,6 +4822,10 @@
         "type": "String"
       }
     }
+  },
+  "mixCoverNotImage": "a cover is a PNG, JPEG, GIF or WebP image",
+  "@mixCoverNotImage": {
+    "description": "Why a mix's cover didn't change, in the {error} of mixCoverFailed: the file chosen isn't such an image."
   },
   "mixCoverSongs": "use the songs' covers",
   "mixCoverSongsAgain": "{title} shows its songs' covers again",
@@ -4762,6 +4837,35 @@
     }
   },
   "mixCoverTitle": "change cover",
+  "mixCoverTooLarge": "the image is too large for a cover: choose one under 40 MB",
+  "@mixCoverTooLarge": {
+    "description": "Why a mix's cover didn't change, in the {error} of mixCoverFailed: the file is too large."
+  },
+  "mixCoverTooManyPixels": "the image is too large for a cover",
+  "@mixCoverTooManyPixels": {
+    "description": "Why a mix's cover didn't change, in the {error} of mixCoverFailed: the image has too many pixels."
+  },
+  "mixCoverTrackFailed": "couldn't get the cover of {title}: {error}",
+  "@mixCoverTrackFailed": {
+    "description": "Why a mix's cover didn't change to a song's, in the {error} of mixCoverFailed. {title} is the song's title; {error} is why.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "mixCoverTrackNone": "{title} has no cover",
+  "@mixCoverTrackNone": {
+    "description": "Why a mix's cover didn't change to a song's, in the {error} of mixCoverFailed. {title} is the song's title.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "mixCoverUse": "Use the cover of {title}",
   "@mixCoverUse": {
     "placeholders": {
@@ -5568,6 +5672,21 @@
         "type": "int"
       },
       "noun": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistReadPartialNamed": "Only {n, plural, one {# track} other {# tracks}} of {title} could be loaded: {error}",
+  "@playlistReadPartialNamed": {
+    "description": "Toast when playing or downloading a whole playlist read only some of its tracks. {title} is the playlist's name; {error} is why, often in the service's own words.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "title": {
         "type": "String"
       },
       "error": {

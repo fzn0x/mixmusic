@@ -573,6 +573,9 @@ MixMusic is built on these projects:
   the windows.
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**,
   whose HCT color science the Material themes' colors are a port of.
+- **[FCast](https://docs.fcast.org)**, the open protocol MixMusic plays on
+  FCast receivers with. MixMusic is an independent implementation of it,
+  and isn't affiliated with FUTO; FCast is a registered trademark of FUTO.
 - **[Kevin MacLeod](https://incompetech.com)**, whose music, under
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), plays on the
   website.

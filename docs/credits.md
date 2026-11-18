@@ -164,6 +164,12 @@ of its own.
 - Loudness: ITU-R BS.1770, which YouTube measures with.
 - Casting: multicast DNS, RFC 6762, and the Cast v2 protocol, from its
   public descriptions.
+- DLNA and UPnP renderers: SSDP and the UPnP Device Architecture, the
+  AVTransport, RenderingControl and ConnectionManager services and the
+  DIDL-Lite of the UPnP AV specifications, and DLNA's HTTP headers.
+- FCast receivers: the [FCast protocol](https://docs.fcast.org), versions 3
+  and 4. FCast is a registered trademark of FUTO: MixMusic implements the
+  protocol on its own, and isn't affiliated with FUTO.
 
 ## Building and publishing
 

@@ -3,7 +3,8 @@
 MixMusic plays on cast devices, Chromecasts, Google Home and Nest speakers
 and TVs with Chromecast built in, through their default media receiver,
 which plays the media at a URL it's given and shows its title, artist and
-cover on a screen.
+cover on a screen; and, the same way, on DLNA and UPnP media renderers and
+on FCast receivers.
 
 - **`internal/cast`** finds the devices and speaks to them, in Go, with no
   library: the Cast v2 protocol, from its public descriptions.
@@ -32,6 +33,35 @@ cover on a screen.
     address that speaks the protocol and keeps the messages it gets, and an
     mDNS responder for it, with DNS and frames of their own, apart from
     the package's.
+- **`internal/upnp`** finds media renderers and plays on them, with no
+  library. `Search` sends SSDP's M-SEARCH for `MediaRenderer:1` three
+  times in 2.5 s, from a port of its own, never UDP 1900, which Windows'
+  SSDP service holds, to the SSDP group on each of the computer's networks
+  (`dnssd.SendToGroup`). It keeps the answers from private or link-local
+  IPv4 hosts whose description, and the control addresses of their
+  services, are their own, with an AVTransport of any version. A `Session`
+  sends SOAP actions: `SetAVTransportURI` with DIDL-Lite metadata, `Play`,
+  `Pause`, `Seek`, `Stop`, `SetNextAVTransportURI`, RenderingControl's
+  volume and mute, and ConnectionManager's `GetProtocolInfo`, whose sink
+  tells the formats the renderer plays. It asks `GetTransportInfo` and
+  `GetPositionInfo` every 1 s while the renderer plays, every 0.6 s
+  otherwise, and the volume every 5 s, and turns them into `cast`'s media
+  statuses: a stop within 4 s of the end is the end, a track address that
+  isn't MixMusic's ends the session as another app's, and so do 10 failed
+  polls in a row. Media loaded to wait paused isn't sent until it plays.
+  `upnptest` is a fake renderer over HTTP on the loopback address, and an
+  SSDP responder for it.
+- **`internal/fcast`** finds FCast receivers under `_fcast._tcp` with
+  `internal/dnssd`, and speaks protocol v4 to one whose `v` TXT value is 4
+  or more: the plaintext `Version`, then TLS 1.3 on the same connection,
+  the receiver's key checked against its `fp` TXT value (the SHA-256 of its
+  SubjectPublicKeyInfo, in base64), never v3 then; then FlatBuffers
+  messages, which `flat.go` writes and reads by hand, each offset aligned
+  as FlatBuffers' verifier asks. An older receiver gets v3, in JSON. The
+  session pings a receiver silent for 3 s and ends after 6 s. FCast has no
+  mute: a muted receiver's volume is 0. `fcasttest` is a fake receiver of
+  both versions, with a key of its own and its own FlatBuffers, which it
+  checks as the verifier does.
 - **The player** (`internal/player/output.go`) plays the queue as it does,
   through a `Stream`; `SetOutput` gives it the cast device's in the
   engine's place, on its goroutine, and loads the current stream again
@@ -45,16 +75,25 @@ cover on a screen.
   into the session's, one after another beside the player's goroutine, and
   the device's statuses into the engine's events: the position moves on
   between them, and the device is asked where it is every 5 s. The engine's
-  events go nowhere while casting.
+  events go nowhere while casting. A renderer's or a receiver's session is
+  a `castOut`'s as a Google Cast session is (`castkinds.go`), and picks
+  the format its device plays (`castformats.go`): Opus in WebM only where
+  it lists it, else the stream's AAC (`stream.AACPath`), and a song on this
+  computer in its own format. The next track goes to a session that queues
+  (`castQueue`, a renderer's `SetNextAVTransportURI`) as the player
+  preloads it, and the next load takes in what the device moved on to.
 - **The audio** comes from MixMusic: the addresses the player plays are
   MixMusic's own, which no device can open, and YouTube's streams need the
   proxy, which fetches them in chunks, waits for YouTube to serve them, and
   serves downloads and the cache first. `castServer` serves the proxy's
   `/yt/` paths, only while casting, at a port of its own on the address
   that reaches the device, to that device's address alone, under a random
-  128-bit token. A load the device fails without fetching anything is told
-  as a firewall's doing.
+  128-bit token. A renderer or a receiver fetches the addresses handed to
+  it, with a file extension, served as the type it was told, a renderer with
+  DLNA's `transferMode.dlna.org` and `contentFeatures.dlna.org` headers
+  (`DLNA.ORG_OP=01`) over at most 8 connections at once. A load the device
+  fails without fetching anything is told as a firewall's doing.
 
-Not yet: live streams, gapless playback through the receiver's own queue,
-lyrics on screens, groups of speakers, a receiver of MixMusic's own, and
-video.
+Not yet: live streams, gapless playback through a Google Cast receiver's
+own queue, songs on this computer on Google Cast, lyrics on screens,
+groups of speakers, a receiver of MixMusic's own, AirPlay, and video.

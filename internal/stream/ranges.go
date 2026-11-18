@@ -153,17 +153,17 @@ func (r *Ranges) fetch(off, n int64) (rangeBlock, error) {
 	case http.StatusPartialContent:
 		from, size, ok := contentRange(w.header.Get("Content-Range"))
 		if !ok || from != off || w.body.Len() == 0 {
-			return rangeBlock{}, errLoad
+			return rangeBlock{}, ErrLoad
 		}
 		r.size = size
 		return rangeBlock{off: off, data: w.body.Bytes()}, nil
 	case http.StatusRequestedRangeNotSatisfiable:
 		return rangeBlock{}, io.EOF
 	}
-	if why := r.p.Failure(r.videoID); why != "" {
-		return rangeBlock{}, errors.New(why)
+	if err := r.p.Fault(r.videoID); err != nil {
+		return rangeBlock{}, err
 	}
-	return rangeBlock{}, errLoad
+	return rangeBlock{}, ErrLoad
 }
 
 // blockWriter is the response the proxy writes a block to.

@@ -96,7 +96,7 @@ func (p *Proxy) OpenLive(ctx context.Context, videoID string, interrupted func()
 	if !ValidVideoID(videoID) {
 		return nil, ErrBadVideoID
 	}
-	p.setFailure(videoID, "")
+	p.setFailure(videoID, nil)
 	ctx, cancel := context.WithCancel(ctx)
 	l := &Live{p: p, videoID: videoID, ctx: ctx, cancel: cancel, interrupted: interrupted,
 		started: make(chan struct{}), renewal: make(chan Stream, 1)}
@@ -142,10 +142,10 @@ func (l *Live) run() {
 // Failure tells it.
 func (l *Live) failed(err error) error {
 	l.p.fail(nil, l.videoID, err)
-	if why := l.p.Failure(l.videoID); why != "" {
-		return errors.New(why)
+	if err := l.p.Fault(l.videoID); err != nil {
+		return err
 	}
-	return errLoad
+	return ErrLoad
 }
 
 // follow fetches the segments of the stream as they come, and returns once

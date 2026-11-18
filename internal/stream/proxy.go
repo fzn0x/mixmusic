@@ -58,7 +58,7 @@ type Proxy struct {
 	Seen func()
 
 	mu       sync.Mutex
-	failures map[string]string // why the last request of a video failed
+	failures map[string]error // why the last request of a video failed
 	// media sends the requests of streams, to their other servers too.
 	media mediaServers
 	// stall, reconnect and backoff are stallTimeout, reconnectTimeout and
@@ -132,7 +132,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	p.setFailure(videoID, "")
+	p.setFailure(videoID, nil)
 	// What is kept holds stereo audio only: 5.1 surround audio comes from
 	// the cache or YouTube, and with no network fails, which the player
 	// plays in stereo instead.
@@ -346,24 +346,33 @@ func (p *Proxy) served(ctx context.Context, videoID string, s Stream) error {
 // words, or "" when it did not fail. The audio element that made it only
 // tells that its source cannot play.
 func (p *Proxy) Failure(videoID string) string {
+	if err := p.Fault(videoID); err != nil {
+		return err.Error()
+	}
+	return ""
+}
+
+// Fault returns why the last request of a video's audio failed, as a
+// *ServeError, whose words Failure returns, or nil when it did not fail.
+func (p *Proxy) Fault(videoID string) error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	return p.failures[videoID]
 }
 
 // setFailure remembers why the last request of a video failed, or that it
-// did not when why is "".
-func (p *Proxy) setFailure(videoID, why string) {
+// did not when err is nil.
+func (p *Proxy) setFailure(videoID string, err error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	if why == "" {
+	if err == nil {
 		delete(p.failures, videoID)
 		return
 	}
 	if p.failures == nil || len(p.failures) >= maxFailures {
-		p.failures = map[string]string{}
+		p.failures = map[string]error{}
 	}
-	p.failures[videoID] = why
+	p.failures[videoID] = err
 }
 
 // fail answers a request whose audio could not be served with err, when w
@@ -377,7 +386,7 @@ func (p *Proxy) fail(w http.ResponseWriter, videoID string, err error) {
 		return
 	}
 	log.Printf("mixmusic: the audio of %s: %v", videoID, loggable(err))
-	p.setFailure(videoID, plainFailure(err))
+	p.setFailure(videoID, serveError(err))
 }
 
 // loggable returns err without the stream URL a request's error quotes,
@@ -420,6 +429,41 @@ func plainFailure(err error) string {
 		return "MixMusic could not reach YouTube's audio servers, which a firewall, a VPN or a DNS filter may block"
 	}
 	return strings.TrimPrefix(err.Error(), "stream: ")
+}
+
+// A ServeError is why the proxy couldn't serve the audio of a video, in
+// plain words, as Failure tells it, wrapping the error it came of. The
+// windows say it in their language (#800): Reason names most of what it
+// tells, and Status and Unreachable the rest.
+type ServeError struct {
+	// Status is the HTTP status YouTube answered for the audio, if it
+	// answered one it shouldn't have.
+	Status int
+	// Unreachable tells that YouTube's audio servers couldn't be reached.
+	Unreachable bool
+
+	plain string
+	err   error
+}
+
+func (e *ServeError) Error() string { return e.plain }
+func (e *ServeError) Unwrap() error { return e.err }
+
+// serveError is err, why the audio of a video couldn't be served, as a
+// ServeError: in the words of plainFailure.
+func serveError(err error) *ServeError {
+	e := &ServeError{plain: plainFailure(err), err: err}
+	var status statusError
+	var ue *url.Error
+	switch {
+	case errors.Is(err, errExpired):
+	case errors.As(err, &status):
+		e.Status = int(status)
+	case errors.Is(err, errStalled):
+	case errors.As(err, &ue):
+		e.Unreachable = true
+	}
+	return e
 }
 
 // errExpired is returned when YouTube refuses a stream URL, which happens

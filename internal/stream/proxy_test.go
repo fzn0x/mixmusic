@@ -163,6 +163,11 @@ func TestProxyTellsWhyItFailed(t *testing.T) {
 	if got := p.Failure(testID); !strings.HasPrefix(got, "YouTube refused to send its audio") {
 		t.Errorf("refused: Failure = %q", got)
 	}
+	// Its fault tells it as the windows do in their language (#800).
+	var se *ServeError
+	if err := p.Fault(testID); !errors.As(err, &se) || err.Error() != p.Failure(testID) || Reason(err) != ReasonRefused {
+		t.Errorf("refused: Fault = %#v, of the reason %q", err, Reason(err))
+	}
 	minGen.Store(0)
 	if rec := get(t, p, ""); rec.Code != 200 || p.Failure(testID) != "" {
 		t.Errorf("served again: %d, Failure = %q", rec.Code, p.Failure(testID))
@@ -177,12 +182,18 @@ func TestProxyTellsWhyItFailed(t *testing.T) {
 	if got := p.Failure(testID); !strings.HasPrefix(got, "YouTube is turning down requests") {
 		t.Errorf("rate limited: Failure = %q", got)
 	}
+	if err := p.Fault(testID); !errors.As(err, &se) || se.Status != http.StatusTooManyRequests || se.Unreachable {
+		t.Errorf("rate limited: Fault = %#v", err)
+	}
 
 	srv.Close()
 	p = testProxy(srv, 1000)
 	get(t, p, "")
 	if got := p.Failure(testID); !strings.HasPrefix(got, "MixMusic could not reach YouTube's audio servers") {
 		t.Errorf("unreachable: Failure = %q", got)
+	}
+	if err := p.Fault(testID); !errors.As(err, &se) || !se.Unreachable || se.Status != 0 || Reason(err) != "" {
+		t.Errorf("unreachable: Fault = %#v", err)
 	}
 	if strings.Contains(logs.String(), "gen=") || !strings.Contains(logs.String(), testID) {
 		t.Errorf("the log names the stream URL, or not the video:\n%s", logs.String())

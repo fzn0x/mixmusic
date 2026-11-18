@@ -42,7 +42,9 @@ This way is called Match in `settings.json` and in the code.
 How the match is made:
 
 1. **The search.** MixMusic searches YouTube Music's songs for the title
-   and the first artist, and when none is close enough, its videos.
+   and the first artist, and when none is close enough, its videos. A
+   clean track whose closest song is explicit looks among the videos
+   too, and takes a clean one that is close enough over the explicit song.
 2. **The score.** Each result scores from 0 to 1:
    - 45% for the title: the share of the words of the shorter title that
      the other has, once both are in lower case, without accents and
@@ -54,12 +56,21 @@ How the match is made:
      0.8, within 10 seconds 0.5, within 20 seconds 0.2, and beyond that
      nothing; half when either length isn't known;
    - and 0.05 more for a song over a video, as songs are the released
-     recordings.
+     recordings;
+   - then 5% less for a result marked explicit when Spotify marks the
+     track clean, or clean when Spotify marks it explicit: of an album's
+     explicit and clean versions, the track gets its own.
 3. **The choice.** The best result plays when it scores 0.6 or more.
    Otherwise YouTube Music has no recording close enough, and the track
    can't play this way.
 4. **The memory.** MixMusic keeps each match in `matches.json` in its
-   cache folder, so a track is searched for once.
+   cache folder, with its explicit mark, so a track is searched for once.
+
+While [Hide explicit content](playing-music.md#hiding-explicit-content)
+is on, a track whose match is explicit counts as explicit, whatever
+Spotify marks it: it doesn't play from that recording, nor download. On a
+Spotify device, in MixMusic or over Spotify Connect, Spotify's own mark
+counts.
 
 When a match is wrong, choose **Find another YouTube Music match** in the
 track's menu: the next play searches again, and a track you downloaded

@@ -24,6 +24,12 @@ type Accounts struct {
 	// ListenBrainzLoves sends the user's likes to ListenBrainz as loves,
 	// and their unlikes as the loves taken back, once they connected it.
 	ListenBrainzLoves bool `json:"listenbrainzLoves"`
+	// LibrefmScrobbling sends what plays to Libre.fm, or to another GNU
+	// FM server, once the user connected it.
+	LibrefmScrobbling bool `json:"librefmScrobbling"`
+	// LibrefmLoves sends the user's likes to Libre.fm as loves, and their
+	// unlikes as unloves, once they connected it.
+	LibrefmLoves bool `json:"librefmLoves"`
 	// YouTubeChannel is the brand channel the user uses YouTube Music as,
 	// by its page ID; "" is the account itself.
 	YouTubeChannel string `json:"youtubeChannel"`
@@ -38,6 +44,7 @@ func defaultAccounts() Accounts {
 	var a Accounts
 	a.Scrobbling = true
 	a.ListenBrainzScrobbling = true
+	a.LibrefmScrobbling = true
 	a.YouTubeHistory = true
 	return a
 }

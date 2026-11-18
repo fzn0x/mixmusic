@@ -92,6 +92,8 @@
   "lastfmLoves": false,
   "listenbrainzScrobbling": true,
   "listenbrainzLoves": false,
+  "librefmScrobbling": true,
+  "librefmLoves": false,
   "youtubeChannel": "",
   "youtubeHistory": true,
   "closeToTray": false,

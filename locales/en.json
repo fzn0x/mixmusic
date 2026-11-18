@@ -3750,6 +3750,32 @@
   "@libraryDisliked": {
     "description": "Library pivot: the songs the user dislikes."
   },
+  "libraryHiddenHint": "Hidden here only: they stay in your library on {service}.",
+  "@libraryHiddenHint": {
+    "description": "Under libraryHiddenTitle. {service} is Spotify or YouTube Music.",
+    "placeholders": {
+      "service": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryHiddenNotice": "{title} is hidden from your library. Hidden, at the foot of the page, shows it again.",
+  "@libraryHiddenNotice": {
+    "description": "Toast after Hide from library. {title} is the playlist's or album's name; Hidden is libraryHiddenTitle.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryHiddenTitle": "Hidden",
+  "@libraryHiddenTitle": {
+    "description": "Title of the section at the foot of Library › Spotify and Library › YouTube Music that lists the playlists and albums the user hid from the library."
+  },
+  "libraryHideFromLibrary": "Hide from library",
+  "@libraryHideFromLibrary": {
+    "description": "Menu item of a playlist or an album in Library › Spotify or Library › YouTube Music: it takes it out of MixMusic's library and changes nothing on the service."
+  },
   "libraryHistory": "History",
   "@libraryHistory": {
     "description": "Library pivot."
@@ -3785,6 +3811,14 @@
   "@libraryMixes": {
     "description": "Library pivot: the user's mixes."
   },
+  "libraryMixesSearchLabel": "Search your mixes",
+  "@libraryMixesSearchLabel": {
+    "description": "What screen readers call the box over Library › Mixes and over the sidebar's Your mixes that filters them by name."
+  },
+  "libraryMixesSearchPlaceholder": "search your mixes",
+  "@libraryMixesSearchPlaceholder": {
+    "description": "Placeholder of the box over Library › Mixes and over the sidebar's Your mixes that filters them by name."
+  },
   "libraryNewMixAbout": "tracks of every service, together",
   "@libraryNewMixAbout": {
     "description": "The line under New mix on its tile. Lowercase."
@@ -3815,6 +3849,24 @@
     }
   },
   "libraryNoLikedOnYouTube": "No liked songs on YouTube Music.",
+  "libraryNoMixMatch": "No mix matches “{query}”.",
+  "@libraryNoMixMatch": {
+    "description": "In Library › Mixes and the sidebar's Your mixes, when no mix's name holds what the user searched. {query} is the search.",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryNoPlaylistMatch": "No playlist matches “{query}”.",
+  "@libraryNoPlaylistMatch": {
+    "description": "In Library › Spotify and Library › YouTube Music, when no playlist's name holds what the user searched. {query} is the search.",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
   "libraryNoSpotifyLiked": "No liked songs on Spotify.",
   "libraryNothingLiked": "Nothing liked yet",
   "@libraryNothingLiked": {
@@ -3833,6 +3885,19 @@
       }
     }
   },
+  "libraryPinToTop": "Pin to top",
+  "@libraryPinToTop": {
+    "description": "Menu item of a mix, of a playlist, album or artist of the user's library on Spotify or YouTube Music, and of its page's More menu: it puts the item at the top of every list it's in, in the Library, the sidebar and Add to mix."
+  },
+  "libraryPinnedTile": "{title}, pinned",
+  "@libraryPinnedTile": {
+    "description": "What screen readers call the tile or the sidebar's entry of a mix, playlist, album or artist the user pinned to the top. {title} is its name.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "libraryPlay": "play",
   "@libraryPlay": {
     "description": "A button that plays what the page shows. Lowercase."
@@ -3844,6 +3909,14 @@
   "libraryPlaylists": "Playlists",
   "@libraryPlaylists": {
     "description": "Shelf title."
+  },
+  "libraryPlaylistsSearchLabel": "Search your playlists",
+  "@libraryPlaylistsSearchLabel": {
+    "description": "What screen readers call the box over the playlists of Library › Spotify and Library › YouTube Music that filters them by name."
+  },
+  "libraryPlaylistsSearchPlaceholder": "search your playlists",
+  "@libraryPlaylistsSearchPlaceholder": {
+    "description": "Placeholder of the box over the playlists of Library › Spotify and Library › YouTube Music that filters them by name."
   },
   "libraryPlaysNext": "{title} plays next",
   "@libraryPlaysNext": {
@@ -3884,6 +3957,19 @@
       }
     }
   },
+  "libraryShowAgain": "show again",
+  "@libraryShowAgain": {
+    "description": "Button of a row of the Hidden section of Library › Spotify or Library › YouTube Music: it puts the playlist or album back in the library."
+  },
+  "libraryShowAgainTitle": "Show {title} again",
+  "@libraryShowAgainTitle": {
+    "description": "What screen readers call libraryShowAgain, with the name of the playlist or album it shows again.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "libraryShuffle": "shuffle",
   "@libraryShuffle": {
     "description": "A button that plays what the page shows shuffled. Lowercase."
@@ -3910,6 +3996,59 @@
   },
   "librarySongsEmpty": "No songs in your library on YouTube Music. A song's Add to library keeps it here without liking it.",
   "librarySongsTitle": "Songs in your library",
+  "librarySortAToZ": "A to Z",
+  "@librarySortAToZ": {
+    "description": "Button beside a Sort by menu of the library, while it sorts by title: it shows the other way, Z to A, when clicked."
+  },
+  "librarySortAdded": "Recently added",
+  "@librarySortAdded": {
+    "description": "Choice of the Sort by menu of Library › Mixes: by the day each mix was made."
+  },
+  "librarySortChanged": "Recently changed",
+  "@librarySortChanged": {
+    "description": "Choice of the Sort by menu of Library › Mixes: by the last time each mix changed."
+  },
+  "librarySortFewest": "Fewest tracks first",
+  "@librarySortFewest": {
+    "description": "Button beside a Sort by menu of the library, while it sorts by track count: it shows the other way, Most tracks first, when clicked."
+  },
+  "librarySortMost": "Most tracks first",
+  "@librarySortMost": {
+    "description": "Button beside a Sort by menu of the library, while it sorts by track count: it shows the other way, Fewest tracks first, when clicked."
+  },
+  "librarySortNewest": "Newest first",
+  "@librarySortNewest": {
+    "description": "Button beside the Sort by menu of Library › Mixes, while it sorts by a time: it shows the other way, Oldest first, when clicked."
+  },
+  "librarySortOldest": "Oldest first",
+  "@librarySortOldest": {
+    "description": "Button beside the Sort by menu of Library › Mixes, while it sorts by a time: it shows the other way, Newest first, when clicked."
+  },
+  "librarySortService": "{service}'s order",
+  "@librarySortService": {
+    "description": "Choice of the Sort by menu of the playlists of Library › Spotify and Library › YouTube Music: the order the service lists them in. {service} is Spotify or YouTube Music.",
+    "placeholders": {
+      "service": {
+        "type": "String"
+      }
+    }
+  },
+  "librarySortTitle": "Title",
+  "@librarySortTitle": {
+    "description": "Choice of the Sort by menu of Library › Mixes and of the playlists of Library › Spotify and Library › YouTube Music: by name."
+  },
+  "librarySortTracks": "Track count",
+  "@librarySortTracks": {
+    "description": "Choice of the Sort by menu of Library › Mixes and of the playlists of Library › Spotify and Library › YouTube Music: by how many tracks each holds."
+  },
+  "librarySortYourOrder": "Your order",
+  "@librarySortYourOrder": {
+    "description": "Choice of the Sort by menu of Library › Mixes: the mixes in the order the user put them in, by dragging them."
+  },
+  "librarySortZToA": "Z to A",
+  "@librarySortZToA": {
+    "description": "Button beside a Sort by menu of the library, while it sorts by title: it shows the other way, A to Z, when clicked."
+  },
   "libraryStartRadio": "Start radio",
   "@libraryStartRadio": {
     "description": "Menu item that starts a radio from the tracks."
@@ -3922,6 +4061,10 @@
         "type": "int"
       }
     }
+  },
+  "libraryUnpin": "Unpin",
+  "@libraryUnpin": {
+    "description": "Menu item of something the user pinned to the top (libraryPinToTop): it goes back to its place in its list."
   },
   "libraryUnsavedNotice": "{what}: no longer saved",
   "@libraryUnsavedNotice": {

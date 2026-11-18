@@ -175,11 +175,31 @@ func (s *shell) artTile(c *ui.Context, key string, art []media.Image, title, sub
 // artTileWith is artTile with the icon and the label of its circle: the
 // label, with the title after it, is what screen readers hear.
 func (s *shell) artTileWith(c *ui.Context, key string, art []media.Image, title, subtitle string, source media.Source, round, active, playable bool, circle, circleLabel string, menu func(m *ui.Menu)) (open, play bool) {
+	return s.artTileOf(c, key, art, title, subtitle, source, round, active, playable, circle, circleLabel, menu, tileExtras{})
+}
+
+// tileExtras are what a tile of the user's library adds to an art tile:
+// the mark of a pin, and moves, which lets the user move the tile
+// (libraryorder.go).
+type tileExtras struct {
+	pinned bool
+	moves  func(tile ui.Element)
+}
+
+// artTileOf is artTileWith with the extras x.
+func (s *shell) artTileOf(c *ui.Context, key string, art []media.Image, title, subtitle string, source media.Source, round, active, playable bool, circle, circleLabel string, menu func(m *ui.Menu), x tileExtras) (open, play bool) {
 	k := &s.lk
 	size := k.cover
-	tile := s.buttonBase(c.Key(key)).Width(k.tileWidth()).Shrink(0).Column().AlignItems(ui.Start).Gap(8).Label(title).Cursor(ui.CursorPointer)
+	label := title
+	if x.pinned {
+		label = locales.LibraryPinnedTile(title)
+	}
+	tile := s.buttonBase(c.Key(key)).Width(k.tileWidth()).Shrink(0).Column().AlignItems(ui.Start).Gap(8).Label(label).Cursor(ui.CursorPointer)
 	if menu != nil {
 		tile.ContextMenu(menu)
+	}
+	if x.moves != nil {
+		x.moves(tile)
 	}
 	open = tile.Clicked()
 	hovered := tile.Hovered()
@@ -221,6 +241,9 @@ func (s *shell) artTileWith(c *ui.Context, key string, art []media.Image, title,
 		ui.Column(c).Width(size).Gap(2).Children(func() {
 			k.labelWeight(ui.Text(c, title).FontSize(k.bodySize()).SingleLine())
 			ui.Row(c).Gap(6).MinWidth(0).Children(func() {
+				if x.pinned {
+					s.pinMark(c)
+				}
 				s.sourceMark(c, source, false)
 				ui.Text(c, subtitle).FontSize(k.smallSize()).TextColor(k.muted).SingleLine().MinWidth(0)
 			})
@@ -285,7 +308,10 @@ func (s *shell) itemTile(c *ui.Context, key string, it media.Item, tracks []medi
 	}
 }
 
-func (s *shell) albumTile(c *ui.Context, key string, a media.Album) {
+func (s *shell) albumTile(c *ui.Context, key string, a media.Album) { s.albumTileWith(c, key, a, nil) }
+
+// albumTileWith is an album's tile whose menu more ends, if set.
+func (s *shell) albumTileWith(c *ui.Context, key string, a media.Album, more func(m *ui.Menu)) {
 	var parts []string
 	if a.Kind != "" && a.Kind != media.AlbumKindAlbum {
 		parts = append(parts, string(a.Kind))
@@ -299,7 +325,7 @@ func (s *shell) albumTile(c *ui.Context, key string, a media.Album) {
 	if n := names(a.Artists); n != "" {
 		parts = append(parts, n)
 	}
-	open, play := s.artTile(c, key, a.Artwork, a.Title, strings.Join(parts, " · "), a.Source, false, false, true, func(m *ui.Menu) {
+	menu := func(m *ui.Menu) {
 		if m.Item(locales.TilesOpen()).Chosen() {
 			s.openAlbum(a.ID)
 		}
@@ -312,7 +338,12 @@ func (s *shell) albumTile(c *ui.Context, key string, a media.Album) {
 		s.editAlbumItem(m, a)
 		s.copyLinkItem(m, a.URL)
 		s.shareItem(m, albumShare(a))
-	})
+		if more != nil {
+			more(m)
+		}
+	}
+	open, play := s.artTileOf(c, key, a.Artwork, a.Title, strings.Join(parts, " · "), a.Source, false, false, true,
+		"play", locales.TilesPlay(a.Title), menu, tileExtras{pinned: s.pinned(a.ID)})
 	switch {
 	case play:
 		s.playAlbum(a.ID)
@@ -327,6 +358,12 @@ func (s *shell) playlistTile(c *ui.Context, key string, p media.Playlist) {
 
 // playlistTileWith is a playlist's tile whose menu more ends, if set.
 func (s *shell) playlistTileWith(c *ui.Context, key string, p media.Playlist, more func(m *ui.Menu, p media.Playlist)) {
+	s.playlistTileOf(c, key, p, more, nil)
+}
+
+// playlistTileOf is playlistTileWith, which moves lets the user move, if
+// set (tileExtras). A mix's menu pins it, or unpins it.
+func (s *shell) playlistTileOf(c *ui.Context, key string, p media.Playlist, more func(m *ui.Menu, p media.Playlist), moves func(tile ui.Element)) {
 	var parts []string
 	if p.Owner != "" {
 		parts = append(parts, p.Owner)
@@ -335,7 +372,7 @@ func (s *shell) playlistTileWith(c *ui.Context, key string, p media.Playlist, mo
 		parts = append(parts, locales.TilesTracks(p.TrackCount))
 	}
 	hidden := tracksHidden(p)
-	open, play := s.artTile(c, key, p.Artwork, p.Title, strings.Join(parts, " · "), p.Source, false, false, !hidden, func(m *ui.Menu) {
+	open, play := s.artTileOf(c, key, p.Artwork, p.Title, strings.Join(parts, " · "), p.Source, false, false, !hidden, "play", locales.TilesPlay(p.Title), func(m *ui.Menu) {
 		if m.Item(locales.TilesOpen()).Chosen() {
 			s.navigate(playlistPath(p.ID))
 		}
@@ -348,10 +385,13 @@ func (s *shell) playlistTileWith(c *ui.Context, key string, p media.Playlist, mo
 		s.copyLinkItem(m, p.URL)
 		s.shareItem(m, playlistShare(p))
 		s.changeCoverItem(m, p)
+		if p.Source == media.SourceLocal {
+			s.pinItem(m, playlistMark(p))
+		}
 		if more != nil {
 			more(m, p)
 		}
-	})
+	}, tileExtras{pinned: s.pinned(p.ID), moves: moves})
 	switch {
 	case play:
 		s.playPlaylist(p.ID)
@@ -360,13 +400,15 @@ func (s *shell) playlistTileWith(c *ui.Context, key string, p media.Playlist, mo
 	}
 }
 
+// artistTile is an artist's tile, whose menu pins them while the user
+// follows them.
 func (s *shell) artistTile(c *ui.Context, key string, a media.Artist) {
 	sub := a.Subtitle
 	if sub == "" {
 		sub = locales.TopbarKindArtist()
 	}
 	// The circle shuffles all the artist's songs, as their page's does.
-	open, shuffle := s.artTileWith(c, key, a.Artwork, a.Name, sub, a.Source, true, false, true, "shuffle", locales.TilesShuffle(a.Name), func(m *ui.Menu) {
+	open, shuffle := s.artTileOf(c, key, a.Artwork, a.Name, sub, a.Source, true, false, true, "shuffle", locales.TilesShuffle(a.Name), func(m *ui.Menu) {
 		if m.Item(locales.TilesOpen()).Chosen() {
 			s.navigate(artistPath(a.ID))
 		}
@@ -378,7 +420,10 @@ func (s *shell) artistTile(c *ui.Context, key string, a media.Artist) {
 		}
 		s.followItem(m, a)
 		s.copyLinkItem(m, a.URL)
-	})
+		if s.pinned(a.ID) || s.followsArtist(a) {
+			s.pinItem(m, artistMark(a))
+		}
+	}, tileExtras{pinned: s.pinned(a.ID)})
 	switch {
 	case shuffle:
 		playArtistID(s, a.ID, true)

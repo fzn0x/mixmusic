@@ -58,6 +58,9 @@ var iconPaths = map[string]string{
 	"highlight":    "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z",
 	"video":        "M3.5 5.5h17v13h-17zM10 9v6l5-3z",
 	"speed":        "M6 18A8.5 8.5 0 1 1 18 18M12 12l3.5-3.5",
+	"pin":          "M9 3.5h6M10 3.5v6.5L6.5 14h11L14 10V3.5M12 14v6.5",
+	"sort-up":      "M8 19.5v-15M4 8l4-3.5L12 8M14 7h6M14 12h4.5M14 17h3",
+	"sort-down":    "M8 4.5v15M4 16l4 3.5 4-3.5M14 7h3M14 12h4.5M14 17h6",
 }
 
 // icons are iconPaths drawn as lines, and solidIcons as filled shapes, as

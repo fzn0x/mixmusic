@@ -148,7 +148,7 @@ func (s *shell) artistLibrary(c *ui.Context) {
 	if accounts.YouTube.SignedIn {
 		services = append(services, serviceArtists{"youtube", locales.FollowedOnYouTube(), s.youtubeArtists()})
 	}
-	here := col.FollowedArtists()
+	here := pinnedFirst(s, col.FollowedArtists(), func(a media.Artist) string { return a.ID }, false)
 	if len(here) == 0 && len(services) == 0 {
 		ui.Text(c, k.words(locales.FollowNothing())).FontSize(k.bigSize()).FontWeight(k.displayWeight()).Font(k.display).TextColor(k.accent)
 		ui.Text(c, locales.FollowIntro()).
@@ -203,6 +203,7 @@ func (s *shell) serviceArtistShelf(c *ui.Context, sv serviceArtists) int {
 			shown = append(shown, a)
 		}
 	}
+	shown = pinnedFirst(s, shown, func(a media.Artist) string { return a.ID }, false)
 	if len(shown) > 0 {
 		s.shelf(c, sv.key+"-followed", sv.title, func() {
 			s.nearShelfTiles(c, sv.key+"-followed", len(shown), func(i int) {

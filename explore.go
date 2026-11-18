@@ -224,7 +224,11 @@ func (s *shell) mixItems(m *ui.Menu, tracks []media.Track) {
 		m.Separator()
 	}
 	for _, p := range mixes {
-		if m.Item(p.Title).Chosen() {
+		item := m.Item(p.Title)
+		if s.pinned(p.ID) {
+			item.Icon(pinMenuIcon())
+		}
+		if item.Chosen() {
 			s.addToMix(p, tracks)
 		}
 	}

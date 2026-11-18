@@ -243,6 +243,8 @@ type lyricsState struct {
 	romaji romajiView
 	// local is what they know of the lyrics romanized on the computer.
 	local romanizeView
+	// pick is what the dialogs of the lyrics' sources show (lyricspick.go).
+	pick lyricsPickView
 }
 
 // lyricsScroll is where a lyrics view scrolled, the line it last scrolled
@@ -304,17 +306,22 @@ func (s *shell) lyricsWith(c *ui.Context, o lyricsOptions) {
 	case l.err != nil:
 		s.lyricsEmpty(c, o, errorText(l.err))
 		// A track without lyrics stays so; a failure may pass. The
-		// full-screen lyrics refresh with the page (F5) instead.
-		if !errors.Is(l.err, lyrics.ErrNotFound) && o.stage == nil {
-			ui.Row(c).Padding(0, 24, 8).Children(func() {
-				if s.button(c, "lyrics-retry-"+where, locales.WidgetsTryAgain(), false).Clicked() {
+		// full-screen lyrics refresh with the page (F5) instead. Another
+		// source may have them (lyricspick.go).
+		if o.stage == nil {
+			ui.Row(c).Padding(0, 24, 8).GapX(16).GapY(8).Wrap().AlignItems(ui.Center).Children(func() {
+				if !errors.Is(l.err, lyrics.ErrNotFound) && s.button(c, "lyrics-retry-"+where, locales.WidgetsTryAgain(), false).Clicked() {
 					s.forget("lyrics:" + t.ID)
 				}
+				s.lyricsSourceButton(c, t, nil, where)
 			})
 		}
 		return
 	case l.value.Instrumental:
 		s.lyricsEmpty(c, o, locales.LyricsInstrumental())
+		if o.stage == nil {
+			ui.Row(c).Padding(0, 24, 8).Children(func() { s.lyricsSourceButton(c, t, nil, where) })
+		}
 		return
 	}
 	ly := l.value
@@ -475,6 +482,10 @@ func lyricsLead(speed float64) time.Duration {
 // creditParts says.
 func (s *shell) lyricsCredit(c *ui.Context, ly lyrics.Lyrics) {
 	k := &s.lk
+	// Lyrics written from nothing in Edit lyrics… have no source.
+	if ly.Source == "" {
+		return
+	}
 	ui.RichText(c).FontSize(k.captionSize()).TextColor(k.muted).Padding(16, 24).Children(func() {
 		s.creditParts(c, ly)
 	})

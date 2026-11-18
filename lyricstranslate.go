@@ -183,8 +183,8 @@ func (s *shell) lyricsChoicesWith(c *ui.Context, t media.Track, ly lyrics.Lyrics
 	if canRomanize {
 		x.romanize = romanize
 	}
-	if !o.quiet && (ly.Synced || canTranslate || canRomanize) {
-		s.lyricsSwitches(c, ly, lang, where, canTranslate, canRomanize, &x)
+	if !o.quiet {
+		s.lyricsSwitches(c, t, ly, lang, where, canTranslate, canRomanize, &x)
 	}
 	if x.ja && x.romanize != "" {
 		x.romaji = s.lyricsRomaji(c, t, ly, where, o.quiet)
@@ -243,11 +243,12 @@ func translationKey(t media.Track, into string) string {
 	return "lyrics-translation:" + t.ID + ":" + into
 }
 
-// lyricsSwitches shows the choices above lyrics in the language lang:
-// synced or as plain text, when they are synced; translated, when they
-// can be; and in Latin letters, under each line or in its place, when
-// they can be. It changes x as the user chooses.
-func (s *shell) lyricsSwitches(c *ui.Context, ly lyrics.Lyrics, lang, where string, canTranslate, canRomanize bool, x *lyricsExtra) {
+// lyricsSwitches shows the choices above the lyrics ly of t, in the
+// language lang: synced or as plain text, when they are synced; their
+// source (lyricspick.go); translated, when they can be; and in Latin
+// letters, under each line or in its place, when they can be. It changes
+// x as the user chooses.
+func (s *shell) lyricsSwitches(c *ui.Context, t media.Track, ly lyrics.Lyrics, lang, where string, canTranslate, canRomanize bool, x *lyricsExtra) {
 	ui.Row(c).Padding(0, 24, 8).GapX(16).GapY(8).Wrap().AlignItems(ui.Center).Shrink(0).Children(func() {
 		if ly.Synced {
 			mode := 0
@@ -259,6 +260,7 @@ func (s *shell) lyricsSwitches(c *ui.Context, ly lyrics.Lyrics, lang, where stri
 				s.save()
 			}
 		}
+		s.lyricsSourceButton(c, t, &ly, where)
 		if canTranslate {
 			on := x.translate
 			if s.lyricsSwitch(c, "lyrics-translate-"+where, locales.LyricsTranslate(), locales.LyricsTranslateLyrics(), locales.LyricsTranslateTip(), &on) {

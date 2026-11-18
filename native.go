@@ -476,6 +476,7 @@ func (s *shell) follow(stop ...func()) {
 		s.p.Subscribe(func(player.Event) { s.win.Invalidate() }),
 		s.a.Watch(func() { s.update(s.refresh) }),
 		s.followLyricsTiming(),
+		s.followLyricsPicks(),
 		s.svc.Downloads.Watch(func() { s.win.Invalidate() }),
 		s.svc.LocalFiles.Watch(func() { s.win.Invalidate() }),
 		s.svc.Downloads.OnNetwork(func(online bool) { s.update(func() { s.followNetwork(online) }) }),

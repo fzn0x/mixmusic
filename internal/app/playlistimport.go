@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
@@ -497,11 +498,7 @@ func (i *Imports) SetColumns(fields []playlistio.Field, header bool) {
 	if header {
 		row = 0
 	}
-	for _, l := range t.Table.Lists(fields, row) {
-		if len(l.Entries) > 0 {
-			j.Lists = append(j.Lists, importListOf(l, t.Source))
-		}
-	}
+	a.addSource(j, playlistio.Source{Lists: t.Table.Lists(fields, row)}, t.Source)
 	a.importNext()
 }
 
@@ -710,7 +707,10 @@ func (i *Imports) Finish(ctx context.Context, target ImportTarget) (ImportResult
 	}
 	im.finishing = true
 	lists := slices.Clone(j.Lists)
-	sources := im.data.Sources
+	for k := range lists {
+		lists[k].Rows = slices.Clone(lists[k].Rows)
+	}
+	sources := maps.Clone(im.data.Sources)
 	im.mu.Unlock()
 	defer func() {
 		im.mu.Lock()

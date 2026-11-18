@@ -326,8 +326,13 @@ func (a *App) resumeImport() {
 	}
 }
 
-// importTask is a song to look for: where it is in the import.
-type importTask struct{ list, row int }
+// importTask is a song to look for: where it is in the import, what its
+// file says of it, and whether its list is MixMusic's own.
+type importTask struct {
+	list, row int
+	entry     playlistio.Entry
+	own       bool
+}
 
 // runImport looks for the songs of the lists picked that aren't looked
 // for yet, importSearches at once, until all are, or the looking stops.
@@ -341,16 +346,14 @@ func (a *App) runImport(ctx context.Context, run *importRun, svc ImportServices,
 	im.mu.Lock()
 	j := im.data.Job
 	var tasks []importTask
-	var lists []ImportList
 	if j != nil {
-		lists = slices.Clone(j.Lists)
 		for k, l := range j.Lists {
 			if !l.Picked {
 				continue
 			}
 			for n, r := range l.Rows {
 				if r.State == ImportPending {
-					tasks = append(tasks, importTask{k, n})
+					tasks = append(tasks, importTask{k, n, r.Entry, l.Own})
 				}
 			}
 		}
@@ -365,14 +368,13 @@ func (a *App) runImport(ctx context.Context, run *importRun, svc ImportServices,
 		go func() {
 			defer wg.Done()
 			for t := range queue {
-				l := lists[t.list]
-				row, err := a.findImportRow(ctx, svc, p, finder, cache, lib, l.Own, l.Rows[t.row].Entry)
+				row, err := a.findImportRow(ctx, svc, p, finder, cache, lib, t.own, t.entry)
 				im.mu.Lock()
 				switch {
 				case ctx.Err() != nil:
 				case err != nil:
 					failures++
-					log.Printf("mixmusic: looking for %s of an import: %v", l.Rows[t.row].Entry, err)
+					log.Printf("mixmusic: looking for %s of an import: %v", t.entry, err)
 					if halt := haltOf(err, failures); halt != "" && im.stopping == "" {
 						if j := im.data.Job; j != nil {
 							j.Halt, j.Cause = halt, err.Error()
@@ -477,6 +479,8 @@ func (a *App) findImportRow(ctx context.Context, svc ImportServices, p *pacer, f
 	switch {
 	case e.VideoID != "" && own && e.Title != "":
 		return found(entryTrack(e, media.ID(media.SourceYouTube, e.VideoID)), match.Sure)
+	case e.VideoID != "" && svc.Song == nil:
+		return found(media.Track{}, match.NotFound)
 	case e.VideoID != "":
 		var t media.Track
 		err := p.do(ctx, func() error {

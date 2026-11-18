@@ -1017,7 +1017,7 @@
   "@castUnreachable": {
     "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. On macOS and Linux, the cast device never fetched the audio from this computer, as a firewall may keep it out."
   },
-  "castUnreachableFirewall": "the cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets it in",
+  "castUnreachableFirewall": "the cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets you allow the connection",
   "@castUnreachableFirewall": {
     "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. On Windows, the cast device never fetched the audio from this computer, as a firewall may keep it out."
   },

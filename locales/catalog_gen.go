@@ -3528,7 +3528,7 @@ func (msgs Messages) CastUnreachable() string {
 	return Catalog.Format(msgs.locale, "castUnreachable", nil)
 }
 
-// CastUnreachableFirewall says "the cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets it in"
+// CastUnreachableFirewall says "the cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets you allow the …"
 // in the language the app shows.
 //
 // Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
@@ -3536,7 +3536,7 @@ func (msgs Messages) CastUnreachable() string {
 // from this computer, as a firewall may keep it out.
 func CastUnreachableFirewall() string { return In(i18n.Locale()).CastUnreachableFirewall() }
 
-// CastUnreachableFirewall says "the cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets it in"
+// CastUnreachableFirewall says "the cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets you allow the …"
 // in the language of msgs.
 //
 // Why a track couldn't play: {error} of playerCouldntPlay, and a step of a

@@ -283,7 +283,7 @@ func (s engineStream) Stop() {
 // track.
 func (s engineStream) Unload() { s.e.Unload() }
 
-func (s engineStream) Preload(url string)     { s.e.Preload(url) }
+func (s engineStream) Preload(url string)     { s.e.Preload(url, audio.Cue{}) }
 func (s engineStream) Play() error            { return s.e.Play() }
 func (s engineStream) Pause()                 { s.e.Pause() }
 func (s engineStream) Seek(t time.Duration)   { s.e.Seek(t) }

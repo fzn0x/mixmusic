@@ -102,7 +102,7 @@ func TestEngineCrossfadeSpeeds(t *testing.T) {
 	buffered(t, e, 0, ringFrames/2)
 	e.Play()
 	dev.play(t, 100*quantum)
-	e.Preload(speech)
+	e.Preload(speech, Cue{})
 	buffered(t, e, 1, ringFrames/2)
 	e.mu.Lock()
 	out := e.decks[e.active]
@@ -185,7 +185,7 @@ func TestEngineSetSpeed(t *testing.T) {
 func TestEngineLoadsThePreloadAtSpeed(t *testing.T) {
 	e, _, _ := newTestEngine(t)
 	e.Load(cuesFront, Cue{})
-	e.Preload(speech)
+	e.Preload(speech, Cue{})
 	e.mu.Lock()
 	preloaded := e.decks[1]
 	e.mu.Unlock()

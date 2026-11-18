@@ -186,7 +186,7 @@ func TestEngineLoadTakesAPreloadPastAPart(t *testing.T) {
 	e, dev, rec := newSkipEngine(t)
 	e.SetSkips(speech, []Skip{{From: 0, To: time.Second}})
 	e.Load(cuesFront, Cue{})
-	e.Preload(speech)
+	e.Preload(speech, Cue{})
 	buffered(t, e, 1, ringFrames/2)
 	e.mu.Lock()
 	preloaded := e.decks[1]

@@ -307,7 +307,7 @@ func TestEngineCrossfade(t *testing.T) {
 	// A whole number of quanta: the fade starts with the next one.
 	at := 188 * quantum
 	dev.play(t, at)
-	e.Preload(speech)
+	e.Preload(speech, Cue{})
 	buffered(t, e, 1, ringFrames/2)
 	const fade = 300 * time.Millisecond
 	if err := e.Crossfade(speech, fade, Cue{}); err != nil {
@@ -343,7 +343,7 @@ func TestEngineLoadTakesThePreload(t *testing.T) {
 	want := reference(t, speech)
 	e, dev, _ := newTestEngine(t)
 	e.Load(cuesFront, Cue{})
-	e.Preload(speech)
+	e.Preload(speech, Cue{})
 	buffered(t, e, 1, ringFrames/2)
 	if err := e.Load(speech, Cue{Autoplay: true}); err != nil {
 		t.Fatal(err)
@@ -362,7 +362,7 @@ func TestEngineUnload(t *testing.T) {
 	e, dev, rec := newTestEngine(t)
 	e.Load(cuesFront, Cue{Autoplay: true})
 	buffered(t, e, 0, ringFrames/2)
-	e.Preload(speech)
+	e.Preload(speech, Cue{})
 	buffered(t, e, 1, ringFrames/2)
 	e.mu.Lock()
 	preloaded := e.decks[1]

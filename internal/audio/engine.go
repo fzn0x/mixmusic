@@ -79,6 +79,12 @@ type Engine struct {
 	paused    bool
 	normalize bool
 	loudness  bool
+	// armed is set while the idle deck follows the active one on its next
+	// sample, as Preload's cue asks, and glide while it starts at the
+	// loudness of the active one; followed is the deck it followed, until
+	// the loop tells of it (follow.go).
+	armed, glide bool
+	followed     *deck
 	// skips are the parts of the tracks the decks pass over, by URL, as
 	// SetSkips told (skip.go).
 	skips map[string][]Skip
@@ -165,7 +171,7 @@ func (e *Engine) wake() {
 // Preload loaded starts at once.
 func (e *Engine) Load(url string, cue Cue) error {
 	e.mu.Lock()
-	var stale []*deck
+	stale := []*deck{e.disarm()}
 	e.fading = false
 	other := 1 - e.active
 	if d := e.decks[other]; d != nil && d.url == url && cue.Start == 0 && d.fresh() {
@@ -194,17 +200,29 @@ func (e *Engine) Load(url string, cue Cue) error {
 	return nil
 }
 
-// Preload starts loading url on the idle deck, for the next track.
-func (e *Engine) Preload(url string) {
+// Preload starts loading url on the idle deck, for the next track, to
+// play from its start at cue's Speed: armed by its Follow, it follows the
+// track that plays on its next sample (follow.go). Preload of the track the
+// idle deck holds loads nothing again, and takes cue's Speed, Follow and
+// Glide, as the next track's speed changes, or it follows no longer. A
+// crossfade under way preloads nothing.
+func (e *Engine) Preload(url string, cue Cue) {
 	e.mu.Lock()
 	other := 1 - e.active
-	if (e.fading) || (e.decks[other] != nil && e.decks[other].url == url) {
+	if e.fading {
 		e.mu.Unlock()
 		return
 	}
-	stale := e.decks[other]
-	e.decks[other] = newDeckSkipping(url, 0, e.skips[url], e.open, e.wake)
-	e.levels[other] = ramp{}
+	var stale *deck
+	if d := e.decks[other]; d == nil || d.url != url {
+		stale = d
+		e.decks[other] = newDeckSkipping(url, 0, e.skips[url], e.open, e.wake)
+		e.levels[other] = ramp{}
+	}
+	e.decks[other].speed = clampSpeed(cue.Speed)
+	_, hears := e.events.(FollowEvents)
+	e.armed = cue.Follow && hears
+	e.glide = e.armed && cue.Glide
 	e.mu.Unlock()
 	closeDecks([]*deck{stale})
 }
@@ -216,7 +234,7 @@ func (e *Engine) Preload(url string) {
 func (e *Engine) Crossfade(url string, d time.Duration, cue Cue) error {
 	e.mu.Lock()
 	from, to := e.active, 1-e.active
-	var stale []*deck
+	stale := []*deck{e.disarm()}
 	if dk := e.decks[to]; dk == nil || dk.url != url {
 		stale = append(stale, dk)
 		e.decks[to] = newDeckSkipping(url, 0, e.skips[url], e.open, e.wake)
@@ -349,7 +367,7 @@ func (e *Engine) Pause() {
 // Stop silences both decks and forgets their tracks.
 func (e *Engine) Stop() {
 	e.mu.Lock()
-	stale := []*deck{e.decks[0], e.decks[1]}
+	stale := []*deck{e.decks[0], e.decks[1], e.disarm()}
 	e.decks = [2]*deck{}
 	e.levels = [2]ramp{}
 	e.fading = false
@@ -366,10 +384,10 @@ func (e *Engine) Stop() {
 
 // Unload silences the active deck and forgets its track, as the player
 // moves to a track it must find first, which may take a while or fail. A
-// track that Preload loaded stays, for Load to take.
+// track that Preload loaded stays, for Load to take, following nothing.
 func (e *Engine) Unload() {
 	e.mu.Lock()
-	stale := []*deck{e.decks[e.active]}
+	stale := []*deck{e.decks[e.active], e.disarm()}
 	e.decks[e.active] = nil
 	if e.fading {
 		// The track fading out goes too.
@@ -635,39 +653,47 @@ func (e *Engine) renderQuantum() {
 	clear(buf)
 	sounding := false
 	// Each deck that plays reads its frames, the active one first: a
-	// crossfade into it holds while it has none, before either deck plays.
-	// They mix in their own order, by which a fused multiply-add rounds
-	// their sum.
-	var rings [2]*ring
-	var read [2]int
-	for _, i := range [2]int{e.active, 1 - e.active} {
-		d, level := e.decks[i], e.levels[i]
-		if d == nil || (level.value == 0 && level.target == 0) {
+	// crossfade into it holds while it has none, before either deck plays,
+	// and the deck armed to follow it takes over once its track ended, for
+	// the rest of the quantum (follow.go). They mix in their own order, by
+	// which a fused multiply-add rounds their sum.
+	decks, active := e.decks, e.active
+	var reads [2]deckRead
+	for _, i := range [2]int{active, 1 - active} {
+		d, level := decks[i], e.levels[i]
+		if d == nil || (level.value == 0 && level.target == 0) || reads[i].r != nil {
 			continue
 		}
 		// A part the deck passes over isn't heard: it holds silent until
-		// the loop moves it past.
+		// the loop moves it past. One that ends the active deck's track
+		// ends it there.
 		if d.holdsStill() {
 			e.wake()
+			if i == active && e.armed && d.endsAtPart() {
+				e.follow(d, 0, &reads)
+			}
 			continue
 		}
 		// At the deck's speed, of its ring's channels: what follows, the
 		// equalizer and the analyser too, takes what is heard.
 		r := d.ring.Load()
-		rings[i], read[i] = r, d.read(r, e.deckBuf[i][:r.channels*quantum])
-		if i == e.active && e.fading {
-			e.followFade(d, r, read[i])
+		reads[i] = deckRead{r: r, n: d.read(r, e.deckBuf[i][:r.channels*quantum])}
+		if i == active && e.fading {
+			e.followFade(d, r, reads[i].n)
+		}
+		if i == active && e.armed && d.played(r) {
+			e.follow(d, reads[i].n, &reads)
 		}
 	}
-	for i, d := range e.decks {
-		r, n := rings[i], read[i]
+	for i, d := range decks {
+		r, n, from := reads[i].r, reads[i].n, reads[i].from
 		if r == nil {
 			continue
 		}
 		sounding = true
 		level := &e.levels[i]
 		dch := r.channels
-		trim := e.trimOf(d, n > 0)
+		trim := e.trimOf(d, n > from)
 		var m *[2][6]float32
 		if dch > ch {
 			if m = d.downmix.Load(); m == nil {
@@ -676,7 +702,7 @@ func (e *Engine) renderQuantum() {
 		}
 		for f := range quantum {
 			g := float32(d.gain.next() * level.next() * trim.next())
-			if f >= n {
+			if f < from || f >= n {
 				continue
 			}
 			src, dst := e.deckBuf[i][dch*f:dch*f+dch], buf[ch*f:ch*f+ch]
@@ -768,6 +794,9 @@ func (e *Engine) report() {
 	}
 	e.mu.Lock()
 	var stale *deck
+	// The deck the active one followed, as its track ended (follow.go).
+	followed := e.followed
+	e.followed = nil
 	// A crossfade ends as the track fading out faded out or ended, which a
 	// pause holds, as followFade does a track fading in that has no audio.
 	if other := 1 - e.active; e.fading && e.decks[other].faded() {
@@ -815,6 +844,11 @@ func (e *Engine) report() {
 	}
 	e.mu.Unlock()
 	closeDecks([]*deck{stale})
+	// What plays now followed what ended: the player hears of that before
+	// anything of it.
+	if followed != nil {
+		e.tellFollowed(followed, d)
+	}
 
 	if outFailure != nil {
 		e.stopOutput()

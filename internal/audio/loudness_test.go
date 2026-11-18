@@ -119,7 +119,7 @@ func TestEngineLoudnessCrossfade(t *testing.T) {
 	e.Play()
 	at := 188 * quantum
 	dev.play(t, at)
-	e.Preload(speech + "#-11")
+	e.Preload(speech+"#-11", Cue{})
 	buffered(t, e, 1, ringFrames/2)
 	const fade = 300 * time.Millisecond
 	if err := e.Crossfade(speech+"#-11", fade, Cue{}); err != nil {

@@ -69,9 +69,13 @@ Each pull request branches off main, and only main merges into it. One
 built on another's branch carries the other's changes a second time once
 that one is squashed into main, and conflicts: a pull request that needs
 another waits for it to merge. CI's Overlap check merges each pull request
-with every other open one ([tools/overlap](tools/overlap/main.go)). When it
-fails, the pull request pushed last changes so that the two don't touch the
-same lines, as below, or waits for the other to merge.
+with every other open one ([tools/overlap](tools/overlap/main.go)), and
+where both change Go code, vets the packages either changes, for Linux,
+Windows and macOS, and runs the tests of those both change: two that pass
+alone can still fail together, as when one changes a function the other's
+new code calls. When it fails, the pull request pushed last changes so that
+the two don't touch the same lines, as below, and pass together, or waits
+for the other to merge.
 
 - **Settings.** A setting lives in its section's struct in
   `internal/settings`, in that section's file, such as `Playback` in

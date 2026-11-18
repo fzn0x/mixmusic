@@ -6067,6 +6067,42 @@
   "pullRefreshPull": "pull to refresh",
   "pullRefreshRefreshing": "refreshing",
   "pullRefreshRelease": "release to refresh",
+  "queueButtonAdd": "Add {title} to the queue",
+  "@queueButtonAdd": {
+    "description": "The label and tooltip of the button that shows in place of a song's or an episode's length while the pointer is over its row, and of one of the two buttons beside the play circle of a song's tile on Home, Explore and the now playing page. {title} is the song's or the episode's title.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "queueButtonPlayNext": "Play {title} next",
+  "@queueButtonPlayNext": {
+    "description": "The label and tooltip of one of the two buttons beside the play circle of a song's tile on Home, Explore and the now playing page: it puts the song right after the one playing. {title} is the song's title.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "queueButtonPlaying": "Playing {title}",
+  "@queueButtonPlaying": {
+    "description": "The toast of Add to queue, from a song's row, menu, tile or keys, or from an album's or a playlist's More menu, when no track was playing: what it adds plays at once. {title} is the song's, the album's or the playlist's title.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "queueButtonPlayingTracks": "Playing {count, plural, one {# track} other {# tracks}}",
+  "@queueButtonPlayingTracks": {
+    "description": "The toast of Add to queue in the bar of the tracks selected in a list, when no track was playing: the tracks selected play at once. {count} is how many tracks.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "railCollapse": "Collapse the sidebar",
   "railCreate": "create",
   "railDownloads": "Downloads",

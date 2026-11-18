@@ -24,7 +24,7 @@ func TestErrorKinds(t *testing.T) {
 		{&APIError{Code: codeTemporary, Status: 200}, false},
 		{&APIError{Code: codeRateLimited, Status: 429}, false},
 		{&APIError{Status: 503}, false},
-		{&netError{errors.New("connection reset")}, false},
+		{&netError{err: errors.New("connection reset")}, false},
 		{ErrSessionExpired, false},
 	} {
 		if got := scrobble.IsRejected(c.err); got != c.rejected {

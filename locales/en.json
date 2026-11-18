@@ -2800,6 +2800,10 @@
   "@errorLastfmNotAuthorized": {
     "description": "An error of Last.fm, as a toast or inside a message that leads it: the user didn't allow MixMusic on Last.fm's page yet."
   },
+  "errorLibrefmNotServer": "this isn't the address of a server: write it as https://gnufm.example.com",
+  "@errorLibrefmNotServer": {
+    "description": "Why connecting in Settings › Accounts › Libre.fm failed, as a toast: the address given for another GNU FM server isn't a web address. Keep the example address as it is."
+  },
   "errorListenBrainzNotServer": "this isn't the address of a server: write it as https://listenbrainz.example.com",
   "@errorListenBrainzNotServer": {
     "description": "An error of ListenBrainz, as a toast or inside a message that leads it. Keep the example address as it is."
@@ -4041,6 +4045,207 @@
     "placeholders": {
       "what": {
         "type": "String"
+      }
+    }
+  },
+  "librefmSettingsAbout": "What you listen to joins your profile on {server}: a track counts once half of it played, or four minutes.",
+  "@librefmSettingsAbout": {
+    "description": "In Settings › Accounts › Libre.fm once connected, under \"Scrobbling as\". {server} is Libre.fm, or the host of another GNU FM server.",
+    "placeholders": {
+      "server": {
+        "type": "String",
+        "example": "Libre.fm"
+      }
+    }
+  },
+  "librefmSettingsAddress": "Address",
+  "@librefmSettingsAddress": {
+    "description": "In Settings › Accounts › Libre.fm, the title of the box for the address of another GNU FM server, shown once \"Another GNU FM server\" is chosen."
+  },
+  "librefmSettingsAnother": "Another GNU FM server",
+  "@librefmSettingsAnother": {
+    "description": "In Settings › Accounts › Libre.fm, the second option of Server, beside Libre.fm: a server that runs GNU FM, the free software Libre.fm runs, at an address the user gives. Keep GNU FM as it is."
+  },
+  "librefmSettingsApprove": "Approve MixMusic on {server}, in your browser",
+  "@librefmSettingsApprove": {
+    "description": "A toast once the user chose to connect in Settings › Accounts › Libre.fm, while the server's page opens in the browser. {server} is Libre.fm, or the host of another GNU FM server.",
+    "placeholders": {
+      "server": {
+        "type": "String",
+        "example": "Libre.fm"
+      }
+    }
+  },
+  "librefmSettingsAskFailed": "MixMusic couldn't ask {server} for a sign-in: check its address and your connection ({error})",
+  "@librefmSettingsAskFailed": {
+    "description": "Why connecting in Settings › Accounts › Libre.fm failed, as a toast: the server didn't give a sign-in token. {server} is Libre.fm, or the host of another GNU FM server; {error} is the server's or the system's own words.",
+    "placeholders": {
+      "server": {
+        "type": "String",
+        "example": "Libre.fm"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "librefmSettingsConnect": "connect to {server}",
+  "@librefmSettingsConnect": {
+    "description": "The button that connects in Settings › Accounts › Libre.fm. {server} is libre.fm, or the host of another GNU FM server.",
+    "placeholders": {
+      "server": {
+        "type": "String",
+        "example": "libre.fm"
+      }
+    }
+  },
+  "librefmSettingsConnectFirst": "connect to Libre.fm first",
+  "@librefmSettingsConnectFirst": {
+    "description": "Why connecting again in Settings › Accounts › Libre.fm failed, as a toast: the connection is gone."
+  },
+  "librefmSettingsConnectTitle": "Connect to Libre.fm",
+  "@librefmSettingsConnectTitle": {
+    "description": "What Settings' search shows for the form of Settings › Accounts › Libre.fm, before the user connected."
+  },
+  "librefmSettingsConnected": "Connected to {server}",
+  "@librefmSettingsConnected": {
+    "description": "A toast once the user connected in Settings › Accounts › Libre.fm. {server} is Libre.fm, or the host of another GNU FM server.",
+    "placeholders": {
+      "server": {
+        "type": "String",
+        "example": "Libre.fm"
+      }
+    }
+  },
+  "librefmSettingsDisconnectBody": "MixMusic forgets your connection; your scrobbles stay on {server}.{waiting, plural, =0 {} one { # scrobble not sent yet will be dropped.} other { # scrobbles not sent yet will be dropped.}}",
+  "@librefmSettingsDisconnectBody": {
+    "description": "The question that disconnecting in Settings › Accounts › Libre.fm asks first. {server} is Libre.fm, or the host of another GNU FM server; {waiting} is how many scrobbles wait to be sent.",
+    "placeholders": {
+      "server": {
+        "type": "String",
+        "example": "Libre.fm"
+      },
+      "waiting": {
+        "type": "int"
+      }
+    }
+  },
+  "librefmSettingsDisconnectTitle": "disconnect {server}",
+  "@librefmSettingsDisconnectTitle": {
+    "description": "The title of the question that disconnecting in Settings › Accounts › Libre.fm asks first. {server} is Libre.fm, or the host of another GNU FM server.",
+    "placeholders": {
+      "server": {
+        "type": "String",
+        "example": "Libre.fm"
+      }
+    }
+  },
+  "librefmSettingsExpired": "Connect again to go on scrobbling.{waiting, plural, =0 {} one { # scrobble waits to be sent.} other { # scrobbles wait to be sent.}}",
+  "@librefmSettingsExpired": {
+    "description": "In Settings › Accounts › Libre.fm, under librefmSettingsGone, when the server no longer accepts the connection. {waiting} is how many scrobbles wait to be sent.",
+    "placeholders": {
+      "waiting": {
+        "type": "int"
+      }
+    }
+  },
+  "librefmSettingsForm": "Choose Libre.fm, or another server that runs GNU FM. Connect, then sign in and approve MixMusic on the page that opens in your browser: MixMusic never sees your password. Server. Another GNU FM server. Address. Use your own API account. API key. Shared secret. Connect to Libre.fm. Scrobble, scrobbling. Self-hosted, GNU FM. Sign in, log in. MixMusic keeps the connection in your system's credential store, with the server.",
+  "@librefmSettingsForm": {
+    "description": "Never shown: what Settings' search finds the Libre.fm form by, its steps and labels, then words people search for. Translate it, and give the words and synonyms people search for in your language."
+  },
+  "librefmSettingsGone": "{server} no longer accepts this connection",
+  "@librefmSettingsGone": {
+    "description": "The title of the alert in Settings › Accounts › Libre.fm when the server refuses the connection, as after the user revoked it. {server} is Libre.fm, or the host of another GNU FM server.",
+    "placeholders": {
+      "server": {
+        "type": "String",
+        "example": "Libre.fm"
+      }
+    }
+  },
+  "librefmSettingsHint": "MixMusic keeps the connection in your system's credential store, with the server.",
+  "@librefmSettingsHint": {
+    "description": "Under the connect button of Settings › Accounts › Libre.fm."
+  },
+  "librefmSettingsLovesDesc": "A like loves the song on {server}, and an unlike takes the love back.",
+  "@librefmSettingsLovesDesc": {
+    "description": "In Settings › Accounts › Libre.fm once connected, under \"Send likes as loves\". {server} is Libre.fm, or the host of another GNU FM server.",
+    "placeholders": {
+      "server": {
+        "type": "String",
+        "example": "Libre.fm"
+      }
+    }
+  },
+  "librefmSettingsLovesSwitch": "Send likes to {server} as loves",
+  "@librefmSettingsLovesSwitch": {
+    "description": "What screen readers say of the switch \"Send likes as loves\" in Settings › Accounts › Libre.fm. {server} is Libre.fm, or the host of another GNU FM server.",
+    "placeholders": {
+      "server": {
+        "type": "String",
+        "example": "Libre.fm"
+      }
+    }
+  },
+  "librefmSettingsOwnAccount": "Use your own API account",
+  "@librefmSettingsOwnAccount": {
+    "description": "In Settings › Accounts › Libre.fm, the title of the switch that shows the API key and shared secret boxes, for a server that wants an API account of the user's."
+  },
+  "librefmSettingsOwnAccountDesc": "For a server that wants one. Libre.fm and GNU FM take MixMusic's own key, so there's no account to create.",
+  "@librefmSettingsOwnAccountDesc": {
+    "description": "In Settings › Accounts › Libre.fm, under \"Use your own API account\". Keep GNU FM as it is."
+  },
+  "librefmSettingsPasteKeys": "paste the API key and the shared secret of your API account on the server",
+  "@librefmSettingsPasteKeys": {
+    "description": "Why connecting in Settings › Accounts › Libre.fm failed, as a toast: \"Use your own API account\" is on, and a box is empty."
+  },
+  "librefmSettingsPlain": "Plain http works only on your local network, and your password and session travel to the server unencrypted: anyone on the network can read them.",
+  "@librefmSettingsPlain": {
+    "description": "A warning in Settings › Accounts › Libre.fm under the address of a server that starts with http://, and once connected to one."
+  },
+  "librefmSettingsPlainRemote": "plain http is for a server on your local network alone, as your password and session would travel unencrypted: use the server's https address",
+  "@librefmSettingsPlainRemote": {
+    "description": "Why connecting in Settings › Accounts › Libre.fm failed, as a toast: the server's address starts with http:// and isn't on the local network."
+  },
+  "librefmSettingsScrobbleSwitch": "Scrobble to {server}",
+  "@librefmSettingsScrobbleSwitch": {
+    "description": "What screen readers say of the switch beside \"Scrobbling as\" in Settings › Accounts › Libre.fm. {server} is Libre.fm, or the host of another GNU FM server.",
+    "placeholders": {
+      "server": {
+        "type": "String",
+        "example": "Libre.fm"
+      }
+    }
+  },
+  "librefmSettingsServerDesc": "Libre.fm, or another server that runs GNU FM, the free software Libre.fm runs.",
+  "@librefmSettingsServerDesc": {
+    "description": "In Settings › Accounts › Libre.fm, under Server, the choice of where to scrobble. Keep GNU FM as it is."
+  },
+  "librefmSettingsStep1": "Choose Libre.fm, or another server that runs GNU FM.",
+  "@librefmSettingsStep1": {
+    "description": "The first step of connecting in Settings › Accounts › Libre.fm. Keep GNU FM as it is."
+  },
+  "librefmSettingsStep2": "Connect, then sign in and approve MixMusic on the page that opens in your browser: MixMusic never sees your password.",
+  "@librefmSettingsStep2": {
+    "description": "The second step of connecting in Settings › Accounts › Libre.fm."
+  },
+  "librefmSettingsTooLong": "{server} did not hear from you in time: approve MixMusic in the browser, then connect again",
+  "@librefmSettingsTooLong": {
+    "description": "Why connecting in Settings › Accounts › Libre.fm failed, as a toast: the user didn't approve in the browser within 5 minutes. {server} is Libre.fm, or the host of another GNU FM server.",
+    "placeholders": {
+      "server": {
+        "type": "String",
+        "example": "Libre.fm"
+      }
+    }
+  },
+  "librefmSettingsWaiting": "waiting for {server}…",
+  "@librefmSettingsWaiting": {
+    "description": "The connect button of Settings › Accounts › Libre.fm while it waits for the user to approve MixMusic in the browser. {server} is Libre.fm, or the host of another GNU FM server.",
+    "placeholders": {
+      "server": {
+        "type": "String",
+        "example": "Libre.fm"
       }
     }
   },

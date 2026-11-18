@@ -112,6 +112,8 @@ both services in one player:
 - **ListenBrainz:** the same, beside Last.fm or without it, to
   ListenBrainz or a server of your own, such as Maloja. Likes can go to
   either as loves.
+- **Libre.fm:** the same, to Libre.fm or another GNU FM server, with no
+  API account to create.
 - **Discord:** your profile shows what plays, with its artwork and the time
   left.
 - **Updates:** MixMusic checks for a new release at start and every few
@@ -276,6 +278,8 @@ desktop.
 - **ListenBrainz:** paste the user token of your
   [ListenBrainz settings](https://listenbrainz.org/settings/), or of your
   own server, in Settings › Accounts.
+- **Libre.fm:** connect in Settings › Accounts, and approve MixMusic on
+  Libre.fm's page in your browser, or another GNU FM server's.
 - **Discord:** while the Discord app runs, your profile shows what you
   listen to. Turn it off in Settings › Desktop.
 
@@ -493,6 +497,8 @@ talks to:
 - **Last.fm,** once you connect it: what you play.
 - **ListenBrainz,** or your own server of its API, once you connect it:
   what you play.
+- **Libre.fm,** or another GNU FM server, once you connect it: what you
+  play.
 - **Discord,** unless you turn it off: what plays, sent to the Discord app
   on your computer, which shows it on your profile.
 

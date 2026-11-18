@@ -130,6 +130,8 @@
   "lastfmLoves": true,
   "listenbrainzScrobbling": false,
   "listenbrainzLoves": true,
+  "librefmScrobbling": false,
+  "librefmLoves": true,
   "youtubeChannel": "112233445566778899",
   "youtubeHistory": false,
   "closeToTray": true,

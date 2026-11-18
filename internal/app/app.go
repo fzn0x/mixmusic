@@ -273,6 +273,9 @@ type App struct {
 	nowPlaying NowPlaying
 	// listenbrainz is the ListenBrainz connection, beside Last.fm's.
 	listenbrainz listenbrainzState
+	// librefm is the connection to Libre.fm or another GNU FM server,
+	// beside those.
+	librefm librefmState
 	// started is the ID of the track whose start the reports told last
 	// (startOf).
 	started    string
@@ -360,6 +363,8 @@ func New(opts Options) (*App, error) {
 	a.openLastfm()
 	a.listenbrainz.store = listenbrainzStore{newSecretStore(opts.DataDir, listenbrainzSecret, "listenbrainz.json", "listenbrainz.dpapi")}
 	a.openListenBrainz()
+	a.librefm.store = librefmStore{newSecretStore(opts.DataDir, librefmSecret, "librefm.json", "librefm.dpapi")}
+	a.openLibrefm()
 	a.tools = tools.New(filepath.Join(opts.DataDir, "bin"))
 	a.tools.Bundled = bundledYTDLP()
 	a.resolver = stream.NewResolver(a.tools, filepath.Join(opts.CacheDir, "yt-dlp"))

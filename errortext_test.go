@@ -15,6 +15,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/colorfile"
 	"github.com/fzn0x/mixmusic/internal/firewall"
 	"github.com/fzn0x/mixmusic/internal/lastfm"
+	"github.com/fzn0x/mixmusic/internal/librefm"
 	"github.com/fzn0x/mixmusic/internal/listenbrainz"
 	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -35,7 +36,7 @@ func TestErrorText(t *testing.T) {
 		spotify.ErrNoClientID, spotify.ErrSignInExpired, spotify.ErrNotSignedIn, spotify.ErrPlaylistUnavailable,
 		spotify.ErrPlaylistNotShown, spotify.ErrPlaylistRefused, &spotify.APIError{Status: http.StatusForbidden, Reason: "PREMIUM_REQUIRED"},
 		&spotify.APIError{Status: http.StatusTooManyRequests}, youtube.ErrSignedOut, youtube.ErrSessionRejected, youtube.ErrNotFound,
-		youtube.ErrAlreadyInPlaylist, youtube.ErrNoSongList, lastfm.ErrNotAuthorized, listenbrainz.ErrNotServer,
+		youtube.ErrAlreadyInPlaylist, youtube.ErrNoSongList, lastfm.ErrNotAuthorized, listenbrainz.ErrNotServer, librefm.ErrNotServer,
 		stream.ErrThrottled, stream.ErrNoAudio, stream.ErrLive, stream.ErrNoCaptions, stream.ErrBadVideoID, stream.ErrUnavailable,
 		stream.ErrNetwork, tools.ErrNoYTDLP, tools.ErrBrowserOpen, tools.ErrCookiesSealed, tools.ErrNoBrowserCookies,
 		tools.ErrCookiesDenied, audio.ErrNoOutput, audio.ErrCantPlay, firewall.ErrUnsupported, firewall.ErrDeclined,

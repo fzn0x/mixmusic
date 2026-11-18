@@ -1,7 +1,7 @@
 # Accounts
 <!-- docs: group=start order=20 -->
 
-Sign in to YouTube Music, Spotify, Last.fm and ListenBrainz in MixMusic, all optional:
+Sign in to YouTube Music, Spotify, Last.fm, ListenBrainz and Libre.fm in MixMusic, all optional:
 the sign-in window, your own browser, a browser's session, brand channels, scrobbling and signing out.
 
 MixMusic needs no account: YouTube Music's search, artists, albums,
@@ -302,6 +302,50 @@ If you also linked Spotify to your account on ListenBrainz's site, it
 hears your Spotify plays from Spotify as well: they count twice. Turn one
 of the two off.
 
+## Libre.fm
+
+MixMusic scrobbles to [Libre.fm](https://libre.fm) too, beside Last.fm and
+ListenBrainz or without them, or to another server that runs GNU FM, the
+free software Libre.fm runs. There is no API account to create:
+
+1. In Settings › Accounts › Libre.fm, keep **Server** on **Libre.fm**, or
+   choose **Another GNU FM server** and write its **Address**.
+2. Choose **connect to libre.fm**, then sign in and approve MixMusic on
+   the server's page that opens in your browser. MixMusic never sees your
+   password.
+
+Connecting works as Last.fm's does: MixMusic asks the server for a token,
+opens its approval page, and asks every 2 seconds whether you approved,
+for up to 5 minutes. Libre.fm's pages don't give its API's addresses, so
+MixMusic uses those of GNU FM's code: `https://libre.fm/2.0/` for the API
+and `https://libre.fm/api/auth/` for the approval page, or `/2.0/` and
+`/api/auth/` after another server's address. GNU FM checks only that an
+API key is 32 characters long, so MixMusic sends a key of its own. For a
+server that wants an API account of yours, turn on **Use your own API
+account**, and paste its **API key** and **shared secret**.
+
+A server's address must be `https://`, but on your local network: there,
+plain `http://` works too, and MixMusic warns that your password and the
+session travel to it unencrypted, for anyone on the network to read. The
+server stays with the connection, in your system's credential store:
+connecting to another means disconnecting first.
+
+What counts, what's sent and what waits are as for Last.fm: a track over
+30 seconds, once half of it or 4 minutes played; the now playing update
+when it starts, and scrobbles up to 50 at a time, kept while the server
+can't be reached or fails on its side. **Scrobble to Libre.fm** pauses
+it, a line under **Scrobbling as** says how many scrobbles wait, and
+**Send likes as loves**, off at first, sends each song you like as a love
+and each you unlike as the love taken back. When the server no longer
+accepts the connection, choose **connect again**, as for Last.fm; if you
+approve as another user, MixMusic asks whether to send the waiting
+scrobbles to that profile or drop them.
+
+MixMusic was built and tested against a stand-in of GNU FM's published
+code. Whether Libre.fm's own server runs that code as it's published
+isn't known yet: a sign-in with a real Libre.fm account is still to be
+checked.
+
 ## Signing out
 
 Each account has its button in Settings › Accounts, which asks first:
@@ -313,6 +357,8 @@ Each account has its button in Settings › Accounts, which asks first:
   stay on Last.fm.
 - **ListenBrainz: disconnect.** MixMusic forgets the token; your listens
   stay on ListenBrainz, or on your server.
+- **Libre.fm: disconnect.** MixMusic forgets the connection; your
+  scrobbles stay on Libre.fm, or on the GNU FM server.
 
 Signing out deletes the sign-in from your computer. What MixMusic keeps
 itself, your [liked songs, mixes and history](library.md), stays. The YouTube Music

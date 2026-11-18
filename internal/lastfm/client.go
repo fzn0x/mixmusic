@@ -3,7 +3,8 @@
 // Client calls the Last.fm API 2.0: it connects the user's account with
 // desktop authentication, and sends now-playing updates and scrobbles. It
 // is the scrobble.Service of a scrobble.Scrobbler, which follows what the
-// player does and decides which plays count as scrobbles.
+// player does and decides which plays count as scrobbles. Other servers
+// of the same API, as GNU FM's, take its calls at their own addresses.
 package lastfm
 
 import (
@@ -17,6 +18,7 @@ import (
 	"net/http"
 	"net/url"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -57,18 +59,31 @@ type APIError struct {
 	Message string
 	// Status is the HTTP status of the answer.
 	Status int
+	// Service names the service in the error's text, as the client's Name
+	// does; when empty, "lastfm".
+	Service string
 }
 
 func (e *APIError) Error() string {
+	name := serviceName(e.Service)
 	switch {
 	case e.Code == codeRateLimited:
-		return "lastfm: too many requests, try again in a moment"
+		return name + ": too many requests, try again in a moment"
 	case e.Code != 0 && e.Message != "":
-		return fmt.Sprintf("lastfm: %s (error %d)", e.Message, e.Code)
+		return fmt.Sprintf("%s: %s (error %d)", name, e.Message, e.Code)
 	case e.Code != 0:
-		return fmt.Sprintf("lastfm: error %d", e.Code)
+		return fmt.Sprintf("%s: error %d", name, e.Code)
 	}
-	return fmt.Sprintf("lastfm: HTTP %d", e.Status)
+	return fmt.Sprintf("%s: HTTP %d", name, e.Status)
+}
+
+// serviceName is name, a service's name in errors, or "lastfm" when it
+// is empty.
+func serviceName(name string) string {
+	if name == "" {
+		return "lastfm"
+	}
+	return name
 }
 
 // temporary reports whether the same call may succeed later.
@@ -84,10 +99,13 @@ func (e *APIError) temporary() bool {
 // which sending it again won't change: what isn't temporary.
 func (e *APIError) Rejected() bool { return !e.temporary() }
 
-// netError is a call that got no answer.
-type netError struct{ err error }
+// netError is a call to the service of name that got no answer.
+type netError struct {
+	name string
+	err  error
+}
 
-func (e *netError) Error() string { return "lastfm: " + e.err.Error() }
+func (e *netError) Error() string { return serviceName(e.name) + ": " + e.err.Error() }
 func (e *netError) Unwrap() error { return e.err }
 
 // IsTemporary reports whether err may go away when the call is made again
@@ -121,6 +139,12 @@ type Client struct {
 	// UserAgent introduces MixMusic to Last.fm; when empty, as
 	// "MixMusic".
 	UserAgent string
+	// AuthPage is the page where the user approves a token, another
+	// server's. When empty, it is https://www.last.fm/api/auth/.
+	AuthPage string
+	// Name names the service in the errors of the calls, as "librefm";
+	// when empty, "lastfm".
+	Name string
 }
 
 // NewClient returns a client of the API account of apiKey and secret.
@@ -157,36 +181,62 @@ func (c *Client) call(ctx context.Context, method string, params url.Values, out
 	}
 	res, err := hc.Do(req)
 	if err != nil {
-		return &netError{err}
+		return &netError{c.Name, err}
 	}
 	data, err := io.ReadAll(io.LimitReader(res.Body, 4<<20))
 	res.Body.Close()
 	if err != nil {
-		return &netError{err}
+		return &netError{c.Name, err}
 	}
 	var answer struct {
-		Error   int    `json:"error"`
-		Message string `json:"message"`
+		Error   json.RawMessage `json:"error"`
+		Message string          `json:"message"`
 	}
-	if json.Unmarshal(data, &answer) == nil && answer.Error != 0 {
-		switch answer.Error {
-		case codeInvalidSession:
-			return ErrSessionExpired
-		case codeUnauthorizedToken:
-			return ErrNotAuthorized
+	if json.Unmarshal(data, &answer) == nil {
+		if code, message := errorOf(answer.Error, answer.Message); code != 0 {
+			switch code {
+			case codeInvalidSession:
+				return ErrSessionExpired
+			case codeUnauthorizedToken:
+				return ErrNotAuthorized
+			}
+			return &APIError{Code: code, Message: message, Status: res.StatusCode, Service: c.Name}
 		}
-		return &APIError{Code: answer.Error, Message: answer.Message, Status: res.StatusCode}
 	}
 	if res.StatusCode >= 300 {
-		return &APIError{Status: res.StatusCode}
+		return &APIError{Status: res.StatusCode, Service: c.Name}
 	}
 	if out == nil {
 		return nil
 	}
 	if err := json.Unmarshal(data, out); err != nil {
-		return fmt.Errorf("lastfm: decoding %s: %w", method, err)
+		return fmt.Errorf("%s: decoding %s: %w", serviceName(c.Name), method, err)
 	}
 	return nil
+}
+
+// errorOf reads the error of an answer, its code and its message: code 0
+// when it has none. Last.fm writes the code as a number beside the
+// message. GNU FM writes some so, and others, of the calls it failed on
+// its side, as an object of the code, a string, and the message:
+// {"error": {"code": "16", "#text": "..."}}.
+func errorOf(raw json.RawMessage, message string) (int, string) {
+	var code int
+	if json.Unmarshal(raw, &code) == nil {
+		return code, message
+	}
+	var obj struct {
+		Code json.RawMessage `json:"code"`
+		Text string          `json:"#text"`
+	}
+	if json.Unmarshal(raw, &obj) != nil {
+		return 0, ""
+	}
+	code, err := strconv.Atoi(strings.Trim(string(obj.Code), `"`))
+	if err != nil {
+		return 0, ""
+	}
+	return code, obj.Text
 }
 
 // signature returns the api_sig of params: the MD5 hex of every parameter

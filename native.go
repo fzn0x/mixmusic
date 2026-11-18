@@ -298,6 +298,8 @@ type shell struct {
 	drafts                  map[string]*draft
 	lastfmKey, lastfmSecret string
 	signingIn               string
+	// librefm is the Libre.fm form's choices.
+	librefm librefmForm
 	// youtubeCookies is the YouTube Music sign-in with a browser's cookies:
 	// the browsers to import from, their names, which the search of the
 	// settings finds the sign-in by too, the one chosen and its profile, the

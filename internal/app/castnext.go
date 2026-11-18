@@ -45,6 +45,7 @@ func (o *castOut) preload(rawURL string) {
 		gone := o.closed || o.idle || o.loading || o.loadedURL == rawURL
 		o.mu.Unlock()
 		if gone {
+			o.unqueue(rawURL)
 			return
 		}
 		if o.upNext != nil {
@@ -54,8 +55,20 @@ func (o *castOut) preload(rawURL string) {
 		}
 		if err := q.Next(ctx, m); err != nil {
 			log.Printf("mixmusic: the cast device didn't take the next track ahead: %v", err)
+			o.unqueue(rawURL)
 		}
 	})
+}
+
+// unqueue takes the stream of rawURL, which the device didn't take ahead,
+// out of what the server serves, unless it was loaded since.
+func (o *castOut) unqueue(rawURL string) {
+	o.mu.Lock()
+	if o.nextURL == rawURL {
+		o.nextURL = ""
+	}
+	o.mu.Unlock()
+	o.serveOnly()
 }
 
 // describe gives m what the device's screen shows of t, the track of the

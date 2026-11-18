@@ -3,15 +3,19 @@ package app
 import (
 	"context"
 	"encoding/binary"
+	"errors"
 	"io"
 	"net"
 	"net/http"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
+	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/cast"
 	"github.com/fzn0x/mixmusic/internal/cast/casttest"
 	"github.com/fzn0x/mixmusic/internal/localfiles"
@@ -310,4 +314,71 @@ func TestCastingToGroup(t *testing.T) {
 		t.Errorf("loaded %v", load.Payload)
 	}
 	waitPlayer(t, p, "on the group", func(s player.State) bool { return s.Remote && s.Playing && !s.Loading })
+}
+
+// queueSession is a fakeSession that takes the next track ahead, or turns
+// it down with nextErr.
+type queueSession struct {
+	*fakeSession
+	nextErr error
+}
+
+func (q *queueSession) Next(_ context.Context, m cast.Media) error {
+	q.record("next %s", m.URL)
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	return q.nextErr
+}
+
+// TestCastOutServesCastAndQueued has the server serve the stream cast and
+// the one the device took ahead alone: not one it turned down, nor one
+// after the next load.
+func TestCastOutServesCastAndQueued(t *testing.T) {
+	ev := &heardEvents{}
+	q := &queueSession{fakeSession: &fakeSession{volume: cast.Volume{Level: 0.5}}}
+	o := newCastOut(ev)
+	o.served = func(path string) string { return "http://lan" + path }
+	o.fetched = func() int64 { return 0 }
+	o.contentType = func(string, bool) string { return "audio/webm" }
+	var mu sync.Mutex
+	var kept [][]string
+	o.keep = func(of ...string) {
+		mu.Lock()
+		kept = append(kept, slices.Clone(of))
+		mu.Unlock()
+	}
+	last := func() []string {
+		mu.Lock()
+		defer mu.Unlock()
+		return kept[len(kept)-1]
+	}
+	o.start(q)
+	t.Cleanup(o.close)
+	a, b, c := streamURL("aaaaaaaaaaa"), streamURL("bbbbbbbbbbb"), streamURL("ccccccccccc")
+	o.Load(a, audio.Cue{Autoplay: true})
+	q.wait(t, "load http://lan/yt/aaaaaaaaaaa 0s true")
+	ev.wait(t, "playing true")
+	o.Preload(b)
+	q.wait(t, "next http://lan/yt/bbbbbbbbbbb")
+	if got := last(); !slices.Equal(got, []string{a, b}) {
+		t.Errorf("served %q, want the one cast and the one next", got)
+	}
+	q.mu.Lock()
+	q.nextErr = errors.New("no next")
+	q.mu.Unlock()
+	o.Preload(c)
+	q.wait(t, "next http://lan/yt/ccccccccccc")
+	for deadline := time.Now().Add(5 * time.Second); !slices.Equal(last(), []string{a, ""}); time.Sleep(time.Millisecond) {
+		if time.Now().After(deadline) {
+			t.Fatalf("served %q, with a next the device turned down", last())
+		}
+	}
+	o.Load(b, audio.Cue{Autoplay: true})
+	if got := last(); !slices.Equal(got, []string{b, ""}) {
+		t.Errorf("served %q after the next load", got)
+	}
+	o.Unload()
+	if got := last(); !slices.Equal(got, []string{"", ""}) {
+		t.Errorf("served %q after the unload", got)
+	}
 }

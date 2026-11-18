@@ -110,7 +110,15 @@
     return frameAt > 0 && now - frameAt > STALL * 1000;
   }
 
-  const logic = { covered, nextPart, target, correction, stale, stalled, AHEAD, BEHIND, JUMP, NEAR, STALL };
+  /**
+   * sameVideo tells whether the streams at a and b are of one video, at
+   * sizes that may differ, as on a display of another scale.
+   */
+  function sameVideo(a, b) {
+    return a.split("?")[0] === b.split("?")[0];
+  }
+
+  const logic = { covered, nextPart, target, correction, stale, stalled, sameVideo, AHEAD, BEHIND, JUMP, NEAR, STALL };
   if (typeof document === "undefined") {
     root.mvLogic = logic;
     return;
@@ -118,6 +126,8 @@
 
   const video = document.querySelector("video");
   video.muted = true;
+  /** still holds the last frame of a stream over the picture, while another of the same video loads. */
+  const still = document.querySelector("canvas");
   /**
    * cur is the picture the page plays: desc, as the Go side gives it
    * (src, mime, init, segments, duration), its MediaSource and
@@ -201,15 +211,39 @@
     if (c && c.fetching) c.fetching.abort();
   }
 
-  /** load starts playing the picture desc tells of, in place of cur's. */
+  /**
+   * freeze draws the frame that shows on still, and shows it, telling
+   * whether it could: what shows while the next stream loads.
+   */
+  function freeze() {
+    if (video.readyState < 2 || !video.videoWidth) return false;
+    still.width = video.videoWidth;
+    still.height = video.videoHeight;
+    try {
+      still.getContext("2d").drawImage(video, 0, 0);
+    } catch {
+      return false;
+    }
+    still.style.filter = video.style.filter;
+    still.hidden = false;
+    return true;
+  }
+
+  /**
+   * load starts playing the picture desc tells of, in place of cur's. When
+   * it is of the video that showed, at another size, its last frame stays
+   * until the first of desc's, and the page tells it shown meanwhile.
+   */
   function load(desc) {
     if (desc.loop) {
       loadLoop(desc);
       return;
     }
+    const kept = cur !== null && !cur.loop && cur.shown && !cur.failed && sameVideo(cur.desc.src, desc.src) && freeze();
+    if (!kept) still.hidden = true;
     unload();
     const ms = new MediaSource();
-    const c = { desc, ms, sb: null, ready: false, fetching: null, failed: "", shown: false };
+    const c = { desc, ms, sb: null, ready: false, fetching: null, failed: "", shown: false, still: kept };
     cur = c;
     tries = new Map();
     drifts = [];
@@ -234,6 +268,7 @@
    * whole of it, fetched as a blob, which every web view plays.
    */
   function loadLoop(desc) {
+    still.hidden = true;
     unload();
     const c = { desc, ms: null, sb: null, ready: false, fetching: null, failed: "", shown: false, loop: true, url: "", frameAt: 0 };
     cur = c;
@@ -278,6 +313,7 @@
   function fail(c, e) {
     if (cur !== c || (e && e.name === "AbortError")) return;
     c.failed = (e && e.message) || "the picture couldn't play";
+    still.hidden = true;
     stop(c);
     video.pause();
     console.error("mixmusic: the picture:", c.failed);
@@ -360,8 +396,11 @@
       }
       return;
     }
+    // While it seeks, the part it seeks to loads: seeking on would give up
+    // that fetch, and a slow one would never end, as on a stream of more
+    // pixels (#764).
     const t = target(clock, now());
-    if (Math.abs(video.currentTime - t) > JUMP) seek(t);
+    if (!video.seeking && Math.abs(video.currentTime - t) > JUMP) seek(t);
     if (video.paused) video.play().catch(() => {});
     pump(cur);
   }
@@ -412,6 +451,7 @@
     video.requestVideoFrameCallback(onFrame);
     if (!cur) return;
     cur.shown = true;
+    still.hidden = true;
     if (cur.loop) {
       if (cur.frameAt > 0) cur.frameAt = now();
       return;
@@ -435,7 +475,9 @@
     });
   }
   video.addEventListener("loadeddata", () => {
-    if (cur) cur.shown = true;
+    if (!cur) return;
+    cur.shown = true;
+    still.hidden = true;
   });
   video.addEventListener("timeupdate", () => {
     if (cur && !cur.loop && wanted()) pump(cur);
@@ -457,11 +499,14 @@
     return { max: Math.round(max * 1000), mean: Math.round((sum / drifts.length) * 1000), frames: drifts.length };
   }
 
-  /** status tells the Go side how the picture is: shown once its first frame showed. */
+  /**
+   * status tells the Go side how the picture is: shown once its first
+   * frame showed, or while the last frame of the stream before stays.
+   */
   function status() {
     return {
       src: cur ? cur.desc.src : "",
-      shown: cur !== null && cur.shown && !cur.failed,
+      shown: cur !== null && (cur.shown || cur.still) && !cur.failed,
       failed: cur ? cur.failed : "",
       drift: drift(),
     };
@@ -521,6 +566,7 @@
       return status();
     },
     clear() {
+      still.hidden = true;
       unload();
       return status();
     },

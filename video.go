@@ -401,8 +401,10 @@ func (s *shell) videoSleeve(c *ui.Context, t, rec media.Track, size float32) {
 			}
 			return
 		}
-		shown := v.status.Src == src.Src && v.status.Shown
-		web := ui.WebView(c.Key("video "+src.Src), v.view).Absolute().Left(0).Top(0).Size(w, h).Label(locales.VideoMusicVideo(t.Title))
+		// A stream of the same video at another size, as on a display of
+		// another scale, takes over from the one that showed with no fade.
+		shown := videoOf(v.status.Src) == videoOf(src.Src) && v.status.Shown
+		web := ui.WebView(c.Key("video "+videoOf(src.Src)), v.view).Absolute().Left(0).Top(0).Size(w, h).Label(locales.VideoMusicVideo(t.Title))
 		target := float32(0)
 		if shown {
 			target = 1
@@ -421,15 +423,22 @@ func (s *shell) videoSleeve(c *ui.Context, t, rec media.Track, size float32) {
 }
 
 // videoSource returns the stream of the picture of rec for the page, once
-// the page told the codecs it plays: nil until then. It is chosen for the
-// largest frame, so that a window resized keeps it.
+// the page told the codecs it plays and a frame the window's pixels: nil
+// until then. It is chosen for the largest frame, so that a window
+// resized keeps it.
 func (s *shell) videoSource(rec media.Track) *loaded[app.VideoSource] {
 	v := &s.video
-	if v.view == nil || len(v.families) == 0 {
+	if v.view == nil || len(v.families) == 0 || s.pixelScale <= 0 {
 		return nil
 	}
 	w, h := videoShape(videoAspect(rec.Artwork, nil), videoFrame)
 	pw, ph := s.artPixels(w), s.artPixels(h)
+	// A stream of the size wanted, or larger, goes on, as on a display of
+	// fewer pixels than the one it was asked for: another would stop the
+	// picture while it loads.
+	if l := v.lastSrc; l != nil && v.lastTrack == rec.ID && !l.Loop && l.Width >= pw && l.Height >= ph {
+		return &loaded[app.VideoSource]{done: true, value: *l}
+	}
 	families := v.families
 	key := "video:" + rec.ID + ":" + strconv.Itoa(pw) + "x" + strconv.Itoa(ph)
 	l := fetch(s, key, func(ctx context.Context) (app.VideoSource, error) {
@@ -439,7 +448,19 @@ func (s *shell) videoSource(rec media.Track) *loaded[app.VideoSource] {
 	// page doesn't ask for its stream again, nor waits for it, nor tells
 	// that it failed.
 	delete(s.showing, key)
+	// On a display of another scale, the picture that plays goes on while
+	// the stream for the new size loads, and if it can't (#764).
+	if (!l.done || l.err != nil) && v.lastSrc != nil && v.lastTrack == rec.ID {
+		return &loaded[app.VideoSource]{done: true, value: *v.lastSrc}
+	}
 	return l
+}
+
+// videoOf is the video the stream at src is of, whatever its size:
+// VideoPath tells the size in its query alone.
+func videoOf(src string) string {
+	video, _, _ := strings.Cut(src, "?")
+	return video
 }
 
 // videoCover is the thumbnail of a music video, filling a frame of w × h.

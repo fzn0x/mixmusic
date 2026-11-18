@@ -369,6 +369,47 @@ func TestNowPlayingVideoRefresh(t *testing.T) {
 	}
 }
 
+// TestNowPlayingVideoOtherDisplay moves the window to a display of another
+// scale: the picture goes on playing while the stream for the new size is
+// asked for, rather than giving way to the cover until it comes, and then
+// plays that stream, which it keeps back on the first (#764).
+func TestNowPlayingVideoOtherDisplay(t *testing.T) {
+	track := musicVideo()
+	s, tt, page, src := videoShell(t, track)
+	waitScript(t, s, page, "playing: true, active: true")
+	tt.SetScale(2)
+	for range 3 {
+		tt.Frame()
+		s.drain()
+	}
+	if _, ok := tt.Find("Music video: " + track.Title); !ok {
+		t.Fatal("the picture gave way to the cover")
+	}
+	if s.video.sent.src != src.Src || !s.video.sent.active {
+		t.Errorf("the page was told %+v", s.video.sent)
+	}
+	// Once the stream for the new size comes, the page plays it, keeping
+	// the last frame of the other until its first (public/video.js).
+	w, h := videoShape(videoAspect(track.Artwork, nil), videoFrame)
+	sharp := app.VideoSource{Src: "stream://localhost/video/x?itag=244", MimeType: src.MimeType, Width: 854, Height: 480, Init: 220}
+	s.loads["video:"+track.ID+":"+itoa(s.artPixels(w))+"x"+itoa(s.artPixels(h))] = &loaded[app.VideoSource]{done: true, value: sharp}
+	s.refresh()
+	tt.Frame()
+	waitScript(t, s, page, "itag=244")
+	if videoOf(sharp.Src) != videoOf(src.Src) {
+		t.Errorf("%s and %s are of other videos", sharp.Src, src.Src)
+	}
+	// Back on the first display, the larger stream goes on.
+	tt.SetScale(1)
+	for range 3 {
+		tt.Frame()
+		s.drain()
+	}
+	if s.video.sent.src != sharp.Src {
+		t.Errorf("back on the first display, the page was told %+v", s.video.sent)
+	}
+}
+
 // TestNowPlayingVideoSettingsFile turns the picture off and on again from
 // settings.json, as an edit of it applies while MixMusic runs.
 func TestNowPlayingVideoSettingsFile(t *testing.T) {

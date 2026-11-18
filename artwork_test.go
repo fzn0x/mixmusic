@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/artwork"
+	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/player"
 )
 
 // scriptedArt is a source of images whose addresses fail as scripted, in
@@ -243,6 +245,30 @@ func TestBlurKeepsItsEdges(t *testing.T) {
 	for x := 1; x < 32; x++ {
 		if row(x) < row(x-1) {
 			t.Fatalf("the edge blurred darkens at %d", x)
+		}
+	}
+}
+
+// TestArtworkWaitsForTheWindowsPixels keeps the first frame, which doesn't
+// know the display's scale yet, from loading a cover at a guessed size that
+// the next frame, at the real one, loads again (#764).
+func TestArtworkWaitsForTheWindowsPixels(t *testing.T) {
+	s := newTestShell(t)
+	s.art.src = &scriptedArt{}
+	track := testTracks[0]
+	track.Artwork = []media.Image{{URL: "https://example.com/cover.jpg", Width: 600, Height: 600}}
+	s.p.PlayTracks([]media.Track{track}, 0)
+	s.settle(t, func(st player.State) bool { return st.Playing && !st.Loading })
+	tt := testerOf(t, s, 1280, 820)
+	first := s.art.clock
+	s.drain()
+	tt.Frame()
+	if s.art.clock == first {
+		t.Fatal("no cover asked for once the window's pixels are known")
+	}
+	for k, e := range s.art.m {
+		if e.used <= first {
+			t.Errorf("%s loaded at %d px for the first frame only", k.url, k.px)
 		}
 	}
 }

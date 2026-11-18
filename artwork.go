@@ -92,9 +92,13 @@ func newArtworks(update func(func()), src artSource) *artworks {
 }
 
 // get returns the image at rawURL, scaled to about px pixels across, or nil
-// while it loads, or when it can't. One that couldn't load asks c for a
-// frame when it tries again.
+// while it loads, or when it can't, or when px is 0, as before the window
+// knows its pixels. One that couldn't load asks c for a frame when it
+// tries again.
 func (a *artworks) get(c *ui.Context, rawURL string, px int) *ui.Bitmap {
+	if px <= 0 {
+		return nil
+	}
 	return a.lookup(c, artKey{rawURL, bucket(px), a.phosphor, false})
 }
 

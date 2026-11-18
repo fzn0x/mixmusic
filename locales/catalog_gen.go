@@ -3022,6 +3022,1514 @@ func (msgs Messages) AudioAsAccountTitle() string {
 	return Catalog.Format(msgs.locale, "audioAsAccountTitle", nil)
 }
 
+// BackupAbout says "Saves your library, settings and add-ons in a file, to restore here or on another computer."
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: what the Back up row does, under its
+// title.
+func BackupAbout() string { return In(i18n.Locale()).BackupAbout() }
+
+// BackupAbout says "Saves your library, settings and add-ons in a file, to restore here or on another computer."
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: what the Back up row does, under its
+// title.
+func (msgs Messages) BackupAbout() string {
+	return Catalog.Format(msgs.locale, "backupAbout", nil)
+}
+
+// BackupAutoDaily says "Daily"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups › Back up automatically: the choice of
+// a backup each day.
+func BackupAutoDaily() string { return In(i18n.Locale()).BackupAutoDaily() }
+
+// BackupAutoDaily says "Daily"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups › Back up automatically: the choice of
+// a backup each day.
+func (msgs Messages) BackupAutoDaily() string {
+	return Catalog.Format(msgs.locale, "backupAutoDaily", nil)
+}
+
+// BackupAutoFailed says "The last automatic backup failed: {error}. MixMusic tries again at its next start."
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: under Back up automatically, in red,
+// when the last one failed: {error} is why, a lowercase fragment as
+// backupErrFolderMissing.
+func BackupAutoFailed(error string) string { return In(i18n.Locale()).BackupAutoFailed(error) }
+
+// BackupAutoFailed says "The last automatic backup failed: {error}. MixMusic tries again at its next start."
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: under Back up automatically, in red,
+// when the last one failed: {error} is why, a lowercase fragment as
+// backupErrFolderMissing.
+func (msgs Messages) BackupAutoFailed(error string) string {
+	return Catalog.Format(msgs.locale, "backupAutoFailed", map[string]any{"error": error})
+}
+
+// BackupAutoFailedNotice says "Couldn't back up automatically: {error}"
+// in the language the app shows.
+//
+// The notice of an automatic backup that failed: {error} is why, a
+// lowercase fragment as backupErrFolderMissing.
+func BackupAutoFailedNotice(error string) string {
+	return In(i18n.Locale()).BackupAutoFailedNotice(error)
+}
+
+// BackupAutoFailedNotice says "Couldn't back up automatically: {error}"
+// in the language of msgs.
+//
+// The notice of an automatic backup that failed: {error} is why, a
+// lowercase fragment as backupErrFolderMissing.
+func (msgs Messages) BackupAutoFailedNotice(error string) string {
+	return Catalog.Format(msgs.locale, "backupAutoFailedNotice", map[string]any{"error": error})
+}
+
+// BackupAutoLast says "Last backup: {time, date, ::yMMMdjm}"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: under Back up automatically, when the
+// last automatic backup was made.
+func BackupAutoLast(time_ time.Time) string { return In(i18n.Locale()).BackupAutoLast(time_) }
+
+// BackupAutoLast says "Last backup: {time, date, ::yMMMdjm}"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: under Back up automatically, when the
+// last automatic backup was made.
+func (msgs Messages) BackupAutoLast(time_ time.Time) string {
+	return Catalog.Format(msgs.locale, "backupAutoLast", map[string]any{"time": time_})
+}
+
+// BackupAutoMonthly says "Monthly"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups › Back up automatically: the choice of
+// a backup each month.
+func BackupAutoMonthly() string { return In(i18n.Locale()).BackupAutoMonthly() }
+
+// BackupAutoMonthly says "Monthly"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups › Back up automatically: the choice of
+// a backup each month.
+func (msgs Messages) BackupAutoMonthly() string {
+	return Catalog.Format(msgs.locale, "backupAutoMonthly", nil)
+}
+
+// BackupAutoNone says "No automatic backup yet."
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: under Back up automatically, before the
+// first automatic backup was made.
+func BackupAutoNone() string { return In(i18n.Locale()).BackupAutoNone() }
+
+// BackupAutoNone says "No automatic backup yet."
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: under Back up automatically, before the
+// first automatic backup was made.
+func (msgs Messages) BackupAutoNone() string {
+	return Catalog.Format(msgs.locale, "backupAutoNone", nil)
+}
+
+// BackupAutoOff says "Off"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups › Back up automatically: the choice
+// that makes no automatic backup, as at first.
+func BackupAutoOff() string { return In(i18n.Locale()).BackupAutoOff() }
+
+// BackupAutoOff says "Off"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups › Back up automatically: the choice
+// that makes no automatic backup, as at first.
+func (msgs Messages) BackupAutoOff() string {
+	return Catalog.Format(msgs.locale, "backupAutoOff", nil)
+}
+
+// BackupAutoQuit says "Each time MixMusic quits"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups › Back up automatically: the choice of
+// a backup each time MixMusic quits.
+func BackupAutoQuit() string { return In(i18n.Locale()).BackupAutoQuit() }
+
+// BackupAutoQuit says "Each time MixMusic quits"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups › Back up automatically: the choice of
+// a backup each time MixMusic quits.
+func (msgs Messages) BackupAutoQuit() string {
+	return Catalog.Format(msgs.locale, "backupAutoQuit", nil)
+}
+
+// BackupAutoTitle says "Back up automatically"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: the title of the row that chooses how
+// often MixMusic backs itself up, to a folder.
+func BackupAutoTitle() string { return In(i18n.Locale()).BackupAutoTitle() }
+
+// BackupAutoTitle says "Back up automatically"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: the title of the row that chooses how
+// often MixMusic backs itself up, to a folder.
+func (msgs Messages) BackupAutoTitle() string {
+	return Catalog.Format(msgs.locale, "backupAutoTitle", nil)
+}
+
+// BackupAutoWeekly says "Weekly"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups › Back up automatically: the choice of
+// a backup each week.
+func BackupAutoWeekly() string { return In(i18n.Locale()).BackupAutoWeekly() }
+
+// BackupAutoWeekly says "Weekly"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups › Back up automatically: the choice of
+// a backup each week.
+func (msgs Messages) BackupAutoWeekly() string {
+	return Catalog.Format(msgs.locale, "backupAutoWeekly", nil)
+}
+
+// BackupBusy says "a backup is being made already"
+// in the language the app shows.
+//
+// Why a backup can't be made now, a lowercase fragment in backupFailed.
+func BackupBusy() string { return In(i18n.Locale()).BackupBusy() }
+
+// BackupBusy says "a backup is being made already"
+// in the language of msgs.
+//
+// Why a backup can't be made now, a lowercase fragment in backupFailed.
+func (msgs Messages) BackupBusy() string {
+	return Catalog.Format(msgs.locale, "backupBusy", nil)
+}
+
+// BackupButton says "Back up…"
+// in the language the app shows.
+//
+// The button of the Back up row in Settings › Desktop › Backups, which
+// opens the Back up MixMusic dialog, which ticks what a backup holds; and
+// that dialog's button, which asks where to save the file.
+func BackupButton() string { return In(i18n.Locale()).BackupButton() }
+
+// BackupButton says "Back up…"
+// in the language of msgs.
+//
+// The button of the Back up row in Settings › Desktop › Backups, which
+// opens the Back up MixMusic dialog, which ticks what a backup holds; and
+// that dialog's button, which asks where to save the file.
+func (msgs Messages) BackupButton() string {
+	return Catalog.Format(msgs.locale, "backupButton", nil)
+}
+
+// BackupDialogIntro says "Choose what the backup holds. A restore brings back what you tick then, of what it holds."
+// in the language the app shows.
+//
+// The text at the top of the Back up MixMusic dialog, which ticks what a
+// backup holds.
+func BackupDialogIntro() string { return In(i18n.Locale()).BackupDialogIntro() }
+
+// BackupDialogIntro says "Choose what the backup holds. A restore brings back what you tick then, of what it holds."
+// in the language of msgs.
+//
+// The text at the top of the Back up MixMusic dialog, which ticks what a
+// backup holds.
+func (msgs Messages) BackupDialogIntro() string {
+	return Catalog.Format(msgs.locale, "backupDialogIntro", nil)
+}
+
+// BackupDialogTitle says "Back up MixMusic"
+// in the language the app shows.
+//
+// The title of the Back up MixMusic dialog, which ticks what a backup
+// holds.
+func BackupDialogTitle() string { return In(i18n.Locale()).BackupDialogTitle() }
+
+// BackupDialogTitle says "Back up MixMusic"
+// in the language of msgs.
+//
+// The title of the Back up MixMusic dialog, which ticks what a backup
+// holds.
+func (msgs Messages) BackupDialogTitle() string {
+	return Catalog.Format(msgs.locale, "backupDialogTitle", nil)
+}
+
+// BackupErrDamaged says "the file is damaged"
+// in the language the app shows.
+//
+// Why a backup can't be restored, a lowercase fragment in backupRefused.
+func BackupErrDamaged() string { return In(i18n.Locale()).BackupErrDamaged() }
+
+// BackupErrDamaged says "the file is damaged"
+// in the language of msgs.
+//
+// Why a backup can't be restored, a lowercase fragment in backupRefused.
+func (msgs Messages) BackupErrDamaged() string {
+	return Catalog.Format(msgs.locale, "backupErrDamaged", nil)
+}
+
+// BackupErrDamagedEntry says "{entry} in it is damaged"
+// in the language the app shows.
+//
+// Why a backup can't be restored, a lowercase fragment in backupRefused:
+// {entry} is the path of the file in it that's damaged, as library.json.
+func BackupErrDamagedEntry(entry string) string {
+	return In(i18n.Locale()).BackupErrDamagedEntry(entry)
+}
+
+// BackupErrDamagedEntry says "{entry} in it is damaged"
+// in the language of msgs.
+//
+// Why a backup can't be restored, a lowercase fragment in backupRefused:
+// {entry} is the path of the file in it that's damaged, as library.json.
+func (msgs Messages) BackupErrDamagedEntry(entry string) string {
+	return Catalog.Format(msgs.locale, "backupErrDamagedEntry", map[string]any{"entry": entry})
+}
+
+// BackupErrDiskFull says "the disk is full"
+// in the language the app shows.
+//
+// Why an automatic backup failed, a lowercase fragment in backupAutoFailed
+// and backupAutoFailedNotice.
+func BackupErrDiskFull() string { return In(i18n.Locale()).BackupErrDiskFull() }
+
+// BackupErrDiskFull says "the disk is full"
+// in the language of msgs.
+//
+// Why an automatic backup failed, a lowercase fragment in backupAutoFailed
+// and backupAutoFailedNotice.
+func (msgs Messages) BackupErrDiskFull() string {
+	return Catalog.Format(msgs.locale, "backupErrDiskFull", nil)
+}
+
+// BackupErrFolderLost says "MixMusic can't reach {folder} any more: choose the folder again"
+// in the language the app shows.
+//
+// Why an automatic backup failed in the Flatpak, whose sandbox lost the
+// folder, a lowercase fragment in backupAutoFailed and
+// backupAutoFailedNotice.
+func BackupErrFolderLost(folder string) string { return In(i18n.Locale()).BackupErrFolderLost(folder) }
+
+// BackupErrFolderLost says "MixMusic can't reach {folder} any more: choose the folder again"
+// in the language of msgs.
+//
+// Why an automatic backup failed in the Flatpak, whose sandbox lost the
+// folder, a lowercase fragment in backupAutoFailed and
+// backupAutoFailedNotice.
+func (msgs Messages) BackupErrFolderLost(folder string) string {
+	return Catalog.Format(msgs.locale, "backupErrFolderLost", map[string]any{"folder": folder})
+}
+
+// BackupErrFolderMissing says "the folder {folder} isn't there"
+// in the language the app shows.
+//
+// Why an automatic backup failed, a lowercase fragment in backupAutoFailed
+// and backupAutoFailedNotice.
+func BackupErrFolderMissing(folder string) string {
+	return In(i18n.Locale()).BackupErrFolderMissing(folder)
+}
+
+// BackupErrFolderMissing says "the folder {folder} isn't there"
+// in the language of msgs.
+//
+// Why an automatic backup failed, a lowercase fragment in backupAutoFailed
+// and backupAutoFailedNotice.
+func (msgs Messages) BackupErrFolderMissing(folder string) string {
+	return Catalog.Format(msgs.locale, "backupErrFolderMissing", map[string]any{"folder": folder})
+}
+
+// BackupErrFolderReadOnly says "the folder {folder} can't be written to"
+// in the language the app shows.
+//
+// Why an automatic backup failed, a lowercase fragment in backupAutoFailed
+// and backupAutoFailedNotice.
+func BackupErrFolderReadOnly(folder string) string {
+	return In(i18n.Locale()).BackupErrFolderReadOnly(folder)
+}
+
+// BackupErrFolderReadOnly says "the folder {folder} can't be written to"
+// in the language of msgs.
+//
+// Why an automatic backup failed, a lowercase fragment in backupAutoFailed
+// and backupAutoFailedNotice.
+func (msgs Messages) BackupErrFolderReadOnly(folder string) string {
+	return Catalog.Format(msgs.locale, "backupErrFolderReadOnly", map[string]any{"folder": folder})
+}
+
+// BackupErrNewer says "it comes from MixMusic {version}, newer than this one: update MixMusic first"
+// in the language the app shows.
+//
+// Why a backup can't be restored, a lowercase fragment in backupRefused:
+// {version} is the version that made it.
+func BackupErrNewer(version string) string { return In(i18n.Locale()).BackupErrNewer(version) }
+
+// BackupErrNewer says "it comes from MixMusic {version}, newer than this one: update MixMusic first"
+// in the language of msgs.
+//
+// Why a backup can't be restored, a lowercase fragment in backupRefused:
+// {version} is the version that made it.
+func (msgs Messages) BackupErrNewer(version string) string {
+	return Catalog.Format(msgs.locale, "backupErrNewer", map[string]any{"version": version})
+}
+
+// BackupErrNotBackup says "it isn't a MixMusic backup"
+// in the language the app shows.
+//
+// Why a file can't be restored, a lowercase fragment in backupRefused.
+func BackupErrNotBackup() string { return In(i18n.Locale()).BackupErrNotBackup() }
+
+// BackupErrNotBackup says "it isn't a MixMusic backup"
+// in the language of msgs.
+//
+// Why a file can't be restored, a lowercase fragment in backupRefused.
+func (msgs Messages) BackupErrNotBackup() string {
+	return Catalog.Format(msgs.locale, "backupErrNotBackup", nil)
+}
+
+// BackupErrOutside says "{entry} in it would land outside the data folder"
+// in the language the app shows.
+//
+// Why a backup can't be restored, a lowercase fragment in backupRefused:
+// {entry} is the path of the file in it.
+func BackupErrOutside(entry string) string { return In(i18n.Locale()).BackupErrOutside(entry) }
+
+// BackupErrOutside says "{entry} in it would land outside the data folder"
+// in the language of msgs.
+//
+// Why a backup can't be restored, a lowercase fragment in backupRefused:
+// {entry} is the path of the file in it.
+func (msgs Messages) BackupErrOutside(entry string) string {
+	return Catalog.Format(msgs.locale, "backupErrOutside", map[string]any{"entry": entry})
+}
+
+// BackupErrTooLarge says "it's larger than {mb} MB"
+// in the language the app shows.
+//
+// Why a backup can't be restored, a lowercase fragment in backupRefused:
+// {mb} is the most a backup may weigh, in megabytes.
+func BackupErrTooLarge(mb int) string { return In(i18n.Locale()).BackupErrTooLarge(mb) }
+
+// BackupErrTooLarge says "it's larger than {mb} MB"
+// in the language of msgs.
+//
+// Why a backup can't be restored, a lowercase fragment in backupRefused:
+// {mb} is the most a backup may weigh, in megabytes.
+func (msgs Messages) BackupErrTooLarge(mb int) string {
+	return Catalog.Format(msgs.locale, "backupErrTooLarge", map[string]any{"mb": mb})
+}
+
+// BackupErrTooLargeUnpacked says "it unpacks to more than {gb} GB"
+// in the language the app shows.
+//
+// Why a backup can't be restored, a lowercase fragment in backupRefused:
+// {gb} is the most a backup may unpack to, in gigabytes.
+func BackupErrTooLargeUnpacked(gb int) string { return In(i18n.Locale()).BackupErrTooLargeUnpacked(gb) }
+
+// BackupErrTooLargeUnpacked says "it unpacks to more than {gb} GB"
+// in the language of msgs.
+//
+// Why a backup can't be restored, a lowercase fragment in backupRefused:
+// {gb} is the most a backup may unpack to, in gigabytes.
+func (msgs Messages) BackupErrTooLargeUnpacked(gb int) string {
+	return Catalog.Format(msgs.locale, "backupErrTooLargeUnpacked", map[string]any{"gb": gb})
+}
+
+// BackupFailed says "Couldn't back up: {error}"
+// in the language the app shows.
+//
+// The notice of a backup made by hand that failed: {error} is why.
+func BackupFailed(error string) string { return In(i18n.Locale()).BackupFailed(error) }
+
+// BackupFailed says "Couldn't back up: {error}"
+// in the language of msgs.
+//
+// The notice of a backup made by hand that failed: {error} is why.
+func (msgs Messages) BackupFailed(error string) string {
+	return Catalog.Format(msgs.locale, "backupFailed", map[string]any{"error": error})
+}
+
+// BackupFilter says "MixMusic backups"
+// in the language the app shows.
+//
+// The name of the kind of file the system's dialogs that save and open
+// backups show: zip files.
+func BackupFilter() string { return In(i18n.Locale()).BackupFilter() }
+
+// BackupFilter says "MixMusic backups"
+// in the language of msgs.
+//
+// The name of the kind of file the system's dialogs that save and open
+// backups show: zip files.
+func (msgs Messages) BackupFilter() string {
+	return Catalog.Format(msgs.locale, "backupFilter", nil)
+}
+
+// BackupFolderChange says "Change…"
+// in the language the app shows.
+//
+// The button of the Folder for backups row in Settings › Desktop ›
+// Backups, which asks for a folder.
+func BackupFolderChange() string { return In(i18n.Locale()).BackupFolderChange() }
+
+// BackupFolderChange says "Change…"
+// in the language of msgs.
+//
+// The button of the Folder for backups row in Settings › Desktop ›
+// Backups, which asks for a folder.
+func (msgs Messages) BackupFolderChange() string {
+	return Catalog.Format(msgs.locale, "backupFolderChange", nil)
+}
+
+// BackupFolderDialog says "Folder for MixMusic's backups"
+// in the language the app shows.
+//
+// The title of the system's dialog that chooses the folder of the automatic
+// backups.
+func BackupFolderDialog() string { return In(i18n.Locale()).BackupFolderDialog() }
+
+// BackupFolderDialog says "Folder for MixMusic's backups"
+// in the language of msgs.
+//
+// The title of the system's dialog that chooses the folder of the automatic
+// backups.
+func (msgs Messages) BackupFolderDialog() string {
+	return Catalog.Format(msgs.locale, "backupFolderDialog", nil)
+}
+
+// BackupFolderNone says "Choose a folder for the backups."
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: under Folder for backups, in the
+// Flatpak, before a folder is chosen.
+func BackupFolderNone() string { return In(i18n.Locale()).BackupFolderNone() }
+
+// BackupFolderNone says "Choose a folder for the backups."
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: under Folder for backups, in the
+// Flatpak, before a folder is chosen.
+func (msgs Messages) BackupFolderNone() string {
+	return Catalog.Format(msgs.locale, "backupFolderNone", nil)
+}
+
+// BackupFolderTitle says "Folder for backups"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: the title of the row of the folder the
+// automatic backups go to, whose path shows under it.
+func BackupFolderTitle() string { return In(i18n.Locale()).BackupFolderTitle() }
+
+// BackupFolderTitle says "Folder for backups"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: the title of the row of the folder the
+// automatic backups go to, whose path shows under it.
+func (msgs Messages) BackupFolderTitle() string {
+	return Catalog.Format(msgs.locale, "backupFolderTitle", nil)
+}
+
+// BackupGroup says "Backups"
+// in the language the app shows.
+//
+// Settings › Desktop: the title of the group of rows that back MixMusic
+// up, restore a backup and back up automatically.
+func BackupGroup() string { return In(i18n.Locale()).BackupGroup() }
+
+// BackupGroup says "Backups"
+// in the language of msgs.
+//
+// Settings › Desktop: the title of the group of rows that back MixMusic
+// up, restore a backup and back up automatically.
+func (msgs Messages) BackupGroup() string {
+	return Catalog.Format(msgs.locale, "backupGroup", nil)
+}
+
+// BackupKeepAbout says "MixMusic deletes only the backups it made itself, the oldest first."
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: what the Keep row does, under its
+// title.
+func BackupKeepAbout() string { return In(i18n.Locale()).BackupKeepAbout() }
+
+// BackupKeepAbout says "MixMusic deletes only the backups it made itself, the oldest first."
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: what the Keep row does, under its
+// title.
+func (msgs Messages) BackupKeepAbout() string {
+	return Catalog.Format(msgs.locale, "backupKeepAbout", nil)
+}
+
+// BackupKeepAll says "All of them"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups › Keep: the choice that keeps every
+// automatic backup.
+func BackupKeepAll() string { return In(i18n.Locale()).BackupKeepAll() }
+
+// BackupKeepAll says "All of them"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups › Keep: the choice that keeps every
+// automatic backup.
+func (msgs Messages) BackupKeepAll() string {
+	return Catalog.Format(msgs.locale, "backupKeepAll", nil)
+}
+
+// BackupKeepLast says "{count, plural, one {The last #} other {The last #}}"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups › Keep: a choice of how many automatic
+// backups to keep: 3, 5, 10, 15 or 30.
+func BackupKeepLast(count int) string { return In(i18n.Locale()).BackupKeepLast(count) }
+
+// BackupKeepLast says "{count, plural, one {The last #} other {The last #}}"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups › Keep: a choice of how many automatic
+// backups to keep: 3, 5, 10, 15 or 30.
+func (msgs Messages) BackupKeepLast(count int) string {
+	return Catalog.Format(msgs.locale, "backupKeepLast", map[string]any{"count": count})
+}
+
+// BackupKeepOne says "One file, written over"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups › Keep: the choice that keeps one
+// backup, in a file each backup writes over.
+func BackupKeepOne() string { return In(i18n.Locale()).BackupKeepOne() }
+
+// BackupKeepOne says "One file, written over"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups › Keep: the choice that keeps one
+// backup, in a file each backup writes over.
+func (msgs Messages) BackupKeepOne() string {
+	return Catalog.Format(msgs.locale, "backupKeepOne", nil)
+}
+
+// BackupKeepTitle says "Keep"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: the title of the row that chooses how
+// many automatic backups the folder keeps.
+func BackupKeepTitle() string { return In(i18n.Locale()).BackupKeepTitle() }
+
+// BackupKeepTitle says "Keep"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: the title of the row that chooses how
+// many automatic backups the folder keeps.
+func (msgs Messages) BackupKeepTitle() string {
+	return Catalog.Format(msgs.locale, "backupKeepTitle", nil)
+}
+
+// BackupNever says "Never in a backup: your sign-ins, remote control's pairings, the scrobbles still to send, the index of your music, yt…"
+// in the language the app shows.
+//
+// the Back up MixMusic dialog, which ticks what a backup holds: under the
+// parts, what no backup holds.
+func BackupNever() string { return In(i18n.Locale()).BackupNever() }
+
+// BackupNever says "Never in a backup: your sign-ins, remote control's pairings, the scrobbles still to send, the index of your music, yt…"
+// in the language of msgs.
+//
+// the Back up MixMusic dialog, which ticks what a backup holds: under the
+// parts, what no backup holds.
+func (msgs Messages) BackupNever() string {
+	return Catalog.Format(msgs.locale, "backupNever", nil)
+}
+
+// BackupNoFolder says "no folder is chosen for the backups"
+// in the language the app shows.
+//
+// Why an automatic backup failed in the Flatpak before a folder was chosen,
+// a lowercase fragment in backupAutoFailed.
+func BackupNoFolder() string { return In(i18n.Locale()).BackupNoFolder() }
+
+// BackupNoFolder says "no folder is chosen for the backups"
+// in the language of msgs.
+//
+// Why an automatic backup failed in the Flatpak before a folder was chosen,
+// a lowercase fragment in backupAutoFailed.
+func (msgs Messages) BackupNoFolder() string {
+	return Catalog.Format(msgs.locale, "backupNoFolder", nil)
+}
+
+// BackupOpenTitle says "Open a backup"
+// in the language the app shows.
+//
+// The title of the system's dialog that asks for the backup to restore.
+func BackupOpenTitle() string { return In(i18n.Locale()).BackupOpenTitle() }
+
+// BackupOpenTitle says "Open a backup"
+// in the language of msgs.
+//
+// The title of the system's dialog that asks for the backup to restore.
+func (msgs Messages) BackupOpenTitle() string {
+	return Catalog.Format(msgs.locale, "backupOpenTitle", nil)
+}
+
+// BackupOpening says "Checking the backup…"
+// in the language the app shows.
+//
+// The notice shown while the backup chosen to restore is checked, before
+// its preview opens.
+func BackupOpening() string { return In(i18n.Locale()).BackupOpening() }
+
+// BackupOpening says "Checking the backup…"
+// in the language of msgs.
+//
+// The notice shown while the backup chosen to restore is checked, before
+// its preview opens.
+func (msgs Messages) BackupOpening() string {
+	return Catalog.Format(msgs.locale, "backupOpening", nil)
+}
+
+// BackupPartAddons says "Add-ons"
+// in the language the app shows.
+//
+// A part of a backup, ticked in the Back up MixMusic dialog, which ticks
+// what a backup holds and in the Restore a backup dialog, which previews a
+// backup before it's restored: the themes and plugins.
+func BackupPartAddons() string { return In(i18n.Locale()).BackupPartAddons() }
+
+// BackupPartAddons says "Add-ons"
+// in the language of msgs.
+//
+// A part of a backup, ticked in the Back up MixMusic dialog, which ticks
+// what a backup holds and in the Restore a backup dialog, which previews a
+// backup before it's restored: the themes and plugins.
+func (msgs Messages) BackupPartAddons() string {
+	return Catalog.Format(msgs.locale, "backupPartAddons", nil)
+}
+
+// BackupPartAddonsAbout says "Themes and plugins, with what plugins keep"
+// in the language the app shows.
+//
+// the Back up MixMusic dialog, which ticks what a backup holds: what the
+// Add-ons part holds, under its box.
+func BackupPartAddonsAbout() string { return In(i18n.Locale()).BackupPartAddonsAbout() }
+
+// BackupPartAddonsAbout says "Themes and plugins, with what plugins keep"
+// in the language of msgs.
+//
+// the Back up MixMusic dialog, which ticks what a backup holds: what the
+// Add-ons part holds, under its box.
+func (msgs Messages) BackupPartAddonsAbout() string {
+	return Catalog.Format(msgs.locale, "backupPartAddonsAbout", nil)
+}
+
+// BackupPartDownloads says "List of downloads"
+// in the language the app shows.
+//
+// A part of a backup, ticked in the Back up MixMusic dialog, which ticks
+// what a backup holds: the list of what was downloaded, without its audio.
+func BackupPartDownloads() string { return In(i18n.Locale()).BackupPartDownloads() }
+
+// BackupPartDownloads says "List of downloads"
+// in the language of msgs.
+//
+// A part of a backup, ticked in the Back up MixMusic dialog, which ticks
+// what a backup holds: the list of what was downloaded, without its audio.
+func (msgs Messages) BackupPartDownloads() string {
+	return Catalog.Format(msgs.locale, "backupPartDownloads", nil)
+}
+
+// BackupPartDownloadsAbout says "What you downloaded, without its audio, to download it again after a restore"
+// in the language the app shows.
+//
+// the Back up MixMusic dialog, which ticks what a backup holds: what the
+// List of downloads part holds, under its box.
+func BackupPartDownloadsAbout() string { return In(i18n.Locale()).BackupPartDownloadsAbout() }
+
+// BackupPartDownloadsAbout says "What you downloaded, without its audio, to download it again after a restore"
+// in the language of msgs.
+//
+// the Back up MixMusic dialog, which ticks what a backup holds: what the
+// List of downloads part holds, under its box.
+func (msgs Messages) BackupPartDownloadsAbout() string {
+	return Catalog.Format(msgs.locale, "backupPartDownloadsAbout", nil)
+}
+
+// BackupPartLibrary says "Library"
+// in the language the app shows.
+//
+// A part of a backup, ticked in the Back up MixMusic dialog, which ticks
+// what a backup holds and in the Restore a backup dialog, which previews a
+// backup before it's restored: the library.
+func BackupPartLibrary() string { return In(i18n.Locale()).BackupPartLibrary() }
+
+// BackupPartLibrary says "Library"
+// in the language of msgs.
+//
+// A part of a backup, ticked in the Back up MixMusic dialog, which ticks
+// what a backup holds and in the Restore a backup dialog, which previews a
+// backup before it's restored: the library.
+func (msgs Messages) BackupPartLibrary() string {
+	return Catalog.Format(msgs.locale, "backupPartLibrary", nil)
+}
+
+// BackupPartLibraryAbout says "Liked and disliked songs, mixes and their covers, history and the plays Stats counts, searches, followed artists and …"
+// in the language the app shows.
+//
+// the Back up MixMusic dialog, which ticks what a backup holds: what the
+// Library part holds, under its box.
+func BackupPartLibraryAbout() string { return In(i18n.Locale()).BackupPartLibraryAbout() }
+
+// BackupPartLibraryAbout says "Liked and disliked songs, mixes and their covers, history and the plays Stats counts, searches, followed artists and …"
+// in the language of msgs.
+//
+// the Back up MixMusic dialog, which ticks what a backup holds: what the
+// Library part holds, under its box.
+func (msgs Messages) BackupPartLibraryAbout() string {
+	return Catalog.Format(msgs.locale, "backupPartLibraryAbout", nil)
+}
+
+// BackupPartQueue says "Queue and episode positions"
+// in the language the app shows.
+//
+// A part of a backup, ticked in the Back up MixMusic dialog, which ticks
+// what a backup holds and in the Restore a backup dialog, which previews a
+// backup before it's restored: the queue, and where each podcast episode
+// was left.
+func BackupPartQueue() string { return In(i18n.Locale()).BackupPartQueue() }
+
+// BackupPartQueue says "Queue and episode positions"
+// in the language of msgs.
+//
+// A part of a backup, ticked in the Back up MixMusic dialog, which ticks
+// what a backup holds and in the Restore a backup dialog, which previews a
+// backup before it's restored: the queue, and where each podcast episode
+// was left.
+func (msgs Messages) BackupPartQueue() string {
+	return Catalog.Format(msgs.locale, "backupPartQueue", nil)
+}
+
+// BackupPartQueueAbout says "The queue, and where you left each podcast episode"
+// in the language the app shows.
+//
+// the Back up MixMusic dialog, which ticks what a backup holds: what the
+// Queue and episode positions part holds, under its box.
+func BackupPartQueueAbout() string { return In(i18n.Locale()).BackupPartQueueAbout() }
+
+// BackupPartQueueAbout says "The queue, and where you left each podcast episode"
+// in the language of msgs.
+//
+// the Back up MixMusic dialog, which ticks what a backup holds: what the
+// Queue and episode positions part holds, under its box.
+func (msgs Messages) BackupPartQueueAbout() string {
+	return Catalog.Format(msgs.locale, "backupPartQueueAbout", nil)
+}
+
+// BackupPartSettings says "Settings"
+// in the language the app shows.
+//
+// A part of a backup, ticked in the Back up MixMusic dialog, which ticks
+// what a backup holds and in the Restore a backup dialog, which previews a
+// backup before it's restored: the settings.
+func BackupPartSettings() string { return In(i18n.Locale()).BackupPartSettings() }
+
+// BackupPartSettings says "Settings"
+// in the language of msgs.
+//
+// A part of a backup, ticked in the Back up MixMusic dialog, which ticks
+// what a backup holds and in the Restore a backup dialog, which previews a
+// backup before it's restored: the settings.
+func (msgs Messages) BackupPartSettings() string {
+	return Catalog.Format(msgs.locale, "backupPartSettings", nil)
+}
+
+// BackupPartSettingsAbout says "A restore keeps the folders, yt-dlp, colours and devices of the computer it's restored on."
+// in the language the app shows.
+//
+// the Back up MixMusic dialog, which ticks what a backup holds: what
+// becomes of the Settings part, under its box.
+func BackupPartSettingsAbout() string { return In(i18n.Locale()).BackupPartSettingsAbout() }
+
+// BackupPartSettingsAbout says "A restore keeps the folders, yt-dlp, colours and devices of the computer it's restored on."
+// in the language of msgs.
+//
+// the Back up MixMusic dialog, which ticks what a backup holds: what
+// becomes of the Settings part, under its box.
+func (msgs Messages) BackupPartSettingsAbout() string {
+	return Catalog.Format(msgs.locale, "backupPartSettingsAbout", nil)
+}
+
+// BackupPrivate says "A backup holds your history: keep it where only you can read it."
+// in the language the app shows.
+//
+// the Back up MixMusic dialog, which ticks what a backup holds: under the
+// parts, a warning that the file holds the history of what was played.
+func BackupPrivate() string { return In(i18n.Locale()).BackupPrivate() }
+
+// BackupPrivate says "A backup holds your history: keep it where only you can read it."
+// in the language of msgs.
+//
+// the Back up MixMusic dialog, which ticks what a backup holds: under the
+// parts, a warning that the file holds the history of what was played.
+func (msgs Messages) BackupPrivate() string {
+	return Catalog.Format(msgs.locale, "backupPrivate", nil)
+}
+
+// BackupRefused says "Couldn't restore {name}: {error}"
+// in the language the app shows.
+//
+// The notice of a backup that can't be restored: {name} is its file's name,
+// {error} why, a lowercase fragment as backupErrDamaged.
+func BackupRefused(name string, error string) string {
+	return In(i18n.Locale()).BackupRefused(name, error)
+}
+
+// BackupRefused says "Couldn't restore {name}: {error}"
+// in the language of msgs.
+//
+// The notice of a backup that can't be restored: {name} is its file's name,
+// {error} why, a lowercase fragment as backupErrDamaged.
+func (msgs Messages) BackupRefused(name string, error string) string {
+	return Catalog.Format(msgs.locale, "backupRefused", map[string]any{"name": name, "error": error})
+}
+
+// BackupRestarting says "Restarting…"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: the Restore and Undo buttons while
+// MixMusic restarts to swap in a restore.
+func BackupRestarting() string { return In(i18n.Locale()).BackupRestarting() }
+
+// BackupRestarting says "Restarting…"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: the Restore and Undo buttons while
+// MixMusic restarts to swap in a restore.
+func (msgs Messages) BackupRestarting() string {
+	return Catalog.Format(msgs.locale, "backupRestarting", nil)
+}
+
+// BackupRestoreAbout says "Brings back what a backup holds, in place of what's here. MixMusic restarts to do it."
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: what the Restore row does, under its
+// title.
+func BackupRestoreAbout() string { return In(i18n.Locale()).BackupRestoreAbout() }
+
+// BackupRestoreAbout says "Brings back what a backup holds, in place of what's here. MixMusic restarts to do it."
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: what the Restore row does, under its
+// title.
+func (msgs Messages) BackupRestoreAbout() string {
+	return Catalog.Format(msgs.locale, "backupRestoreAbout", nil)
+}
+
+// BackupRestoreAddons says "{count, plural, one {# add-on} other {# add-ons}}. Plugins come back switched off, to be trusted again."
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: what the Add-ons part holds, under its box.
+func BackupRestoreAddons(count int) string { return In(i18n.Locale()).BackupRestoreAddons(count) }
+
+// BackupRestoreAddons says "{count, plural, one {# add-on} other {# add-ons}}. Plugins come back switched off, to be trusted again."
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: what the Add-ons part holds, under its box.
+func (msgs Messages) BackupRestoreAddons(count int) string {
+	return Catalog.Format(msgs.locale, "backupRestoreAddons", map[string]any{"count": count})
+}
+
+// BackupRestoreAdds says "Adds {liked, plural, one {# liked song} other {# liked songs}}, {disliked, plural, one {# dislike} other {# dislikes}…"
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: with Add to my library chosen, what the backup adds to the
+// library here.
+func BackupRestoreAdds(liked int, disliked int, mixes int, plays int, artists int, podcasts int) string {
+	return In(i18n.Locale()).BackupRestoreAdds(liked, disliked, mixes, plays, artists, podcasts)
+}
+
+// BackupRestoreAdds says "Adds {liked, plural, one {# liked song} other {# liked songs}}, {disliked, plural, one {# dislike} other {# dislikes}…"
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: with Add to my library chosen, what the backup adds to the
+// library here.
+func (msgs Messages) BackupRestoreAdds(liked int, disliked int, mixes int, plays int, artists int, podcasts int) string {
+	return Catalog.Format(msgs.locale, "backupRestoreAdds", map[string]any{"liked": liked, "disliked": disliked, "mixes": mixes, "plays": plays, "artists": artists, "podcasts": podcasts})
+}
+
+// BackupRestoreButton says "Restore…"
+// in the language the app shows.
+//
+// The button of the Restore row in Settings › Desktop › Backups, which
+// asks for a backup's file, then opens the Restore a backup dialog, which
+// previews a backup before it's restored.
+func BackupRestoreButton() string { return In(i18n.Locale()).BackupRestoreButton() }
+
+// BackupRestoreButton says "Restore…"
+// in the language of msgs.
+//
+// The button of the Restore row in Settings › Desktop › Backups, which
+// asks for a backup's file, then opens the Restore a backup dialog, which
+// previews a backup before it's restored.
+func (msgs Messages) BackupRestoreButton() string {
+	return Catalog.Format(msgs.locale, "backupRestoreButton", nil)
+}
+
+// BackupRestoreCounting says "Counting what it adds…"
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: with Add to my library chosen, while what it adds is counted.
+func BackupRestoreCounting() string { return In(i18n.Locale()).BackupRestoreCounting() }
+
+// BackupRestoreCounting says "Counting what it adds…"
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: with Add to my library chosen, while what it adds is counted.
+func (msgs Messages) BackupRestoreCounting() string {
+	return Catalog.Format(msgs.locale, "backupRestoreCounting", nil)
+}
+
+// BackupRestoreDialogTitle says "Restore a backup"
+// in the language the app shows.
+//
+// The title of the Restore a backup dialog, which previews a backup before
+// it's restored.
+func BackupRestoreDialogTitle() string { return In(i18n.Locale()).BackupRestoreDialogTitle() }
+
+// BackupRestoreDialogTitle says "Restore a backup"
+// in the language of msgs.
+//
+// The title of the Restore a backup dialog, which previews a backup before
+// it's restored.
+func (msgs Messages) BackupRestoreDialogTitle() string {
+	return Catalog.Format(msgs.locale, "backupRestoreDialogTitle", nil)
+}
+
+// BackupRestoreDownload says "Download {count, plural, one {# song} other {# songs}} again"
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: the box that downloads again what the backup lists of the
+// downloads.
+func BackupRestoreDownload(count int) string { return In(i18n.Locale()).BackupRestoreDownload(count) }
+
+// BackupRestoreDownload says "Download {count, plural, one {# song} other {# songs}} again"
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: the box that downloads again what the backup lists of the
+// downloads.
+func (msgs Messages) BackupRestoreDownload(count int) string {
+	return Catalog.Format(msgs.locale, "backupRestoreDownload", map[string]any{"count": count})
+}
+
+// BackupRestoreDownloadAbout says "Albums, playlists and mixes downloaded whole go on taking in new songs."
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: under the box that downloads the songs again.
+func BackupRestoreDownloadAbout() string { return In(i18n.Locale()).BackupRestoreDownloadAbout() }
+
+// BackupRestoreDownloadAbout says "Albums, playlists and mixes downloaded whole go on taking in new songs."
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: under the box that downloads the songs again.
+func (msgs Messages) BackupRestoreDownloadAbout() string {
+	return Catalog.Format(msgs.locale, "backupRestoreDownloadAbout", nil)
+}
+
+// BackupRestoreFailed says "Couldn't restore the backup: {error}"
+// in the language the app shows.
+//
+// The notice of a restore that couldn't be made ready before MixMusic
+// restarts: {error} is why.
+func BackupRestoreFailed(error string) string { return In(i18n.Locale()).BackupRestoreFailed(error) }
+
+// BackupRestoreFailed says "Couldn't restore the backup: {error}"
+// in the language of msgs.
+//
+// The notice of a restore that couldn't be made ready before MixMusic
+// restarts: {error} is why.
+func (msgs Messages) BackupRestoreFailed(error string) string {
+	return Catalog.Format(msgs.locale, "backupRestoreFailed", map[string]any{"error": error})
+}
+
+// BackupRestoreFolderFor says "Folder here for {folder}"
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: the name, to assistive technology, of the choice of the folder
+// here that matches {folder}, a folder the backup's songs came from.
+func BackupRestoreFolderFor(folder string) string {
+	return In(i18n.Locale()).BackupRestoreFolderFor(folder)
+}
+
+// BackupRestoreFolderFor says "Folder here for {folder}"
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: the name, to assistive technology, of the choice of the folder
+// here that matches {folder}, a folder the backup's songs came from.
+func (msgs Messages) BackupRestoreFolderFor(folder string) string {
+	return Catalog.Format(msgs.locale, "backupRestoreFolderFor", map[string]any{"folder": folder})
+}
+
+// BackupRestoreFolderNone says "None"
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: the choice of no folder here, for a folder the backup's songs
+// came from: they show as missing.
+func BackupRestoreFolderNone() string { return In(i18n.Locale()).BackupRestoreFolderNone() }
+
+// BackupRestoreFolderNone says "None"
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: the choice of no folder here, for a folder the backup's songs
+// came from: they show as missing.
+func (msgs Messages) BackupRestoreFolderNone() string {
+	return Catalog.Format(msgs.locale, "backupRestoreFolderNone", nil)
+}
+
+// BackupRestoreFolders says "Your music"
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: the heading of the folders of music the backup's songs came
+// from, each matched to a folder here.
+func BackupRestoreFolders() string { return In(i18n.Locale()).BackupRestoreFolders() }
+
+// BackupRestoreFolders says "Your music"
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: the heading of the folders of music the backup's songs came
+// from, each matched to a folder here.
+func (msgs Messages) BackupRestoreFolders() string {
+	return Catalog.Format(msgs.locale, "backupRestoreFolders", nil)
+}
+
+// BackupRestoreFoldersAbout says "The backup's songs came from other folders. Choose the folder here that holds each, for your likes, mixes and history…"
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: under Your music.
+func BackupRestoreFoldersAbout() string { return In(i18n.Locale()).BackupRestoreFoldersAbout() }
+
+// BackupRestoreFoldersAbout says "The backup's songs came from other folders. Choose the folder here that holds each, for your likes, mixes and history…"
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: under Your music.
+func (msgs Messages) BackupRestoreFoldersAbout() string {
+	return Catalog.Format(msgs.locale, "backupRestoreFoldersAbout", nil)
+}
+
+// BackupRestoreFrom says "Backed up {time, date, ::yMMMdjm} by MixMusic {version} on {system}."
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: where the backup comes from: {version} is MixMusic's version,
+// as 0.5.12, and {system} the system's name, as Windows, macOS or Linux.
+func BackupRestoreFrom(time_ time.Time, version string, system string) string {
+	return In(i18n.Locale()).BackupRestoreFrom(time_, version, system)
+}
+
+// BackupRestoreFrom says "Backed up {time, date, ::yMMMdjm} by MixMusic {version} on {system}."
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: where the backup comes from: {version} is MixMusic's version,
+// as 0.5.12, and {system} the system's name, as Windows, macOS or Linux.
+func (msgs Messages) BackupRestoreFrom(time_ time.Time, version string, system string) string {
+	return Catalog.Format(msgs.locale, "backupRestoreFrom", map[string]any{"time": time_, "version": version, "system": system})
+}
+
+// BackupRestoreGo says "Restore and restart"
+// in the language the app shows.
+//
+// The button of the Restore a backup dialog, which previews a backup before
+// it's restored that restores what's ticked and restarts MixMusic.
+func BackupRestoreGo() string { return In(i18n.Locale()).BackupRestoreGo() }
+
+// BackupRestoreGo says "Restore and restart"
+// in the language of msgs.
+//
+// The button of the Restore a backup dialog, which previews a backup before
+// it's restored that restores what's ticked and restarts MixMusic.
+func (msgs Messages) BackupRestoreGo() string {
+	return Catalog.Format(msgs.locale, "backupRestoreGo", nil)
+}
+
+// BackupRestoreLibraryHolds says "{liked, plural, one {# liked song} other {# liked songs}}, {disliked, plural, one {# dislike} other {# dislikes}}, {m…"
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: what the Library part holds, under its box.
+func BackupRestoreLibraryHolds(liked int, disliked int, mixes int, plays int, artists int, podcasts int) string {
+	return In(i18n.Locale()).BackupRestoreLibraryHolds(liked, disliked, mixes, plays, artists, podcasts)
+}
+
+// BackupRestoreLibraryHolds says "{liked, plural, one {# liked song} other {# liked songs}}, {disliked, plural, one {# dislike} other {# dislikes}}, {m…"
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: what the Library part holds, under its box.
+func (msgs Messages) BackupRestoreLibraryHolds(liked int, disliked int, mixes int, plays int, artists int, podcasts int) string {
+	return Catalog.Format(msgs.locale, "backupRestoreLibraryHolds", map[string]any{"liked": liked, "disliked": disliked, "mixes": mixes, "plays": plays, "artists": artists, "podcasts": podcasts})
+}
+
+// BackupRestoreMerge says "Add to my library"
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: the choice that adds the backup's likes, mixes, follows and
+// plays to the library here.
+func BackupRestoreMerge() string { return In(i18n.Locale()).BackupRestoreMerge() }
+
+// BackupRestoreMerge says "Add to my library"
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: the choice that adds the backup's likes, mixes, follows and
+// plays to the library here.
+func (msgs Messages) BackupRestoreMerge() string {
+	return Catalog.Format(msgs.locale, "backupRestoreMerge", nil)
+}
+
+// BackupRestoreQueue says "{count, plural, one {# track in the queue} other {# tracks in the queue}}, and where you left your episodes"
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: what the Queue and episode positions part holds, under its box.
+func BackupRestoreQueue(count int) string { return In(i18n.Locale()).BackupRestoreQueue(count) }
+
+// BackupRestoreQueue says "{count, plural, one {# track in the queue} other {# tracks in the queue}}, and where you left your episodes"
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: what the Queue and episode positions part holds, under its box.
+func (msgs Messages) BackupRestoreQueue(count int) string {
+	return Catalog.Format(msgs.locale, "backupRestoreQueue", map[string]any{"count": count})
+}
+
+// BackupRestoreReplace says "Replace"
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: the choice that restores the backup's library in place of the
+// one here, as at first.
+func BackupRestoreReplace() string { return In(i18n.Locale()).BackupRestoreReplace() }
+
+// BackupRestoreReplace says "Replace"
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: the choice that restores the backup's library in place of the
+// one here, as at first.
+func (msgs Messages) BackupRestoreReplace() string {
+	return Catalog.Format(msgs.locale, "backupRestoreReplace", nil)
+}
+
+// BackupRestoreSettingsAbout says "This computer keeps its folders of downloads, music and backups, its yt-dlp and JavaScript runtime, its colours, its …"
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: what stays of this computer's settings, under the Settings box.
+func BackupRestoreSettingsAbout() string { return In(i18n.Locale()).BackupRestoreSettingsAbout() }
+
+// BackupRestoreSettingsAbout says "This computer keeps its folders of downloads, music and backups, its yt-dlp and JavaScript runtime, its colours, its …"
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: what stays of this computer's settings, under the Settings box.
+func (msgs Messages) BackupRestoreSettingsAbout() string {
+	return Catalog.Format(msgs.locale, "backupRestoreSettingsAbout", nil)
+}
+
+// BackupRestoreTitle says "Restore"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: the title of the row that restores a
+// backup.
+func BackupRestoreTitle() string { return In(i18n.Locale()).BackupRestoreTitle() }
+
+// BackupRestoreTitle says "Restore"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: the title of the row that restores a
+// backup.
+func (msgs Messages) BackupRestoreTitle() string {
+	return Catalog.Format(msgs.locale, "backupRestoreTitle", nil)
+}
+
+// BackupRestoreWarning says "What you tick replaces what's on this computer, and MixMusic restarts to swap it in. Sign-ins aren't in a backup: on …"
+// in the language the app shows.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: above its buttons.
+func BackupRestoreWarning() string { return In(i18n.Locale()).BackupRestoreWarning() }
+
+// BackupRestoreWarning says "What you tick replaces what's on this computer, and MixMusic restarts to swap it in. Sign-ins aren't in a backup: on …"
+// in the language of msgs.
+//
+// the Restore a backup dialog, which previews a backup before it's
+// restored: above its buttons.
+func (msgs Messages) BackupRestoreWarning() string {
+	return Catalog.Format(msgs.locale, "backupRestoreWarning", nil)
+}
+
+// BackupRestored says "Restored the backup of {time, date, ::yMMMd}"
+// in the language the app shows.
+//
+// The notice as MixMusic starts after a restore: {time} is when the backup
+// was made.
+func BackupRestored(time_ time.Time) string { return In(i18n.Locale()).BackupRestored(time_) }
+
+// BackupRestored says "Restored the backup of {time, date, ::yMMMd}"
+// in the language of msgs.
+//
+// The notice as MixMusic starts after a restore: {time} is when the backup
+// was made.
+func (msgs Messages) BackupRestored(time_ time.Time) string {
+	return Catalog.Format(msgs.locale, "backupRestored", map[string]any{"time": time_})
+}
+
+// BackupRestoredDownloading says "{count, plural, one {Downloading # song of the backup again} other {Downloading # songs of the backup again}}"
+// in the language the app shows.
+//
+// The notice as MixMusic starts after a restore that downloads the backup's
+// list of downloads again.
+func BackupRestoredDownloading(count int) string {
+	return In(i18n.Locale()).BackupRestoredDownloading(count)
+}
+
+// BackupRestoredDownloading says "{count, plural, one {Downloading # song of the backup again} other {Downloading # songs of the backup again}}"
+// in the language of msgs.
+//
+// The notice as MixMusic starts after a restore that downloads the backup's
+// list of downloads again.
+func (msgs Messages) BackupRestoredDownloading(count int) string {
+	return Catalog.Format(msgs.locale, "backupRestoredDownloading", map[string]any{"count": count})
+}
+
+// BackupSaveTitle says "Save the backup"
+// in the language the app shows.
+//
+// The title of the system's dialog that asks where to save a backup.
+func BackupSaveTitle() string { return In(i18n.Locale()).BackupSaveTitle() }
+
+// BackupSaveTitle says "Save the backup"
+// in the language of msgs.
+//
+// The title of the system's dialog that asks where to save a backup.
+func (msgs Messages) BackupSaveTitle() string {
+	return Catalog.Format(msgs.locale, "backupSaveTitle", nil)
+}
+
+// BackupSaved says "Saved {name}"
+// in the language the app shows.
+//
+// The toast of a backup made by hand, once saved, with a button that shows
+// it in its folder: {name} is the file's name.
+func BackupSaved(name string) string { return In(i18n.Locale()).BackupSaved(name) }
+
+// BackupSaved says "Saved {name}"
+// in the language of msgs.
+//
+// The toast of a backup made by hand, once saved, with a button that shows
+// it in its folder: {name} is the file's name.
+func (msgs Messages) BackupSaved(name string) string {
+	return Catalog.Format(msgs.locale, "backupSaved", map[string]any{"name": name})
+}
+
+// BackupSaving says "Backing up…"
+// in the language the app shows.
+//
+// The notice shown while a backup made by hand is written.
+func BackupSaving() string { return In(i18n.Locale()).BackupSaving() }
+
+// BackupSaving says "Backing up…"
+// in the language of msgs.
+//
+// The notice shown while a backup made by hand is written.
+func (msgs Messages) BackupSaving() string {
+	return Catalog.Format(msgs.locale, "backupSaving", nil)
+}
+
+// BackupSwapFailed says "Couldn't restore the backup, so every file stayed as it was: {error}"
+// in the language the app shows.
+//
+// The notice as MixMusic starts when a restore couldn't be swapped in:
+// {error} is why.
+func BackupSwapFailed(error string) string { return In(i18n.Locale()).BackupSwapFailed(error) }
+
+// BackupSwapFailed says "Couldn't restore the backup, so every file stayed as it was: {error}"
+// in the language of msgs.
+//
+// The notice as MixMusic starts when a restore couldn't be swapped in:
+// {error} is why.
+func (msgs Messages) BackupSwapFailed(error string) string {
+	return Catalog.Format(msgs.locale, "backupSwapFailed", map[string]any{"error": error})
+}
+
+// BackupTitle says "Back up"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: the title of the row that backs
+// MixMusic up by hand, into a file.
+func BackupTitle() string { return In(i18n.Locale()).BackupTitle() }
+
+// BackupTitle says "Back up"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: the title of the row that backs
+// MixMusic up by hand, into a file.
+func (msgs Messages) BackupTitle() string {
+	return Catalog.Format(msgs.locale, "backupTitle", nil)
+}
+
+// BackupUndoAbout says "Puts back what the restore of {time, date, ::yMMMdjm} replaced."
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: what the Undo the last restore row
+// does, under its title: {time} is when the backup was restored.
+func BackupUndoAbout(time_ time.Time) string { return In(i18n.Locale()).BackupUndoAbout(time_) }
+
+// BackupUndoAbout says "Puts back what the restore of {time, date, ::yMMMdjm} replaced."
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: what the Undo the last restore row
+// does, under its title: {time} is when the backup was restored.
+func (msgs Messages) BackupUndoAbout(time_ time.Time) string {
+	return Catalog.Format(msgs.locale, "backupUndoAbout", map[string]any{"time": time_})
+}
+
+// BackupUndoButton says "Undo"
+// in the language the app shows.
+//
+// The button of the Undo the last restore row in Settings › Desktop ›
+// Backups, which asks first.
+func BackupUndoButton() string { return In(i18n.Locale()).BackupUndoButton() }
+
+// BackupUndoButton says "Undo"
+// in the language of msgs.
+//
+// The button of the Undo the last restore row in Settings › Desktop ›
+// Backups, which asks first.
+func (msgs Messages) BackupUndoButton() string {
+	return Catalog.Format(msgs.locale, "backupUndoButton", nil)
+}
+
+// BackupUndoConfirm says "MixMusic puts back what the restore replaced, as it was then, and restarts. What changed in it since goes."
+// in the language the app shows.
+//
+// The text of the dialog that asks before the last restore is undone.
+func BackupUndoConfirm() string { return In(i18n.Locale()).BackupUndoConfirm() }
+
+// BackupUndoConfirm says "MixMusic puts back what the restore replaced, as it was then, and restarts. What changed in it since goes."
+// in the language of msgs.
+//
+// The text of the dialog that asks before the last restore is undone.
+func (msgs Messages) BackupUndoConfirm() string {
+	return Catalog.Format(msgs.locale, "backupUndoConfirm", nil)
+}
+
+// BackupUndoConfirmTitle says "Undo the last restore?"
+// in the language the app shows.
+//
+// The title of the dialog that asks before the last restore is undone.
+func BackupUndoConfirmTitle() string { return In(i18n.Locale()).BackupUndoConfirmTitle() }
+
+// BackupUndoConfirmTitle says "Undo the last restore?"
+// in the language of msgs.
+//
+// The title of the dialog that asks before the last restore is undone.
+func (msgs Messages) BackupUndoConfirmTitle() string {
+	return Catalog.Format(msgs.locale, "backupUndoConfirmTitle", nil)
+}
+
+// BackupUndoFailed says "Couldn't undo the restore, so every file stayed as it was: {error}"
+// in the language the app shows.
+//
+// The notice as MixMusic starts when the undo of a restore couldn't be
+// swapped in: {error} is why.
+func BackupUndoFailed(error string) string { return In(i18n.Locale()).BackupUndoFailed(error) }
+
+// BackupUndoFailed says "Couldn't undo the restore, so every file stayed as it was: {error}"
+// in the language of msgs.
+//
+// The notice as MixMusic starts when the undo of a restore couldn't be
+// swapped in: {error} is why.
+func (msgs Messages) BackupUndoFailed(error string) string {
+	return Catalog.Format(msgs.locale, "backupUndoFailed", map[string]any{"error": error})
+}
+
+// BackupUndoGo says "Undo and restart"
+// in the language the app shows.
+//
+// The button of the dialog that asks before the last restore is undone,
+// which undoes it and restarts MixMusic.
+func BackupUndoGo() string { return In(i18n.Locale()).BackupUndoGo() }
+
+// BackupUndoGo says "Undo and restart"
+// in the language of msgs.
+//
+// The button of the dialog that asks before the last restore is undone,
+// which undoes it and restarts MixMusic.
+func (msgs Messages) BackupUndoGo() string {
+	return Catalog.Format(msgs.locale, "backupUndoGo", nil)
+}
+
+// BackupUndoTitle says "Undo the last restore"
+// in the language the app shows.
+//
+// Settings › Desktop › Backups: the title of the row, shown after a
+// restore, that puts back what it replaced; and the command of the command
+// palette that does it.
+func BackupUndoTitle() string { return In(i18n.Locale()).BackupUndoTitle() }
+
+// BackupUndoTitle says "Undo the last restore"
+// in the language of msgs.
+//
+// Settings › Desktop › Backups: the title of the row, shown after a
+// restore, that puts back what it replaced; and the command of the command
+// palette that does it.
+func (msgs Messages) BackupUndoTitle() string {
+	return Catalog.Format(msgs.locale, "backupUndoTitle", nil)
+}
+
+// BackupUndone says "Put back what the last restore replaced"
+// in the language the app shows.
+//
+// The notice as MixMusic starts after the last restore was undone.
+func BackupUndone() string { return In(i18n.Locale()).BackupUndone() }
+
+// BackupUndone says "Put back what the last restore replaced"
+// in the language of msgs.
+//
+// The notice as MixMusic starts after the last restore was undone.
+func (msgs Messages) BackupUndone() string {
+	return Catalog.Format(msgs.locale, "backupUndone", nil)
+}
+
 // CacheSettingsClear says "clear"
 // in the language the app shows.
 func CacheSettingsClear() string { return In(i18n.Locale()).CacheSettingsClear() }
@@ -3432,6 +4940,38 @@ func CmdAddonsReloaded() string { return In(i18n.Locale()).CmdAddonsReloaded() }
 // in the language of msgs.
 func (msgs Messages) CmdAddonsReloaded() string {
 	return Catalog.Format(msgs.locale, "cmdAddonsReloaded", nil)
+}
+
+// CmdBackupNow says "Back up MixMusic"
+// in the language the app shows.
+//
+// A command of the command palette, which opens the Back up MixMusic
+// dialog.
+func CmdBackupNow() string { return In(i18n.Locale()).CmdBackupNow() }
+
+// CmdBackupNow says "Back up MixMusic"
+// in the language of msgs.
+//
+// A command of the command palette, which opens the Back up MixMusic
+// dialog.
+func (msgs Messages) CmdBackupNow() string {
+	return Catalog.Format(msgs.locale, "cmdBackupNow", nil)
+}
+
+// CmdBackupRestore says "Restore a backup"
+// in the language the app shows.
+//
+// A command of the command palette, which asks for a backup's file to
+// restore.
+func CmdBackupRestore() string { return In(i18n.Locale()).CmdBackupRestore() }
+
+// CmdBackupRestore says "Restore a backup"
+// in the language of msgs.
+//
+// A command of the command palette, which asks for a backup's file to
+// restore.
+func (msgs Messages) CmdBackupRestore() string {
+	return Catalog.Format(msgs.locale, "cmdBackupRestore", nil)
 }
 
 // CmdGoComputer says "On this computer"

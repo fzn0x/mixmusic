@@ -822,6 +822,553 @@
   "audioAsAccountDesc": "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before.",
   "audioAsAccountSignIn": "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before. Sign in to YouTube Music in accounts first.",
   "audioAsAccountTitle": "Play audio as your account",
+  "backupAbout": "Saves your library, settings and add-ons in a file, to restore here or on another computer.",
+  "@backupAbout": {
+    "description": "Settings › Desktop › Backups: what the Back up row does, under its title."
+  },
+  "backupAutoDaily": "Daily",
+  "@backupAutoDaily": {
+    "description": "Settings › Desktop › Backups › Back up automatically: the choice of a backup each day."
+  },
+  "backupAutoFailed": "The last automatic backup failed: {error}. MixMusic tries again at its next start.",
+  "@backupAutoFailed": {
+    "description": "Settings › Desktop › Backups: under Back up automatically, in red, when the last one failed: {error} is why, a lowercase fragment as backupErrFolderMissing.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "backupAutoFailedNotice": "Couldn't back up automatically: {error}",
+  "@backupAutoFailedNotice": {
+    "description": "The notice of an automatic backup that failed: {error} is why, a lowercase fragment as backupErrFolderMissing.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "backupAutoLast": "Last backup: {time, date, ::yMMMdjm}",
+  "@backupAutoLast": {
+    "description": "Settings › Desktop › Backups: under Back up automatically, when the last automatic backup was made.",
+    "placeholders": {
+      "time": {
+        "type": "DateTime"
+      }
+    }
+  },
+  "backupAutoMonthly": "Monthly",
+  "@backupAutoMonthly": {
+    "description": "Settings › Desktop › Backups › Back up automatically: the choice of a backup each month."
+  },
+  "backupAutoNone": "No automatic backup yet.",
+  "@backupAutoNone": {
+    "description": "Settings › Desktop › Backups: under Back up automatically, before the first automatic backup was made."
+  },
+  "backupAutoOff": "Off",
+  "@backupAutoOff": {
+    "description": "Settings › Desktop › Backups › Back up automatically: the choice that makes no automatic backup, as at first."
+  },
+  "backupAutoQuit": "Each time MixMusic quits",
+  "@backupAutoQuit": {
+    "description": "Settings › Desktop › Backups › Back up automatically: the choice of a backup each time MixMusic quits."
+  },
+  "backupAutoTitle": "Back up automatically",
+  "@backupAutoTitle": {
+    "description": "Settings › Desktop › Backups: the title of the row that chooses how often MixMusic backs itself up, to a folder."
+  },
+  "backupAutoWeekly": "Weekly",
+  "@backupAutoWeekly": {
+    "description": "Settings › Desktop › Backups › Back up automatically: the choice of a backup each week."
+  },
+  "backupBusy": "a backup is being made already",
+  "@backupBusy": {
+    "description": "Why a backup can't be made now, a lowercase fragment in backupFailed."
+  },
+  "backupButton": "Back up…",
+  "@backupButton": {
+    "description": "The button of the Back up row in Settings › Desktop › Backups, which opens the Back up MixMusic dialog, which ticks what a backup holds; and that dialog's button, which asks where to save the file."
+  },
+  "backupDialogIntro": "Choose what the backup holds. A restore brings back what you tick then, of what it holds.",
+  "@backupDialogIntro": {
+    "description": "The text at the top of the Back up MixMusic dialog, which ticks what a backup holds."
+  },
+  "backupDialogTitle": "Back up MixMusic",
+  "@backupDialogTitle": {
+    "description": "The title of the Back up MixMusic dialog, which ticks what a backup holds."
+  },
+  "backupErrDamaged": "the file is damaged",
+  "@backupErrDamaged": {
+    "description": "Why a backup can't be restored, a lowercase fragment in backupRefused."
+  },
+  "backupErrDamagedEntry": "{entry} in it is damaged",
+  "@backupErrDamagedEntry": {
+    "description": "Why a backup can't be restored, a lowercase fragment in backupRefused: {entry} is the path of the file in it that's damaged, as library.json.",
+    "placeholders": {
+      "entry": {
+        "type": "String"
+      }
+    }
+  },
+  "backupErrDiskFull": "the disk is full",
+  "@backupErrDiskFull": {
+    "description": "Why an automatic backup failed, a lowercase fragment in backupAutoFailed and backupAutoFailedNotice."
+  },
+  "backupErrFolderLost": "MixMusic can't reach {folder} any more: choose the folder again",
+  "@backupErrFolderLost": {
+    "description": "Why an automatic backup failed in the Flatpak, whose sandbox lost the folder, a lowercase fragment in backupAutoFailed and backupAutoFailedNotice.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "backupErrFolderMissing": "the folder {folder} isn't there",
+  "@backupErrFolderMissing": {
+    "description": "Why an automatic backup failed, a lowercase fragment in backupAutoFailed and backupAutoFailedNotice.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "backupErrFolderReadOnly": "the folder {folder} can't be written to",
+  "@backupErrFolderReadOnly": {
+    "description": "Why an automatic backup failed, a lowercase fragment in backupAutoFailed and backupAutoFailedNotice.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "backupErrNewer": "it comes from MixMusic {version}, newer than this one: update MixMusic first",
+  "@backupErrNewer": {
+    "description": "Why a backup can't be restored, a lowercase fragment in backupRefused: {version} is the version that made it.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "backupErrNotBackup": "it isn't a MixMusic backup",
+  "@backupErrNotBackup": {
+    "description": "Why a file can't be restored, a lowercase fragment in backupRefused."
+  },
+  "backupErrOutside": "{entry} in it would land outside the data folder",
+  "@backupErrOutside": {
+    "description": "Why a backup can't be restored, a lowercase fragment in backupRefused: {entry} is the path of the file in it.",
+    "placeholders": {
+      "entry": {
+        "type": "String"
+      }
+    }
+  },
+  "backupErrTooLarge": "it's larger than {mb} MB",
+  "@backupErrTooLarge": {
+    "description": "Why a backup can't be restored, a lowercase fragment in backupRefused: {mb} is the most a backup may weigh, in megabytes.",
+    "placeholders": {
+      "mb": {
+        "type": "int"
+      }
+    }
+  },
+  "backupErrTooLargeUnpacked": "it unpacks to more than {gb} GB",
+  "@backupErrTooLargeUnpacked": {
+    "description": "Why a backup can't be restored, a lowercase fragment in backupRefused: {gb} is the most a backup may unpack to, in gigabytes.",
+    "placeholders": {
+      "gb": {
+        "type": "int"
+      }
+    }
+  },
+  "backupFailed": "Couldn't back up: {error}",
+  "@backupFailed": {
+    "description": "The notice of a backup made by hand that failed: {error} is why.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "backupFilter": "MixMusic backups",
+  "@backupFilter": {
+    "description": "The name of the kind of file the system's dialogs that save and open backups show: zip files."
+  },
+  "backupFolderChange": "Change…",
+  "@backupFolderChange": {
+    "description": "The button of the Folder for backups row in Settings › Desktop › Backups, which asks for a folder."
+  },
+  "backupFolderDialog": "Folder for MixMusic's backups",
+  "@backupFolderDialog": {
+    "description": "The title of the system's dialog that chooses the folder of the automatic backups."
+  },
+  "backupFolderNone": "Choose a folder for the backups.",
+  "@backupFolderNone": {
+    "description": "Settings › Desktop › Backups: under Folder for backups, in the Flatpak, before a folder is chosen."
+  },
+  "backupFolderTitle": "Folder for backups",
+  "@backupFolderTitle": {
+    "description": "Settings › Desktop › Backups: the title of the row of the folder the automatic backups go to, whose path shows under it."
+  },
+  "backupGroup": "Backups",
+  "@backupGroup": {
+    "description": "Settings › Desktop: the title of the group of rows that back MixMusic up, restore a backup and back up automatically."
+  },
+  "backupKeepAbout": "MixMusic deletes only the backups it made itself, the oldest first.",
+  "@backupKeepAbout": {
+    "description": "Settings › Desktop › Backups: what the Keep row does, under its title."
+  },
+  "backupKeepAll": "All of them",
+  "@backupKeepAll": {
+    "description": "Settings › Desktop › Backups › Keep: the choice that keeps every automatic backup."
+  },
+  "backupKeepLast": "{count, plural, one {The last #} other {The last #}}",
+  "@backupKeepLast": {
+    "description": "Settings › Desktop › Backups › Keep: a choice of how many automatic backups to keep: 3, 5, 10, 15 or 30.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupKeepOne": "One file, written over",
+  "@backupKeepOne": {
+    "description": "Settings › Desktop › Backups › Keep: the choice that keeps one backup, in a file each backup writes over."
+  },
+  "backupKeepTitle": "Keep",
+  "@backupKeepTitle": {
+    "description": "Settings › Desktop › Backups: the title of the row that chooses how many automatic backups the folder keeps."
+  },
+  "backupNever": "Never in a backup: your sign-ins, remote control's pairings, the scrobbles still to send, the index of your music, yt-dlp, the cache, the logs and any audio.",
+  "@backupNever": {
+    "description": "the Back up MixMusic dialog, which ticks what a backup holds: under the parts, what no backup holds."
+  },
+  "backupNoFolder": "no folder is chosen for the backups",
+  "@backupNoFolder": {
+    "description": "Why an automatic backup failed in the Flatpak before a folder was chosen, a lowercase fragment in backupAutoFailed."
+  },
+  "backupOpenTitle": "Open a backup",
+  "@backupOpenTitle": {
+    "description": "The title of the system's dialog that asks for the backup to restore."
+  },
+  "backupOpening": "Checking the backup…",
+  "@backupOpening": {
+    "description": "The notice shown while the backup chosen to restore is checked, before its preview opens."
+  },
+  "backupPartAddons": "Add-ons",
+  "@backupPartAddons": {
+    "description": "A part of a backup, ticked in the Back up MixMusic dialog, which ticks what a backup holds and in the Restore a backup dialog, which previews a backup before it's restored: the themes and plugins."
+  },
+  "backupPartAddonsAbout": "Themes and plugins, with what plugins keep",
+  "@backupPartAddonsAbout": {
+    "description": "the Back up MixMusic dialog, which ticks what a backup holds: what the Add-ons part holds, under its box."
+  },
+  "backupPartDownloads": "List of downloads",
+  "@backupPartDownloads": {
+    "description": "A part of a backup, ticked in the Back up MixMusic dialog, which ticks what a backup holds: the list of what was downloaded, without its audio."
+  },
+  "backupPartDownloadsAbout": "What you downloaded, without its audio, to download it again after a restore",
+  "@backupPartDownloadsAbout": {
+    "description": "the Back up MixMusic dialog, which ticks what a backup holds: what the List of downloads part holds, under its box."
+  },
+  "backupPartLibrary": "Library",
+  "@backupPartLibrary": {
+    "description": "A part of a backup, ticked in the Back up MixMusic dialog, which ticks what a backup holds and in the Restore a backup dialog, which previews a backup before it's restored: the library."
+  },
+  "backupPartLibraryAbout": "Liked and disliked songs, mixes and their covers, history and the plays Stats counts, searches, followed artists and podcasts, and linked copies of your songs",
+  "@backupPartLibraryAbout": {
+    "description": "the Back up MixMusic dialog, which ticks what a backup holds: what the Library part holds, under its box."
+  },
+  "backupPartQueue": "Queue and episode positions",
+  "@backupPartQueue": {
+    "description": "A part of a backup, ticked in the Back up MixMusic dialog, which ticks what a backup holds and in the Restore a backup dialog, which previews a backup before it's restored: the queue, and where each podcast episode was left."
+  },
+  "backupPartQueueAbout": "The queue, and where you left each podcast episode",
+  "@backupPartQueueAbout": {
+    "description": "the Back up MixMusic dialog, which ticks what a backup holds: what the Queue and episode positions part holds, under its box."
+  },
+  "backupPartSettings": "Settings",
+  "@backupPartSettings": {
+    "description": "A part of a backup, ticked in the Back up MixMusic dialog, which ticks what a backup holds and in the Restore a backup dialog, which previews a backup before it's restored: the settings."
+  },
+  "backupPartSettingsAbout": "A restore keeps the folders, yt-dlp, colours and devices of the computer it's restored on.",
+  "@backupPartSettingsAbout": {
+    "description": "the Back up MixMusic dialog, which ticks what a backup holds: what becomes of the Settings part, under its box."
+  },
+  "backupPrivate": "A backup holds your history: keep it where only you can read it.",
+  "@backupPrivate": {
+    "description": "the Back up MixMusic dialog, which ticks what a backup holds: under the parts, a warning that the file holds the history of what was played."
+  },
+  "backupRefused": "Couldn't restore {name}: {error}",
+  "@backupRefused": {
+    "description": "The notice of a backup that can't be restored: {name} is its file's name, {error} why, a lowercase fragment as backupErrDamaged.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "backupRestarting": "Restarting…",
+  "@backupRestarting": {
+    "description": "Settings › Desktop › Backups: the Restore and Undo buttons while MixMusic restarts to swap in a restore."
+  },
+  "backupRestoreAbout": "Brings back what a backup holds, in place of what's here. MixMusic restarts to do it.",
+  "@backupRestoreAbout": {
+    "description": "Settings › Desktop › Backups: what the Restore row does, under its title."
+  },
+  "backupRestoreAddons": "{count, plural, one {# add-on} other {# add-ons}}. Plugins come back switched off, to be trusted again.",
+  "@backupRestoreAddons": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: what the Add-ons part holds, under its box.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestoreAdds": "Adds {liked, plural, one {# liked song} other {# liked songs}}, {disliked, plural, one {# dislike} other {# dislikes}}, {mixes, plural, one {# mix} other {# mixes}}, {plays, plural, one {# play} other {# plays}}, {artists, plural, one {# followed artist} other {# followed artists}} and {podcasts, plural, one {# followed podcast} other {# followed podcasts}}.",
+  "@backupRestoreAdds": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: with Add to my library chosen, what the backup adds to the library here.",
+    "placeholders": {
+      "liked": {
+        "type": "int"
+      },
+      "disliked": {
+        "type": "int"
+      },
+      "mixes": {
+        "type": "int"
+      },
+      "plays": {
+        "type": "int"
+      },
+      "artists": {
+        "type": "int"
+      },
+      "podcasts": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestoreButton": "Restore…",
+  "@backupRestoreButton": {
+    "description": "The button of the Restore row in Settings › Desktop › Backups, which asks for a backup's file, then opens the Restore a backup dialog, which previews a backup before it's restored."
+  },
+  "backupRestoreCounting": "Counting what it adds…",
+  "@backupRestoreCounting": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: with Add to my library chosen, while what it adds is counted."
+  },
+  "backupRestoreDialogTitle": "Restore a backup",
+  "@backupRestoreDialogTitle": {
+    "description": "The title of the Restore a backup dialog, which previews a backup before it's restored."
+  },
+  "backupRestoreDownload": "Download {count, plural, one {# song} other {# songs}} again",
+  "@backupRestoreDownload": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: the box that downloads again what the backup lists of the downloads.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestoreDownloadAbout": "Albums, playlists and mixes downloaded whole go on taking in new songs.",
+  "@backupRestoreDownloadAbout": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: under the box that downloads the songs again."
+  },
+  "backupRestoreFailed": "Couldn't restore the backup: {error}",
+  "@backupRestoreFailed": {
+    "description": "The notice of a restore that couldn't be made ready before MixMusic restarts: {error} is why.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "backupRestoreFolderFor": "Folder here for {folder}",
+  "@backupRestoreFolderFor": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: the name, to assistive technology, of the choice of the folder here that matches {folder}, a folder the backup's songs came from.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "backupRestoreFolderNone": "None",
+  "@backupRestoreFolderNone": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: the choice of no folder here, for a folder the backup's songs came from: they show as missing."
+  },
+  "backupRestoreFolders": "Your music",
+  "@backupRestoreFolders": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: the heading of the folders of music the backup's songs came from, each matched to a folder here."
+  },
+  "backupRestoreFoldersAbout": "The backup's songs came from other folders. Choose the folder here that holds each, for your likes, mixes and history to find them: songs without one show as missing.",
+  "@backupRestoreFoldersAbout": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: under Your music."
+  },
+  "backupRestoreFrom": "Backed up {time, date, ::yMMMdjm} by MixMusic {version} on {system}.",
+  "@backupRestoreFrom": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: where the backup comes from: {version} is MixMusic's version, as 0.5.12, and {system} the system's name, as Windows, macOS or Linux.",
+    "placeholders": {
+      "time": {
+        "type": "DateTime"
+      },
+      "version": {
+        "type": "String"
+      },
+      "system": {
+        "type": "String"
+      }
+    }
+  },
+  "backupRestoreGo": "Restore and restart",
+  "@backupRestoreGo": {
+    "description": "The button of the Restore a backup dialog, which previews a backup before it's restored that restores what's ticked and restarts MixMusic."
+  },
+  "backupRestoreLibraryHolds": "{liked, plural, one {# liked song} other {# liked songs}}, {disliked, plural, one {# dislike} other {# dislikes}}, {mixes, plural, one {# mix} other {# mixes}}, {plays, plural, one {# play} other {# plays}}, {artists, plural, one {# followed artist} other {# followed artists}} and {podcasts, plural, one {# followed podcast} other {# followed podcasts}}",
+  "@backupRestoreLibraryHolds": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: what the Library part holds, under its box.",
+    "placeholders": {
+      "liked": {
+        "type": "int"
+      },
+      "disliked": {
+        "type": "int"
+      },
+      "mixes": {
+        "type": "int"
+      },
+      "plays": {
+        "type": "int"
+      },
+      "artists": {
+        "type": "int"
+      },
+      "podcasts": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestoreMerge": "Add to my library",
+  "@backupRestoreMerge": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: the choice that adds the backup's likes, mixes, follows and plays to the library here."
+  },
+  "backupRestoreQueue": "{count, plural, one {# track in the queue} other {# tracks in the queue}}, and where you left your episodes",
+  "@backupRestoreQueue": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: what the Queue and episode positions part holds, under its box.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestoreReplace": "Replace",
+  "@backupRestoreReplace": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: the choice that restores the backup's library in place of the one here, as at first."
+  },
+  "backupRestoreSettingsAbout": "This computer keeps its folders of downloads, music and backups, its yt-dlp and JavaScript runtime, its colours, its output device and its Spotify device.",
+  "@backupRestoreSettingsAbout": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: what stays of this computer's settings, under the Settings box."
+  },
+  "backupRestoreTitle": "Restore",
+  "@backupRestoreTitle": {
+    "description": "Settings › Desktop › Backups: the title of the row that restores a backup."
+  },
+  "backupRestoreWarning": "What you tick replaces what's on this computer, and MixMusic restarts to swap it in. Sign-ins aren't in a backup: on another computer, sign in again.",
+  "@backupRestoreWarning": {
+    "description": "the Restore a backup dialog, which previews a backup before it's restored: above its buttons."
+  },
+  "backupRestored": "Restored the backup of {time, date, ::yMMMd}",
+  "@backupRestored": {
+    "description": "The notice as MixMusic starts after a restore: {time} is when the backup was made.",
+    "placeholders": {
+      "time": {
+        "type": "DateTime"
+      }
+    }
+  },
+  "backupRestoredDownloading": "{count, plural, one {Downloading # song of the backup again} other {Downloading # songs of the backup again}}",
+  "@backupRestoredDownloading": {
+    "description": "The notice as MixMusic starts after a restore that downloads the backup's list of downloads again.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupSaveTitle": "Save the backup",
+  "@backupSaveTitle": {
+    "description": "The title of the system's dialog that asks where to save a backup."
+  },
+  "backupSaved": "Saved {name}",
+  "@backupSaved": {
+    "description": "The toast of a backup made by hand, once saved, with a button that shows it in its folder: {name} is the file's name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "backupSaving": "Backing up…",
+  "@backupSaving": {
+    "description": "The notice shown while a backup made by hand is written."
+  },
+  "backupSwapFailed": "Couldn't restore the backup, so every file stayed as it was: {error}",
+  "@backupSwapFailed": {
+    "description": "The notice as MixMusic starts when a restore couldn't be swapped in: {error} is why.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "backupTitle": "Back up",
+  "@backupTitle": {
+    "description": "Settings › Desktop › Backups: the title of the row that backs MixMusic up by hand, into a file."
+  },
+  "backupUndoAbout": "Puts back what the restore of {time, date, ::yMMMdjm} replaced.",
+  "@backupUndoAbout": {
+    "description": "Settings › Desktop › Backups: what the Undo the last restore row does, under its title: {time} is when the backup was restored.",
+    "placeholders": {
+      "time": {
+        "type": "DateTime"
+      }
+    }
+  },
+  "backupUndoButton": "Undo",
+  "@backupUndoButton": {
+    "description": "The button of the Undo the last restore row in Settings › Desktop › Backups, which asks first."
+  },
+  "backupUndoConfirm": "MixMusic puts back what the restore replaced, as it was then, and restarts. What changed in it since goes.",
+  "@backupUndoConfirm": {
+    "description": "The text of the dialog that asks before the last restore is undone."
+  },
+  "backupUndoConfirmTitle": "Undo the last restore?",
+  "@backupUndoConfirmTitle": {
+    "description": "The title of the dialog that asks before the last restore is undone."
+  },
+  "backupUndoFailed": "Couldn't undo the restore, so every file stayed as it was: {error}",
+  "@backupUndoFailed": {
+    "description": "The notice as MixMusic starts when the undo of a restore couldn't be swapped in: {error} is why.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "backupUndoGo": "Undo and restart",
+  "@backupUndoGo": {
+    "description": "The button of the dialog that asks before the last restore is undone, which undoes it and restarts MixMusic."
+  },
+  "backupUndoTitle": "Undo the last restore",
+  "@backupUndoTitle": {
+    "description": "Settings › Desktop › Backups: the title of the row, shown after a restore, that puts back what it replaced; and the command of the command palette that does it."
+  },
+  "backupUndone": "Put back what the last restore replaced",
+  "@backupUndone": {
+    "description": "The notice as MixMusic starts after the last restore was undone."
+  },
   "cacheSettingsClear": "clear",
   "cacheSettingsClearCovers": "Clear covers",
   "cacheSettingsClearTracks": "Clear tracks",
@@ -975,6 +1522,14 @@
   "cleanVersionsPrefer": "Prefer clean versions",
   "cmdAddonsReload": "Reload add-ons",
   "cmdAddonsReloaded": "Add-ons reloaded",
+  "cmdBackupNow": "Back up MixMusic",
+  "@cmdBackupNow": {
+    "description": "A command of the command palette, which opens the Back up MixMusic dialog."
+  },
+  "cmdBackupRestore": "Restore a backup",
+  "@cmdBackupRestore": {
+    "description": "A command of the command palette, which asks for a backup's file to restore."
+  },
   "cmdGoComputer": "On this computer",
   "cmdGoHome": "Go home",
   "cmdGoNowPlaying": "Now playing",

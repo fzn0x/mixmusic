@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -149,5 +150,69 @@ func TestUseFirstAccountFails(t *testing.T) {
 	}
 	if c.AuthUser() != 3 || c.Channel() != "123456789012345678901" {
 		t.Errorf("went on as account %d, channel %q", c.AuthUser(), c.Channel())
+	}
+}
+
+// accountsList is an accounts list of a session signed in to the accounts
+// of the indexes users, each named after its index, with an email of its
+// own; the account of withBand manages a brand channel too.
+func accountsList(withBand int, users ...int) string {
+	var sections []string
+	for _, i := range users {
+		items := fmt.Sprintf(`{"accountItem":{"accountName":{"simpleText":"Account %d"},
+			"serviceEndpoint":{"selectActiveIdentityEndpoint":{"supportedTokens":[{"accountSigninToken":{"signinUrl":"/signin?authuser=%d"}}]}}}}`, i, i)
+		if i == withBand {
+			items += fmt.Sprintf(`,{"accountItem":{"accountName":{"simpleText":"Band %d"},
+				"serviceEndpoint":{"selectActiveIdentityEndpoint":{"supportedTokens":[{"pageIdToken":{"pageId":"90000000000000000000%d"}},
+					{"accountSigninToken":{"signinUrl":"/signin?pageid=90000000000000000000%d&authuser=%d"}}]}}}}`, i, i, i, i)
+		}
+		sections = append(sections, fmt.Sprintf(`{"accountSectionListRenderer":{"header":{"googleAccountHeaderRenderer":{"email":{"simpleText":"user%d@example.com"}}},
+			"contents":[{"accountItemSectionRenderer":{"contents":[%s]}}]}}`, i, items))
+	}
+	return `{"actions":[{"getMultiPageMenuAction":{"menu":{"multiPageMenuRenderer":{"sections":[` + strings.Join(sections, ",") + `]}}}}]}`
+}
+
+// TestChannelsLeaveSignedOut leaves out of the channels those of the
+// accounts of the session that were signed out of it, asking each other
+// account than the one in use as itself, at once. One whose answer fails
+// otherwise stays.
+func TestChannelsLeaveSignedOut(t *testing.T) {
+	s := &sessionServer{
+		menus: map[int]string{0: "401", 1: "Account 1", 2: "Account 2", 4: "500"},
+		list:  accountsList(2, 0, 1, 2, 3, 4),
+	}
+	c := sessionClient(t, s)
+	c.SetAccount(1, "800000000000000000001")
+	list, err := c.Channels(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	var names []string
+	for _, ch := range list {
+		names = append(names, ch.Name)
+	}
+	if want := []string{"Account 1", "Account 2", "Band 2", "Account 4"}; !slices.Equal(names, want) {
+		t.Errorf("channels %q, want %q", names, want)
+	}
+	asked, pages := s.askedAs()
+	slices.Sort(asked)
+	if !slices.Equal(asked, []int{0, 2, 3, 4}) || slices.ContainsFunc(pages, func(p string) bool { return p != "" }) {
+		t.Errorf("asked as %v, of pages %q", asked, pages)
+	}
+	if c.Rejected() || c.AuthUser() != 1 || c.Channel() != "800000000000000000001" {
+		t.Errorf("rejected %v, using account %d, channel %q", c.Rejected(), c.AuthUser(), c.Channel())
+	}
+}
+
+// TestChannelsOfOneAccount asks nothing more of a session of one account.
+func TestChannelsOfOneAccount(t *testing.T) {
+	s := &sessionServer{list: accountsList(0, 0)}
+	c := sessionClient(t, s)
+	list, err := c.Channels(context.Background())
+	if err != nil || len(list) != 2 {
+		t.Fatalf("channels = %+v, %v", list, err)
+	}
+	if asked, _ := s.askedAs(); len(asked) != 0 {
+		t.Errorf("asked the account's menu as %v", asked)
 	}
 }

@@ -3,9 +3,12 @@ package youtube
 import (
 	"cmp"
 	"context"
+	"errors"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 // AccountChannel is an identity the account can use YouTube Music as: the
@@ -43,11 +46,13 @@ func (ch AccountChannel) Is(a Account) bool {
 // YouTube Music's client does not.
 var webClient = innerClient{name: "WEB", id: "1", major: "2"}
 
-// Channels returns the channels the account can use YouTube Music as.
+// Channels returns the channels the account can use YouTube Music as: of
+// each Google account of the session still signed in.
 func (c *Client) Channels(ctx context.Context) ([]AccountChannel, error) {
 	if err := c.session(); err != nil {
 		return nil, err
 	}
+	asked := c.AuthUser()
 	n, err := c.callAs(ctx, webClient, "account/accounts_list", map[string]any{
 		"requestType":      "ACCOUNTS_LIST_REQUEST_TYPE_CHANNEL_SWITCHER",
 		"callCircumstance": "SWITCHING_USERS_FULL",
@@ -55,7 +60,34 @@ func (c *Client) Channels(ctx context.Context) ([]AccountChannel, error) {
 	if err != nil {
 		return nil, err
 	}
-	return parseChannels(n, c.AuthUser()), nil
+	return c.signedInChannels(ctx, parseChannels(n, asked), asked), nil
+}
+
+// signedInChannels leaves out of channels those of the Google accounts of
+// the session that were signed out of it, which the list may still name.
+// The account the list was asked as, asked, is the client's own, signed
+// in; each other one is asked for its menu, all at once. An account whose
+// answer fails otherwise stays: it wasn't found signed out.
+func (c *Client) signedInChannels(ctx context.Context, channels []AccountChannel, asked int) []AccountChannel {
+	var others []int
+	for _, ch := range channels {
+		if ch.AuthUser != asked && !slices.Contains(others, ch.AuthUser) {
+			others = append(others, ch.AuthUser)
+		}
+	}
+	out := make([]bool, len(others))
+	var wg sync.WaitGroup
+	for k, i := range others {
+		wg.Go(func() {
+			_, err := c.probeAccount(ctx, &i)
+			out[k] = errors.Is(err, errAccountOut)
+		})
+	}
+	wg.Wait()
+	return slices.DeleteFunc(channels, func(ch AccountChannel) bool {
+		k := slices.Index(others, ch.AuthUser)
+		return k >= 0 && out[k]
+	})
 }
 
 // parseChannels reads the account items of an accounts list, wherever the

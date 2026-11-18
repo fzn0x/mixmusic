@@ -10,6 +10,7 @@ import (
 	"github.com/egoist/mygo/i18n"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/locales"
 )
 
@@ -78,6 +79,8 @@ func TestSpotifyNotHereWords(t *testing.T) {
 		f.prepare = here
 		f.streamErr = errors.New("not on YouTube Music")
 	})
+	// Spotify in MixMusic, which some systems' defaults aren't.
+	h.p.SettingsChanged(settings.Settings{Playback: settings.Playback{SpotifyPlayback: settings.SpotifyPlaybackHere}})
 	h.p.PlayTracks([]media.Track{spotifyTrack("1")}, 0)
 	f := h.failedOnce(1)
 	said := locales.PlayerSpotifyNotHere()

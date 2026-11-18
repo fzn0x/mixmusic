@@ -143,6 +143,10 @@ type Stream struct {
 	// a live stream. Its URL is "" when YouTube's player API told only
 	// that it is there: Resolver.Surround has yt-dlp find it.
 	Surround *Stream
+	// AAC is the video's stereo AAC-LC in MP4, of itag 140, beside a
+	// Stream of Opus in WebM, for a cast device that plays no WebM: nil
+	// when the Stream is AAC itself, or YouTube lists none.
+	AAC *Stream
 	// later is the answer of YouTube's TV app of the video's 5.1 surround
 	// audio, while Surround is nil and the answer hadn't come as the
 	// direct route found the stream: the resolver keeps it with the stream
@@ -182,6 +186,11 @@ func (s Stream) found(route Route, args []string) Stream {
 		sur := *s.Surround
 		sur.Route, sur.Args = s.Route, s.Args
 		s.Surround = &sur
+	}
+	if s.AAC != nil {
+		aac := *s.AAC
+		aac.Route, aac.Args = s.Route, s.Args
+		s.AAC = &aac
 	}
 	return s
 }
@@ -271,6 +280,27 @@ func (r *Resolver) Resolve(ctx context.Context, videoID string) (Stream, error) 
 		return Stream{}, ErrBadVideoID
 	}
 	return r.share(ctx, videoID, false, r.resolve)
+}
+
+// errNoAAC is why the proxy serves no AAC audio of a video YouTube has
+// none of.
+var errNoAAC = errors.New("YouTube has no AAC audio of this track")
+
+// AAC returns the stereo AAC-LC audio of a video, in MP4: its stream, when
+// it is AAC, or the AAC beside its Opus.
+func (r *Resolver) AAC(ctx context.Context, videoID string) (Stream, error) {
+	s, err := r.Resolve(ctx, videoID)
+	switch {
+	case err != nil:
+		return Stream{}, err
+	case s.Live:
+		return Stream{}, errNoAAC
+	case strings.HasPrefix(s.MimeType, "audio/mp4"):
+		return s, nil
+	case s.AAC != nil:
+		return *s.AAC, nil
+	}
+	return Stream{}, errNoAAC
 }
 
 // Surround returns the 5.1 surround audio of a video, which the stream
@@ -750,7 +780,42 @@ func parseInfo(out []byte) (Stream, error) {
 		sur := best.stream(in.Duration)
 		s.Surround = &sur
 	}
+	// The AAC beside an Opus stream, of the best audio track, then the
+	// original dynamics, then the most bits.
+	if !strings.HasPrefix(s.MimeType, "audio/mp4") {
+		var aac *ytFormat
+		for i, f := range in.Formats {
+			if f.aacLC() && (aac == nil || f.betterAAC(*aac)) {
+				aac = &in.Formats[i]
+			}
+		}
+		if aac != nil {
+			a := aac.stream(in.Duration)
+			s.AAC = &a
+		}
+	}
 	return s, nil
+}
+
+// aacLC reports whether f is stereo or mono AAC-LC in MP4, as itag 140 is,
+// unencrypted, whole, over plain HTTPS.
+func (f ytFormat) aacLC() bool {
+	return f.ACodec == "mp4a.40.2" && f.AudioChannels <= 2 && (f.VCodec == "" || f.VCodec == "none") &&
+		(f.Ext == "m4a" || f.Ext == "mp4") && (f.Protocol == "" || f.Protocol == "https") &&
+		f.URL != "" && f.HasDRM != true && f.HasDRM != "maybe"
+}
+
+// betterAAC reports whether the AAC format f is a better pick than o: of a
+// better audio track, then of the original dynamics, then of more bits.
+func (f ytFormat) betterAAC(o ytFormat) bool {
+	fd, od := strings.Contains(f.FormatID, "drc"), strings.Contains(o.FormatID, "drc")
+	switch {
+	case f.LanguagePreference != o.LanguagePreference:
+		return f.LanguagePreference > o.LanguagePreference
+	case fd != od:
+		return !fd
+	}
+	return f.ABR > o.ABR
 }
 
 // mimeType returns the content type of a stream of a container and codec.

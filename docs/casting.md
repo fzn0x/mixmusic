@@ -132,7 +132,9 @@ protocol on its own, and isn't affiliated with FUTO.
   ([how Spotify tracks play](playing-music.md#how-spotify-tracks-play)).
 - **Another computer** with MixMusic on plays what plays here, with
   [remote control's](remote-control.md#move-what-plays-here-there)
-  **Move to …**.
+  **Move to …**, and plays here what plays there, with its
+  [move here](remote-control.md#move-what-plays-there-here). Its page's
+  **Output device** casts what plays there to a device it found.
 
 ## Firewalls and the local network
 

@@ -60,6 +60,24 @@
   settings say, Sound effects off making the equalizer flat and width
   and crossfeed neutral, and `internal/settings` keeps the user's
   presets (`Equalizer.Save`, `EncodePresets`).
+  Between the equalizer and those stages, `echo.go` and `reverb.go` play
+  the echo and the reverb of #546 (`SetEcho`, `SetReverb`), each at a wet
+  and a dry level of its own (`MixLevels` gives both of a single mix), so
+  that a sound mood (#547) can play the hall at its own: the echo a line
+  of two seconds of six channels, a new delay fading in over the one
+  before; the reverb four rooms, each a feedback delay network of sixteen
+  lines, after Jot and Chaigne, mixed by a Hadamard matrix, with a
+  low-pass in each line for the room's decay at the low and the high
+  notes, a new room fading in over the one before. Both are skipped at
+  neutral, keep no subnormal numbers, and allocate nothing on the audio
+  thread: `SetEcho` and `SetReverb` make their lines as each is first
+  turned on. A seek has their tails fade out (`cut`), an output that
+  starts again forgets them (`stale`), and the engine keeps its output on
+  while they ring (`ringing`). `Engine.shape` runs the stages after the
+  decks' mix, which `BenchmarkEveryEffect` times with each of them on.
+  `internal/app/reverb.go` gives the engine what the settings say, Sound
+  effects off turning both off, and `internal/settings` keeps the room,
+  the echo's preset and the mixes (`Reverb`, `Echo`, `EchoPresets`).
   Last, `correction.go` plays the correction of headphones of #616
   (`SetCorrection`), the filters of a ParametricEQ.txt, fading from one
   correction to the next, and skipped at none; `biquad.go` gives it

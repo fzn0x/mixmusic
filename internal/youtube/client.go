@@ -124,13 +124,21 @@ type callOptions struct {
 	// baseURL is the origin to ask, when it isn't the client's: YouTube's
 	// own, for the website's search.
 	baseURL string
+	// account, when set, asks as the Google account of that index of the
+	// session itself, not as the client's account and channel. What the
+	// answer tells of Premium isn't kept: it is another account's.
+	account *int
+	// probe asks whether the account asked as is still signed in: an
+	// answer as signed out tells of that account alone, so it doesn't end
+	// the session.
+	probe bool
 }
 
 // callWith is callAs, asking as o says.
 func (c *Client) callWith(ctx context.Context, ic innerClient, endpoint string, body map[string]any, query url.Values, o callOptions) (node, error) {
 	version := ic.version(time.Now())
 	user := map[string]any{}
-	if page := c.Channel(); page != "" && c.SignedIn() && !o.anonymous {
+	if page := c.Channel(); page != "" && c.SignedIn() && !o.anonymous && o.account == nil {
 		user["onBehalfOfUser"] = page
 	}
 	payload := map[string]any{
@@ -177,8 +185,8 @@ func (c *Client) callWith(ctx context.Context, ic innerClient, endpoint string, 
 		req.Header.Set("X-Goog-Visitor-Id", v)
 	}
 	now := time.Now()
-	signed := !o.anonymous && c.signRequest(req, now)
-	signedAs := c.signedAs(signed)
+	signed := !o.anonymous && c.signRequestAs(req, now, o.account)
+	signedAs := c.signedAs(signed && o.account == nil)
 	res, err := c.HTTP.Do(req)
 	if err != nil {
 		return node{}, fmt.Errorf("youtube music: %w", err)
@@ -187,7 +195,7 @@ func (c *Client) callWith(ctx context.Context, ic innerClient, endpoint string, 
 	if !o.anonymous {
 		c.keepCookies(res.Cookies(), now)
 	}
-	if signed && deniedStatus(res.StatusCode) && !refusable[endpoint] {
+	if signed && deniedStatus(res.StatusCode) && !refusable[endpoint] && !o.probe {
 		c.reject()
 	}
 	raw, err := io.ReadAll(io.LimitReader(res.Body, 32<<20))
@@ -208,7 +216,7 @@ func (c *Client) callWith(ctx context.Context, ic innerClient, endpoint string, 
 	if v := n.get("responseContext", "visitorData").str(); v != "" && !o.anonymous {
 		c.setVisitorID(v)
 	}
-	if signed && accountEndpoints[endpoint] && loggedOut(n) {
+	if signed && accountEndpoints[endpoint] && loggedOut(n) && !o.probe {
 		c.reject()
 	}
 	if signed && !loggedOut(n) {

@@ -141,9 +141,19 @@ func cookieHeader(cookies []*http.Cookie, now time.Time) string {
 // signRequest adds the user's cookies and signature to a request, when the
 // client is signed in, and reports whether it did.
 func (c *Client) signRequest(req *http.Request, now time.Time) bool {
+	return c.signRequestAs(req, now, nil)
+}
+
+// signRequestAs is signRequest, signing as account, the index of a Google
+// account of the session, that account itself, when it isn't nil: not as
+// the client's account and channel.
+func (c *Client) signRequestAs(req *http.Request, now time.Time, account *int) bool {
 	c.mu.Lock()
 	cookies, page, user := c.cookies, c.pageID, c.authUser
 	c.mu.Unlock()
+	if account != nil {
+		page, user = "", max(*account, 0)
+	}
 	if signingCookie(cookies) == "" {
 		return false
 	}

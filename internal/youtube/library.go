@@ -57,6 +57,65 @@ func (c *Client) Account(ctx context.Context) (Account, error) {
 	return a, nil
 }
 
+// errAccountOut is the answer of a Google account of the session that was
+// signed out of it, as from another device: the browser keeps it in the
+// session, at its index, beside the accounts still signed in.
+var errAccountOut = errors.New("youtube music: that account of the session is signed out")
+
+// maxAccounts is how many Google accounts of a session MixMusic looks
+// among for those still signed in: those of index 0 to 9.
+const maxAccounts = 10
+
+// UseFirstAccount makes the client use YouTube Music as the first Google
+// account of its session still signed in, itself, and returns it: of the
+// indexes 0 to 9, in order, the first whose account menu, asked as it,
+// names an account. A session whose first account was signed out of has
+// others still signed in. With none, YouTube ended the session:
+// ErrSessionRejected. Any other failure stops the search, as the account
+// asked as may be signed in still, and the client goes on as before.
+func (c *Client) UseFirstAccount(ctx context.Context) (Account, error) {
+	if err := c.session(); err != nil {
+		return Account{}, err
+	}
+	wasUser, wasPage := c.AuthUser(), c.Channel()
+	for i := range maxAccounts {
+		c.SetAccount(i, "")
+		a, err := c.probeAccount(ctx, nil)
+		if errors.Is(err, errAccountOut) {
+			continue
+		}
+		if err != nil {
+			c.SetAccount(wasUser, wasPage)
+		}
+		return a, err
+	}
+	c.SetAccount(wasUser, wasPage)
+	c.reject()
+	return Account{}, ErrSessionRejected
+}
+
+// probeAccount asks the account's menu as the client's account, or as the
+// account of index *account of the session itself, and returns the account
+// it names. An answer as signed out, a visitor's, a 401 or 403, or a menu
+// that names no account, is errAccountOut: it tells of that account alone,
+// so the session goes on.
+func (c *Client) probeAccount(ctx context.Context, account *int) (Account, error) {
+	n, err := c.callWith(ctx, musicClient, "account/account_menu", map[string]any{}, nil, callOptions{account: account, probe: true})
+	var api *APIError
+	switch {
+	case errors.As(err, &api) && deniedStatus(api.Status):
+		return Account{}, errAccountOut
+	case err != nil:
+		return Account{}, err
+	case loggedOut(n):
+		return Account{}, errAccountOut
+	}
+	if a := parseAccount(n); a.Name != "" {
+		return a, nil
+	}
+	return Account{}, errAccountOut
+}
+
 func parseAccount(n node) Account {
 	h := n.get("actions", 0, "openPopupAction", "popup", "multiPageMenuRenderer", "header", "activeAccountHeaderRenderer")
 	a := Account{Name: h.get("accountName").text(), Handle: h.get("channelHandle").text()}

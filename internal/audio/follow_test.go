@@ -195,6 +195,41 @@ func TestEngineFollowsAtTheAlbumsLoudness(t *testing.T) {
 	}
 }
 
+// TestEngineFollowsAnEndToldLate follows a track whose ring ran out a
+// moment before its decoder told it ended, as on a slow network: the
+// engine's loop doesn't tell the end meanwhile, and the next track follows
+// at the next quantum.
+func TestEngineFollowsAnEndToldLate(t *testing.T) {
+	j := joins(t)[1]
+	e, dev, rec := newTestEngine(t)
+	e.Load(j.first, Cue{Autoplay: true})
+	e.Preload(j.next, Cue{Follow: true})
+	buffered(t, e, 0, ringFrames/2)
+	buffered(t, e, 1, ringFrames/2)
+	// Past the fade in, in whole quanta: nothing rendered waits to play.
+	dev.play(t, 38*quantum)
+	// What the audio thread would have read, before it saw the end: the
+	// whole track, which the ring holds.
+	buffered(t, e, 0, ringFrames)
+	e.mu.Lock()
+	r := e.decks[0].ring.Load()
+	r.read.Store(r.write.Load())
+	e.mu.Unlock()
+	time.Sleep(2 * tick)
+	e.report()
+	if rec.has("ended") || rec.has("playing false") {
+		t.Fatalf("the end was told: %q", rec.events)
+	}
+	got := dev.play(t, Rate/10)
+	for f := range Rate / 10 {
+		if got[2*f] != j.b[2*f] || got[2*f+1] != j.b[2*f+1] {
+			t.Fatalf("frame %d: %v, want %v", f, got[2*f:2*f+2], j.b[2*f:2*f+2])
+		}
+	}
+	e.report()
+	rec.waitFor(t, "followed "+j.next)
+}
+
 // TestEngineFollowsArmedAgain arms the track the idle deck holds again,
 // without loading it again: at another speed, and to follow no longer, as
 // the next track's speed changes, or the queue does. Not armed, the track
@@ -218,9 +253,9 @@ func TestEngineFollowsArmedAgain(t *testing.T) {
 	dev.play(t, len(reference(t, cuesFront))/2+4800)
 	rec.waitFor(t, "ended")
 	e.mu.Lock()
-	idle := e.decks[1]
+	idle, speed := e.decks[1], preloaded.speed
 	e.mu.Unlock()
-	if rec.has("followed") || idle != preloaded || preloaded.speed != 1 {
+	if rec.has("followed") || idle != preloaded || speed != 1 {
 		t.Errorf("disarmed, it followed: %q", rec.events)
 	}
 	// Load, Unload, Crossfade and Stop disarm what Preload armed.

@@ -829,7 +829,7 @@ func (e *Engine) report() {
 				failed = e.reported.failed != r
 				e.reported.failed = r
 			} else {
-				ended = e.reported.ended != r && !e.fading
+				ended = e.reported.ended != r && !e.fading && !e.follows(d)
 				if ended {
 					e.reported.ended = r
 				}

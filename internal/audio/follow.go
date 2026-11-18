@@ -69,6 +69,16 @@ func (e *Engine) follow(d *deck, at int, reads *[2]deckRead) {
 	reads[j] = deckRead{r: r, from: at, n: at + next.read(r, e.deckBuf[j][r.channels*at:r.channels*quantum])}
 }
 
+// follows reports whether the deck armed to follow d, the active deck,
+// takes over as d's track ends: the loop leaves that end to the audio
+// thread, which takes over at its next quantum, rather than tell it, as
+// when d's ring ran out a moment before its decoder told it ended. Its
+// caller holds mu.
+func (e *Engine) follows(d *deck) bool {
+	return e.armed && e.decks[1-e.active] != nil && e.decks[e.active] == d && !e.fading && !e.paused &&
+		e.followed == nil && e.out != nil
+}
+
 // takeOver makes the deck armed to follow d, the active deck, whose track
 // ended, the active deck: at d's level, which it moves as d's does through
 // the quantum, at full gain, from its own first frame. Gliding, it starts

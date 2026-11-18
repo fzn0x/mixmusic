@@ -3300,6 +3300,104 @@
   "@downloadsTracks": {
     "description": "Heading of the downloaded tracks."
   },
+  "echoCustom": "Custom: a time, feedback and mix of your own.",
+  "@echoCustom": {
+    "description": "Under Preset (echoPreset), in Settings › Playback › Echo, once a slider below it moved and no preset is chosen."
+  },
+  "echoDesc": "Repeat the music a moment later, each repeat softer, after the equalizer.",
+  "@echoDesc": {
+    "description": "Under the Echo switch (echoTitle), in Settings › Playback › Echo."
+  },
+  "echoFeedback": "Feedback",
+  "@echoFeedback": {
+    "description": "In Settings › Playback › Echo, the row of the slider of how loud each repeat plays against the one before, and the slider's name to screen readers."
+  },
+  "echoFeedbackAt": "{percent}%: each repeat plays this loud against the one before.",
+  "@echoFeedbackAt": {
+    "description": "Under Feedback (echoFeedback), in Settings › Playback › Echo, while it is above 0%. {percent} is a whole number from 1 to 90.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "echoFeedbackOff": "0%: a single repeat.",
+  "@echoFeedbackOff": {
+    "description": "Under Feedback (echoFeedback), in Settings › Playback › Echo, while it is at 0%."
+  },
+  "echoMixAt": "{percent}% of the repeats against the music's own sound: at 100%, the repeats alone.",
+  "@echoMixAt": {
+    "description": "Under Mix (reverbMix), in Settings › Playback › Echo. {percent} is a whole number from 0 to 100.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "echoMixLabel": "Echo mix",
+  "@echoMixLabel": {
+    "description": "In Settings › Playback › Echo, the name of the Mix slider (reverbMix) to screen readers."
+  },
+  "echoPreset": "Preset",
+  "@echoPreset": {
+    "description": "In Settings › Playback › Echo, the row of the echo's presets, and their name to screen readers."
+  },
+  "echoQuarter": "Quarter note",
+  "@echoQuarter": {
+    "description": "In Settings › Playback › Echo, a preset: repeats a quarter note apart, at 120 beats a minute. Keep it short."
+  },
+  "echoQuarterDesc": "Repeats every {ms} ms, a quarter note at 120 beats a minute, fading after a few.",
+  "@echoQuarterDesc": {
+    "description": "Under Preset (echoPreset), in Settings › Playback › Echo, while Quarter note (echoQuarter) is chosen. {ms} is a whole number of milliseconds.",
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "echoSlapback": "Slapback",
+  "@echoSlapback": {
+    "description": "In Settings › Playback › Echo, a preset: a single quick repeat, as on rock'n'roll records of the 1950s. Keep it short."
+  },
+  "echoSlapbackDesc": "One quick repeat, {ms} ms later.",
+  "@echoSlapbackDesc": {
+    "description": "Under Preset (echoPreset), in Settings › Playback › Echo, while Slapback (echoSlapback) is chosen. {ms} is a whole number of milliseconds.",
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "echoTail": "Long tail",
+  "@echoTail": {
+    "description": "In Settings › Playback › Echo, a preset: repeats that feed back, for a long trail. Keep it short."
+  },
+  "echoTailDesc": "Repeats every {ms} ms, each feeding the next, for a long trail.",
+  "@echoTailDesc": {
+    "description": "Under Preset (echoPreset), in Settings › Playback › Echo, while Long tail (echoTail) is chosen. {ms} is a whole number of milliseconds.",
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "echoTime": "Time",
+  "@echoTime": {
+    "description": "In Settings › Playback › Echo, the row of the slider of the time between the music and its repeats, and the slider's name to screen readers."
+  },
+  "echoTimeAt": "{ms} ms from the music to its first repeat, and from each repeat to the next.",
+  "@echoTimeAt": {
+    "description": "Under Time (echoTime), in Settings › Playback › Echo. {ms} is a whole number of milliseconds from 20 to 2000.",
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "echoTitle": "Echo",
+  "@echoTitle": {
+    "description": "In Settings › Playback, the title of the echo's group, the row of its switch, and the switch's name to screen readers: the echo repeats the music a moment later."
+  },
   "episodeDetails": "Details",
   "episodeDetailsFailed": "The episode's details can't be loaded right now. Check your connection, or try again in a moment.",
   "@episodeDetailsFailed": {
@@ -3419,9 +3517,9 @@
   "equalizerDesc": "Shape the sound of YouTube Music with ten bands and a preamp.",
   "equalizerEffects": "Sound effects",
   "@equalizerEffects": {
-    "description": "In Settings › Playback › Equalizer, the switch at the head of the group, and its name to screen readers: it turns the equalizer, crossfeed and stereo width on and off at once."
+    "description": "In Settings › Playback › Equalizer, the switch at the head of the group, and its name to screen readers: it turns the equalizer, the reverb, the echo, crossfeed and stereo width on and off at once."
   },
-  "equalizerEffectsDesc": "Off, the equalizer, crossfeed and stereo width stop at once, and keep their settings. Balance and mono still apply.",
+  "equalizerEffectsDesc": "Off, the equalizer, reverb, echo, crossfeed and stereo width stop at once, and keep their settings. Balance and mono still apply.",
   "@equalizerEffectsDesc": {
     "description": "Under the Sound effects switch (equalizerEffects), in Settings › Playback › Equalizer."
   },
@@ -9443,6 +9541,71 @@
     "description": "The name of a computer of remote control that told none."
   },
   "remoteTitle": "Remote control",
+  "reverbDesc": "Play the music in a room, after the equalizer.",
+  "@reverbDesc": {
+    "description": "Under the Reverb switch (reverbTitle), in Settings › Playback › Reverb."
+  },
+  "reverbEffectsOff": "Sound effects are off: the reverb and the echo wait until they're on again, in Settings › Playback › Equalizer.",
+  "@reverbEffectsOff": {
+    "description": "In Settings › Playback, under the Reverb and the Echo groups' rows, while the Sound effects switch (equalizerEffects) is off."
+  },
+  "reverbMix": "Mix",
+  "@reverbMix": {
+    "description": "In Settings › Playback › Reverb and in › Echo, the row of the slider that sets how much of the effect plays against the music's own sound."
+  },
+  "reverbMixAt": "{percent}% of the room against the music's own sound: at 100%, the room alone.",
+  "@reverbMixAt": {
+    "description": "Under Mix (reverbMix), in Settings › Playback › Reverb. {percent} is a whole number from 0 to 100.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "reverbMixLabel": "Reverb mix",
+  "@reverbMixLabel": {
+    "description": "In Settings › Playback › Reverb, the name of the Mix slider (reverbMix) to screen readers."
+  },
+  "reverbRoom": "Room",
+  "@reverbRoom": {
+    "description": "In Settings › Playback › Reverb, the name of the list of rooms to screen readers."
+  },
+  "reverbRoomHall": "Hall",
+  "@reverbRoomHall": {
+    "description": "In Settings › Playback › Reverb, a room of the list: a concert hall."
+  },
+  "reverbRoomHallDesc": "A concert hall: a full, smooth sound of about 2.4 seconds, after a short pause.",
+  "@reverbRoomHallDesc": {
+    "description": "Under Hall (reverbRoomHall), in Settings › Playback › Reverb: how it sounds."
+  },
+  "reverbRoomLarge": "Large space",
+  "@reverbRoomLarge": {
+    "description": "In Settings › Playback › Reverb, a room of the list: a very large space, as a cathedral."
+  },
+  "reverbRoomLargeDesc": "A vast space, as a cathedral, that rings for about 4 seconds.",
+  "@reverbRoomLargeDesc": {
+    "description": "Under Large space (reverbRoomLarge), in Settings › Playback › Reverb: how it sounds."
+  },
+  "reverbRoomPlate": "Plate",
+  "@reverbRoomPlate": {
+    "description": "In Settings › Playback › Reverb, a room of the list: a plate reverb, a large metal sheet studios use to add reverb."
+  },
+  "reverbRoomPlateDesc": "A studio's metal plate: dense and bright, about 1.8 seconds, as on many voices.",
+  "@reverbRoomPlateDesc": {
+    "description": "Under Plate (reverbRoomPlate), in Settings › Playback › Reverb: how it sounds."
+  },
+  "reverbRoomSmall": "Small room",
+  "@reverbRoomSmall": {
+    "description": "In Settings › Playback › Reverb, a room of the list: a small room."
+  },
+  "reverbRoomSmallDesc": "Close walls: a short, warm sound of about 0.6 seconds that keeps voices up front.",
+  "@reverbRoomSmallDesc": {
+    "description": "Under Small room (reverbRoomSmall), in Settings › Playback › Reverb: how it sounds."
+  },
+  "reverbTitle": "Reverb",
+  "@reverbTitle": {
+    "description": "In Settings › Playback, the title of the reverb's group, the row of its switch, and the switch's name to screen readers: the reverb plays the music in a room."
+  },
   "roomControlRefused": "{host} doesn't let guests control playback",
   "@roomControlRefused": {
     "description": "Toast when a guest pressed play, pause or skip in the room of {host}, who doesn't let guests control it.",

@@ -10380,6 +10380,286 @@ func (msgs Messages) DownloadsTracks() string {
 	return Catalog.Format(msgs.locale, "downloadsTracks", nil)
 }
 
+// EchoCustom says "Custom: a time, feedback and mix of your own."
+// in the language the app shows.
+//
+// Under Preset (echoPreset), in Settings › Playback › Echo, once a
+// slider below it moved and no preset is chosen.
+func EchoCustom() string { return In(i18n.Locale()).EchoCustom() }
+
+// EchoCustom says "Custom: a time, feedback and mix of your own."
+// in the language of msgs.
+//
+// Under Preset (echoPreset), in Settings › Playback › Echo, once a
+// slider below it moved and no preset is chosen.
+func (msgs Messages) EchoCustom() string {
+	return Catalog.Format(msgs.locale, "echoCustom", nil)
+}
+
+// EchoDesc says "Repeat the music a moment later, each repeat softer, after the equalizer."
+// in the language the app shows.
+//
+// Under the Echo switch (echoTitle), in Settings › Playback › Echo.
+func EchoDesc() string { return In(i18n.Locale()).EchoDesc() }
+
+// EchoDesc says "Repeat the music a moment later, each repeat softer, after the equalizer."
+// in the language of msgs.
+//
+// Under the Echo switch (echoTitle), in Settings › Playback › Echo.
+func (msgs Messages) EchoDesc() string {
+	return Catalog.Format(msgs.locale, "echoDesc", nil)
+}
+
+// EchoFeedback says "Feedback"
+// in the language the app shows.
+//
+// In Settings › Playback › Echo, the row of the slider of how loud each
+// repeat plays against the one before, and the slider's name to screen
+// readers.
+func EchoFeedback() string { return In(i18n.Locale()).EchoFeedback() }
+
+// EchoFeedback says "Feedback"
+// in the language of msgs.
+//
+// In Settings › Playback › Echo, the row of the slider of how loud each
+// repeat plays against the one before, and the slider's name to screen
+// readers.
+func (msgs Messages) EchoFeedback() string {
+	return Catalog.Format(msgs.locale, "echoFeedback", nil)
+}
+
+// EchoFeedbackAt says "{percent}%: each repeat plays this loud against the one before."
+// in the language the app shows.
+//
+// Under Feedback (echoFeedback), in Settings › Playback › Echo, while
+// it is above 0%. {percent} is a whole number from 1 to 90.
+func EchoFeedbackAt(percent int) string { return In(i18n.Locale()).EchoFeedbackAt(percent) }
+
+// EchoFeedbackAt says "{percent}%: each repeat plays this loud against the one before."
+// in the language of msgs.
+//
+// Under Feedback (echoFeedback), in Settings › Playback › Echo, while
+// it is above 0%. {percent} is a whole number from 1 to 90.
+func (msgs Messages) EchoFeedbackAt(percent int) string {
+	return Catalog.Format(msgs.locale, "echoFeedbackAt", map[string]any{"percent": percent})
+}
+
+// EchoFeedbackOff says "0%: a single repeat."
+// in the language the app shows.
+//
+// Under Feedback (echoFeedback), in Settings › Playback › Echo, while
+// it is at 0%.
+func EchoFeedbackOff() string { return In(i18n.Locale()).EchoFeedbackOff() }
+
+// EchoFeedbackOff says "0%: a single repeat."
+// in the language of msgs.
+//
+// Under Feedback (echoFeedback), in Settings › Playback › Echo, while
+// it is at 0%.
+func (msgs Messages) EchoFeedbackOff() string {
+	return Catalog.Format(msgs.locale, "echoFeedbackOff", nil)
+}
+
+// EchoMixAt says "{percent}% of the repeats against the music's own sound: at 100%, the repeats alone."
+// in the language the app shows.
+//
+// Under Mix (reverbMix), in Settings › Playback › Echo. {percent} is a
+// whole number from 0 to 100.
+func EchoMixAt(percent int) string { return In(i18n.Locale()).EchoMixAt(percent) }
+
+// EchoMixAt says "{percent}% of the repeats against the music's own sound: at 100%, the repeats alone."
+// in the language of msgs.
+//
+// Under Mix (reverbMix), in Settings › Playback › Echo. {percent} is a
+// whole number from 0 to 100.
+func (msgs Messages) EchoMixAt(percent int) string {
+	return Catalog.Format(msgs.locale, "echoMixAt", map[string]any{"percent": percent})
+}
+
+// EchoMixLabel says "Echo mix"
+// in the language the app shows.
+//
+// In Settings › Playback › Echo, the name of the Mix slider (reverbMix)
+// to screen readers.
+func EchoMixLabel() string { return In(i18n.Locale()).EchoMixLabel() }
+
+// EchoMixLabel says "Echo mix"
+// in the language of msgs.
+//
+// In Settings › Playback › Echo, the name of the Mix slider (reverbMix)
+// to screen readers.
+func (msgs Messages) EchoMixLabel() string {
+	return Catalog.Format(msgs.locale, "echoMixLabel", nil)
+}
+
+// EchoPreset says "Preset"
+// in the language the app shows.
+//
+// In Settings › Playback › Echo, the row of the echo's presets, and
+// their name to screen readers.
+func EchoPreset() string { return In(i18n.Locale()).EchoPreset() }
+
+// EchoPreset says "Preset"
+// in the language of msgs.
+//
+// In Settings › Playback › Echo, the row of the echo's presets, and
+// their name to screen readers.
+func (msgs Messages) EchoPreset() string {
+	return Catalog.Format(msgs.locale, "echoPreset", nil)
+}
+
+// EchoQuarter says "Quarter note"
+// in the language the app shows.
+//
+// In Settings › Playback › Echo, a preset: repeats a quarter note
+// apart, at 120 beats a minute. Keep it short.
+func EchoQuarter() string { return In(i18n.Locale()).EchoQuarter() }
+
+// EchoQuarter says "Quarter note"
+// in the language of msgs.
+//
+// In Settings › Playback › Echo, a preset: repeats a quarter note
+// apart, at 120 beats a minute. Keep it short.
+func (msgs Messages) EchoQuarter() string {
+	return Catalog.Format(msgs.locale, "echoQuarter", nil)
+}
+
+// EchoQuarterDesc says "Repeats every {ms} ms, a quarter note at 120 beats a minute, fading after a few."
+// in the language the app shows.
+//
+// Under Preset (echoPreset), in Settings › Playback › Echo, while
+// Quarter note (echoQuarter) is chosen. {ms} is a whole number of
+// milliseconds.
+func EchoQuarterDesc(ms int) string { return In(i18n.Locale()).EchoQuarterDesc(ms) }
+
+// EchoQuarterDesc says "Repeats every {ms} ms, a quarter note at 120 beats a minute, fading after a few."
+// in the language of msgs.
+//
+// Under Preset (echoPreset), in Settings › Playback › Echo, while
+// Quarter note (echoQuarter) is chosen. {ms} is a whole number of
+// milliseconds.
+func (msgs Messages) EchoQuarterDesc(ms int) string {
+	return Catalog.Format(msgs.locale, "echoQuarterDesc", map[string]any{"ms": ms})
+}
+
+// EchoSlapback says "Slapback"
+// in the language the app shows.
+//
+// In Settings › Playback › Echo, a preset: a single quick repeat, as on
+// rock'n'roll records of the 1950s. Keep it short.
+func EchoSlapback() string { return In(i18n.Locale()).EchoSlapback() }
+
+// EchoSlapback says "Slapback"
+// in the language of msgs.
+//
+// In Settings › Playback › Echo, a preset: a single quick repeat, as on
+// rock'n'roll records of the 1950s. Keep it short.
+func (msgs Messages) EchoSlapback() string {
+	return Catalog.Format(msgs.locale, "echoSlapback", nil)
+}
+
+// EchoSlapbackDesc says "One quick repeat, {ms} ms later."
+// in the language the app shows.
+//
+// Under Preset (echoPreset), in Settings › Playback › Echo, while
+// Slapback (echoSlapback) is chosen. {ms} is a whole number of
+// milliseconds.
+func EchoSlapbackDesc(ms int) string { return In(i18n.Locale()).EchoSlapbackDesc(ms) }
+
+// EchoSlapbackDesc says "One quick repeat, {ms} ms later."
+// in the language of msgs.
+//
+// Under Preset (echoPreset), in Settings › Playback › Echo, while
+// Slapback (echoSlapback) is chosen. {ms} is a whole number of
+// milliseconds.
+func (msgs Messages) EchoSlapbackDesc(ms int) string {
+	return Catalog.Format(msgs.locale, "echoSlapbackDesc", map[string]any{"ms": ms})
+}
+
+// EchoTail says "Long tail"
+// in the language the app shows.
+//
+// In Settings › Playback › Echo, a preset: repeats that feed back, for
+// a long trail. Keep it short.
+func EchoTail() string { return In(i18n.Locale()).EchoTail() }
+
+// EchoTail says "Long tail"
+// in the language of msgs.
+//
+// In Settings › Playback › Echo, a preset: repeats that feed back, for
+// a long trail. Keep it short.
+func (msgs Messages) EchoTail() string {
+	return Catalog.Format(msgs.locale, "echoTail", nil)
+}
+
+// EchoTailDesc says "Repeats every {ms} ms, each feeding the next, for a long trail."
+// in the language the app shows.
+//
+// Under Preset (echoPreset), in Settings › Playback › Echo, while Long
+// tail (echoTail) is chosen. {ms} is a whole number of milliseconds.
+func EchoTailDesc(ms int) string { return In(i18n.Locale()).EchoTailDesc(ms) }
+
+// EchoTailDesc says "Repeats every {ms} ms, each feeding the next, for a long trail."
+// in the language of msgs.
+//
+// Under Preset (echoPreset), in Settings › Playback › Echo, while Long
+// tail (echoTail) is chosen. {ms} is a whole number of milliseconds.
+func (msgs Messages) EchoTailDesc(ms int) string {
+	return Catalog.Format(msgs.locale, "echoTailDesc", map[string]any{"ms": ms})
+}
+
+// EchoTime says "Time"
+// in the language the app shows.
+//
+// In Settings › Playback › Echo, the row of the slider of the time
+// between the music and its repeats, and the slider's name to screen
+// readers.
+func EchoTime() string { return In(i18n.Locale()).EchoTime() }
+
+// EchoTime says "Time"
+// in the language of msgs.
+//
+// In Settings › Playback › Echo, the row of the slider of the time
+// between the music and its repeats, and the slider's name to screen
+// readers.
+func (msgs Messages) EchoTime() string {
+	return Catalog.Format(msgs.locale, "echoTime", nil)
+}
+
+// EchoTimeAt says "{ms} ms from the music to its first repeat, and from each repeat to the next."
+// in the language the app shows.
+//
+// Under Time (echoTime), in Settings › Playback › Echo. {ms} is a whole
+// number of milliseconds from 20 to 2000.
+func EchoTimeAt(ms int) string { return In(i18n.Locale()).EchoTimeAt(ms) }
+
+// EchoTimeAt says "{ms} ms from the music to its first repeat, and from each repeat to the next."
+// in the language of msgs.
+//
+// Under Time (echoTime), in Settings › Playback › Echo. {ms} is a whole
+// number of milliseconds from 20 to 2000.
+func (msgs Messages) EchoTimeAt(ms int) string {
+	return Catalog.Format(msgs.locale, "echoTimeAt", map[string]any{"ms": ms})
+}
+
+// EchoTitle says "Echo"
+// in the language the app shows.
+//
+// In Settings › Playback, the title of the echo's group, the row of its
+// switch, and the switch's name to screen readers: the echo repeats the
+// music a moment later.
+func EchoTitle() string { return In(i18n.Locale()).EchoTitle() }
+
+// EchoTitle says "Echo"
+// in the language of msgs.
+//
+// In Settings › Playback, the title of the echo's group, the row of its
+// switch, and the switch's name to screen readers: the echo repeats the
+// music a moment later.
+func (msgs Messages) EchoTitle() string {
+	return Catalog.Format(msgs.locale, "echoTitle", nil)
+}
+
 // EpisodeDetails says "Details"
 // in the language the app shows.
 func EpisodeDetails() string { return In(i18n.Locale()).EpisodeDetails() }
@@ -10796,28 +11076,28 @@ func (msgs Messages) EqualizerDesc() string {
 // in the language the app shows.
 //
 // In Settings › Playback › Equalizer, the switch at the head of the
-// group, and its name to screen readers: it turns the equalizer, crossfeed
-// and stereo width on and off at once.
+// group, and its name to screen readers: it turns the equalizer, the
+// reverb, the echo, crossfeed and stereo width on and off at once.
 func EqualizerEffects() string { return In(i18n.Locale()).EqualizerEffects() }
 
 // EqualizerEffects says "Sound effects"
 // in the language of msgs.
 //
 // In Settings › Playback › Equalizer, the switch at the head of the
-// group, and its name to screen readers: it turns the equalizer, crossfeed
-// and stereo width on and off at once.
+// group, and its name to screen readers: it turns the equalizer, the
+// reverb, the echo, crossfeed and stereo width on and off at once.
 func (msgs Messages) EqualizerEffects() string {
 	return Catalog.Format(msgs.locale, "equalizerEffects", nil)
 }
 
-// EqualizerEffectsDesc says "Off, the equalizer, crossfeed and stereo width stop at once, and keep their settings. Balance and mono still apply."
+// EqualizerEffectsDesc says "Off, the equalizer, reverb, echo, crossfeed and stereo width stop at once, and keep their settings. Balance and mono …"
 // in the language the app shows.
 //
 // Under the Sound effects switch (equalizerEffects), in Settings ›
 // Playback › Equalizer.
 func EqualizerEffectsDesc() string { return In(i18n.Locale()).EqualizerEffectsDesc() }
 
-// EqualizerEffectsDesc says "Off, the equalizer, crossfeed and stereo width stop at once, and keep their settings. Balance and mono still apply."
+// EqualizerEffectsDesc says "Off, the equalizer, reverb, echo, crossfeed and stereo width stop at once, and keep their settings. Balance and mono …"
 // in the language of msgs.
 //
 // Under the Sound effects switch (equalizerEffects), in Settings ›
@@ -28770,6 +29050,246 @@ func RemoteTitle() string { return In(i18n.Locale()).RemoteTitle() }
 // in the language of msgs.
 func (msgs Messages) RemoteTitle() string {
 	return Catalog.Format(msgs.locale, "remoteTitle", nil)
+}
+
+// ReverbDesc says "Play the music in a room, after the equalizer."
+// in the language the app shows.
+//
+// Under the Reverb switch (reverbTitle), in Settings › Playback ›
+// Reverb.
+func ReverbDesc() string { return In(i18n.Locale()).ReverbDesc() }
+
+// ReverbDesc says "Play the music in a room, after the equalizer."
+// in the language of msgs.
+//
+// Under the Reverb switch (reverbTitle), in Settings › Playback ›
+// Reverb.
+func (msgs Messages) ReverbDesc() string {
+	return Catalog.Format(msgs.locale, "reverbDesc", nil)
+}
+
+// ReverbEffectsOff says "Sound effects are off: the reverb and the echo wait until they're on again, in Settings › Playback › Equalizer."
+// in the language the app shows.
+//
+// In Settings › Playback, under the Reverb and the Echo groups' rows,
+// while the Sound effects switch (equalizerEffects) is off.
+func ReverbEffectsOff() string { return In(i18n.Locale()).ReverbEffectsOff() }
+
+// ReverbEffectsOff says "Sound effects are off: the reverb and the echo wait until they're on again, in Settings › Playback › Equalizer."
+// in the language of msgs.
+//
+// In Settings › Playback, under the Reverb and the Echo groups' rows,
+// while the Sound effects switch (equalizerEffects) is off.
+func (msgs Messages) ReverbEffectsOff() string {
+	return Catalog.Format(msgs.locale, "reverbEffectsOff", nil)
+}
+
+// ReverbMix says "Mix"
+// in the language the app shows.
+//
+// In Settings › Playback › Reverb and in › Echo, the row of the
+// slider that sets how much of the effect plays against the music's own
+// sound.
+func ReverbMix() string { return In(i18n.Locale()).ReverbMix() }
+
+// ReverbMix says "Mix"
+// in the language of msgs.
+//
+// In Settings › Playback › Reverb and in › Echo, the row of the
+// slider that sets how much of the effect plays against the music's own
+// sound.
+func (msgs Messages) ReverbMix() string {
+	return Catalog.Format(msgs.locale, "reverbMix", nil)
+}
+
+// ReverbMixAt says "{percent}% of the room against the music's own sound: at 100%, the room alone."
+// in the language the app shows.
+//
+// Under Mix (reverbMix), in Settings › Playback › Reverb. {percent} is
+// a whole number from 0 to 100.
+func ReverbMixAt(percent int) string { return In(i18n.Locale()).ReverbMixAt(percent) }
+
+// ReverbMixAt says "{percent}% of the room against the music's own sound: at 100%, the room alone."
+// in the language of msgs.
+//
+// Under Mix (reverbMix), in Settings › Playback › Reverb. {percent} is
+// a whole number from 0 to 100.
+func (msgs Messages) ReverbMixAt(percent int) string {
+	return Catalog.Format(msgs.locale, "reverbMixAt", map[string]any{"percent": percent})
+}
+
+// ReverbMixLabel says "Reverb mix"
+// in the language the app shows.
+//
+// In Settings › Playback › Reverb, the name of the Mix slider
+// (reverbMix) to screen readers.
+func ReverbMixLabel() string { return In(i18n.Locale()).ReverbMixLabel() }
+
+// ReverbMixLabel says "Reverb mix"
+// in the language of msgs.
+//
+// In Settings › Playback › Reverb, the name of the Mix slider
+// (reverbMix) to screen readers.
+func (msgs Messages) ReverbMixLabel() string {
+	return Catalog.Format(msgs.locale, "reverbMixLabel", nil)
+}
+
+// ReverbRoom says "Room"
+// in the language the app shows.
+//
+// In Settings › Playback › Reverb, the name of the list of rooms to
+// screen readers.
+func ReverbRoom() string { return In(i18n.Locale()).ReverbRoom() }
+
+// ReverbRoom says "Room"
+// in the language of msgs.
+//
+// In Settings › Playback › Reverb, the name of the list of rooms to
+// screen readers.
+func (msgs Messages) ReverbRoom() string {
+	return Catalog.Format(msgs.locale, "reverbRoom", nil)
+}
+
+// ReverbRoomHall says "Hall"
+// in the language the app shows.
+//
+// In Settings › Playback › Reverb, a room of the list: a concert hall.
+func ReverbRoomHall() string { return In(i18n.Locale()).ReverbRoomHall() }
+
+// ReverbRoomHall says "Hall"
+// in the language of msgs.
+//
+// In Settings › Playback › Reverb, a room of the list: a concert hall.
+func (msgs Messages) ReverbRoomHall() string {
+	return Catalog.Format(msgs.locale, "reverbRoomHall", nil)
+}
+
+// ReverbRoomHallDesc says "A concert hall: a full, smooth sound of about 2.4 seconds, after a short pause."
+// in the language the app shows.
+//
+// Under Hall (reverbRoomHall), in Settings › Playback › Reverb: how it
+// sounds.
+func ReverbRoomHallDesc() string { return In(i18n.Locale()).ReverbRoomHallDesc() }
+
+// ReverbRoomHallDesc says "A concert hall: a full, smooth sound of about 2.4 seconds, after a short pause."
+// in the language of msgs.
+//
+// Under Hall (reverbRoomHall), in Settings › Playback › Reverb: how it
+// sounds.
+func (msgs Messages) ReverbRoomHallDesc() string {
+	return Catalog.Format(msgs.locale, "reverbRoomHallDesc", nil)
+}
+
+// ReverbRoomLarge says "Large space"
+// in the language the app shows.
+//
+// In Settings › Playback › Reverb, a room of the list: a very large
+// space, as a cathedral.
+func ReverbRoomLarge() string { return In(i18n.Locale()).ReverbRoomLarge() }
+
+// ReverbRoomLarge says "Large space"
+// in the language of msgs.
+//
+// In Settings › Playback › Reverb, a room of the list: a very large
+// space, as a cathedral.
+func (msgs Messages) ReverbRoomLarge() string {
+	return Catalog.Format(msgs.locale, "reverbRoomLarge", nil)
+}
+
+// ReverbRoomLargeDesc says "A vast space, as a cathedral, that rings for about 4 seconds."
+// in the language the app shows.
+//
+// Under Large space (reverbRoomLarge), in Settings › Playback › Reverb:
+// how it sounds.
+func ReverbRoomLargeDesc() string { return In(i18n.Locale()).ReverbRoomLargeDesc() }
+
+// ReverbRoomLargeDesc says "A vast space, as a cathedral, that rings for about 4 seconds."
+// in the language of msgs.
+//
+// Under Large space (reverbRoomLarge), in Settings › Playback › Reverb:
+// how it sounds.
+func (msgs Messages) ReverbRoomLargeDesc() string {
+	return Catalog.Format(msgs.locale, "reverbRoomLargeDesc", nil)
+}
+
+// ReverbRoomPlate says "Plate"
+// in the language the app shows.
+//
+// In Settings › Playback › Reverb, a room of the list: a plate reverb,
+// a large metal sheet studios use to add reverb.
+func ReverbRoomPlate() string { return In(i18n.Locale()).ReverbRoomPlate() }
+
+// ReverbRoomPlate says "Plate"
+// in the language of msgs.
+//
+// In Settings › Playback › Reverb, a room of the list: a plate reverb,
+// a large metal sheet studios use to add reverb.
+func (msgs Messages) ReverbRoomPlate() string {
+	return Catalog.Format(msgs.locale, "reverbRoomPlate", nil)
+}
+
+// ReverbRoomPlateDesc says "A studio's metal plate: dense and bright, about 1.8 seconds, as on many voices."
+// in the language the app shows.
+//
+// Under Plate (reverbRoomPlate), in Settings › Playback › Reverb: how
+// it sounds.
+func ReverbRoomPlateDesc() string { return In(i18n.Locale()).ReverbRoomPlateDesc() }
+
+// ReverbRoomPlateDesc says "A studio's metal plate: dense and bright, about 1.8 seconds, as on many voices."
+// in the language of msgs.
+//
+// Under Plate (reverbRoomPlate), in Settings › Playback › Reverb: how
+// it sounds.
+func (msgs Messages) ReverbRoomPlateDesc() string {
+	return Catalog.Format(msgs.locale, "reverbRoomPlateDesc", nil)
+}
+
+// ReverbRoomSmall says "Small room"
+// in the language the app shows.
+//
+// In Settings › Playback › Reverb, a room of the list: a small room.
+func ReverbRoomSmall() string { return In(i18n.Locale()).ReverbRoomSmall() }
+
+// ReverbRoomSmall says "Small room"
+// in the language of msgs.
+//
+// In Settings › Playback › Reverb, a room of the list: a small room.
+func (msgs Messages) ReverbRoomSmall() string {
+	return Catalog.Format(msgs.locale, "reverbRoomSmall", nil)
+}
+
+// ReverbRoomSmallDesc says "Close walls: a short, warm sound of about 0.6 seconds that keeps voices up front."
+// in the language the app shows.
+//
+// Under Small room (reverbRoomSmall), in Settings › Playback › Reverb:
+// how it sounds.
+func ReverbRoomSmallDesc() string { return In(i18n.Locale()).ReverbRoomSmallDesc() }
+
+// ReverbRoomSmallDesc says "Close walls: a short, warm sound of about 0.6 seconds that keeps voices up front."
+// in the language of msgs.
+//
+// Under Small room (reverbRoomSmall), in Settings › Playback › Reverb:
+// how it sounds.
+func (msgs Messages) ReverbRoomSmallDesc() string {
+	return Catalog.Format(msgs.locale, "reverbRoomSmallDesc", nil)
+}
+
+// ReverbTitle says "Reverb"
+// in the language the app shows.
+//
+// In Settings › Playback, the title of the reverb's group, the row of its
+// switch, and the switch's name to screen readers: the reverb plays the
+// music in a room.
+func ReverbTitle() string { return In(i18n.Locale()).ReverbTitle() }
+
+// ReverbTitle says "Reverb"
+// in the language of msgs.
+//
+// In Settings › Playback, the title of the reverb's group, the row of its
+// switch, and the switch's name to screen readers: the reverb plays the
+// music in a room.
+func (msgs Messages) ReverbTitle() string {
+	return Catalog.Format(msgs.locale, "reverbTitle", nil)
 }
 
 // RoomControlRefused says "{host} doesn't let guests control playback"

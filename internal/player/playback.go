@@ -676,7 +676,8 @@ func (p *Player) retryStream(why string) {
 	})
 }
 
-// onProgress counts the play, prepares the next track, and crossfades.
+// onProgress counts the play, prepares the next track, or asks for
+// autoplay's radio after the last one, and crossfades.
 func (p *Player) onProgress() {
 	entry, ok := p.s.Current()
 	if !ok {
@@ -723,6 +724,12 @@ func (p *Player) onProgress() {
 				p.lookUp(src) // its parts, as its stream is found
 			}
 		})
+	}
+	if !hasNext && pos > prepareAfter {
+		// The last track: autoplay's radio after it is found now, so that
+		// its first track is found, downloaded and faded into as any next
+		// one is (radioahead.go).
+		p.askRadioAhead()
 	}
 	if hasNext && next.UID != entry.UID && p.prefetched != next.UID && pos > prefetchAfter && p.retry.n == 0 {
 		p.prefetched = next.UID

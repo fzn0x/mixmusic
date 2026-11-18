@@ -138,21 +138,31 @@ func NewEngine(open Opener, start OutputStarter, events Events) *Engine {
 		start:  start,
 		events: events,
 		paused: true,
-		eq:     newEqualizer(),
-		echo:   newEcho(),
-		verb:   newReverb(),
-		sound:  newSound(),
-		corr:   newCorrection(),
-		comp:   newCompressor(),
 		master: newSmoother(0.64, glide), // the gain of the volume 0.8 saved
 		vol:    volume.Of(0.8),
-		an:     newAnalyser(),
 		bus:    2,
 		notify: make(chan struct{}, 1),
 		closed: make(chan struct{}),
 	}
+	e.withStages()
 	e.wg.Add(1)
 	go e.loop()
+	return e
+}
+
+// withStages gives e the stages a quantum passes through after its decks,
+// in their order: the equalizer, the echo, the reverb, the sound's stages,
+// the headphones' correction, then levelling and the analyser. A test that
+// renders quanta on an engine of its own takes them here too, so that a
+// stage added later is in it.
+func (e *Engine) withStages() *Engine {
+	e.eq = newEqualizer()
+	e.echo = newEcho()
+	e.verb = newReverb()
+	e.sound = newSound()
+	e.corr = newCorrection()
+	e.comp = newCompressor()
+	e.an = newAnalyser()
 	return e
 }
 

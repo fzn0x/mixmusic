@@ -413,10 +413,7 @@ func TestEngineFollowsAtAPartThatEnds(t *testing.T) {
 // TestEngineFollowAllocs takes over from a track that ended without
 // allocating: on the audio thread.
 func TestEngineFollowAllocs(t *testing.T) {
-	e := &Engine{
-		eq: newEqualizer(), sound: newSound(), corr: newCorrection(), comp: newCompressor(), master: newSmoother(1, glide), an: newAnalyser(),
-		bus: 2, notify: make(chan struct{}, 1), events: newRecorder(),
-	}
+	e := (&Engine{master: newSmoother(1, glide), bus: 2, notify: make(chan struct{}, 1), events: newRecorder()}).withStages()
 	ended, next := newRing(0, 2), newRing(0, 2)
 	ended.done.Store(true)
 	next.writeFrom(sine(440, 0.1), func(<-chan struct{}) bool { return false })

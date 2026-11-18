@@ -9671,17 +9671,17 @@ func (msgs Messages) FailureCopyLabel() string {
 // FailureFromFile says "a file on this computer"
 // in the language the app shows.
 //
-// Where a track of a failure comes from, in its details: it goes in the
-// {from} of failureFromWhen, whose first letter MixMusic makes a capital,
-// and of failurePlayedAs.
+// Where a track of a failure comes from, in its details: the {from} of
+// failureFromWhen, whose first letter MixMusic makes a capital.
+// failurePlayedAsFile says it after “from”.
 func FailureFromFile() string { return In(i18n.Locale()).FailureFromFile() }
 
 // FailureFromFile says "a file on this computer"
 // in the language of msgs.
 //
-// Where a track of a failure comes from, in its details: it goes in the
-// {from} of failureFromWhen, whose first letter MixMusic makes a capital,
-// and of failurePlayedAs.
+// Where a track of a failure comes from, in its details: the {from} of
+// failureFromWhen, whose first letter MixMusic makes a capital.
+// failurePlayedAsFile says it after “from”.
 func (msgs Messages) FailureFromFile() string {
 	return Catalog.Format(msgs.locale, "failureFromFile", nil)
 }
@@ -9689,17 +9689,17 @@ func (msgs Messages) FailureFromFile() string {
 // FailureFromFileAt says "a file on this computer, {path}"
 // in the language the app shows.
 //
-// Where a track of a failure comes from, in its details: it goes in the
-// {from} of failureFromWhen, whose first letter MixMusic makes a capital,
-// and of failurePlayedAs. {path} is the file's path.
+// Where a track of a failure comes from, in its details: the {from} of
+// failureFromWhen, whose first letter MixMusic makes a capital. {path} is
+// the file's path. failurePlayedAsFileAt says it after “from”.
 func FailureFromFileAt(path string) string { return In(i18n.Locale()).FailureFromFileAt(path) }
 
 // FailureFromFileAt says "a file on this computer, {path}"
 // in the language of msgs.
 //
-// Where a track of a failure comes from, in its details: it goes in the
-// {from} of failureFromWhen, whose first letter MixMusic makes a capital,
-// and of failurePlayedAs. {path} is the file's path.
+// Where a track of a failure comes from, in its details: the {from} of
+// failureFromWhen, whose first letter MixMusic makes a capital. {path} is
+// the file's path. failurePlayedAsFileAt says it after “from”.
 func (msgs Messages) FailureFromFileAt(path string) string {
 	return Catalog.Format(msgs.locale, "failureFromFileAt", map[string]any{"path": path})
 }
@@ -9718,14 +9718,60 @@ func (msgs Messages) FailureFromWhen(from string, when string) string {
 
 // FailurePlayedAs says "Played as {track}, from {from}"
 // in the language the app shows.
+//
+// In a failure's details: the recording that played for the track, as
+// “Played as Song by Artist, from YouTube Music, dQw4w9WgXcQ”. {track}
+// is the recording's title, artists and album; {from} is its service and
+// its ID there.
 func FailurePlayedAs(track string, from string) string {
 	return In(i18n.Locale()).FailurePlayedAs(track, from)
 }
 
 // FailurePlayedAs says "Played as {track}, from {from}"
 // in the language of msgs.
+//
+// In a failure's details: the recording that played for the track, as
+// “Played as Song by Artist, from YouTube Music, dQw4w9WgXcQ”. {track}
+// is the recording's title, artists and album; {from} is its service and
+// its ID there.
 func (msgs Messages) FailurePlayedAs(track string, from string) string {
 	return Catalog.Format(msgs.locale, "failurePlayedAs", map[string]any{"track": track, "from": from})
+}
+
+// FailurePlayedAsFile says "Played as {track}, from a file on this computer"
+// in the language the app shows.
+//
+// In a failure's details: the recording that played for the track, a file
+// on this computer. {track} is the recording's title, artists and album.
+func FailurePlayedAsFile(track string) string { return In(i18n.Locale()).FailurePlayedAsFile(track) }
+
+// FailurePlayedAsFile says "Played as {track}, from a file on this computer"
+// in the language of msgs.
+//
+// In a failure's details: the recording that played for the track, a file
+// on this computer. {track} is the recording's title, artists and album.
+func (msgs Messages) FailurePlayedAsFile(track string) string {
+	return Catalog.Format(msgs.locale, "failurePlayedAsFile", map[string]any{"track": track})
+}
+
+// FailurePlayedAsFileAt says "Played as {track}, from a file on this computer, {path}"
+// in the language the app shows.
+//
+// In a failure's details: the recording that played for the track, a file
+// on this computer. {track} is the recording's title, artists and album;
+// {path} is the file's path.
+func FailurePlayedAsFileAt(track string, path string) string {
+	return In(i18n.Locale()).FailurePlayedAsFileAt(track, path)
+}
+
+// FailurePlayedAsFileAt says "Played as {track}, from a file on this computer, {path}"
+// in the language of msgs.
+//
+// In a failure's details: the recording that played for the track, a file
+// on this computer. {track} is the recording's title, artists and album;
+// {path} is the file's path.
+func (msgs Messages) FailurePlayedAsFileAt(track string, path string) string {
+	return Catalog.Format(msgs.locale, "failurePlayedAsFileAt", map[string]any{"track": track, "path": path})
 }
 
 // FailureStep says "{way}: {why}"

@@ -73,7 +73,7 @@ func (s *shell) failureDetails(c *ui.Context, f player.Failure) ui.Element {
 			ui.Text(c, locales.FailureFromWhen(sentenceStart(failureFromSaid(f.Track, pr)), failureWhen(f.At, c.Now()))).
 				FontSize(k.smallSize()).TextColor(k.muted).Selectable()
 			if r := f.Recording; r.ID != "" {
-				ui.Text(c, locales.FailurePlayedAs(pr.clean(failureTrackSaid(r)), failureFromSaid(r, pr))).
+				ui.Text(c, failurePlayedAsSaid(r, pr)).
 					FontSize(k.smallSize()).TextColor(k.muted).Selectable()
 			}
 		})

@@ -87,3 +87,18 @@ func failureFromSaid(t media.Track, pr privacy) string {
 	}
 	return failureFrom(t, pr)
 }
+
+// failurePlayedAsSaid tells the recording r a track of a failure played
+// as, and where it comes from, as the window does. A file on this computer
+// has messages of its own: after "from", it takes a case of its own in
+// some languages.
+func failurePlayedAsSaid(r media.Track, pr privacy) string {
+	track := pr.clean(failureTrackSaid(r))
+	if r.Source == media.SourceFile {
+		if path, ok := localfiles.PathOf(r.ID); ok {
+			return locales.FailurePlayedAsFileAt(track, pr.inHome(path))
+		}
+		return locales.FailurePlayedAsFile(track)
+	}
+	return locales.FailurePlayedAs(track, failureFrom(r, pr))
+}

@@ -2921,11 +2921,11 @@
   "failureCopyLabel": "copy the details",
   "failureFromFile": "a file on this computer",
   "@failureFromFile": {
-    "description": "Where a track of a failure comes from, in its details: it goes in the {from} of failureFromWhen, whose first letter MixMusic makes a capital, and of failurePlayedAs."
+    "description": "Where a track of a failure comes from, in its details: the {from} of failureFromWhen, whose first letter MixMusic makes a capital. failurePlayedAsFile says it after “from”."
   },
   "failureFromFileAt": "a file on this computer, {path}",
   "@failureFromFileAt": {
-    "description": "Where a track of a failure comes from, in its details: it goes in the {from} of failureFromWhen, whose first letter MixMusic makes a capital, and of failurePlayedAs. {path} is the file's path.",
+    "description": "Where a track of a failure comes from, in its details: the {from} of failureFromWhen, whose first letter MixMusic makes a capital. {path} is the file's path. failurePlayedAsFileAt says it after “from”.",
     "placeholders": {
       "path": {
         "type": "String"
@@ -2945,11 +2945,33 @@
   },
   "failurePlayedAs": "Played as {track}, from {from}",
   "@failurePlayedAs": {
+    "description": "In a failure's details: the recording that played for the track, as “Played as Song by Artist, from YouTube Music, dQw4w9WgXcQ”. {track} is the recording's title, artists and album; {from} is its service and its ID there.",
     "placeholders": {
       "track": {
         "type": "String"
       },
       "from": {
+        "type": "String"
+      }
+    }
+  },
+  "failurePlayedAsFile": "Played as {track}, from a file on this computer",
+  "@failurePlayedAsFile": {
+    "description": "In a failure's details: the recording that played for the track, a file on this computer. {track} is the recording's title, artists and album.",
+    "placeholders": {
+      "track": {
+        "type": "String"
+      }
+    }
+  },
+  "failurePlayedAsFileAt": "Played as {track}, from a file on this computer, {path}",
+  "@failurePlayedAsFileAt": {
+    "description": "In a failure's details: the recording that played for the track, a file on this computer. {track} is the recording's title, artists and album; {path} is the file's path.",
+    "placeholders": {
+      "track": {
+        "type": "String"
+      },
+      "path": {
         "type": "String"
       }
     }

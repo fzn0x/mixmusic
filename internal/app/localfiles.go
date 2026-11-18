@@ -33,7 +33,7 @@ type LocalFiles struct{ a *App }
 var errFileMissing = errors.New("File not found")
 
 func fileMissing() error {
-	return worded(errFileMissing.Error(), locales.TracksFileNotFound(), errFileMissing)
+	return wordedLater(errFileMissing.Error(), locales.ErrorLocalFilesMissing, errFileMissing)
 }
 
 // notIndexed is why a track of id, which the index doesn't know, doesn't

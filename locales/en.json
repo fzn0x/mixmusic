@@ -2796,6 +2796,10 @@
   "@errorLocalFilesCantWatch": {
     "description": "Why a folder of music isn't watched for changes, inside a message that leads it."
   },
+  "errorLocalFilesMissing": "the file isn't on this computer anymore",
+  "@errorLocalFilesMissing": {
+    "description": "Why a track of this computer couldn't play, as {error} of playerCouldntPlay and a step of a failure's details: its file was moved or deleted."
+  },
   "errorLocalFilesNetworkDrive": "it's on a network drive",
   "@errorLocalFilesNetworkDrive": {
     "description": "Why a folder of music isn't watched for changes, inside a message that leads it."
@@ -8869,7 +8873,7 @@
   "tracksEmpty": "No tracks here yet.",
   "tracksFileNotFound": "File not found",
   "@tracksFileNotFound": {
-    "description": "A track whose file on this computer is gone: in a list of tracks, and why it couldn't play, as {error} of playerCouldntPlay and a step of a failure's details."
+    "description": "A track whose file on this computer is gone, in a list of tracks."
   },
   "tracksMoreFor": "More for {title}",
   "@tracksMoreFor": {

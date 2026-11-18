@@ -9148,6 +9148,24 @@ func (msgs Messages) ErrorLocalFilesCantWatch() string {
 	return Catalog.Format(msgs.locale, "errorLocalFilesCantWatch", nil)
 }
 
+// ErrorLocalFilesMissing says "the file isn't on this computer anymore"
+// in the language the app shows.
+//
+// Why a track of this computer couldn't play, as {error} of
+// playerCouldntPlay and a step of a failure's details: its file was moved
+// or deleted.
+func ErrorLocalFilesMissing() string { return In(i18n.Locale()).ErrorLocalFilesMissing() }
+
+// ErrorLocalFilesMissing says "the file isn't on this computer anymore"
+// in the language of msgs.
+//
+// Why a track of this computer couldn't play, as {error} of
+// playerCouldntPlay and a step of a failure's details: its file was moved
+// or deleted.
+func (msgs Messages) ErrorLocalFilesMissing() string {
+	return Catalog.Format(msgs.locale, "errorLocalFilesMissing", nil)
+}
+
 // ErrorLocalFilesNetworkDrive says "it's on a network drive"
 // in the language the app shows.
 //
@@ -27607,17 +27625,13 @@ func (msgs Messages) TracksEmpty() string {
 // TracksFileNotFound says "File not found"
 // in the language the app shows.
 //
-// A track whose file on this computer is gone: in a list of tracks, and why
-// it couldn't play, as {error} of playerCouldntPlay and a step of a
-// failure's details.
+// A track whose file on this computer is gone, in a list of tracks.
 func TracksFileNotFound() string { return In(i18n.Locale()).TracksFileNotFound() }
 
 // TracksFileNotFound says "File not found"
 // in the language of msgs.
 //
-// A track whose file on this computer is gone: in a list of tracks, and why
-// it couldn't play, as {error} of playerCouldntPlay and a step of a
-// failure's details.
+// A track whose file on this computer is gone, in a list of tracks.
 func (msgs Messages) TracksFileNotFound() string {
 	return Catalog.Format(msgs.locale, "tracksFileNotFound", nil)
 }

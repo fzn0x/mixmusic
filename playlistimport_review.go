@@ -18,6 +18,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/export"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/playlistio"
 	"github.com/fzn0x/mixmusic/locales"
 )
 
@@ -80,7 +81,7 @@ func (s *shell) importReview(c *ui.Context, st app.ImportStatus) {
 		}
 	}
 	if st.Cut {
-		ui.Text(c, locales.PlaylistImportCut(st.Total)).FontSize(k.bodySize()).TextColor(k.muted)
+		ui.Text(c, locales.PlaylistImportCut(playlistio.MaxEntries)).FontSize(k.bodySize()).TextColor(k.muted)
 	}
 	ui.Text(c, locales.PlaylistImportCounts(st.Counts.Found, st.Counts.Check, st.Counts.InLibrary, st.Counts.Missing)).
 		FontSize(k.subtitleSize()).FontWeight(k.leadWeight())

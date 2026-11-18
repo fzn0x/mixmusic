@@ -359,10 +359,12 @@ func (s *Accounts) YouTubeLogin(ctx context.Context) (AccountsStatus, error) {
 }
 
 // youtubeSignIn signs MixMusic in to YouTube Music with the cookies of a
-// session, as the first Google account of it and that account itself,
-// once one signed-in request shows that YouTube Music takes them; then it
-// keeps them. Every way of signing in ends here. Nothing is kept of a
-// session YouTube Music did not take.
+// session, as the first Google account of it still signed in and that
+// account itself, once a signed-in request shows that YouTube Music takes
+// them; then it keeps them, and that account's index beside them. A
+// browser keeps an account signed out of, as from another device, in its
+// session: the first may be one (#582). Every way of signing in ends
+// here. Nothing is kept of a session YouTube Music did not take.
 func (a *App) youtubeSignIn(ctx context.Context, cookies []*http.Cookie) (AccountsStatus, error) {
 	a.youtubeChecking.Store(true)
 	defer a.youtubeChecking.Store(false)
@@ -373,7 +375,7 @@ func (a *App) youtubeSignIn(ctx context.Context, cookies []*http.Cookie) (Accoun
 	a.mu.Unlock()
 	// Nor the refusals of the audio found as the account before (#578).
 	a.resolver.ForgetRefusals()
-	me, err := a.youtube.Account(ctx)
+	me, err := a.youtube.UseFirstAccount(ctx)
 	if err != nil {
 		a.youtube.SetCookies(nil)
 		if errors.Is(err, youtube.ErrSessionRejected) {
@@ -390,7 +392,7 @@ func (a *App) youtubeSignIn(ctx context.Context, cookies []*http.Cookie) (Accoun
 			log.Printf("mixmusic: forgetting the YouTube Music channel: %v", err)
 		}
 	}
-	if err := a.youtubeStore.Save(youtubeSession{cookies: a.youtube.Cookies()}); err != nil {
+	if err := a.youtubeStore.Save(youtubeSession{a.youtube.Cookies(), a.youtube.AuthUser()}); err != nil {
 		a.youtube.SetCookies(nil)
 		return AccountsStatus{}, err
 	}

@@ -128,7 +128,8 @@ channels, each with its own home feed, library and likes. When yours
 does, Settings › Accounts shows an **Account and channel** row (or
 **Channel**, for one account with brand channels), which lists each by
 name, with its handle and, for several accounts, its email. MixMusic uses
-the first account until you choose another there.
+the first account still signed in until you choose another there. An
+account signed out of since, as from another device, isn't listed.
 
 - A brand channel that YouTube lists without the ID MixMusic needs shows in
   the list, but can't be chosen, and says so.

@@ -456,9 +456,10 @@ func TestChooseAccountAndChannel(t *testing.T) {
 	if list, _ := s.YouTubeChannels(ctx); list[0].Current || !list[1].Current {
 		t.Errorf("after choosing: %+v", list)
 	}
-	// YouTube changed a cookie meanwhile: the account stays with it.
+	// YouTube changed a cookie meanwhile, last in the menu the list asks of
+	// the other account: the account in use stays with it.
 	kept, err := a.youtubeStore.Load()
-	if err != nil || kept.authUser != 1 || !slices.Contains(cookieNames(kept.cookies), "SIDCC=rotated") {
+	if err != nil || kept.authUser != 1 || !slices.Contains(cookieNames(kept.cookies), "SIDCC=changed") {
 		t.Errorf("kept account %d with %q, %v", kept.authUser, cookieNames(kept.cookies), err)
 	}
 

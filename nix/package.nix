@@ -54,8 +54,12 @@ in
 
   src = lib.cleanSource ../.;
   # The hash of the Go modules go.sum names: a change of go.sum changes it,
-  # and `nix build` then tells the new one.
-  vendorHash = "sha256-Py5hGcPM5K5Ryrd9FV1ObEnZHDAveQIkMCXbp6vqOwE=";
+  # and `nix build` then tells the new one. proxyVendor hashes the module
+  # cache `go mod download` fills rather than the vendor folder, which holds
+  # only the packages imported, so a new import of a module MixMusic already
+  # uses leaves it as it is (#839).
+  proxyVendor = true;
+  vendorHash = "sha256-tyTdWuY2b0M/9XHoTCLEVhsxs99xM93wqvgmmeVtlZo=";
 
   subPackages = [ "." ];
   env.CGO_ENABLED = "0";

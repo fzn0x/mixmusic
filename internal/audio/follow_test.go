@@ -145,6 +145,39 @@ func TestEngineFollows(t *testing.T) {
 	}
 }
 
+// deckPlays is what a deck plays of the track of path, whole.
+func deckPlays(t *testing.T, path string) []float32 {
+	t.Helper()
+	d := newDeck(path, 0, fileOpener, func() {})
+	defer d.close()
+	return drain(t, d)
+}
+
+// TestEngineFollowsAAC joins YouTube's AAC in MP4 with its Opus in WebM,
+// both ways: what a deck plays of the one track and then of the other,
+// sample for sample, with no silence between them and no fade-in.
+func TestEngineFollowsAAC(t *testing.T) {
+	opus, aac := deckPlays(t, cuesFront), deckPlays(t, aacFragments)
+	for _, j := range []joined{{"aac into opus", aacFragments, cuesFront, aac, opus}, {"opus into aac", cuesFront, aacFragments, opus, aac}} {
+		e, dev, rec := newTestEngine(t)
+		e.Load(j.first, Cue{})
+		buffered(t, e, 0, ringFrames/2)
+		e.Preload(j.next, Cue{Follow: true})
+		buffered(t, e, 1, ringFrames/2)
+		e.Play()
+		join := len(j.a) / 2
+		got := dev.play(t, join+Rate/4)
+		want := slices.Concat(j.a, j.b[:2*(Rate/4)])
+		for i := 2 * fadeFrames; i < len(got); i++ {
+			if got[i] != want[i] {
+				t.Fatalf("%s: frame %d, %d from the join: %v, want %v", j.name, i/2, i/2-join, got[i], want[i])
+			}
+		}
+		e.report()
+		rec.waitFor(t, "followed "+j.next)
+	}
+}
+
 // TestEngineFollowsAtTheAlbumsLoudness plays a track that follows another
 // under Even loudness: at its own loudness from its first frame, or, as a
 // song of the same album, at the loudness of the track before, from where

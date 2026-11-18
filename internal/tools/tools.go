@@ -513,7 +513,8 @@ func (m *Manager) InstallYTDLP(ctx context.Context, progress Progress) error {
 
 // download fetches the yt-dlp file name from base, the address of a
 // release's files, and checks it against the checksums published beside
-// it. A download that failed is a fetchError.
+// it. A download that failed is a fetchError. A file that doesn't match
+// its checksum isn't downloaded again.
 func (m *Manager) download(ctx context.Context, base, name string, progress Progress) ([]byte, error) {
 	sums, err := m.fetch(ctx, base+"SHA2-256SUMS", nil)
 	if err != nil {
@@ -662,19 +663,93 @@ func checksum(sums []byte, file string) (string, error) {
 	return "", fmt.Errorf("no checksum published for %s", file)
 }
 
-// fetch downloads url into memory, reporting progress.
+// fetch tries again for up to retryFor in all, waiting firstRetryWait
+// after the first failure, then twice as long after each (#538).
+const (
+	retryFor       = 2 * time.Minute
+	firstRetryWait = time.Second
+)
+
+// retryNow tells the time, and retryWait waits d or until ctx ends, for
+// fetch's tries. They are variables for tests, which don't wait.
+var (
+	retryNow  = time.Now
+	retryWait = func(ctx context.Context, d time.Duration) error {
+		t := time.NewTimer(d)
+		defer t.Stop()
+		select {
+		case <-t.C:
+			return nil
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
+)
+
+// fetch downloads url into memory, reporting progress. GitHub's release
+// downloads fail for minutes at a time, with a 502, a 504 or a download
+// broken off, though the same address may answer a second later: fetch
+// tries again after a network error, a 5xx or a 429, for up to retryFor
+// in all while ctx lasts. Each new try reports progress from zero, and
+// the log says how many tries it took.
 func (m *Manager) fetch(ctx context.Context, url string, progress Progress) ([]byte, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
+	start, wait := retryNow(), firstRetryWait
+	for tries := 1; ; tries++ {
+		data, err := m.fetchOnce(req, progress)
+		if err == nil {
+			if tries > 1 {
+				log.Printf("mixmusic: downloaded %s after %d tries", url, tries)
+			}
+			return data, nil
+		}
+		left := retryFor - retryNow().Sub(start)
+		if !retryable(err) || ctx.Err() != nil || left <= 0 {
+			if tries > 1 {
+				log.Printf("mixmusic: gave up downloading %s after %d tries: %v", url, tries, err)
+			}
+			return nil, err
+		}
+		if progress != nil {
+			progress(0, 0)
+		}
+		if retryWait(ctx, min(wait, left)) != nil {
+			log.Printf("mixmusic: gave up downloading %s after %d tries: %v", url, tries, err)
+			return nil, err
+		}
+		wait *= 2
+	}
+}
+
+// statusError is an answer other than 200 OK.
+type statusError int
+
+func (e statusError) Error() string { return fmt.Sprintf("HTTP %d", int(e)) }
+
+// retryable reports whether a try that failed with err may work later:
+// after a network error, a 5xx or a 429, not after a 404 or another
+// answer.
+func retryable(err error) bool {
+	var s statusError
+	if errors.As(err, &s) {
+		return s >= 500 || s == http.StatusTooManyRequests
+	}
+	return true
+}
+
+// fetchOnce downloads what req asks into memory, reporting progress from
+// zero.
+func (m *Manager) fetchOnce(req *http.Request, progress Progress) ([]byte, error) {
 	res, err := m.HTTP.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("HTTP %d", res.StatusCode)
+		return nil, statusError(res.StatusCode)
 	}
 	var buf bytes.Buffer
 	r := io.Reader(io.LimitReader(res.Body, 256<<20))

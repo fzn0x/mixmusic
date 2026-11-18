@@ -137,9 +137,9 @@ func byteSize(n int64) string {
 		i++
 	}
 	if v < 10 && i > 0 {
-		return strconv.FormatFloat(v, 'f', 1, 64) + " " + units[i]
+		return locales.FormatBytes(strconv.FormatFloat(v, 'f', 1, 64), units[i])
 	}
-	return strconv.FormatFloat(v, 'f', 0, 64) + " " + units[i]
+	return locales.FormatBytes(strconv.FormatFloat(v, 'f', 0, 64), units[i])
 }
 
 // compactCount writes a count as YouTube Music does, in three figures at

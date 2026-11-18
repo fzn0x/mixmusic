@@ -105,7 +105,7 @@ func (s *shell) signInWithBrowser() {
 			case errors.Is(err, context.Canceled):
 				// The user cancelled, which tells itself.
 			case err != nil:
-				msg := err.Error()
+				msg := app.ErrorWords(err)
 				if msg != "" {
 					msg = strings.ToUpper(msg[:1]) + msg[1:]
 				}

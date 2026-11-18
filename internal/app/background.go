@@ -12,6 +12,7 @@ import (
 	"github.com/egoist/mygo"
 
 	"github.com/fzn0x/mixmusic/internal/portal"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // Inside a Flatpak's sandbox, the autostart entry MyGo writes lands in the
@@ -34,9 +35,10 @@ var (
 	askBackground = func(autostart bool) (portal.Answer, error) {
 		ctx, cancel := context.WithTimeout(context.Background(), backgroundWait)
 		defer cancel()
-		reason := "MixMusic plays on in the tray when you close its window"
+		// The desktop shows the reason as it asks the user.
+		reason := locales.DesktopSettingsBackgroundReason()
 		if autostart {
-			reason = "MixMusic starts when you log in, as you chose in its settings"
+			reason = locales.DesktopSettingsAutostartReason()
 		}
 		return portal.RequestBackground(ctx, portal.Background{Reason: reason, Autostart: autostart, Commandline: loginCommand})
 	}
@@ -72,15 +74,17 @@ func setLogin(open bool) error {
 	switch {
 	case errors.Is(err, portal.ErrNoBackground):
 		if open {
-			return errors.New("this desktop has no Background portal, which starts MixMusic at login from its Flatpak: add MixMusic to the apps your desktop starts at login instead")
+			return worded("this desktop has no Background portal, which starts MixMusic at login from its Flatpak: add MixMusic to the apps your desktop starts at login instead",
+				locales.DesktopSettingsNoBackgroundPortal(), nil)
 		}
 		// Nothing the portal wrote to remove.
 	case err != nil:
 		return fmt.Errorf("asking the desktop to start MixMusic at login: %w", err)
 	case answer.Autostart != open && open:
-		return errors.New("the desktop didn't let MixMusic start at login: allow it to run in the background in your system's settings for apps, then turn this on again")
+		return worded("the desktop didn't let MixMusic start at login: allow it to run in the background in your system's settings for apps, then turn this on again",
+			locales.DesktopSettingsAutostartRefused(), nil)
 	case answer.Autostart != open:
-		return errors.New("the desktop still starts MixMusic at login")
+		return worded("the desktop still starts MixMusic at login", locales.DesktopSettingsAutostartStays(), nil)
 	}
 	return setOpenAtLogin(open)
 }

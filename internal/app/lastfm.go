@@ -13,6 +13,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/lastfm"
 	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/scrobble"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // lastfmSecret is the key, in the system's credential store, of what
@@ -164,7 +165,7 @@ func (a *App) lastfmApprove(ctx context.Context, apiKey, secret string) (lastfm.
 		}
 		select {
 		case <-ctx.Done():
-			return lastfm.Session{}, errors.New("Last.fm did not hear from you in time: approve MixMusic in the browser, then connect again")
+			return lastfm.Session{}, worded("Last.fm did not hear from you in time: approve MixMusic in the browser, then connect again", locales.AccountSettingsLastfmTooLong(), nil)
 		case <-time.After(lastfmPoll):
 		}
 	}
@@ -176,7 +177,7 @@ func (a *App) lastfmApprove(ctx context.Context, apiKey, secret string) (lastfm.
 func (s *Accounts) LastfmLogin(ctx context.Context, apiKey, secret string) (AccountsStatus, error) {
 	apiKey, secret = strings.TrimSpace(apiKey), strings.TrimSpace(secret)
 	if apiKey == "" || secret == "" {
-		return AccountsStatus{}, errors.New("paste the API key and the shared secret of your Last.fm API account")
+		return AccountsStatus{}, worded("paste the API key and the shared secret of your Last.fm API account", locales.AccountSettingsLastfmPasteKeys(), nil)
 	}
 	session, err := s.a.lastfmApprove(ctx, apiKey, secret)
 	if err != nil {
@@ -202,7 +203,7 @@ func (s *Accounts) LastfmLogin(ctx context.Context, apiKey, secret string) (Acco
 func (s *Accounts) LastfmReconnect(ctx context.Context) error {
 	c, err := s.a.lastfmStore.Load()
 	if err != nil || c.APIKey == "" {
-		return errors.New("connect to Last.fm first")
+		return worded("connect to Last.fm first", locales.AccountSettingsLastfmConnectFirst(), nil)
 	}
 	session, err := s.a.lastfmApprove(ctx, c.APIKey, c.Secret)
 	if err != nil {
@@ -221,7 +222,7 @@ func (a *App) lastfmNewSession(c lastfmCredentials, session lastfm.Session) erro
 	l := a.lastfm
 	a.mu.Unlock()
 	if l == nil {
-		return errors.New("connect to Last.fm first")
+		return worded("connect to Last.fm first", locales.AccountSettingsLastfmConnectFirst(), nil)
 	}
 	c.Session = session
 	a.mu.Lock()

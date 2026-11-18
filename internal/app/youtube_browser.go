@@ -10,6 +10,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/browser"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // browserSignInTimeout is how long signing in through a browser waits for
@@ -78,11 +79,11 @@ func (s *Accounts) YouTubeBrowserLogin(ctx context.Context, id string) (Accounts
 	})
 	switch {
 	case errors.Is(err, browser.ErrClosed):
-		return AccountsStatus{}, worded(b.Name+" closed before you signed in to YouTube Music", err)
+		return AccountsStatus{}, worded(b.Name+" closed before you signed in to YouTube Music", locales.AccountSettingsBrowserClosed(b.Name), err)
 	case ctx.Err() != nil:
 		return AccountsStatus{}, ctx.Err()
 	case errors.Is(err, context.DeadlineExceeded):
-		return AccountsStatus{}, worded("signing in to YouTube Music took too long; try again", err)
+		return AccountsStatus{}, worded("signing in to YouTube Music took too long; try again", locales.AccountSettingsYouTubeTooLong(), err)
 	case err != nil:
 		return AccountsStatus{}, fmt.Errorf("MixMusic couldn't open %s: %w", b.Name, err)
 	}

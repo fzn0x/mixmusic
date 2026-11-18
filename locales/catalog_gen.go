@@ -301,6 +301,24 @@ func (msgs Messages) AccountSettingsApproveLastfm() string {
 	return Catalog.Format(msgs.locale, "accountSettingsApproveLastfm", nil)
 }
 
+// AccountSettingsBrowserClosed says "{browser} closed before you signed in to YouTube Music"
+// in the language the app shows.
+//
+// Why signing in to YouTube Music in a browser failed, in Settings ›
+// Accounts. {browser} is the browser's name, as Firefox.
+func AccountSettingsBrowserClosed(browser string) string {
+	return In(i18n.Locale()).AccountSettingsBrowserClosed(browser)
+}
+
+// AccountSettingsBrowserClosed says "{browser} closed before you signed in to YouTube Music"
+// in the language of msgs.
+//
+// Why signing in to YouTube Music in a browser failed, in Settings ›
+// Accounts. {browser} is the browser's name, as Firefox.
+func (msgs Messages) AccountSettingsBrowserClosed(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsBrowserClosed", map[string]any{"browser": browser})
+}
+
 // AccountSettingsCharsPlaceholder says "32 letters and digits"
 // in the language the app shows.
 func AccountSettingsCharsPlaceholder() string {
@@ -343,6 +361,130 @@ func AccountSettingsConnectedLastfm() string {
 // in the language of msgs.
 func (msgs Messages) AccountSettingsConnectedLastfm() string {
 	return Catalog.Format(msgs.locale, "accountSettingsConnectedLastfm", nil)
+}
+
+// AccountSettingsCookiesDenied says "the system keeps the cookies of {browser} from MixMusic"
+// in the language the app shows.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func AccountSettingsCookiesDenied(browser string) string {
+	return In(i18n.Locale()).AccountSettingsCookiesDenied(browser)
+}
+
+// AccountSettingsCookiesDenied says "the system keeps the cookies of {browser} from MixMusic"
+// in the language of msgs.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func (msgs Messages) AccountSettingsCookiesDenied(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsCookiesDenied", map[string]any{"browser": browser})
+}
+
+// AccountSettingsCookiesNone says "MixMusic found no cookies of {browser}: is it installed? For a profile kept elsewhere, give its folder"
+// in the language the app shows.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func AccountSettingsCookiesNone(browser string) string {
+	return In(i18n.Locale()).AccountSettingsCookiesNone(browser)
+}
+
+// AccountSettingsCookiesNone says "MixMusic found no cookies of {browser}: is it installed? For a profile kept elsewhere, give its folder"
+// in the language of msgs.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func (msgs Messages) AccountSettingsCookiesNone(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsCookiesNone", map[string]any{"browser": browser})
+}
+
+// AccountSettingsCookiesNoneInFolder says "MixMusic found no cookies of {browser} in that folder: give the folder of one of its profiles"
+// in the language the app shows.
+//
+// Why importing the YouTube Music sign-in from a browser's folder the user
+// gave failed, in Settings › Accounts. {browser} is the browser's name.
+func AccountSettingsCookiesNoneInFolder(browser string) string {
+	return In(i18n.Locale()).AccountSettingsCookiesNoneInFolder(browser)
+}
+
+// AccountSettingsCookiesNoneInFolder says "MixMusic found no cookies of {browser} in that folder: give the folder of one of its profiles"
+// in the language of msgs.
+//
+// Why importing the YouTube Music sign-in from a browser's folder the user
+// gave failed, in Settings › Accounts. {browser} is the browser's name.
+func (msgs Messages) AccountSettingsCookiesNoneInFolder(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsCookiesNoneInFolder", map[string]any{"browser": browser})
+}
+
+// AccountSettingsCookiesNoneInItsFolder says "MixMusic found no cookies of {browser} in its folder: give the folder of one of its profiles"
+// in the language the app shows.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func AccountSettingsCookiesNoneInItsFolder(browser string) string {
+	return In(i18n.Locale()).AccountSettingsCookiesNoneInItsFolder(browser)
+}
+
+// AccountSettingsCookiesNoneInItsFolder says "MixMusic found no cookies of {browser} in its folder: give the folder of one of its profiles"
+// in the language of msgs.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func (msgs Messages) AccountSettingsCookiesNoneInItsFolder(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsCookiesNoneInItsFolder", map[string]any{"browser": browser})
+}
+
+// AccountSettingsCookiesOpen says "{browser} is open, and keeps its cookies to itself while it is: close it, then import again"
+// in the language the app shows.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func AccountSettingsCookiesOpen(browser string) string {
+	return In(i18n.Locale()).AccountSettingsCookiesOpen(browser)
+}
+
+// AccountSettingsCookiesOpen says "{browser} is open, and keeps its cookies to itself while it is: close it, then import again"
+// in the language of msgs.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func (msgs Messages) AccountSettingsCookiesOpen(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsCookiesOpen", map[string]any{"browser": browser})
+}
+
+// AccountSettingsCookiesSafari says "macOS keeps Safari's cookies from MixMusic: allow MixMusic Full Disk Access in System Settings › Privacy & Security…"
+// in the language the app shows.
+//
+// Why importing the YouTube Music sign-in from Safari failed, in Settings
+// › Accounts. Use the names macOS gives these settings in the language.
+func AccountSettingsCookiesSafari() string { return In(i18n.Locale()).AccountSettingsCookiesSafari() }
+
+// AccountSettingsCookiesSafari says "macOS keeps Safari's cookies from MixMusic: allow MixMusic Full Disk Access in System Settings › Privacy & Security…"
+// in the language of msgs.
+//
+// Why importing the YouTube Music sign-in from Safari failed, in Settings
+// › Accounts. Use the names macOS gives these settings in the language.
+func (msgs Messages) AccountSettingsCookiesSafari() string {
+	return Catalog.Format(msgs.locale, "accountSettingsCookiesSafari", nil)
+}
+
+// AccountSettingsCookiesSealed says "{browser} seals its cookies so that other programs can't read them, as recent Chrome does on Windows: import from Fir…"
+// in the language the app shows.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func AccountSettingsCookiesSealed(browser string) string {
+	return In(i18n.Locale()).AccountSettingsCookiesSealed(browser)
+}
+
+// AccountSettingsCookiesSealed says "{browser} seals its cookies so that other programs can't read them, as recent Chrome does on Windows: import from Fir…"
+// in the language of msgs.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func (msgs Messages) AccountSettingsCookiesSealed(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsCookiesSealed", map[string]any{"browser": browser})
 }
 
 // AccountSettingsCopiedRedirect says "Copied the redirect URI"
@@ -429,6 +571,22 @@ func AccountSettingsLastfmConnectAgain() string {
 // in the language of msgs.
 func (msgs Messages) AccountSettingsLastfmConnectAgain() string {
 	return Catalog.Format(msgs.locale, "accountSettingsLastfmConnectAgain", nil)
+}
+
+// AccountSettingsLastfmConnectFirst says "connect to Last.fm first"
+// in the language the app shows.
+//
+// Why something of Last.fm can't be done, as a toast.
+func AccountSettingsLastfmConnectFirst() string {
+	return In(i18n.Locale()).AccountSettingsLastfmConnectFirst()
+}
+
+// AccountSettingsLastfmConnectFirst says "connect to Last.fm first"
+// in the language of msgs.
+//
+// Why something of Last.fm can't be done, as a toast.
+func (msgs Messages) AccountSettingsLastfmConnectFirst() string {
+	return Catalog.Format(msgs.locale, "accountSettingsLastfmConnectFirst", nil)
 }
 
 // AccountSettingsLastfmDrop says "drop them"
@@ -539,6 +697,22 @@ func (msgs Messages) AccountSettingsLastfmOther(count int, name string, other st
 	return Catalog.Format(msgs.locale, "accountSettingsLastfmOther", map[string]any{"count": count, "name": name, "other": other})
 }
 
+// AccountSettingsLastfmPasteKeys says "paste the API key and the shared secret of your Last.fm API account"
+// in the language the app shows.
+//
+// Why connecting to Last.fm didn't start, as a toast.
+func AccountSettingsLastfmPasteKeys() string {
+	return In(i18n.Locale()).AccountSettingsLastfmPasteKeys()
+}
+
+// AccountSettingsLastfmPasteKeys says "paste the API key and the shared secret of your Last.fm API account"
+// in the language of msgs.
+//
+// Why connecting to Last.fm didn't start, as a toast.
+func (msgs Messages) AccountSettingsLastfmPasteKeys() string {
+	return Catalog.Format(msgs.locale, "accountSettingsLastfmPasteKeys", nil)
+}
+
 // AccountSettingsLastfmSend says "send them"
 // in the language the app shows.
 func AccountSettingsLastfmSend() string { return In(i18n.Locale()).AccountSettingsLastfmSend() }
@@ -597,6 +771,20 @@ func AccountSettingsLastfmStep3() string { return In(i18n.Locale()).AccountSetti
 // in the language of msgs.
 func (msgs Messages) AccountSettingsLastfmStep3() string {
 	return Catalog.Format(msgs.locale, "accountSettingsLastfmStep3", nil)
+}
+
+// AccountSettingsLastfmTooLong says "Last.fm did not hear from you in time: approve MixMusic in the browser, then connect again"
+// in the language the app shows.
+//
+// Why connecting to Last.fm failed, as a toast.
+func AccountSettingsLastfmTooLong() string { return In(i18n.Locale()).AccountSettingsLastfmTooLong() }
+
+// AccountSettingsLastfmTooLong says "Last.fm did not hear from you in time: approve MixMusic in the browser, then connect again"
+// in the language of msgs.
+//
+// Why connecting to Last.fm failed, as a toast.
+func (msgs Messages) AccountSettingsLastfmTooLong() string {
+	return Catalog.Format(msgs.locale, "accountSettingsLastfmTooLong", nil)
 }
 
 // AccountSettingsLastfmWaiting says "{count, plural, one {# scrobble waits} other {# scrobbles wait}} to be sent."
@@ -1295,6 +1483,22 @@ func (msgs Messages) AccountSettingsYouTubeSession() string {
 	return Catalog.Format(msgs.locale, "accountSettingsYouTubeSession", nil)
 }
 
+// AccountSettingsYouTubeSessionEnded says "YouTube Music did not accept the session: it may have ended, as when you sign out of Google. Sign in to YouTube Music…"
+// in the language the app shows.
+//
+// Why signing in to YouTube Music failed, in Settings › Accounts.
+func AccountSettingsYouTubeSessionEnded() string {
+	return In(i18n.Locale()).AccountSettingsYouTubeSessionEnded()
+}
+
+// AccountSettingsYouTubeSessionEnded says "YouTube Music did not accept the session: it may have ended, as when you sign out of Google. Sign in to YouTube Music…"
+// in the language of msgs.
+//
+// Why signing in to YouTube Music failed, in Settings › Accounts.
+func (msgs Messages) AccountSettingsYouTubeSessionEnded() string {
+	return Catalog.Format(msgs.locale, "accountSettingsYouTubeSessionEnded", nil)
+}
+
 // AccountSettingsYouTubeSignInButton says "sign in to youtube music"
 // in the language the app shows.
 func AccountSettingsYouTubeSignInButton() string {
@@ -1391,6 +1595,22 @@ func (msgs Messages) AccountSettingsYouTubeSwitchNamed(name string) string {
 	return Catalog.Format(msgs.locale, "accountSettingsYouTubeSwitchNamed", map[string]any{"name": name})
 }
 
+// AccountSettingsYouTubeTooLong says "signing in to YouTube Music took too long; try again"
+// in the language the app shows.
+//
+// Why signing in to YouTube Music failed, in Settings › Accounts.
+// MixMusic makes its first letter a capital.
+func AccountSettingsYouTubeTooLong() string { return In(i18n.Locale()).AccountSettingsYouTubeTooLong() }
+
+// AccountSettingsYouTubeTooLong says "signing in to YouTube Music took too long; try again"
+// in the language of msgs.
+//
+// Why signing in to YouTube Music failed, in Settings › Accounts.
+// MixMusic makes its first letter a capital.
+func (msgs Messages) AccountSettingsYouTubeTooLong() string {
+	return Catalog.Format(msgs.locale, "accountSettingsYouTubeTooLong", nil)
+}
+
 // AccountSettingsYouTubeUnswitchable says "YouTube doesn't let MixMusic switch to this channel"
 // in the language the app shows.
 func AccountSettingsYouTubeUnswitchable() string {
@@ -1413,6 +1633,40 @@ func AccountSettingsYouTubeUsingAs(name string) string {
 // in the language of msgs.
 func (msgs Messages) AccountSettingsYouTubeUsingAs(name string) string {
 	return Catalog.Format(msgs.locale, "accountSettingsYouTubeUsingAs", map[string]any{"name": name})
+}
+
+// AccountSettingsYouTubeWindowClosed says "the sign-in window closed before signing in"
+// in the language the app shows.
+//
+// Why signing in to YouTube Music failed, in Settings › Accounts.
+// MixMusic makes its first letter a capital.
+func AccountSettingsYouTubeWindowClosed() string {
+	return In(i18n.Locale()).AccountSettingsYouTubeWindowClosed()
+}
+
+// AccountSettingsYouTubeWindowClosed says "the sign-in window closed before signing in"
+// in the language of msgs.
+//
+// Why signing in to YouTube Music failed, in Settings › Accounts.
+// MixMusic makes its first letter a capital.
+func (msgs Messages) AccountSettingsYouTubeWindowClosed() string {
+	return Catalog.Format(msgs.locale, "accountSettingsYouTubeWindowClosed", nil)
+}
+
+// AccountSettingsYouTubeWindowTitle says "Sign in to YouTube Music"
+// in the language the app shows.
+//
+// The title of the window in which the user signs in to YouTube Music.
+func AccountSettingsYouTubeWindowTitle() string {
+	return In(i18n.Locale()).AccountSettingsYouTubeWindowTitle()
+}
+
+// AccountSettingsYouTubeWindowTitle says "Sign in to YouTube Music"
+// in the language of msgs.
+//
+// The title of the window in which the user signs in to YouTube Music.
+func (msgs Messages) AccountSettingsYouTubeWindowTitle() string {
+	return Catalog.Format(msgs.locale, "accountSettingsYouTubeWindowTitle", nil)
 }
 
 // AccountsClientID says "Client ID"
@@ -1913,6 +2167,112 @@ func AppearanceUseTheme() string { return In(i18n.Locale()).AppearanceUseTheme()
 // in the language of msgs.
 func (msgs Messages) AppearanceUseTheme() string {
 	return Catalog.Format(msgs.locale, "appearanceUseTheme", nil)
+}
+
+// ArtistPlayFailed says "{artist}'s songs couldn't be loaded: {error}"
+// in the language the app shows.
+//
+// Toast when an artist's songs didn't load to play. {error} is why, often
+// in the service's own words.
+func ArtistPlayFailed(artist string, error string) string {
+	return In(i18n.Locale()).ArtistPlayFailed(artist, error)
+}
+
+// ArtistPlayFailed says "{artist}'s songs couldn't be loaded: {error}"
+// in the language of msgs.
+//
+// Toast when an artist's songs didn't load to play. {error} is why, often
+// in the service's own words.
+func (msgs Messages) ArtistPlayFailed(artist string, error string) string {
+	return Catalog.Format(msgs.locale, "artistPlayFailed", map[string]any{"artist": artist, "error": error})
+}
+
+// ArtistPlayFirst says "Only the first {count} of {artist}'s {unit, select, releases {albums and singles} other {songs}} could be loaded: {er…"
+// in the language the app shows.
+//
+// Toast when playing all of an artist's songs read only some. {unit} is
+// releases for Spotify's artists, read an album or single at a time, and
+// songs otherwise. {error} is why, often in the service's own words.
+func ArtistPlayFirst(count int, artist string, unit string, error string) string {
+	return In(i18n.Locale()).ArtistPlayFirst(count, artist, unit, error)
+}
+
+// ArtistPlayFirst says "Only the first {count} of {artist}'s {unit, select, releases {albums and singles} other {songs}} could be loaded: {er…"
+// in the language of msgs.
+//
+// Toast when playing all of an artist's songs read only some. {unit} is
+// releases for Spotify's artists, read an album or single at a time, and
+// songs otherwise. {error} is why, often in the service's own words.
+func (msgs Messages) ArtistPlayFirst(count int, artist string, unit string, error string) string {
+	return Catalog.Format(msgs.locale, "artistPlayFirst", map[string]any{"count": count, "artist": artist, "unit": unit, "error": error})
+}
+
+// ArtistPlayNoSongs says "No songs listed for {artist}"
+// in the language the app shows.
+//
+// Toast when an artist has no songs to play.
+func ArtistPlayNoSongs(artist string) string { return In(i18n.Locale()).ArtistPlayNoSongs(artist) }
+
+// ArtistPlayNoSongs says "No songs listed for {artist}"
+// in the language of msgs.
+//
+// Toast when an artist has no songs to play.
+func (msgs Messages) ArtistPlayNoSongs(artist string) string {
+	return Catalog.Format(msgs.locale, "artistPlayNoSongs", map[string]any{"artist": artist})
+}
+
+// ArtistPlaySome says "Only {count} of {artist}'s {total} {unit, select, releases {albums and singles} other {songs}} could be loaded: {error}"
+// in the language the app shows.
+//
+// Toast when playing all of an artist's songs read only some of those the
+// service counts. {unit} is releases for Spotify's artists and songs
+// otherwise. {error} is why, often in the service's own words.
+func ArtistPlaySome(count int, artist string, total int, unit string, error string) string {
+	return In(i18n.Locale()).ArtistPlaySome(count, artist, total, unit, error)
+}
+
+// ArtistPlaySome says "Only {count} of {artist}'s {total} {unit, select, releases {albums and singles} other {songs}} could be loaded: {error}"
+// in the language of msgs.
+//
+// Toast when playing all of an artist's songs read only some of those the
+// service counts. {unit} is releases for Spotify's artists and songs
+// otherwise. {error} is why, often in the service's own words.
+func (msgs Messages) ArtistPlaySome(count int, artist string, total int, unit string, error string) string {
+	return Catalog.Format(msgs.locale, "artistPlaySome", map[string]any{"count": count, "artist": artist, "total": total, "unit": unit, "error": error})
+}
+
+// ArtistPlayTopFailed says "{artist}'s top songs play, as the list of all their songs couldn't be loaded: {error}"
+// in the language the app shows.
+//
+// Toast when playing all of an artist's songs plays their top songs
+// instead. {error} is why, often in the service's own words.
+func ArtistPlayTopFailed(artist string, error string) string {
+	return In(i18n.Locale()).ArtistPlayTopFailed(artist, error)
+}
+
+// ArtistPlayTopFailed says "{artist}'s top songs play, as the list of all their songs couldn't be loaded: {error}"
+// in the language of msgs.
+//
+// Toast when playing all of an artist's songs plays their top songs
+// instead. {error} is why, often in the service's own words.
+func (msgs Messages) ArtistPlayTopFailed(artist string, error string) string {
+	return Catalog.Format(msgs.locale, "artistPlayTopFailed", map[string]any{"artist": artist, "error": error})
+}
+
+// ArtistPlayTopOnly says "{artist}'s top songs play: YouTube Music lists no more of their songs"
+// in the language the app shows.
+//
+// Toast when playing all of an artist's songs plays their top songs, which
+// is all YouTube Music lists.
+func ArtistPlayTopOnly(artist string) string { return In(i18n.Locale()).ArtistPlayTopOnly(artist) }
+
+// ArtistPlayTopOnly says "{artist}'s top songs play: YouTube Music lists no more of their songs"
+// in the language of msgs.
+//
+// Toast when playing all of an artist's songs plays their top songs, which
+// is all YouTube Music lists.
+func (msgs Messages) ArtistPlayTopOnly(artist string) string {
+	return Catalog.Format(msgs.locale, "artistPlayTopOnly", map[string]any{"artist": artist})
 }
 
 // AssistantsAbout says "AI assistants on this computer that speak MCP, the Model Context Protocol, can tell what plays, play, pause, skip, se…"
@@ -5189,6 +5549,72 @@ func (msgs Messages) CrossfadeTitle() string {
 	return Catalog.Format(msgs.locale, "crossfadeTitle", nil)
 }
 
+// DesktopSettingsAutostartReason says "MixMusic starts when you log in, as you chose in its settings"
+// in the language the app shows.
+//
+// Why MixMusic asks to start at login, which the Linux desktop shows as it
+// asks the user.
+func DesktopSettingsAutostartReason() string {
+	return In(i18n.Locale()).DesktopSettingsAutostartReason()
+}
+
+// DesktopSettingsAutostartReason says "MixMusic starts when you log in, as you chose in its settings"
+// in the language of msgs.
+//
+// Why MixMusic asks to start at login, which the Linux desktop shows as it
+// asks the user.
+func (msgs Messages) DesktopSettingsAutostartReason() string {
+	return Catalog.Format(msgs.locale, "desktopSettingsAutostartReason", nil)
+}
+
+// DesktopSettingsAutostartRefused says "the desktop didn't let MixMusic start at login: allow it to run in the background in your system's settings for apps,…"
+// in the language the app shows.
+//
+// Why Open at login didn't turn on, as a toast.
+func DesktopSettingsAutostartRefused() string {
+	return In(i18n.Locale()).DesktopSettingsAutostartRefused()
+}
+
+// DesktopSettingsAutostartRefused says "the desktop didn't let MixMusic start at login: allow it to run in the background in your system's settings for apps,…"
+// in the language of msgs.
+//
+// Why Open at login didn't turn on, as a toast.
+func (msgs Messages) DesktopSettingsAutostartRefused() string {
+	return Catalog.Format(msgs.locale, "desktopSettingsAutostartRefused", nil)
+}
+
+// DesktopSettingsAutostartStays says "the desktop still starts MixMusic at login"
+// in the language the app shows.
+//
+// Why Open at login didn't turn off, as a toast.
+func DesktopSettingsAutostartStays() string { return In(i18n.Locale()).DesktopSettingsAutostartStays() }
+
+// DesktopSettingsAutostartStays says "the desktop still starts MixMusic at login"
+// in the language of msgs.
+//
+// Why Open at login didn't turn off, as a toast.
+func (msgs Messages) DesktopSettingsAutostartStays() string {
+	return Catalog.Format(msgs.locale, "desktopSettingsAutostartStays", nil)
+}
+
+// DesktopSettingsBackgroundReason says "MixMusic plays on in the tray when you close its window"
+// in the language the app shows.
+//
+// Why MixMusic asks to run in the background, which the Linux desktop shows
+// as it asks the user.
+func DesktopSettingsBackgroundReason() string {
+	return In(i18n.Locale()).DesktopSettingsBackgroundReason()
+}
+
+// DesktopSettingsBackgroundReason says "MixMusic plays on in the tray when you close its window"
+// in the language of msgs.
+//
+// Why MixMusic asks to run in the background, which the Linux desktop shows
+// as it asks the user.
+func (msgs Messages) DesktopSettingsBackgroundReason() string {
+	return Catalog.Format(msgs.locale, "desktopSettingsBackgroundReason", nil)
+}
+
 // DesktopSettingsDiscordAbout says "While Discord runs, your profile says what you listen to: you choose its lines, cover, time and button."
 // in the language the app shows.
 func DesktopSettingsDiscordAbout() string { return In(i18n.Locale()).DesktopSettingsDiscordAbout() }
@@ -5297,6 +5723,24 @@ func DesktopSettingsMediaKeysTitle() string { return In(i18n.Locale()).DesktopSe
 // in the language of msgs.
 func (msgs Messages) DesktopSettingsMediaKeysTitle() string {
 	return Catalog.Format(msgs.locale, "desktopSettingsMediaKeysTitle", nil)
+}
+
+// DesktopSettingsNoBackgroundPortal says "this desktop has no Background portal, which starts MixMusic at login from its Flatpak: add MixMusic to the apps your…"
+// in the language the app shows.
+//
+// Why Open at login didn't turn on, as a toast. The Background portal is a
+// part of Linux desktops.
+func DesktopSettingsNoBackgroundPortal() string {
+	return In(i18n.Locale()).DesktopSettingsNoBackgroundPortal()
+}
+
+// DesktopSettingsNoBackgroundPortal says "this desktop has no Background portal, which starts MixMusic at login from its Flatpak: add MixMusic to the apps your…"
+// in the language of msgs.
+//
+// Why Open at login didn't turn on, as a toast. The Background portal is a
+// part of Linux desktops.
+func (msgs Messages) DesktopSettingsNoBackgroundPortal() string {
+	return Catalog.Format(msgs.locale, "desktopSettingsNoBackgroundPortal", nil)
 }
 
 // DesktopSettingsNotificationsAbout says "Tell what starts playing while MixMusic is in the background."
@@ -8669,6 +9113,22 @@ func (msgs Messages) ErrorYouTubeSignedOut() string {
 	return Catalog.Format(msgs.locale, "errorYouTubeSignedOut", nil)
 }
 
+// ExplicitBadge says "e"
+// in the language the app shows.
+//
+// The badge of an explicit track: a letter in a small box beside its title,
+// as E in English. Keep it one or two characters.
+func ExplicitBadge() string { return In(i18n.Locale()).ExplicitBadge() }
+
+// ExplicitBadge says "e"
+// in the language of msgs.
+//
+// The badge of an explicit track: a letter in a small box beside its title,
+// as E in English. Keep it one or two characters.
+func (msgs Messages) ExplicitBadge() string {
+	return Catalog.Format(msgs.locale, "explicitBadge", nil)
+}
+
 // ExplicitHideDesc says "Songs, albums and videos marked explicit don't show in the search, on Home, on artists' pages or in radios, and never…"
 // in the language the app shows.
 func ExplicitHideDesc() string { return In(i18n.Locale()).ExplicitHideDesc() }
@@ -9773,6 +10233,54 @@ func (msgs Messages) FontNoticeWalnut() string {
 	return Catalog.Format(msgs.locale, "fontNoticeWalnut", nil)
 }
 
+// FormatBitDepth says "{bits}-bit"
+// in the language the app shows.
+//
+// A file's bit depth, as 24-bit, in the line of a copy's audio, as FLAC ·
+// 24-bit · 96 kHz.
+func FormatBitDepth(bits int) string { return In(i18n.Locale()).FormatBitDepth(bits) }
+
+// FormatBitDepth says "{bits}-bit"
+// in the language of msgs.
+//
+// A file's bit depth, as 24-bit, in the line of a copy's audio, as FLAC ·
+// 24-bit · 96 kHz.
+func (msgs Messages) FormatBitDepth(bits int) string {
+	return Catalog.Format(msgs.locale, "formatBitDepth", map[string]any{"bits": bits})
+}
+
+// FormatBitrate says "{rate} kbit/s"
+// in the language the app shows.
+//
+// A file's bitrate, as 320 kbit/s, in the line of a copy's audio, as MP3 ·
+// 320 kbit/s · 44.1 kHz.
+func FormatBitrate(rate int) string { return In(i18n.Locale()).FormatBitrate(rate) }
+
+// FormatBitrate says "{rate} kbit/s"
+// in the language of msgs.
+//
+// A file's bitrate, as 320 kbit/s, in the line of a copy's audio, as MP3 ·
+// 320 kbit/s · 44.1 kHz.
+func (msgs Messages) FormatBitrate(rate int) string {
+	return Catalog.Format(msgs.locale, "formatBitrate", map[string]any{"rate": rate})
+}
+
+// FormatBytes says "{size} {unit, select, KB {KB} MB {MB} GB {GB} TB {TB} other {B}}"
+// in the language the app shows.
+//
+// A size, as 512 MB. {size} is the number, already written; {unit} picks
+// the unit: B for bytes, KB, MB, GB or TB.
+func FormatBytes(size string, unit string) string { return In(i18n.Locale()).FormatBytes(size, unit) }
+
+// FormatBytes says "{size} {unit, select, KB {KB} MB {MB} GB {GB} TB {TB} other {B}}"
+// in the language of msgs.
+//
+// A size, as 512 MB. {size} is the number, already written; {unit} picks
+// the unit: B for bytes, KB, MB, GB or TB.
+func (msgs Messages) FormatBytes(size string, unit string) string {
+	return Catalog.Format(msgs.locale, "formatBytes", map[string]any{"size": size, "unit": unit})
+}
+
 // FormatDayMonth says "{date, date, ::MMMd}"
 // in the language the app shows.
 //
@@ -9799,6 +10307,22 @@ func FormatHourMinutes(hours int, minutes int) string {
 // in the language of msgs.
 func (msgs Messages) FormatHourMinutes(hours int, minutes int) string {
 	return Catalog.Format(msgs.locale, "formatHourMinutes", map[string]any{"hours": hours, "minutes": minutes})
+}
+
+// FormatKilohertz says "{rate} kHz"
+// in the language the app shows.
+//
+// A sample rate in kilohertz, as 44.1 kHz. {rate} is the number, already
+// written.
+func FormatKilohertz(rate string) string { return In(i18n.Locale()).FormatKilohertz(rate) }
+
+// FormatKilohertz says "{rate} kHz"
+// in the language of msgs.
+//
+// A sample rate in kilohertz, as 44.1 kHz. {rate} is the number, already
+// written.
+func (msgs Messages) FormatKilohertz(rate string) string {
+	return Catalog.Format(msgs.locale, "formatKilohertz", map[string]any{"rate": rate})
 }
 
 // FormatMinutes says "{count} min"
@@ -11545,6 +12069,22 @@ func (msgs Messages) ListenBrainzSettingsConnectAgain() string {
 	return Catalog.Format(msgs.locale, "listenBrainzSettingsConnectAgain", nil)
 }
 
+// ListenBrainzSettingsConnectFirst says "connect to ListenBrainz first"
+// in the language the app shows.
+//
+// Why something of ListenBrainz can't be done, as a toast.
+func ListenBrainzSettingsConnectFirst() string {
+	return In(i18n.Locale()).ListenBrainzSettingsConnectFirst()
+}
+
+// ListenBrainzSettingsConnectFirst says "connect to ListenBrainz first"
+// in the language of msgs.
+//
+// Why something of ListenBrainz can't be done, as a toast.
+func (msgs Messages) ListenBrainzSettingsConnectFirst() string {
+	return Catalog.Format(msgs.locale, "listenBrainzSettingsConnectFirst", nil)
+}
+
 // ListenBrainzSettingsConnectTitle says "Connect to ListenBrainz"
 // in the language the app shows.
 func ListenBrainzSettingsConnectTitle() string {
@@ -11757,6 +12297,22 @@ func (msgs Messages) ListenBrainzSettingsPlain() string {
 	return Catalog.Format(msgs.locale, "listenBrainzSettingsPlain", nil)
 }
 
+// ListenBrainzSettingsPlainRemote says "plain http is for a server on your local network alone, as the token would travel unencrypted: use the server's https…"
+// in the language the app shows.
+//
+// Why connecting to a ListenBrainz server failed, as a toast.
+func ListenBrainzSettingsPlainRemote() string {
+	return In(i18n.Locale()).ListenBrainzSettingsPlainRemote()
+}
+
+// ListenBrainzSettingsPlainRemote says "plain http is for a server on your local network alone, as the token would travel unencrypted: use the server's https…"
+// in the language of msgs.
+//
+// Why connecting to a ListenBrainz server failed, as a toast.
+func (msgs Messages) ListenBrainzSettingsPlainRemote() string {
+	return Catalog.Format(msgs.locale, "listenBrainzSettingsPlainRemote", nil)
+}
+
 // ListenBrainzSettingsScrobbleSwitch says "Scrobble to ListenBrainz"
 // in the language the app shows.
 func ListenBrainzSettingsScrobbleSwitch() string {
@@ -11849,6 +12405,22 @@ func ListenBrainzSettingsTokenPlaceholder() string {
 // in the language of msgs.
 func (msgs Messages) ListenBrainzSettingsTokenPlaceholder() string {
 	return Catalog.Format(msgs.locale, "listenBrainzSettingsTokenPlaceholder", nil)
+}
+
+// ListenBrainzSettingsTokenRefused says "ListenBrainz doesn't accept this token"
+// in the language the app shows.
+//
+// Why connecting to ListenBrainz failed, as a toast.
+func ListenBrainzSettingsTokenRefused() string {
+	return In(i18n.Locale()).ListenBrainzSettingsTokenRefused()
+}
+
+// ListenBrainzSettingsTokenRefused says "ListenBrainz doesn't accept this token"
+// in the language of msgs.
+//
+// Why connecting to ListenBrainz failed, as a toast.
+func (msgs Messages) ListenBrainzSettingsTokenRefused() string {
+	return Catalog.Format(msgs.locale, "listenBrainzSettingsTokenRefused", nil)
 }
 
 // ListenBrainzSettingsUserToken says "User token"
@@ -23325,6 +23897,54 @@ func (msgs Messages) SpeedTitle() string {
 	return Catalog.Format(msgs.locale, "speedTitle", nil)
 }
 
+// SpotifyPageClose says "You can close this tab and go back to MixMusic."
+// in the language the app shows.
+//
+// The page the browser shows once the user signed in to Spotify for
+// MixMusic.
+func SpotifyPageClose() string { return In(i18n.Locale()).SpotifyPageClose() }
+
+// SpotifyPageClose says "You can close this tab and go back to MixMusic."
+// in the language of msgs.
+//
+// The page the browser shows once the user signed in to Spotify for
+// MixMusic.
+func (msgs Messages) SpotifyPageClose() string {
+	return Catalog.Format(msgs.locale, "spotifyPageClose", nil)
+}
+
+// SpotifyPageFailed says "Could not sign in"
+// in the language the app shows.
+//
+// The title of the page the browser shows when signing in to Spotify for
+// MixMusic failed. Spotify's own words follow it.
+func SpotifyPageFailed() string { return In(i18n.Locale()).SpotifyPageFailed() }
+
+// SpotifyPageFailed says "Could not sign in"
+// in the language of msgs.
+//
+// The title of the page the browser shows when signing in to Spotify for
+// MixMusic failed. Spotify's own words follow it.
+func (msgs Messages) SpotifyPageFailed() string {
+	return Catalog.Format(msgs.locale, "spotifyPageFailed", nil)
+}
+
+// SpotifyPageSignedIn says "Signed in to Spotify"
+// in the language the app shows.
+//
+// The title of the page the browser shows once the user signed in to
+// Spotify for MixMusic.
+func SpotifyPageSignedIn() string { return In(i18n.Locale()).SpotifyPageSignedIn() }
+
+// SpotifyPageSignedIn says "Signed in to Spotify"
+// in the language of msgs.
+//
+// The title of the page the browser shows once the user signed in to
+// Spotify for MixMusic.
+func (msgs Messages) SpotifyPageSignedIn() string {
+	return Catalog.Format(msgs.locale, "spotifyPageSignedIn", nil)
+}
+
 // StatsAllTime says "All time"
 // in the language the app shows.
 func StatsAllTime() string { return In(i18n.Locale()).StatsAllTime() }
@@ -24569,6 +25189,34 @@ func (msgs Messages) TrackInfoBitrateValue(kbps int) string {
 	return Catalog.Format(msgs.locale, "trackInfoBitrateValue", map[string]any{"kbps": kbps})
 }
 
+// TrackInfoCantPlay says "MixMusic can't play this file"
+// in the language the app shows.
+//
+// A problem of a track's file, in Track info.
+func TrackInfoCantPlay() string { return In(i18n.Locale()).TrackInfoCantPlay() }
+
+// TrackInfoCantPlay says "MixMusic can't play this file"
+// in the language of msgs.
+//
+// A problem of a track's file, in Track info.
+func (msgs Messages) TrackInfoCantPlay() string {
+	return Catalog.Format(msgs.locale, "trackInfoCantPlay", nil)
+}
+
+// TrackInfoCantRead says "Can't read the file"
+// in the language the app shows.
+//
+// A problem of a track's file, in Track info.
+func TrackInfoCantRead() string { return In(i18n.Locale()).TrackInfoCantRead() }
+
+// TrackInfoCantRead says "Can't read the file"
+// in the language of msgs.
+//
+// A problem of a track's file, in Track info.
+func (msgs Messages) TrackInfoCantRead() string {
+	return Catalog.Format(msgs.locale, "trackInfoCantRead", nil)
+}
+
 // TrackInfoChannels says "{count} channels"
 // in the language the app shows.
 func TrackInfoChannels(count int) string { return In(i18n.Locale()).TrackInfoChannels(count) }
@@ -24763,6 +25411,20 @@ func TrackInfoFileLoudness() string { return In(i18n.Locale()).TrackInfoFileLoud
 // in the language of msgs.
 func (msgs Messages) TrackInfoFileLoudness() string {
 	return Catalog.Format(msgs.locale, "trackInfoFileLoudness", nil)
+}
+
+// TrackInfoFileNotFound says "File not found"
+// in the language the app shows.
+//
+// A problem of a track's file, in Track info.
+func TrackInfoFileNotFound() string { return In(i18n.Locale()).TrackInfoFileNotFound() }
+
+// TrackInfoFileNotFound says "File not found"
+// in the language of msgs.
+//
+// A problem of a track's file, in Track info.
+func (msgs Messages) TrackInfoFileNotFound() string {
+	return Catalog.Format(msgs.locale, "trackInfoFileNotFound", nil)
 }
 
 // TrackInfoFileProblem says "{path} · {problem}"
@@ -26493,6 +27155,60 @@ func WavyProgressTitle() string { return In(i18n.Locale()).WavyProgressTitle() }
 // in the language of msgs.
 func (msgs Messages) WavyProgressTitle() string {
 	return Catalog.Format(msgs.locale, "wavyProgressTitle", nil)
+}
+
+// WebViewMissing says "{feature, select, signIn {Signing in to YouTube Music} spotify {Playing Spotify in MixMusic} videos {Showing music vi…"
+// in the language the app shows.
+//
+// Why a feature can't work. {feature} picks the sentence's start by the
+// feature: signIn, spotify or videos.
+func WebViewMissing(feature string) string { return In(i18n.Locale()).WebViewMissing(feature) }
+
+// WebViewMissing says "{feature, select, signIn {Signing in to YouTube Music} spotify {Playing Spotify in MixMusic} videos {Showing music vi…"
+// in the language of msgs.
+//
+// Why a feature can't work. {feature} picks the sentence's start by the
+// feature: signIn, spotify or videos.
+func (msgs Messages) WebViewMissing(feature string) string {
+	return Catalog.Format(msgs.locale, "webViewMissing", map[string]any{"feature": feature})
+}
+
+// WebViewMissingLinux says "{feature, select, signIn {Signing in to YouTube Music} spotify {Playing Spotify in MixMusic} videos {Showing music vi…"
+// in the language the app shows.
+//
+// Why a feature can't work on Linux. {feature} picks the sentence's start
+// by the feature: signIn, spotify or videos. Keep the packages' names as
+// they are.
+func WebViewMissingLinux(feature string) string {
+	return In(i18n.Locale()).WebViewMissingLinux(feature)
+}
+
+// WebViewMissingLinux says "{feature, select, signIn {Signing in to YouTube Music} spotify {Playing Spotify in MixMusic} videos {Showing music vi…"
+// in the language of msgs.
+//
+// Why a feature can't work on Linux. {feature} picks the sentence's start
+// by the feature: signIn, spotify or videos. Keep the packages' names as
+// they are.
+func (msgs Messages) WebViewMissingLinux(feature string) string {
+	return Catalog.Format(msgs.locale, "webViewMissingLinux", map[string]any{"feature": feature})
+}
+
+// WebViewMissingWindows says "{feature, select, signIn {Signing in to YouTube Music} spotify {Playing Spotify in MixMusic} videos {Showing music vi…"
+// in the language the app shows.
+//
+// Why a feature can't work on Windows. {feature} picks the sentence's start
+// by the feature: signIn, spotify or videos. Keep the address as it is.
+func WebViewMissingWindows(feature string) string {
+	return In(i18n.Locale()).WebViewMissingWindows(feature)
+}
+
+// WebViewMissingWindows says "{feature, select, signIn {Signing in to YouTube Music} spotify {Playing Spotify in MixMusic} videos {Showing music vi…"
+// in the language of msgs.
+//
+// Why a feature can't work on Windows. {feature} picks the sentence's start
+// by the feature: signIn, spotify or videos. Keep the address as it is.
+func (msgs Messages) WebViewMissingWindows(feature string) string {
+	return Catalog.Format(msgs.locale, "webViewMissingWindows", map[string]any{"feature": feature})
 }
 
 // WidgetsLoading says "Loading"

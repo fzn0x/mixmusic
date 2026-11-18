@@ -258,7 +258,7 @@ func (s *shell) youtubeSignIn(kind string, do func(ctx context.Context) error) {
 			}
 			if err != nil {
 				// A sentence of the alert, but yt-dlp's name as it is.
-				msg := err.Error()
+				msg := app.ErrorWords(err)
 				if msg != "" && !strings.HasPrefix(msg, "yt-dlp") {
 					msg = strings.ToUpper(msg[:1]) + msg[1:]
 				}
@@ -491,7 +491,7 @@ func (s *shell) account(kind, done string, do func(ctx context.Context) error) {
 				s.signingIn = ""
 			}
 			if err != nil {
-				s.notes = append(s.notes, noticeOf(err))
+				s.notes = append(s.notes, wordsNotice(err))
 				s.forget("accounts")
 				return
 			}

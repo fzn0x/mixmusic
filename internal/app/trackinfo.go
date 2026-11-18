@@ -19,6 +19,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/stream"
 	"github.com/fzn0x/mixmusic/internal/tags"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // TrackPlays is what plays a track.
@@ -274,10 +275,10 @@ func readTrackFile(kind FileKind, path string, withTags bool) *TrackFile {
 	f, err := os.Open(path)
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
-		tf.Problem = "File not found"
+		tf.Problem = locales.TrackInfoFileNotFound()
 		return tf
 	case err != nil:
-		tf.Problem = "Can't read the file"
+		tf.Problem = locales.TrackInfoCantRead()
 		return tf
 	}
 	defer f.Close()
@@ -285,9 +286,9 @@ func readTrackFile(kind FileKind, path string, withTags bool) *TrackFile {
 		tf.Size = fi.Size()
 	}
 	if tf.Format, err = audio.Inspect(f); err != nil {
-		tf.Problem = "MixMusic can't play this file"
+		tf.Problem = locales.TrackInfoCantPlay()
 		if !errors.Is(err, audio.ErrCantPlay) {
-			tf.Problem = "Can't read the file"
+			tf.Problem = locales.TrackInfoCantRead()
 		}
 	}
 	if withTags {

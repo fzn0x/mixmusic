@@ -107,7 +107,7 @@ func (s *shell) shownGroup(g []media.Album) []media.Album {
 
 // explicitBadge is the "e" of an explicit track, in ink.
 func (s *shell) explicitBadge(c *ui.Context, ink ui.Color) {
-	ui.Text(c, "e").FontSize(s.lk.captionSize()).TextColor(ink).Padding(0, 4).Border(1, ink).
+	ui.Text(c, locales.ExplicitBadge()).FontSize(s.lk.captionSize()).TextColor(ink).Padding(0, 4).Border(1, ink).
 		Radius(2).Label(locales.ExplicitTagLabel()).Shrink(0)
 }
 

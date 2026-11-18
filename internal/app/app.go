@@ -454,13 +454,7 @@ func needWebView(what string) error {
 	if webViewAvailable() {
 		return nil
 	}
-	switch runtime.GOOS {
-	case "windows":
-		return fmt.Errorf("%s needs Microsoft's WebView2 Runtime, which this computer doesn't have: get it from https://go.microsoft.com/fwlink/p/?LinkId=2124703", what)
-	case "linux":
-		return fmt.Errorf("%s needs WebKitGTK, which this computer doesn't have: install libwebkit2gtk-4.1-0 on Debian and Ubuntu, webkit2gtk4.1 on Fedora", what)
-	}
-	return fmt.Errorf("%s needs the system's webview, which this computer doesn't have", what)
+	return webViewMissing(what, runtime.GOOS)
 }
 
 // webViewAvailable is mygo.WebViewAvailable, asked on the main thread. On

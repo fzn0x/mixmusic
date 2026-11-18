@@ -68,7 +68,7 @@ type spotifyHere struct {
 
 // page returns the page of the device, opening its window if need be.
 func (h *spotifyHere) page(ctx context.Context) (*mygo.Page, error) {
-	if err := needWebView("playing Spotify in MixMusic"); err != nil {
+	if err := needWebView(webViewSpotify); err != nil {
 		return nil, err
 	}
 	h.mu.Lock()

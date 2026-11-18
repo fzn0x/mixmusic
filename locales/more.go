@@ -11,15 +11,14 @@ import (
 
 // more holds the catalogs of more/, which MixMusic adds to Catalog as it
 // starts. MyGo's generate, check and build read the JSON files at the
-// root of locales/ alone, so they don't see these: every translation
+// root of locales/ alone, so they don't see these: every new language
 // lands in more/ first, as a file no other pull request touches, and the
 // languages MyGo's Windows installer lacks stay there. more/README.md
 // tells how one moves to the root.
 //
 // MyGo's own words come from a catalog's mygo.<key> messages. MyGo's
-// packages of its Japanese and Chinese aren't imported here: they would
-// change the Go modules the Nix build vendors, and its vendorHash, which
-// catalog_gen.go's imports change once those languages move to the root.
+// packages of its own translations are linked by catalog_gen.go's
+// imports, for the languages at the root alone.
 //
 //go:embed more
 var more embed.FS

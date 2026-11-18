@@ -24,7 +24,7 @@ var playAllSongs = func(s *shell, a media.Artist, shuffled bool) {
 		ctx, cancel := context.WithTimeout(context.Background(), artistSongsWait)
 		defer cancel()
 		if err := s.svc.Catalog.PlayArtist(ctx, s.p, a, shuffled); err != nil {
-			s.update(func() { s.notes = append(s.notes, noticeOf(err)) })
+			s.update(func() { s.notes = append(s.notes, wordsNotice(err)) })
 		}
 	}()
 }
@@ -39,7 +39,7 @@ var playArtistID = func(s *shell, id string, shuffled bool) {
 		ctx, cancel := context.WithTimeout(context.Background(), artistSongsWait)
 		defer cancel()
 		if err := s.svc.Catalog.PlayArtistID(ctx, s.p, id, shuffled); err != nil {
-			s.update(func() { s.notes = append(s.notes, noticeOf(err)) })
+			s.update(func() { s.notes = append(s.notes, wordsNotice(err)) })
 		}
 	}()
 }

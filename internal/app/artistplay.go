@@ -8,11 +8,11 @@ package app
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // songsRead reads all the songs of an artist, giving each the new ones as
@@ -123,13 +123,14 @@ func (a *App) playArtistSongs(ctx context.Context, p *player.Player, artist medi
 			// Spotify's artists are read a release at a time.
 			unit := "songs"
 			if artist.Source == media.SourceSpotify {
-				unit = "albums and singles"
+				unit = "releases"
 			}
-			what := fmt.Sprintf("Only the first %d of %s's %s", short.Got, artist.Name, unit)
+			why := ErrorWords(short.Err)
+			msg := locales.ArtistPlayFirst(short.Got, artist.Name, unit, why)
 			if short.Total > short.Got {
-				what = fmt.Sprintf("Only %d of %s's %d %s", short.Got, artist.Name, short.Total, unit)
+				msg = locales.ArtistPlaySome(short.Got, artist.Name, short.Total, unit, why)
 			}
-			p.Tell(player.Notice{Message: what + " could be loaded: " + short.Err.Error(), Error: true})
+			p.Tell(player.Notice{Message: msg, Error: true})
 		}
 		return nil
 	}
@@ -138,19 +139,18 @@ func (a *App) playArtistSongs(ctx context.Context, p *player.Player, artist medi
 	top := a.songsKept()(artist.TopTracks)
 	switch {
 	case len(top) == 0 && err != nil:
-		return fmt.Errorf("%s's songs couldn't be loaded: %w", artist.Name, err)
+		return worded(artist.Name+"'s songs couldn't be loaded: "+err.Error(), locales.ArtistPlayFailed(artist.Name, ErrorWords(err)), err)
 	case len(top) == 0:
-		return errors.New("No songs listed for " + artist.Name)
+		return worded("No songs listed for "+artist.Name, locales.ArtistPlayNoSongs(artist.Name), nil)
 	case moved():
 		return nil
 	}
 	p.PlayAll(top, shuffled)
 	switch {
 	case err != nil:
-		p.Tell(player.Notice{Message: artist.Name + "'s top songs play, as the list of all their songs couldn't be loaded: " + err.Error(),
-			Error: true})
+		p.Tell(player.Notice{Message: locales.ArtistPlayTopFailed(artist.Name, ErrorWords(err)), Error: true})
 	case read == nil && artist.Source == media.SourceYouTube:
-		p.Tell(player.Notice{Message: artist.Name + "'s top songs play: YouTube Music lists no more of their songs"})
+		p.Tell(player.Notice{Message: locales.ArtistPlayTopOnly(artist.Name)})
 	}
 	return nil
 }

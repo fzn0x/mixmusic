@@ -414,12 +414,15 @@ saves each page, a third longer, to look for cut words.
 MixMusic's languages are translated by a machine first, then fixed by the
 people who speak them.
 
-- **One file.** A language is `locales/more/<tag>.json`, named after its
-  BCP 47 tag in its canonical form, as `hi.json`, `pt-BR.json` or
-  `zh-Hant.json`. MixMusic adds it as it starts: the Language setting lists
-  it, named in itself, and the computer's language picks it. Adding one
-  changes no other file, so pull requests that each add a language merge in
-  any order. [locales/more/README.md](locales/more/README.md) shows a file,
+- **One file.** A language is one file, named after its BCP 47 tag in its
+  canonical form, as `hi.json`, `pt-BR.json` or `zh-Hant.json`: in
+  `locales/` for the languages the Windows installer can be in, as
+  `locales/de.json`, and in `locales/more/` for the others, as
+  `locales/more/hi.json`. A new language starts in `locales/more/`, which
+  MixMusic adds as it starts: the Language setting lists it, named in
+  itself, and the computer's language picks it. Adding one changes no other
+  file, so pull requests that each add a language merge in any order.
+  [locales/more/README.md](locales/more/README.md) shows a file,
   and tells how a language moves to `locales/` itself, for the Windows
   installer to be in it.
 - **Its messages.** `"@@locale"` comes first, then the keys of en.json it
@@ -447,7 +450,9 @@ people who speak them.
   messages that parse, keys en.json has, in order, the placeholders and
   the cases. `bunx mygo dev -lang <tag>` runs the app in the language.
 - **The pull request.** One that adds or fixes a translation changes its
-  file alone, with no entry in changelog.d.
+  file alone, with no entry in changelog.d. CI then checks the catalogs and
+  runs the tests of the packages that read them, on Linux alone, rather
+  than every check and build; main's CI runs everything after the merge.
 
 ## Translations of the README
 

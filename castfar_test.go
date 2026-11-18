@@ -16,13 +16,14 @@ import (
 )
 
 // newFarShell is a test shell of an app that finds a Google Cast device,
-// two DLNA renderers, one that names its model and one that doesn't, and
-// an FCast receiver, without the network.
+// a group of Google Cast speakers, two DLNA renderers, one that names its
+// model and one that doesn't, and an FCast receiver, without the network.
 func newFarShell(t *testing.T) *shell {
 	t.Helper()
 	return newTestShellOf(t, func(o *app.Options) {
 		o.CastBrowse = func(context.Context) ([]cast.Device, error) {
-			return []cast.Device{{ID: "mini", Name: "Kitchen", Model: "Google Nest Mini", Host: "192.0.2.2", Port: 8009}}, nil
+			return []cast.Device{{ID: "mini", Name: "Kitchen", Model: "Google Nest Mini", Host: "192.0.2.2", Port: 8009},
+				{ID: "group", Name: "Everywhere", Model: "Google Cast Group", Host: "192.0.2.2", Port: 32187, Group: true}}, nil
 		}
 		o.RendererSearch = func(context.Context) ([]upnp.Renderer, error) {
 			return []upnp.Renderer{{ID: "uuid:tv", Name: "Living Room TV", Model: "Bravia", Host: "192.0.2.3"},
@@ -38,7 +39,7 @@ func newFarShell(t *testing.T) *shell {
 func openCastMenu(t *testing.T, s *shell, tt *ui.Tester) []string {
 	t.Helper()
 	s.svc.Player.FindCastDevices()
-	for deadline := time.Now().Add(5 * time.Second); len(s.svc.Player.CastDevices()) < 4; time.Sleep(time.Millisecond) {
+	for deadline := time.Now().Add(5 * time.Second); len(s.svc.Player.CastDevices()) < 5; time.Sleep(time.Millisecond) {
 		if time.Now().After(deadline) {
 			t.Fatalf("found %+v", s.svc.Player.CastDevices())
 		}
@@ -52,11 +53,11 @@ func openCastMenu(t *testing.T, s *shell, tt *ui.Tester) []string {
 
 // TestCastMenuRenderers lists the DLNA renderers and FCast receivers
 // beside the Google Cast devices, by name, each with its model, or what it
-// is where it names none.
+// is where it names none, as a group of speakers is.
 func TestCastMenuRenderers(t *testing.T) {
 	s := newFarShell(t)
-	want := []string{"This computer", "Bedroom TV · FCast receiver", "Kitchen · Google Nest Mini", "Living Room TV · Bravia",
-		"Study · DLNA renderer", "-", "Join a room…"}
+	want := []string{"This computer", "Bedroom TV · FCast receiver", "Everywhere · Speaker group", "Kitchen · Google Nest Mini",
+		"Living Room TV · Bravia", "Study · DLNA renderer", "-", "Join a room…"}
 	if got := openCastMenu(t, s, tester(t, s)); !slices.Equal(got, want) {
 		t.Errorf("menu %q, want %q", got, want)
 	}
@@ -64,7 +65,8 @@ func TestCastMenuRenderers(t *testing.T) {
 	for _, d := range s.svc.Player.CastDevices() {
 		kinds[d.Name] = d.Kind
 	}
-	if kinds["Kitchen"] != app.CastGoogle || kinds["Study"] != app.CastRenderer || kinds["Bedroom TV"] != app.CastFCast {
+	if kinds["Kitchen"] != app.CastGoogle || kinds["Everywhere"] != app.CastGoogle || kinds["Study"] != app.CastRenderer ||
+		kinds["Bedroom TV"] != app.CastFCast {
 		t.Errorf("kinds %v", kinds)
 	}
 }
@@ -77,14 +79,15 @@ func TestPseudoLocaleCastMenu(t *testing.T) {
 	tt := tester(t, s)
 	tt.SetLocale("en-XA")
 	menu := slices.DeleteFunc(openCastMenu(t, s, tt), func(item string) bool { return item == "-" })
-	checkPseudo(t, "The cast menu", menu, "Bedroom TV", "Kitchen", "Google Nest Mini", "Living Room TV", "Bravia", "Study")
+	checkPseudo(t, "The cast menu", menu, "Bedroom TV", "Everywhere", "Kitchen", "Google Nest Mini", "Living Room TV", "Bravia", "Study")
 	xa := locales.In("en-XA")
-	if !slices.Contains(menu, "Study · "+xa.CastRendererModel()) || !slices.Contains(menu, "Bedroom TV · "+xa.CastReceiverModel()) {
+	if !slices.Contains(menu, "Study · "+xa.CastRendererModel()) || !slices.Contains(menu, "Bedroom TV · "+xa.CastReceiverModel()) ||
+		!slices.Contains(menu, "Everywhere · "+xa.CastGroupModel()) {
 		t.Errorf("menu %q", menu)
 	}
 	// The words casting tells as it plays on these, in the language.
 	for _, said := range []string{xa.CastRendererFormat("Study", "FLAC"), xa.CastReceiverKey(), xa.CastReceiverNoKey(),
-		xa.CastReceiverOlder(), xa.SpeedMenuLockedCast("Study")} {
+		xa.CastReceiverOlder(), xa.SpeedMenuLockedCast("Study"), xa.CastFLACBeyond("Study"), xa.CastWAVFloat("Study")} {
 		checkPseudo(t, "Casting's words", []string{said}, "Study", "FLAC")
 	}
 }

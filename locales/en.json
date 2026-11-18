@@ -885,6 +885,10 @@
   "@castAlreadyConnecting": {
     "description": "A notice, as casting starts while another starts."
   },
+  "castCantPlayAudio": "this track's audio can't play on a cast device",
+  "@castCantPlayAudio": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. The track's audio isn't one MixMusic can send to a cast device."
+  },
   "castConnecting": "connecting…",
   "castCouldntCast": "Couldn't cast to {device}: {error}",
   "@castCouldntCast": {
@@ -909,6 +913,20 @@
       }
     }
   },
+  "castCouldntPlay": "the cast device couldn't play the track: {error}",
+  "@castCouldntPlay": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. {error} is what the cast device said, in its words.",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "LOAD_CANCELLED"
+      }
+    }
+  },
+  "castCouldntPlayAudio": "the cast device couldn't play this track's audio",
+  "@castCouldntPlayAudio": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. The cast device got the audio, and couldn't play it."
+  },
   "castCouldntServe": "Couldn't serve {device} the audio: {error}",
   "@castCouldntServe": {
     "description": "A notice, as casting to a device starts. {error} says why, as the system says it.",
@@ -925,6 +943,18 @@
   "castDeviceGone": "That cast device is no longer on the network",
   "@castDeviceGone": {
     "description": "A notice, as casting starts to a device that has left the network."
+  },
+  "castLiveNotYet": "live streams don't play on cast devices yet",
+  "@castLiveNotYet": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. The track is a live stream, and MixMusic casts to a device."
+  },
+  "castLocalFiles": "tracks on this computer don't play on cast devices",
+  "@castLocalFiles": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. The track is a file on this computer, and MixMusic casts to a device."
+  },
+  "castNoAnswer": "the cast device didn't answer",
+  "@castNoAnswer": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. The cast device didn't answer MixMusic in time."
   },
   "castPlayingOn": "Playing on {name}",
   "@castPlayingOn": {
@@ -954,9 +984,13 @@
       }
     }
   },
+  "castStoppedPlaying": "the cast device stopped playing this track's audio",
+  "@castStoppedPlaying": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. The cast device stopped by itself, partway through the track."
+  },
   "castStoppedTaken": "Casting to {device} stopped: {why}",
   "@castStoppedTaken": {
-    "description": "A notice, as another app took the device. {why} says which, as the device says it.",
+    "description": "A notice, as another app took the cast device. {why} is castTakenBy, which names it.",
     "placeholders": {
       "device": {
         "type": "String",
@@ -967,8 +1001,26 @@
       }
     }
   },
+  "castTakenBy": "{app} plays on it now",
+  "@castTakenBy": {
+    "description": "{why} of castStoppedTaken, a notice as another app took the cast device. {app} names that app, as the device names it.",
+    "placeholders": {
+      "app": {
+        "type": "String",
+        "example": "YouTube"
+      }
+    }
+  },
   "castThisComputer": "This computer",
   "castToDevice": "Cast to a device",
+  "castUnreachable": "the cast device couldn't reach MixMusic: let MixMusic take connections from your network in the firewall",
+  "@castUnreachable": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. On macOS and Linux, the cast device never fetched the audio from this computer, as a firewall may keep it out."
+  },
+  "castUnreachableFirewall": "the cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets it in",
+  "@castUnreachableFirewall": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. On Windows, the cast device never fetched the audio from this computer, as a firewall may keep it out."
+  },
   "cleanVersionsDesc": "An album that comes explicit and clean shows its clean version, and its page opens on it. Its version switch still has the explicit one.",
   "cleanVersionsFixed": "On while explicit content is hidden: an album that comes explicit and clean shows its clean version alone.",
   "cleanVersionsGroup": "Explicit content",
@@ -2674,9 +2726,35 @@
   "@errorAudioCantPlay": {
     "description": "An error of a file, as a toast or inside a message that leads it."
   },
+  "errorAudioCantRead": "the file can't be read",
+  "@errorAudioCantRead": {
+    "description": "Why a track on this computer couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. Reading its file failed partway through."
+  },
+  "errorAudioCantStart": "the audio device couldn't start ({error})",
+  "@errorAudioCantStart": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. The speakers or headphones couldn't start; {error} is the system's reason, in its words.",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "output: WASAPI: the device is in use"
+      }
+    }
+  },
+  "errorAudioDecode": "the audio could not be decoded",
+  "@errorAudioDecode": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. Its audio is damaged. The decoder's own words may follow, in parentheses."
+  },
+  "errorAudioNetwork": "the network failed while loading the audio",
+  "@errorAudioNetwork": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. The download of its audio broke off."
+  },
   "errorAudioNoOutput": "no audio output device",
   "@errorAudioNoOutput": {
     "description": "An error of the sound, as a toast or inside a message that leads it: the computer has no speakers or headphones MixMusic can play on."
+  },
+  "errorAudioUnsupported": "the audio format is not supported",
+  "@errorAudioUnsupported": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. Its audio is of a kind MixMusic doesn't play. The decoder's own words may follow, in parentheses."
   },
   "errorColorFileEmpty": "it's empty",
   "@errorColorFileEmpty": {
@@ -2721,6 +2799,10 @@
   "errorLocalFilesNetworkDrive": "it's on a network drive",
   "@errorLocalFilesNetworkDrive": {
     "description": "Why a folder of music isn't watched for changes, inside a message that leads it."
+  },
+  "errorLocalFilesNotIndexed": "this track isn't a file MixMusic knows on this computer",
+  "@errorLocalFilesNotIndexed": {
+    "description": "Why a track on this computer couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. Its file isn't among the files MixMusic found, as when its folder was taken out of Settings."
   },
   "errorLocalFilesRemovableDrive": "it's on a removable drive, which a watch would keep from being ejected",
   "@errorLocalFilesRemovableDrive": {
@@ -2830,6 +2912,16 @@
   "@errorStreamStalled": {
     "description": "Why a track's audio failed, as a toast or inside a message that leads it."
   },
+  "errorStreamStatus": "YouTube answered HTTP {status} for its audio",
+  "@errorStreamStatus": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. YouTube answered the request of its audio with an error. {status} is the HTTP status code, as digits.",
+    "placeholders": {
+      "status": {
+        "type": "String",
+        "example": "503"
+      }
+    }
+  },
   "errorStreamThrottled": "YouTube is turning down requests from this network for now; try again in a while",
   "@errorStreamThrottled": {
     "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
@@ -2837,6 +2929,10 @@
   "errorStreamUnavailable": "YouTube won't send this track",
   "@errorStreamUnavailable": {
     "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+  },
+  "errorStreamUnreachable": "MixMusic could not reach YouTube's audio servers, which a firewall, a VPN or a DNS filter may block",
+  "@errorStreamUnreachable": {
+    "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. The request of its audio didn't reach YouTube."
   },
   "errorTagsCover": "the cover must be a JPEG or PNG image of at most 10 MB",
   "@errorTagsCover": {
@@ -5502,6 +5598,10 @@
   "playerMiniPlayer": "Open the mini player",
   "playerNext": "Next",
   "playerNoDevices": "Open Spotify on a device to see it here",
+  "playerNoEngine": "MixMusic's audio engine isn't available on this system",
+  "@playerNoEngine": {
+    "description": "The details of the dialog playerCantPlayHere as MixMusic starts, and a toast as casting can't start: this system has no audio engine."
+  },
   "playerNoHighlight": "This track has no highlight",
   "playerNoSeeking": "Live: no seeking",
   "playerOffline": "No network. MixMusic plays on from here once it's back",
@@ -5614,6 +5714,10 @@
         "type": "String"
       }
     }
+  },
+  "playerSpotifyNotHere": "Spotify can't play inside MixMusic on this computer",
+  "@playerSpotifyNotHere": {
+    "description": "Why a Spotify track plays from YouTube Music instead: {why} of playerFromYouTubeInstead, and a step of a failure's details. MixMusic can't play Spotify itself on this computer."
   },
   "playerStopped": "{error}. Stopped, as {count, plural, one {# track} other {# tracks}} in a row couldn't play",
   "@playerStopped": {
@@ -8046,6 +8150,34 @@
   "speedPodcasts": "Podcasts",
   "speedSongs": "Songs",
   "speedTitle": "Speed",
+  "spotifyHereNoDrm": "this computer's webview can't play Spotify's protected audio",
+  "@spotifyHereNoDrm": {
+    "description": "Why a Spotify track plays from YouTube Music instead: {why} of playerFromYouTubeInstead, and a step of a failure's details. The system's webview can't decrypt Spotify's audio."
+  },
+  "spotifyHereNotConnected": "Spotify's player did not connect",
+  "@spotifyHereNotConnected": {
+    "description": "Why a Spotify track plays from YouTube Music instead: {why} of playerFromYouTubeInstead, and a step of a failure's details. Spotify's player didn't connect to Spotify in time."
+  },
+  "spotifyHereNotLoaded": "MixMusic's Spotify player didn't load",
+  "@spotifyHereNotLoaded": {
+    "description": "Why a Spotify track plays from YouTube Music instead: {why} of playerFromYouTubeInstead, and a step of a failure's details. The hidden page that plays Spotify in MixMusic didn't load in time."
+  },
+  "spotifyHerePremium": "Spotify plays in MixMusic with Spotify Premium only",
+  "@spotifyHerePremium": {
+    "description": "Why a Spotify track plays from YouTube Music instead: {why} of playerFromYouTubeInstead, and a step of a failure's details. The Spotify account has no Premium."
+  },
+  "spotifyHereSdkNotLoaded": "Spotify's player did not load: is MixMusic online?",
+  "@spotifyHereSdkNotLoaded": {
+    "description": "Why a Spotify track plays from YouTube Music instead: {why} of playerFromYouTubeInstead, and a step of a failure's details. Spotify's own player script couldn't be downloaded."
+  },
+  "spotifyHereSignIn": "sign in to Spotify in Settings › Accounts to play it",
+  "@spotifyHereSignIn": {
+    "description": "Why a Spotify track plays from YouTube Music instead: {why} of playerFromYouTubeInstead, and a step of a failure's details. The user isn't signed in to Spotify."
+  },
+  "spotifyHereSignInAgain": "sign in to Spotify again in Settings › Accounts, for MixMusic to play it itself",
+  "@spotifyHereSignInAgain": {
+    "description": "Why a Spotify track plays from YouTube Music instead: {why} of playerFromYouTubeInstead, and a step of a failure's details. The Spotify sign-in doesn't let MixMusic play Spotify itself, or Spotify refused it."
+  },
   "spotifyPageClose": "You can close this tab and go back to MixMusic.",
   "@spotifyPageClose": {
     "description": "The page the browser shows once the user signed in to Spotify for MixMusic."
@@ -8736,6 +8868,9 @@
   "trackToolsSortTitle": "Title",
   "tracksEmpty": "No tracks here yet.",
   "tracksFileNotFound": "File not found",
+  "@tracksFileNotFound": {
+    "description": "A track whose file on this computer is gone: in a list of tracks, and why it couldn't play, as {error} of playerCouldntPlay and a step of a failure's details."
+  },
   "tracksMoreFor": "More for {title}",
   "@tracksMoreFor": {
     "placeholders": {

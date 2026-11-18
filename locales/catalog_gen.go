@@ -3220,6 +3220,24 @@ func (msgs Messages) CastAlreadyConnecting() string {
 	return Catalog.Format(msgs.locale, "castAlreadyConnecting", nil)
 }
 
+// CastCantPlayAudio says "this track's audio can't play on a cast device"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The track's audio isn't one MixMusic can send to a
+// cast device.
+func CastCantPlayAudio() string { return In(i18n.Locale()).CastCantPlayAudio() }
+
+// CastCantPlayAudio says "this track's audio can't play on a cast device"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The track's audio isn't one MixMusic can send to a
+// cast device.
+func (msgs Messages) CastCantPlayAudio() string {
+	return Catalog.Format(msgs.locale, "castCantPlayAudio", nil)
+}
+
 // CastConnecting says "connecting…"
 // in the language the app shows.
 func CastConnecting() string { return In(i18n.Locale()).CastConnecting() }
@@ -3262,6 +3280,38 @@ func (msgs Messages) CastCouldntConnect(device string) string {
 	return Catalog.Format(msgs.locale, "castCouldntConnect", map[string]any{"device": device})
 }
 
+// CastCouldntPlay says "the cast device couldn't play the track: {error}"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. {error} is what the cast device said, in its words.
+func CastCouldntPlay(error string) string { return In(i18n.Locale()).CastCouldntPlay(error) }
+
+// CastCouldntPlay says "the cast device couldn't play the track: {error}"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. {error} is what the cast device said, in its words.
+func (msgs Messages) CastCouldntPlay(error string) string {
+	return Catalog.Format(msgs.locale, "castCouldntPlay", map[string]any{"error": error})
+}
+
+// CastCouldntPlayAudio says "the cast device couldn't play this track's audio"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The cast device got the audio, and couldn't play it.
+func CastCouldntPlayAudio() string { return In(i18n.Locale()).CastCouldntPlayAudio() }
+
+// CastCouldntPlayAudio says "the cast device couldn't play this track's audio"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The cast device got the audio, and couldn't play it.
+func (msgs Messages) CastCouldntPlayAudio() string {
+	return Catalog.Format(msgs.locale, "castCouldntPlayAudio", nil)
+}
+
 // CastCouldntServe says "Couldn't serve {device} the audio: {error}"
 // in the language the app shows.
 //
@@ -3292,6 +3342,58 @@ func CastDeviceGone() string { return In(i18n.Locale()).CastDeviceGone() }
 // A notice, as casting starts to a device that has left the network.
 func (msgs Messages) CastDeviceGone() string {
 	return Catalog.Format(msgs.locale, "castDeviceGone", nil)
+}
+
+// CastLiveNotYet says "live streams don't play on cast devices yet"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The track is a live stream, and MixMusic casts to a
+// device.
+func CastLiveNotYet() string { return In(i18n.Locale()).CastLiveNotYet() }
+
+// CastLiveNotYet says "live streams don't play on cast devices yet"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The track is a live stream, and MixMusic casts to a
+// device.
+func (msgs Messages) CastLiveNotYet() string {
+	return Catalog.Format(msgs.locale, "castLiveNotYet", nil)
+}
+
+// CastLocalFiles says "tracks on this computer don't play on cast devices"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The track is a file on this computer, and MixMusic
+// casts to a device.
+func CastLocalFiles() string { return In(i18n.Locale()).CastLocalFiles() }
+
+// CastLocalFiles says "tracks on this computer don't play on cast devices"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The track is a file on this computer, and MixMusic
+// casts to a device.
+func (msgs Messages) CastLocalFiles() string {
+	return Catalog.Format(msgs.locale, "castLocalFiles", nil)
+}
+
+// CastNoAnswer says "the cast device didn't answer"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The cast device didn't answer MixMusic in time.
+func CastNoAnswer() string { return In(i18n.Locale()).CastNoAnswer() }
+
+// CastNoAnswer says "the cast device didn't answer"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The cast device didn't answer MixMusic in time.
+func (msgs Messages) CastNoAnswer() string {
+	return Catalog.Format(msgs.locale, "castNoAnswer", nil)
 }
 
 // CastPlayingOn says "Playing on {name}"
@@ -3336,11 +3438,29 @@ func (msgs Messages) CastStoppedLost(device string) string {
 	return Catalog.Format(msgs.locale, "castStoppedLost", map[string]any{"device": device})
 }
 
+// CastStoppedPlaying says "the cast device stopped playing this track's audio"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The cast device stopped by itself, partway through the
+// track.
+func CastStoppedPlaying() string { return In(i18n.Locale()).CastStoppedPlaying() }
+
+// CastStoppedPlaying says "the cast device stopped playing this track's audio"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The cast device stopped by itself, partway through the
+// track.
+func (msgs Messages) CastStoppedPlaying() string {
+	return Catalog.Format(msgs.locale, "castStoppedPlaying", nil)
+}
+
 // CastStoppedTaken says "Casting to {device} stopped: {why}"
 // in the language the app shows.
 //
-// A notice, as another app took the device. {why} says which, as the device
-// says it.
+// A notice, as another app took the cast device. {why} is castTakenBy,
+// which names it.
 func CastStoppedTaken(device string, why string) string {
 	return In(i18n.Locale()).CastStoppedTaken(device, why)
 }
@@ -3348,10 +3468,26 @@ func CastStoppedTaken(device string, why string) string {
 // CastStoppedTaken says "Casting to {device} stopped: {why}"
 // in the language of msgs.
 //
-// A notice, as another app took the device. {why} says which, as the device
-// says it.
+// A notice, as another app took the cast device. {why} is castTakenBy,
+// which names it.
 func (msgs Messages) CastStoppedTaken(device string, why string) string {
 	return Catalog.Format(msgs.locale, "castStoppedTaken", map[string]any{"device": device, "why": why})
+}
+
+// CastTakenBy says "{app} plays on it now"
+// in the language the app shows.
+//
+// {why} of castStoppedTaken, a notice as another app took the cast device.
+// {app} names that app, as the device names it.
+func CastTakenBy(app string) string { return In(i18n.Locale()).CastTakenBy(app) }
+
+// CastTakenBy says "{app} plays on it now"
+// in the language of msgs.
+//
+// {why} of castStoppedTaken, a notice as another app took the cast device.
+// {app} names that app, as the device names it.
+func (msgs Messages) CastTakenBy(app string) string {
+	return Catalog.Format(msgs.locale, "castTakenBy", map[string]any{"app": app})
 }
 
 // CastThisComputer says "This computer"
@@ -3372,6 +3508,42 @@ func CastToDevice() string { return In(i18n.Locale()).CastToDevice() }
 // in the language of msgs.
 func (msgs Messages) CastToDevice() string {
 	return Catalog.Format(msgs.locale, "castToDevice", nil)
+}
+
+// CastUnreachable says "the cast device couldn't reach MixMusic: let MixMusic take connections from your network in the firewall"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. On macOS and Linux, the cast device never fetched the
+// audio from this computer, as a firewall may keep it out.
+func CastUnreachable() string { return In(i18n.Locale()).CastUnreachable() }
+
+// CastUnreachable says "the cast device couldn't reach MixMusic: let MixMusic take connections from your network in the firewall"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. On macOS and Linux, the cast device never fetched the
+// audio from this computer, as a firewall may keep it out.
+func (msgs Messages) CastUnreachable() string {
+	return Catalog.Format(msgs.locale, "castUnreachable", nil)
+}
+
+// CastUnreachableFirewall says "the cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets it in"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. On Windows, the cast device never fetched the audio
+// from this computer, as a firewall may keep it out.
+func CastUnreachableFirewall() string { return In(i18n.Locale()).CastUnreachableFirewall() }
+
+// CastUnreachableFirewall says "the cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets it in"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. On Windows, the cast device never fetched the audio
+// from this computer, as a firewall may keep it out.
+func (msgs Messages) CastUnreachableFirewall() string {
+	return Catalog.Format(msgs.locale, "castUnreachableFirewall", nil)
 }
 
 // CleanVersionsDesc says "An album that comes explicit and clean shows its clean version, and its page opens on it. Its version switch still ha…"
@@ -8722,6 +8894,76 @@ func (msgs Messages) ErrorAudioCantPlay() string {
 	return Catalog.Format(msgs.locale, "errorAudioCantPlay", nil)
 }
 
+// ErrorAudioCantRead says "the file can't be read"
+// in the language the app shows.
+//
+// Why a track on this computer couldn't play: {error} of playerCouldntPlay,
+// and a step of a failure's details. Reading its file failed partway
+// through.
+func ErrorAudioCantRead() string { return In(i18n.Locale()).ErrorAudioCantRead() }
+
+// ErrorAudioCantRead says "the file can't be read"
+// in the language of msgs.
+//
+// Why a track on this computer couldn't play: {error} of playerCouldntPlay,
+// and a step of a failure's details. Reading its file failed partway
+// through.
+func (msgs Messages) ErrorAudioCantRead() string {
+	return Catalog.Format(msgs.locale, "errorAudioCantRead", nil)
+}
+
+// ErrorAudioCantStart says "the audio device couldn't start ({error})"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The speakers or headphones couldn't start; {error} is
+// the system's reason, in its words.
+func ErrorAudioCantStart(error string) string { return In(i18n.Locale()).ErrorAudioCantStart(error) }
+
+// ErrorAudioCantStart says "the audio device couldn't start ({error})"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The speakers or headphones couldn't start; {error} is
+// the system's reason, in its words.
+func (msgs Messages) ErrorAudioCantStart(error string) string {
+	return Catalog.Format(msgs.locale, "errorAudioCantStart", map[string]any{"error": error})
+}
+
+// ErrorAudioDecode says "the audio could not be decoded"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. Its audio is damaged. The decoder's own words may
+// follow, in parentheses.
+func ErrorAudioDecode() string { return In(i18n.Locale()).ErrorAudioDecode() }
+
+// ErrorAudioDecode says "the audio could not be decoded"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. Its audio is damaged. The decoder's own words may
+// follow, in parentheses.
+func (msgs Messages) ErrorAudioDecode() string {
+	return Catalog.Format(msgs.locale, "errorAudioDecode", nil)
+}
+
+// ErrorAudioNetwork says "the network failed while loading the audio"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The download of its audio broke off.
+func ErrorAudioNetwork() string { return In(i18n.Locale()).ErrorAudioNetwork() }
+
+// ErrorAudioNetwork says "the network failed while loading the audio"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The download of its audio broke off.
+func (msgs Messages) ErrorAudioNetwork() string {
+	return Catalog.Format(msgs.locale, "errorAudioNetwork", nil)
+}
+
 // ErrorAudioNoOutput says "no audio output device"
 // in the language the app shows.
 //
@@ -8736,6 +8978,24 @@ func ErrorAudioNoOutput() string { return In(i18n.Locale()).ErrorAudioNoOutput()
 // computer has no speakers or headphones MixMusic can play on.
 func (msgs Messages) ErrorAudioNoOutput() string {
 	return Catalog.Format(msgs.locale, "errorAudioNoOutput", nil)
+}
+
+// ErrorAudioUnsupported says "the audio format is not supported"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. Its audio is of a kind MixMusic doesn't play. The
+// decoder's own words may follow, in parentheses.
+func ErrorAudioUnsupported() string { return In(i18n.Locale()).ErrorAudioUnsupported() }
+
+// ErrorAudioUnsupported says "the audio format is not supported"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. Its audio is of a kind MixMusic doesn't play. The
+// decoder's own words may follow, in parentheses.
+func (msgs Messages) ErrorAudioUnsupported() string {
+	return Catalog.Format(msgs.locale, "errorAudioUnsupported", nil)
 }
 
 // ErrorColorFileEmpty says "it's empty"
@@ -8902,6 +9162,24 @@ func ErrorLocalFilesNetworkDrive() string { return In(i18n.Locale()).ErrorLocalF
 // leads it.
 func (msgs Messages) ErrorLocalFilesNetworkDrive() string {
 	return Catalog.Format(msgs.locale, "errorLocalFilesNetworkDrive", nil)
+}
+
+// ErrorLocalFilesNotIndexed says "this track isn't a file MixMusic knows on this computer"
+// in the language the app shows.
+//
+// Why a track on this computer couldn't play: {error} of playerCouldntPlay,
+// and a step of a failure's details. Its file isn't among the files
+// MixMusic found, as when its folder was taken out of Settings.
+func ErrorLocalFilesNotIndexed() string { return In(i18n.Locale()).ErrorLocalFilesNotIndexed() }
+
+// ErrorLocalFilesNotIndexed says "this track isn't a file MixMusic knows on this computer"
+// in the language of msgs.
+//
+// Why a track on this computer couldn't play: {error} of playerCouldntPlay,
+// and a step of a failure's details. Its file isn't among the files
+// MixMusic found, as when its folder was taken out of Settings.
+func (msgs Messages) ErrorLocalFilesNotIndexed() string {
+	return Catalog.Format(msgs.locale, "errorLocalFilesNotIndexed", nil)
 }
 
 // ErrorLocalFilesRemovableDrive says "it's on a removable drive, which a watch would keep from being ejected"
@@ -9322,6 +9600,24 @@ func (msgs Messages) ErrorStreamStalled() string {
 	return Catalog.Format(msgs.locale, "errorStreamStalled", nil)
 }
 
+// ErrorStreamStatus says "YouTube answered HTTP {status} for its audio"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. YouTube answered the request of its audio with an
+// error. {status} is the HTTP status code, as digits.
+func ErrorStreamStatus(status string) string { return In(i18n.Locale()).ErrorStreamStatus(status) }
+
+// ErrorStreamStatus says "YouTube answered HTTP {status} for its audio"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. YouTube answered the request of its audio with an
+// error. {status} is the HTTP status code, as digits.
+func (msgs Messages) ErrorStreamStatus(status string) string {
+	return Catalog.Format(msgs.locale, "errorStreamStatus", map[string]any{"status": status})
+}
+
 // ErrorStreamThrottled says "YouTube is turning down requests from this network for now; try again in a while"
 // in the language the app shows.
 //
@@ -9352,6 +9648,22 @@ func ErrorStreamUnavailable() string { return In(i18n.Locale()).ErrorStreamUnava
 // leads it.
 func (msgs Messages) ErrorStreamUnavailable() string {
 	return Catalog.Format(msgs.locale, "errorStreamUnavailable", nil)
+}
+
+// ErrorStreamUnreachable says "MixMusic could not reach YouTube's audio servers, which a firewall, a VPN or a DNS filter may block"
+// in the language the app shows.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The request of its audio didn't reach YouTube.
+func ErrorStreamUnreachable() string { return In(i18n.Locale()).ErrorStreamUnreachable() }
+
+// ErrorStreamUnreachable says "MixMusic could not reach YouTube's audio servers, which a firewall, a VPN or a DNS filter may block"
+// in the language of msgs.
+//
+// Why a track couldn't play: {error} of playerCouldntPlay, and a step of a
+// failure's details. The request of its audio didn't reach YouTube.
+func (msgs Messages) ErrorStreamUnreachable() string {
+	return Catalog.Format(msgs.locale, "errorStreamUnreachable", nil)
 }
 
 // ErrorTagsCover says "the cover must be a JPEG or PNG image of at most 10 MB"
@@ -18306,6 +18618,22 @@ func (msgs Messages) PlayerNoDevices() string {
 	return Catalog.Format(msgs.locale, "playerNoDevices", nil)
 }
 
+// PlayerNoEngine says "MixMusic's audio engine isn't available on this system"
+// in the language the app shows.
+//
+// The details of the dialog playerCantPlayHere as MixMusic starts, and a
+// toast as casting can't start: this system has no audio engine.
+func PlayerNoEngine() string { return In(i18n.Locale()).PlayerNoEngine() }
+
+// PlayerNoEngine says "MixMusic's audio engine isn't available on this system"
+// in the language of msgs.
+//
+// The details of the dialog playerCantPlayHere as MixMusic starts, and a
+// toast as casting can't start: this system has no audio engine.
+func (msgs Messages) PlayerNoEngine() string {
+	return Catalog.Format(msgs.locale, "playerNoEngine", nil)
+}
+
 // PlayerNoHighlight says "This track has no highlight"
 // in the language the app shows.
 func PlayerNoHighlight() string { return In(i18n.Locale()).PlayerNoHighlight() }
@@ -18618,6 +18946,24 @@ func PlayerSpeed(line string, speed string) string { return In(i18n.Locale()).Pl
 // in the language of msgs.
 func (msgs Messages) PlayerSpeed(line string, speed string) string {
 	return Catalog.Format(msgs.locale, "playerSpeed", map[string]any{"line": line, "speed": speed})
+}
+
+// PlayerSpotifyNotHere says "Spotify can't play inside MixMusic on this computer"
+// in the language the app shows.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. MixMusic
+// can't play Spotify itself on this computer.
+func PlayerSpotifyNotHere() string { return In(i18n.Locale()).PlayerSpotifyNotHere() }
+
+// PlayerSpotifyNotHere says "Spotify can't play inside MixMusic on this computer"
+// in the language of msgs.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. MixMusic
+// can't play Spotify itself on this computer.
+func (msgs Messages) PlayerSpotifyNotHere() string {
+	return Catalog.Format(msgs.locale, "playerSpotifyNotHere", nil)
 }
 
 // PlayerStopped says "{error}. Stopped, as {count, plural, one {# track} other {# tracks}} in a row couldn't play"
@@ -24812,6 +25158,132 @@ func (msgs Messages) SpeedTitle() string {
 	return Catalog.Format(msgs.locale, "speedTitle", nil)
 }
 
+// SpotifyHereNoDrm says "this computer's webview can't play Spotify's protected audio"
+// in the language the app shows.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. The system's
+// webview can't decrypt Spotify's audio.
+func SpotifyHereNoDrm() string { return In(i18n.Locale()).SpotifyHereNoDrm() }
+
+// SpotifyHereNoDrm says "this computer's webview can't play Spotify's protected audio"
+// in the language of msgs.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. The system's
+// webview can't decrypt Spotify's audio.
+func (msgs Messages) SpotifyHereNoDrm() string {
+	return Catalog.Format(msgs.locale, "spotifyHereNoDrm", nil)
+}
+
+// SpotifyHereNotConnected says "Spotify's player did not connect"
+// in the language the app shows.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. Spotify's
+// player didn't connect to Spotify in time.
+func SpotifyHereNotConnected() string { return In(i18n.Locale()).SpotifyHereNotConnected() }
+
+// SpotifyHereNotConnected says "Spotify's player did not connect"
+// in the language of msgs.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. Spotify's
+// player didn't connect to Spotify in time.
+func (msgs Messages) SpotifyHereNotConnected() string {
+	return Catalog.Format(msgs.locale, "spotifyHereNotConnected", nil)
+}
+
+// SpotifyHereNotLoaded says "MixMusic's Spotify player didn't load"
+// in the language the app shows.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. The hidden
+// page that plays Spotify in MixMusic didn't load in time.
+func SpotifyHereNotLoaded() string { return In(i18n.Locale()).SpotifyHereNotLoaded() }
+
+// SpotifyHereNotLoaded says "MixMusic's Spotify player didn't load"
+// in the language of msgs.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. The hidden
+// page that plays Spotify in MixMusic didn't load in time.
+func (msgs Messages) SpotifyHereNotLoaded() string {
+	return Catalog.Format(msgs.locale, "spotifyHereNotLoaded", nil)
+}
+
+// SpotifyHerePremium says "Spotify plays in MixMusic with Spotify Premium only"
+// in the language the app shows.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. The Spotify
+// account has no Premium.
+func SpotifyHerePremium() string { return In(i18n.Locale()).SpotifyHerePremium() }
+
+// SpotifyHerePremium says "Spotify plays in MixMusic with Spotify Premium only"
+// in the language of msgs.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. The Spotify
+// account has no Premium.
+func (msgs Messages) SpotifyHerePremium() string {
+	return Catalog.Format(msgs.locale, "spotifyHerePremium", nil)
+}
+
+// SpotifyHereSdkNotLoaded says "Spotify's player did not load: is MixMusic online?"
+// in the language the app shows.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. Spotify's
+// own player script couldn't be downloaded.
+func SpotifyHereSdkNotLoaded() string { return In(i18n.Locale()).SpotifyHereSdkNotLoaded() }
+
+// SpotifyHereSdkNotLoaded says "Spotify's player did not load: is MixMusic online?"
+// in the language of msgs.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. Spotify's
+// own player script couldn't be downloaded.
+func (msgs Messages) SpotifyHereSdkNotLoaded() string {
+	return Catalog.Format(msgs.locale, "spotifyHereSdkNotLoaded", nil)
+}
+
+// SpotifyHereSignIn says "sign in to Spotify in Settings › Accounts to play it"
+// in the language the app shows.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. The user
+// isn't signed in to Spotify.
+func SpotifyHereSignIn() string { return In(i18n.Locale()).SpotifyHereSignIn() }
+
+// SpotifyHereSignIn says "sign in to Spotify in Settings › Accounts to play it"
+// in the language of msgs.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. The user
+// isn't signed in to Spotify.
+func (msgs Messages) SpotifyHereSignIn() string {
+	return Catalog.Format(msgs.locale, "spotifyHereSignIn", nil)
+}
+
+// SpotifyHereSignInAgain says "sign in to Spotify again in Settings › Accounts, for MixMusic to play it itself"
+// in the language the app shows.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. The Spotify
+// sign-in doesn't let MixMusic play Spotify itself, or Spotify refused it.
+func SpotifyHereSignInAgain() string { return In(i18n.Locale()).SpotifyHereSignInAgain() }
+
+// SpotifyHereSignInAgain says "sign in to Spotify again in Settings › Accounts, for MixMusic to play it itself"
+// in the language of msgs.
+//
+// Why a Spotify track plays from YouTube Music instead: {why} of
+// playerFromYouTubeInstead, and a step of a failure's details. The Spotify
+// sign-in doesn't let MixMusic play Spotify itself, or Spotify refused it.
+func (msgs Messages) SpotifyHereSignInAgain() string {
+	return Catalog.Format(msgs.locale, "spotifyHereSignInAgain", nil)
+}
+
 // SpotifyPageClose says "You can close this tab and go back to MixMusic."
 // in the language the app shows.
 //
@@ -27134,10 +27606,18 @@ func (msgs Messages) TracksEmpty() string {
 
 // TracksFileNotFound says "File not found"
 // in the language the app shows.
+//
+// A track whose file on this computer is gone: in a list of tracks, and why
+// it couldn't play, as {error} of playerCouldntPlay and a step of a
+// failure's details.
 func TracksFileNotFound() string { return In(i18n.Locale()).TracksFileNotFound() }
 
 // TracksFileNotFound says "File not found"
 // in the language of msgs.
+//
+// A track whose file on this computer is gone: in a list of tracks, and why
+// it couldn't play, as {error} of playerCouldntPlay and a step of a
+// failure's details.
 func (msgs Messages) TracksFileNotFound() string {
 	return Catalog.Format(msgs.locale, "tracksFileNotFound", nil)
 }

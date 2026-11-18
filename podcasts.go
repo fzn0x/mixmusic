@@ -299,6 +299,7 @@ func (s *shell) episodeRow(c *ui.Context, key string, i int, episodes []media.Tr
 	}
 	menu := func(m *ui.Menu) { s.trackMenu(m, t) }
 	row.ContextMenu(menu)
+	s.queueKeys(row, t)
 	hovered := row.Hovered()
 	const art = 48
 	row.Children(func() {
@@ -331,7 +332,13 @@ func (s *shell) episodeRow(c *ui.Context, key string, i int, episodes []media.Tr
 		if t.DurationMs > 0 {
 			duration = clockLength(ms(t.DurationMs))
 		}
-		ui.Text(c, duration).FontSize(k.smallSize()).TextColor(sub).FontFeatures("tnum").Width(64).TextAlign(ui.End).Shrink(0)
+		// Under the pointer, the queue's button takes the length's place
+		// (queuebutton.go).
+		if s.queueButtonShows(key, hovered) {
+			s.rowQueueButton(c, key+"-queue-"+count(i), t, 64, s.episodeRowHeight())
+		} else {
+			ui.Text(c, duration).FontSize(k.smallSize()).TextColor(sub).FontFeatures("tnum").Width(64).TextAlign(ui.End).Shrink(0)
+		}
 		more := s.iconButton(c, key+"-more-"+count(i), "more", locales.PodcastsMoreFor(t.Title), false, 18).Menu(menu)
 		if !hovered && !more.FocusVisible() {
 			more.Opacity(0)

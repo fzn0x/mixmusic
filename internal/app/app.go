@@ -25,6 +25,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/clips"
 	"github.com/fzn0x/mixmusic/internal/diag"
 	"github.com/fzn0x/mixmusic/internal/downloads"
+	"github.com/fzn0x/mixmusic/internal/fcast"
 	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/match"
@@ -39,6 +40,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/stream"
 	"github.com/fzn0x/mixmusic/internal/taskbar"
 	"github.com/fzn0x/mixmusic/internal/tools"
+	"github.com/fzn0x/mixmusic/internal/upnp"
 	"github.com/fzn0x/mixmusic/internal/youtube"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
@@ -101,6 +103,12 @@ type Options struct {
 	// CastBrowse, when set, finds the cast devices on the network in place
 	// of mDNS: tests set it.
 	CastBrowse func(ctx context.Context) ([]cast.Device, error)
+	// RendererSearch and FCastBrowse, when set, find the DLNA and UPnP
+	// renderers and the FCast receivers on the network in place of SSDP
+	// and mDNS: tests set them. A test that sets any of the three finds
+	// nothing of those it leaves unset.
+	RendererSearch func(ctx context.Context) ([]upnp.Renderer, error)
+	FCastBrowse    func(ctx context.Context) ([]fcast.Receiver, error)
 	// Browsers, when set, finds the browsers that sign in to YouTube Music,
 	// and signs in with one, in place of those installed: tests set it
 	// (youtube_browser.go).

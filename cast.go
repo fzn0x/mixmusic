@@ -27,8 +27,9 @@ func (s *shell) castShown() bool {
 }
 
 // castButton chooses where the player's tracks play: on this computer, or
-// on a cast device on the network, listed by its name, which tells its
-// room, and its model. Choosing one moves what plays there, from where it
+// on a cast device on the network, a Google Cast device, a DLNA or UPnP
+// renderer or an FCast receiver, listed by its name, which tells its room,
+// and its model. Choosing one moves what plays there, from where it
 // was. Spotify tracks that play on Spotify Connect, or in MixMusic as a
 // Spotify device, stay where they play. Below the devices, the computers
 // with MixMusic's remote control on open their pages (remote.go).
@@ -50,8 +51,8 @@ func (s *shell) castButton(c *ui.Context) {
 		}
 		for _, d := range devices {
 			label := d.Name
-			if d.Model != "" {
-				label += " · " + d.Model
+			if model := app.ModelOf(d); model != "" {
+				label += " · " + model
 			}
 			if connecting && starting.ID == d.ID {
 				label += " · " + locales.CastConnecting()

@@ -115,7 +115,8 @@ talks to:
 - **Discord**, through the Discord app on your computer, over its local
   pipe or socket: what plays, for your profile.
 - **Cast devices** on your network, such as Chromecasts and Nest
-  speakers, which MixMusic finds and speaks to itself, in Go.
+  speakers, DLNA renderers and FCast receivers, which MixMusic finds and
+  speaks to itself, in Go.
 - **GitHub**, for new versions of MixMusic, for yt-dlp, for the community
   marketplace, and for the kanji dictionary.
 

@@ -221,6 +221,15 @@ func (d *Direct) stream(ctx context.Context, videoID string, q Quality) (Stream,
 	if err := d.check(ctx, &st); err != nil {
 		return Stream{}, err
 	}
+	// The AAC beside an Opus stream, unchecked, for a cast device that
+	// plays no WebM.
+	if f.opus() {
+		if af, ok, _ := pickOf(ans.StreamingData.AdaptiveFormats, QualityBest, length, playerFormat.aacLC); ok {
+			aac := af.stream()
+			aac.Loudness, aac.Measured = ans.loudness(&af)
+			st.AAC = &aac
+		}
+	}
 	// The 5.1 surround beside it, unchecked: few play it, and its first
 	// request tells if YouTube refuses it. YouTube lists none to the
 	// visionOS app, of the videos seen: the TV client tells of it then.

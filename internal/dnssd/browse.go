@@ -139,7 +139,12 @@ func queryID() uint16 {
 
 // sendToGroup sends q to mDNS's group on each network of the computer that
 // takes multicast, or, where it finds none, as the system routes it.
-func sendToGroup(conn *net.UDPConn, q []byte) error {
+func sendToGroup(conn *net.UDPConn, q []byte) error { return SendToGroup(conn, q, mdnsGroup) }
+
+// SendToGroup sends b to the multicast group on each network of the
+// computer that takes multicast, or, where it finds none, as the system
+// routes it: SSDP's searches go so too.
+func SendToGroup(conn *net.UDPConn, b []byte, group *net.UDPAddr) error {
 	sent := false
 	var last error
 	for _, n := range multicastNetworks() {
@@ -147,7 +152,7 @@ func sendToGroup(conn *net.UDPConn, q []byte) error {
 			last = err
 			continue
 		}
-		if _, err := conn.WriteToUDP(q, mdnsGroup); err != nil {
+		if _, err := conn.WriteToUDP(b, group); err != nil {
 			last = err
 			continue
 		}
@@ -156,7 +161,7 @@ func sendToGroup(conn *net.UDPConn, q []byte) error {
 	if sent {
 		return nil
 	}
-	if _, err := conn.WriteToUDP(q, mdnsGroup); err != nil {
+	if _, err := conn.WriteToUDP(b, group); err != nil {
 		if last != nil {
 			return last
 		}

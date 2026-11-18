@@ -117,6 +117,16 @@ func SurroundKey(videoID string) string { return videoID + ".5.1" }
 // YouTube has none of.
 var errNoSurround = errors.New("YouTube has no 5.1 surround audio of this track")
 
+// AACSuffix ends the path the proxy serves a video's stereo AAC audio at,
+// in MP4, after Path: for a cast device that plays no WebM.
+const AACSuffix = "/aac"
+
+// AACPath returns the path the proxy serves a video's AAC audio at.
+func AACPath(videoID string) string { return Path(videoID) + AACSuffix }
+
+// AACKey is the name a video's AAC audio is cached by, beside its own.
+func AACKey(videoID string) string { return videoID + ".aac" }
+
 // LivePath returns the path of the live stream of a video, which OpenLive
 // opens, as the engine's opener reads it.
 func LivePath(videoID string) string { return "/live/" + videoID }
@@ -124,7 +134,8 @@ func LivePath(videoID string) string { return "/live/" + videoID }
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	videoID, ok := strings.CutPrefix(r.URL.Path, "/yt/")
 	videoID, surround := strings.CutSuffix(videoID, SurroundSuffix)
-	if !ok || !ValidVideoID(videoID) {
+	videoID, aac := strings.CutSuffix(videoID, AACSuffix)
+	if !ok || !ValidVideoID(videoID) || surround && aac {
 		http.Error(w, "not found", http.StatusNotFound)
 		return
 	}
@@ -136,19 +147,25 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// What is kept holds stereo audio only: 5.1 surround audio comes from
 	// the cache or YouTube, and with no network fails, which the player
 	// plays in stereo instead.
-	if !surround && p.Kept != nil && fromHere(w, func() bool { return p.Kept.Serve(w, r, videoID) }) {
+	if !surround && !aac && p.Kept != nil && fromHere(w, func() bool { return p.Kept.Serve(w, r, videoID) }) {
 		return
 	}
 	key := videoID
-	if surround {
+	switch {
+	case surround:
 		key = SurroundKey(videoID)
+	case aac:
+		key = AACKey(videoID)
 	}
 	if p.Cache != nil && fromHere(w, func() bool { return p.Cache.Serve(w, r, key) }) {
 		return
 	}
 	resolve := func() (Stream, error) {
-		if surround {
+		switch {
+		case surround:
 			return p.resolveSurround(r.Context(), videoID)
+		case aac:
+			return p.resolveAAC(r.Context(), videoID)
 		}
 		return p.resolve(r.Context(), videoID)
 	}
@@ -314,6 +331,18 @@ func (p *Proxy) resolve(ctx context.Context, videoID string) (Stream, error) {
 // later then.
 func (p *Proxy) resolveSurround(ctx context.Context, videoID string) (Stream, error) {
 	s, err := p.Resolver.Surround(ctx, videoID)
+	if err != nil {
+		return s, err
+	}
+	if err := p.served(ctx, videoID, s); err != nil {
+		return Stream{}, err
+	}
+	return s, nil
+}
+
+// resolveAAC is resolve for the AAC audio of a video.
+func (p *Proxy) resolveAAC(ctx context.Context, videoID string) (Stream, error) {
+	s, err := p.Resolver.AAC(ctx, videoID)
 	if err != nil {
 		return s, err
 	}

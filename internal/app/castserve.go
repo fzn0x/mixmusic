@@ -17,11 +17,16 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
+	"golang.org/x/net/netutil"
+
 	"github.com/fzn0x/mixmusic/internal/stream"
+	"github.com/fzn0x/mixmusic/internal/upnp"
 )
 
 // castServer serves the proxy's audio to a cast device, while casting.
@@ -31,13 +36,37 @@ type castServer struct {
 	token  string
 	device net.IP
 	proxy  http.Handler
+	// dlna is set for a DLNA renderer, which gets DLNA's headers.
+	dlna bool
 	// fetched counts the requests of audio the device made.
 	fetched atomic.Int64
+
+	mu sync.Mutex
+	// served are the addresses handed to the device, past the token,
+	// by what they serve (castFormats).
+	served map[string]castServed
 }
+
+// castServed is what an address handed to a device serves: a path of the
+// proxy, or the file of a song on this computer, as contentType.
+type castServed struct {
+	path, file  string
+	contentType string
+}
+
+// castConns is how many connections at once a renderer's server takes:
+// a renderer opens one for each request, and some never close them.
+const castConns = 8
 
 // serveToCast serves proxy to the device at device, on the computer's
 // address local, which reaches it, at a port of its own.
 func serveToCast(local, device net.IP, proxy http.Handler) (*castServer, error) {
+	return serveCast(local, device, proxy, false)
+}
+
+// serveCast is serveToCast, of a DLNA renderer when dlna: with DLNA's
+// headers, over castConns connections at once.
+func serveCast(local, device net.IP, proxy http.Handler, dlna bool) (*castServer, error) {
 	ln, err := net.Listen("tcp", net.JoinHostPort(local.String(), "0"))
 	if err != nil {
 		return nil, err
@@ -47,11 +76,26 @@ func serveToCast(local, device net.IP, proxy http.Handler) (*castServer, error) 
 		ln.Close()
 		return nil, err
 	}
-	s := &castServer{ln: ln, token: hex.EncodeToString(b[:]), device: device, proxy: proxy}
+	s := &castServer{ln: ln, token: hex.EncodeToString(b[:]), device: device, proxy: proxy, dlna: dlna,
+		served: map[string]castServed{}}
 	s.srv = &http.Server{Handler: s, ReadHeaderTimeout: 10 * time.Second}
+	if dlna {
+		ln = netutil.LimitListener(ln, castConns)
+	}
 	go s.srv.Serve(ln)
 	return s, nil
 }
+
+// serve hands the device the address at, past the token, which serves c.
+func (s *castServer) serve(at string, c castServed) {
+	s.mu.Lock()
+	s.served[at] = c
+	s.mu.Unlock()
+}
+
+// ours reports whether an address a device plays is one this server
+// handed it: its token is in no other.
+func (s *castServer) ours(uri string) bool { return strings.Contains(uri, "/"+s.token+"/") }
 
 // url returns the address the device fetches the audio of path at, a path
 // of the proxy, as /yt/<video id>.
@@ -73,15 +117,77 @@ func (s *castServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	path, ok := strings.CutPrefix(r.URL.Path, "/"+s.token+"/")
-	if !ok || !strings.HasPrefix(path, "yt/") {
+	s.mu.Lock()
+	c, handed := s.served["/"+path]
+	s.mu.Unlock()
+	if !ok || !handed && !strings.HasPrefix(path, "yt/") {
 		http.Error(w, errNotCast.Error(), http.StatusNotFound)
 		return
 	}
 	s.fetched.Add(1)
+	if s.dlna {
+		// The audio comes as it plays, from its start or a byte range
+		// (DLNA.ORG_OP=01).
+		w.Header().Set("transferMode.dlna.org", "Streaming")
+		w.Header().Set("contentFeatures.dlna.org", upnp.Features)
+	}
+	if handed {
+		w = &typedWriter{ResponseWriter: w, contentType: c.contentType}
+		if c.file != "" {
+			serveCastFile(w, r, c.file)
+			return
+		}
+		path = strings.TrimPrefix(c.path, "/")
+	}
 	r2 := r.Clone(r.Context())
 	r2.URL.Path = "/" + path
 	r2.URL.RawPath = ""
 	s.proxy.ServeHTTP(w, r2)
+}
+
+// serveCastFile serves the file of a song on this computer, by ranges.
+func serveCastFile(w http.ResponseWriter, r *http.Request, file string) {
+	f, err := os.Open(file)
+	if err != nil {
+		http.Error(w, errNotCast.Error(), http.StatusNotFound)
+		return
+	}
+	defer f.Close()
+	info, err := f.Stat()
+	if err != nil || info.IsDir() {
+		http.Error(w, errNotCast.Error(), http.StatusNotFound)
+		return
+	}
+	http.ServeContent(w, r, "", info.ModTime(), f)
+}
+
+// typedWriter answers with the content type the device was told of, in
+// place of the proxy's, which names the codecs too.
+type typedWriter struct {
+	http.ResponseWriter
+	contentType string
+	wrote       bool
+}
+
+func (w *typedWriter) WriteHeader(code int) {
+	if !w.wrote && code < 300 {
+		w.Header().Set("Content-Type", w.contentType)
+	}
+	w.wrote = true
+	w.ResponseWriter.WriteHeader(code)
+}
+
+func (w *typedWriter) Write(b []byte) (int, error) {
+	if !w.wrote {
+		w.WriteHeader(http.StatusOK)
+	}
+	return w.ResponseWriter.Write(b)
+}
+
+func (w *typedWriter) Flush() {
+	if f, ok := w.ResponseWriter.(http.Flusher); ok {
+		f.Flush()
+	}
 }
 
 // castContentType returns the MIME type of the audio of a video the cast

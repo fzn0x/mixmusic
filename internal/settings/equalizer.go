@@ -31,8 +31,9 @@ const (
 )
 
 // Equalizer shapes the sound of MixMusic's own player: the equalizer of
-// Settings › Playback › Equalizer, and the balance, mono, crossfeed and
-// width of Settings › Playback › Sound (#615).
+// Settings › Playback › Equalizer, the balance, mono, crossfeed and width
+// of Settings › Playback › Sound (#615), and the reverb and the echo of
+// Settings › Playback (#546).
 type Equalizer struct {
 	// Enabled turns the equalizer on.
 	Enabled bool `json:"enabled"`
@@ -57,9 +58,9 @@ type Equalizer struct {
 	Bass   float64 `json:"bass"`
 	Mid    float64 `json:"mid"`
 	Treble float64 `json:"treble"`
-	// Effects is Sound effects: off, the equalizer, crossfeed and width
-	// stop shaping the sound, and keep their settings. Balance and Mono
-	// still apply. It is on at first.
+	// Effects is Sound effects: off, the equalizer, the reverb, the echo,
+	// crossfeed and width stop shaping the sound, and keep their settings.
+	// Balance and Mono still apply. It is on at first.
 	Effects bool `json:"effects"`
 	// Balance weighs the left side against the right, from -100, the left
 	// alone, to 100, the right alone.
@@ -77,6 +78,11 @@ type Equalizer struct {
 	// Headphones is the correction of the user's headphones, which plays
 	// after the bands, whether the equalizer is on or not (#616).
 	Headphones Headphones `json:"headphones"`
+	// Reverb plays the music in a room, after the bands (#546).
+	Reverb Reverb `json:"reverb"`
+	// Echo repeats the music, after the bands and before the reverb
+	// (#546).
+	Echo Echo `json:"echo"`
 }
 
 // EqualizerPreset is a preset of the user's: what Save as… keeps of the
@@ -112,7 +118,8 @@ func (p *EqualizerPreset) UnmarshalJSON(data []byte) error {
 }
 
 // defaultEqualizer is the equalizer of a new install: off, and flat, with
-// Auto headroom and Sound effects on, and nothing else shaping the sound.
+// Auto headroom and Sound effects on, and nothing else shaping the sound:
+// the reverb and the echo are off too.
 func defaultEqualizer() Equalizer {
 	var e Equalizer
 	e.Preset = "flat"
@@ -122,6 +129,8 @@ func defaultEqualizer() Equalizer {
 	e.Width = 100
 	e.Presets = []EqualizerPreset{}
 	e.Headphones = noHeadphones()
+	e.Reverb = defaultReverb()
+	e.Echo = defaultEcho()
 	return e
 }
 
@@ -160,6 +169,8 @@ func (e Equalizer) clean() Equalizer {
 	}
 	e.Presets = presets
 	e.Headphones = e.Headphones.clean()
+	e.Reverb = e.Reverb.clean()
+	e.Echo = e.Echo.clean()
 	return e
 }
 

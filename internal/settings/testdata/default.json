@@ -153,6 +153,18 @@
       "rig": "",
       "preamp": 0,
       "filters": []
+    },
+    "reverb": {
+      "on": false,
+      "room": "hall",
+      "mix": 25
+    },
+    "echo": {
+      "on": false,
+      "preset": "slapback",
+      "time": 120,
+      "feedback": 0,
+      "mix": 30
     }
   },
   "volumeCurve": "natural",

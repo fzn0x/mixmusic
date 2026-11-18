@@ -1,7 +1,9 @@
 package remote
 
 import (
+	"encoding/json"
 	"math"
+	"slices"
 	"strings"
 )
 
@@ -25,10 +27,49 @@ type State struct {
 	Muted  bool    `json:"muted,omitempty"`
 	// Next are the tracks after the one that plays, MaxNext at most.
 	Next []Track `json:"next,omitempty"`
+	// Shuffle and Repeat ("all", "one", or "" for neither) tell how the
+	// queue goes on, and Liked whether the track that plays is among the
+	// liked songs there: an older MixMusic tells none (FeatureModes).
+	Shuffle bool   `json:"shuffle,omitempty"`
+	Repeat  string `json:"repeat,omitempty"`
+	Liked   bool   `json:"liked,omitempty"`
+	// Outputs are where the computer can play, MaxOutputs at most, and
+	// Output the ID of the one it plays on (FeatureOutputs).
+	Outputs []Output `json:"outputs,omitempty"`
+	Output  string   `json:"output,omitempty"`
 }
 
 // MaxNext bounds the tracks after the current one that a state tells.
-const MaxNext = 20
+const MaxNext = 40
+
+// Output is a place the computer controlled can play, of a kind of
+// OutputKinds: its system's default sound output, another of its sound
+// outputs, by its name, or a cast device it found, by its name and model.
+// Its ID is the computer's own, which tells nothing of the device.
+type Output struct {
+	ID    string `json:"id"`
+	Kind  string `json:"kind"`
+	Name  string `json:"name,omitempty"`
+	Model string `json:"model,omitempty"`
+}
+
+// The kinds of the places a computer plays: its system's default sound
+// output, another of its sound outputs, a Google Cast device, a group of
+// Google Cast speakers, a DLNA or UPnP renderer, and an FCast receiver.
+const (
+	OutputDefault  = "default"
+	OutputSound    = "sound"
+	OutputCast     = "cast"
+	OutputGroup    = "group"
+	OutputRenderer = "dlna"
+	OutputFCast    = "fcast"
+)
+
+// OutputKinds are the kinds of Output this MixMusic knows.
+var OutputKinds = []string{OutputDefault, OutputSound, OutputCast, OutputGroup, OutputRenderer, OutputFCast}
+
+// MaxOutputs bounds the places a state tells.
+const MaxOutputs = 64
 
 // Track is a track as a state tells it: its title, its artists, its album
 // and the address of its cover, where it has one online.
@@ -52,6 +93,20 @@ const (
 	OpVolume   = "volume"
 )
 
+// The commands a computer whose welcome tells FeatureModes takes:
+// OpShuffle shuffles, or no longer, as Shuffle tells; OpRepeat repeats as
+// Repeat tells; OpMute mutes, or unmutes, as Muted tells; OpLike likes the
+// track of the entry Entry, or the one that plays when it names none, or
+// no longer, as Liked tells. OpOutput, which one whose welcome tells
+// FeatureOutputs takes, plays on the place of the ID Output.
+const (
+	OpShuffle = "shuffle"
+	OpRepeat  = "repeat"
+	OpMute    = "mute"
+	OpLike    = "like"
+	OpOutput  = "output"
+)
+
 // The commands on the queue, which a computer whose welcome tells
 // FeatureQueue takes: OpPlayEntry plays the entry Entry, OpRemove takes it
 // out of the queue, OpMove moves it to the place of the entry To, as
@@ -73,6 +128,20 @@ func queueOp(op string) bool {
 	return false
 }
 
+// featureOf is the feature the computer controlled must tell to take the
+// command op, or "" for one every MixMusic takes.
+func featureOf(op string) string {
+	switch {
+	case queueOp(op):
+		return FeatureQueue
+	case op == OpShuffle, op == OpRepeat, op == OpMute, op == OpLike:
+		return FeatureModes
+	case op == OpOutput:
+		return FeatureOutputs
+	}
+	return ""
+}
+
 // Command is what the computer controlling asks the player of the one
 // controlled: Op, and for OpSeek where to, for OpVolume the volume, from 0
 // to 1, and for the commands on the queue the entries, as the tracks of a
@@ -83,6 +152,13 @@ type Command struct {
 	Volume     float64 `json:"volume,omitempty"`
 	Entry      string  `json:"entry,omitempty"`
 	To         string  `json:"to,omitempty"`
+	// Shuffle, Repeat, Muted and Liked are what OpShuffle, OpRepeat, OpMute
+	// and OpLike set, and Output where OpOutput plays.
+	Shuffle bool   `json:"shuffle,omitempty"`
+	Repeat  string `json:"repeat,omitempty"`
+	Muted   bool   `json:"muted,omitempty"`
+	Liked   bool   `json:"liked,omitempty"`
+	Output  string `json:"output,omitempty"`
 }
 
 // clean is c with its values in range, or false for a command the
@@ -105,6 +181,18 @@ func (c Command) clean() (Command, bool) {
 			return c, false
 		}
 		return Command{Op: c.Op, Volume: min(max(v, 0), 1)}, true
+	case OpShuffle:
+		return Command{Op: c.Op, Shuffle: c.Shuffle}, true
+	case OpRepeat:
+		return Command{Op: c.Op, Repeat: c.Repeat}, c.Repeat == "" || c.Repeat == "all" || c.Repeat == "one"
+	case OpMute:
+		return Command{Op: c.Op, Muted: c.Muted}, true
+	case OpLike:
+		e := cleanEntry(c.Entry)
+		return Command{Op: c.Op, Liked: c.Liked, Entry: e}, e == c.Entry
+	case OpOutput:
+		o := cleanToken(c.Output, 64)
+		return Command{Op: c.Op, Output: o}, o != ""
 	}
 	return c, false
 }
@@ -131,7 +219,41 @@ func cleanState(s State) State {
 	s.Volume = min(max(s.Volume, 0), 1)
 	s.PositionMs, s.DurationMs = max(s.PositionMs, 0), max(s.DurationMs, 0)
 	s.Parts = cleanParts(s.Parts, s.DurationMs)
+	if s.Repeat != "all" && s.Repeat != "one" {
+		s.Repeat = ""
+	}
+	s.Outputs = cleanOutputs(s.Outputs)
+	s.Output = cleanToken(s.Output, 64)
 	return s
+}
+
+// cleanOutputs are the places a state tells, of the kinds this MixMusic
+// knows, with an ID, MaxOutputs at most, each ID once.
+func cleanOutputs(outputs []Output) []Output {
+	var out []Output
+	for _, o := range outputs {
+		if len(out) == MaxOutputs {
+			break
+		}
+		o = Output{ID: cleanToken(o.ID, 64), Kind: o.Kind, Name: cleanText(o.Name, 200), Model: cleanText(o.Model, 100)}
+		if o.ID == "" || !slices.Contains(OutputKinds, o.Kind) || slices.ContainsFunc(out, func(x Output) bool { return x.ID == o.ID }) {
+			continue
+		}
+		out = append(out, o)
+	}
+	return out
+}
+
+// fitState is s with fewer tracks after the one that plays, until its
+// message is no longer than the protocol takes.
+func fitState(s State) State {
+	for {
+		data, err := json.Marshal(message{Type: "state", State: &s})
+		if err == nil && len(data) <= maxMessage || len(s.Next) == 0 {
+			return s
+		}
+		s.Next = s.Next[:len(s.Next)/2]
+	}
 }
 
 func cleanTrack(t Track) Track {

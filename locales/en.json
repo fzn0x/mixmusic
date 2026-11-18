@@ -9028,6 +9028,44 @@
     "description": "The name of a computer paired for remote control that MixMusic no longer knows by name."
   },
   "remoteBothWays": "Can control this computer; You control it from here",
+  "remoteBroughtLeft": "Moved here from {name}, and paused there, but for {count, plural, one {# track} other {# tracks}}, files of {name} this computer doesn't have{next, select, yes {: it plays from the next one} other {}}",
+  "@remoteBroughtLeft": {
+    "description": "A notice once what played on the computer named {name} moved to this one, from that computer's remote control page, but for {count} music files of that computer which this one has no file of the same song of. {next} is yes when the track that played there was one of them, and this computer plays from the track after it.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Desktop"
+      },
+      "count": {
+        "type": "int",
+        "example": "2"
+      },
+      "next": {
+        "type": "String",
+        "example": "yes"
+      }
+    }
+  },
+  "remoteBroughtNone": "This computer has none of the tracks on {name}, files of that computer: they play on there",
+  "@remoteBroughtNone": {
+    "description": "A notice when moving what plays on the computer named {name} to this one, from that computer's remote control page, moved nothing: every track there is a music file of that computer, and this one has no file of the same songs.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Desktop"
+      }
+    }
+  },
+  "remoteBroughtPaused": "Moved here from {name}, and paused there",
+  "@remoteBroughtPaused": {
+    "description": "A notice once what played on the computer named {name} moved to this one, from that computer's remote control page, and that computer paused.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Desktop"
+      }
+    }
+  },
   "remoteCanControl": "Can control this computer",
   "remoteCodeAsks": "{name} asks to control MixMusic on this computer. To let it, type this code there:",
   "@remoteCodeAsks": {
@@ -9141,7 +9179,25 @@
     "description": "Toast when there is nothing to move to another computer."
   },
   "remoteFirewallHint": "Windows Firewall keeps the other computers from reaching this one. Windows Firewall, below, tells why, and how to let them in.",
+  "remoteMoveHere": "move here",
+  "@remoteMoveHere": {
+    "description": "A button on the remote control page of another computer, beside the track that plays there: it moves what plays there (the queue, the track, where it is, shuffle and repeat) to this computer, which plays it in its place. Lowercase, as the button \"move to {name}\" beside it."
+  },
+  "remoteMovingHere": "moving here…",
+  "@remoteMovingHere": {
+    "description": "The button \"move here\" on the remote control page of another computer, while what plays there moves to this computer."
+  },
   "remoteNoPaired": "No computer is paired yet. To control another computer, choose it in the player bar's devices menu, the cast button's.",
+  "remoteNoteBroughtAway": "Moved to {name}, which asked for it, and paused here",
+  "@remoteNoteBroughtAway": {
+    "description": "A notice on the computer controlled, once the computer named {name}, which controls it, moved what played here to itself, with \"move here\" on its remote control page, and this computer paused.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Laptop"
+      }
+    }
+  },
   "remoteNoteHandedOver": "{name} moved what it played to this computer",
   "@remoteNoteHandedOver": {
     "description": "Toast when the computer named {name} moved its queue and the track it played to this one.",
@@ -9214,6 +9270,16 @@
     "placeholders": {
       "name": {
         "type": "String"
+      }
+    }
+  },
+  "remoteOlderModes": "MixMusic on {name} is older: update it there to move what plays there here, and to change its shuffle, repeat, mute, likes and output device from here.",
+  "@remoteOlderModes": {
+    "description": "Under the remote control page of the computer named {name}, whose MixMusic is older than this one's, and can't move what plays there to this computer, nor take shuffle, repeat, mute, like and the output device from here.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Desktop"
       }
     }
   },

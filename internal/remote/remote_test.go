@@ -32,6 +32,10 @@ type fakeHost struct {
 	state    State
 	commands []Command
 	handed   []HandOver
+	// give is what plays, which Give hands over, and given how the
+	// computer that asked for it took it.
+	give     *HandOver
+	given    []Taken
 	watchers []*func()
 	// shown gets the request of each pairing as its code shows, and ended
 	// how each ended.
@@ -107,6 +111,21 @@ func (h *fakeHost) TakeOver(_ Fingerprint, ho HandOver) Taken {
 		}
 	}
 	return t
+}
+
+func (h *fakeHost) Give(Fingerprint) (HandOver, bool) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.give == nil {
+		return HandOver{}, false
+	}
+	return *h.give, true
+}
+
+func (h *fakeHost) Given(_ Fingerprint, t Taken) {
+	h.mu.Lock()
+	h.given = append(h.given, t)
+	h.mu.Unlock()
 }
 
 func (h *fakeHost) Watch(fn func()) func() {

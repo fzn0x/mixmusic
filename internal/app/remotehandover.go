@@ -3,7 +3,9 @@ package app
 // Handing what plays over to another computer (remote control, #353):
 // this computer sends its queue, the track that plays and where it is to
 // the computer whose page shows, which plays them in place of its own,
-// and pauses once that one took them.
+// and pauses once that one took them. Or, the other way (#556), the
+// computer whose page shows hands what plays there over to this one, as
+// its page's Move here asks, and pauses once this one took them.
 //
 // A track of YouTube Music or Spotify goes with its ID, and the other
 // plays it as it plays its own: a Spotify track as its settings play
@@ -101,6 +103,68 @@ func (rc *Remote) HandOver(id string) (HandedOver, error) {
 	return HandedOver{Kept: taken.Kept, Left: taken.Left, CurrentLeft: taken.CurrentLeft}, nil
 }
 
+// Bring plays here what plays on the computer id, whose page shows, in
+// place of what plays here: its queue, the track that plays and where it
+// is, whether it plays, shuffle and repeat, its files as this computer's
+// own files of the same songs. Once this computer took a track, that one
+// pauses. It tells how it went as HandOver does, from this side: Left
+// counts the files of that computer this one doesn't have, and when it
+// has none of its tracks, nothing moves.
+func (rc *Remote) Bring(id string) (HandedOver, error) {
+	a := rc.a
+	s, err := rc.session(id)
+	if err != nil {
+		return HandedOver{}, err
+	}
+	p := remoteHost{a}.player()
+	if p == nil {
+		return HandedOver{}, noNative()
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), handOverFor)
+	defer cancel()
+	h, err := s.Bring(ctx)
+	if err != nil {
+		log.Printf("mixmusic: remote control: bringing what plays on %s here: %v", s.Name(), err)
+		switch {
+		case errors.Is(err, remote.ErrNothingThere):
+			name := s.Name()
+			return HandedOver{}, wordedLater("Nothing plays on "+name+".", func() string { return locales.RemotePageNothing(name) }, err)
+		case errors.Is(err, context.DeadlineExceeded):
+			return HandedOver{}, &peerError{name: s.Name(), err: errHandOverLate}
+		}
+		return HandedOver{}, &peerError{name: s.Name(), err: err}
+	}
+	taken := a.playHandedOver(p, h)
+	if err := s.Took(h, taken); err != nil {
+		log.Printf("mixmusic: remote control: telling %s what was taken: %v", s.Name(), err)
+	}
+	log.Printf("mixmusic: remote control: brought %d tracks here from %s, and left out %d", taken.Kept, s.Name(), taken.Left)
+	return HandedOver{Kept: taken.Kept, Left: taken.Left, CurrentLeft: taken.CurrentLeft}, nil
+}
+
+// Give is what plays here, which the computer of fp asks for, to play it
+// there: false when nothing plays.
+func (h remoteHost) Give(remote.Fingerprint) (remote.HandOver, bool) {
+	p := h.player()
+	if p == nil {
+		return remote.HandOver{}, false
+	}
+	return handOverOf(p.State())
+}
+
+// Given pauses the player, as the computer of fp took what plays here,
+// a track or more of it, and tells the windows.
+func (h remoteHost) Given(fp remote.Fingerprint, t remote.Taken) {
+	p := h.player()
+	if p == nil {
+		return
+	}
+	p.Pause()
+	name := h.a.pairedName(fp)
+	log.Printf("mixmusic: remote control: %s took %d tracks of what played here, and left out %d", name, t.Kept, t.Left)
+	h.a.notifyRemote(locales.RemoteNoteBroughtAway(name))
+}
+
 // handOverOf is what the player's st hands over: its queue around the
 // track that plays, which the protocol cuts to its bounds, where that
 // track is, whether it plays, and how the queue goes on. It is false when
@@ -111,15 +175,10 @@ func handOverOf(st player.State) (remote.HandOver, bool) {
 	}
 	from := max(st.Index-remote.MaxHandOver/10, 0)
 	to := min(from+remote.MaxHandOver, len(st.Queue))
-	h := remote.HandOver{Index: st.Index - from, Playing: st.Playing || st.Loading || st.Waiting && st.WillPlay, Shuffle: st.Shuffle}
+	h := remote.HandOver{Index: st.Index - from, Playing: st.Playing || st.Loading || st.Waiting && st.WillPlay, Shuffle: st.Shuffle,
+		Repeat: repeatOf(st.Repeat)}
 	if !st.Live {
 		h.PositionMs = st.Position.Milliseconds()
-	}
-	switch st.Repeat {
-	case player.RepeatAll:
-		h.Repeat = "all"
-	case player.RepeatOne:
-		h.Repeat = "one"
 	}
 	for _, it := range st.Queue[from:to] {
 		h.Queue = append(h.Queue, queueTrackOf(it.Track))
@@ -165,11 +224,26 @@ func queueTrackOf(t media.Track) remote.QueueTrack {
 // the next track kept plays from its start.
 func (h remoteHost) TakeOver(fp remote.Fingerprint, ho remote.HandOver) remote.Taken {
 	a := h.a
-	taken := remote.Taken{Left: len(ho.Queue)}
 	p := h.player()
 	if p == nil {
+		return remote.Taken{Left: len(ho.Queue)}
+	}
+	taken := a.playHandedOver(p, ho)
+	if taken.Kept == 0 {
 		return taken
 	}
+	name := a.pairedName(fp)
+	log.Printf("mixmusic: remote control: %s handed %d tracks over, of which %d were left out", name, len(ho.Queue), taken.Left)
+	a.notifyRemote(locales.RemoteNoteHandedOver(name))
+	return taken
+}
+
+// playHandedOver has p play what another computer handed over, in place
+// of what plays: its tracks of a service as its own, its files as the
+// same songs of this computer's files, where it has them, and the rest
+// left out. It tells how it took it.
+func (a *App) playHandedOver(p *player.Player, ho remote.HandOver) remote.Taken {
+	taken := remote.Taken{Left: len(ho.Queue)}
 	var mine *localSongs
 	find := func(q remote.QueueTrack) (media.Track, bool) {
 		if mine == nil {
@@ -203,18 +277,8 @@ func (h remoteHost) TakeOver(fp remote.Fingerprint, ho remote.HandOver) remote.T
 	if current {
 		pos = time.Duration(ho.PositionMs) * time.Millisecond
 	}
-	repeat := player.RepeatOff
-	switch ho.Repeat {
-	case "all":
-		repeat = player.RepeatAll
-	case "one":
-		repeat = player.RepeatOne
-	}
-	p.TakeOver(tracks, at, pos, ho.Playing, ho.Shuffle, repeat)
+	p.TakeOver(tracks, at, pos, ho.Playing, ho.Shuffle, repeatNamed(ho.Repeat))
 	taken.Kept, taken.Left = len(tracks), len(ho.Queue)-len(tracks)
-	name := a.pairedName(fp)
-	log.Printf("mixmusic: remote control: %s handed %d tracks over, of which %d were left out", name, len(ho.Queue), taken.Left)
-	a.notifyRemote(locales.RemoteNoteHandedOver(name))
 	return taken
 }
 

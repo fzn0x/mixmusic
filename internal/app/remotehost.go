@@ -5,8 +5,10 @@ package app
 // server tells of and runs the commands on.
 
 import (
+	"context"
 	"errors"
 	"log"
+	"slices"
 	"time"
 
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -157,13 +159,20 @@ func (h remoteHost) player() *player.Player {
 	return h.a.goPlayer.Load()
 }
 
-// State is what the player does now.
+// State is what the player does now, whether the track that plays is
+// liked, and where this computer can play.
 func (h remoteHost) State() remote.State {
 	p := h.player()
 	if p == nil {
 		return remote.State{}
 	}
-	return remoteStateOf(p.State())
+	st := p.State()
+	out := remoteStateOf(st)
+	if cur, ok := st.Current(); ok {
+		out.Liked = h.a.IsLiked(cur.Track.ID)
+	}
+	out.Outputs, out.Output = h.a.remoteOutputs()
+	return out
 }
 
 // remoteStateOf is the state the player's st tells the computer that
@@ -172,7 +181,8 @@ func (h remoteHost) State() remote.State {
 // the commands on the queue name.
 func remoteStateOf(st player.State) remote.State {
 	out := remote.State{Playing: st.Playing || st.Waiting && st.WillPlay, Loading: st.Loading, Live: st.Live,
-		PositionMs: st.Position.Milliseconds(), DurationMs: st.Duration.Milliseconds(), Volume: st.Volume, Muted: st.Muted}
+		PositionMs: st.Position.Milliseconds(), DurationMs: st.Duration.Milliseconds(), Volume: st.Volume, Muted: st.Muted,
+		Shuffle: st.Shuffle, Repeat: repeatOf(st.Repeat)}
 	cur, ok := st.Current()
 	if !ok {
 		return out
@@ -234,14 +244,87 @@ func (h remoteHost) Do(c remote.Command) {
 		p.MoveEntry(c.Entry, c.To)
 	case remote.OpClear:
 		p.ClearUpcoming()
+	case remote.OpShuffle:
+		p.SetShuffle(c.Shuffle)
+	case remote.OpRepeat:
+		p.SetRepeat(repeatNamed(c.Repeat))
+	case remote.OpMute:
+		p.SetMuted(c.Muted)
+	case remote.OpLike:
+		h.like(p, c.Entry, c.Liked)
+	case remote.OpOutput:
+		h.a.playOn(c.Output)
 	}
 }
 
-// Watch has fn told as the player changes.
+// like likes the track of the queue's entry, or the one that plays for
+// none, or no longer, as the windows do: a like takes a dislike back.
+func (h remoteHost) like(p *player.Player, entry string, liked bool) {
+	a := h.a
+	st := p.State()
+	i := st.Index
+	if entry != "" {
+		i = slices.IndexFunc(st.Queue, func(it player.Item) bool { return it.UID == entry })
+	}
+	if i < 0 || i >= len(st.Queue) {
+		return
+	}
+	t := st.Queue[i].Track
+	if liked && a.IsDisliked(t.ID) {
+		p.Disliked(t.ID, false)
+	}
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		if err := (&Collection{a}).SetLiked(ctx, t, liked); err != nil {
+			log.Printf("mixmusic: remote control: liking a track as asked: %v", err)
+		}
+		notify()
+		a.pokeRemote()
+	}()
+}
+
+// Watch has fn told as the player changes, and as what the computers that
+// control this one see changes otherwise (pokeRemote).
 func (h remoteHost) Watch(fn func()) func() {
 	p := h.player()
 	if p == nil {
 		return func() {}
 	}
-	return p.Subscribe(func(player.Event) { fn() })
+	r := &h.a.remote
+	f := &fn
+	r.mu.Lock()
+	r.pokes = append(slices.Clone(r.pokes), f)
+	r.mu.Unlock()
+	stop := p.Subscribe(func(player.Event) { fn() })
+	return func() {
+		stop()
+		r.mu.Lock()
+		r.pokes = slices.DeleteFunc(slices.Clone(r.pokes), func(g *func()) bool { return g == f })
+		r.mu.Unlock()
+	}
+}
+
+// pokeRemote tells the sessions of the computers that control this one
+// that what they see changed, as a track liked.
+func (a *App) pokeRemote() {
+	r := &a.remote
+	r.mu.Lock()
+	fns := r.pokes
+	r.mu.Unlock()
+	for _, fn := range fns {
+		(*fn)()
+	}
+}
+
+// repeatNamed is the repeat a command or a hand-over names: "all", "one",
+// or neither (repeatOf).
+func repeatNamed(word string) player.Repeat {
+	switch word {
+	case "all":
+		return player.RepeatAll
+	case "one":
+		return player.RepeatOne
+	}
+	return player.RepeatOff
 }

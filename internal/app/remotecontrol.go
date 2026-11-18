@@ -165,9 +165,11 @@ type RemoteView struct {
 	At       time.Time
 	HasState bool
 	// CanQueue is set when the computer takes the commands on its queue,
-	// and CanHandOver when it takes what plays here: an older MixMusic
-	// doesn't.
-	CanQueue, CanHandOver bool
+	// CanHandOver when it takes what plays here, CanBring when it hands
+	// what plays there over to this one, CanModes when it takes shuffle,
+	// repeat, mute and like, and CanOutputs when it tells where it can
+	// play: an older MixMusic doesn't.
+	CanQueue, CanHandOver, CanBring, CanModes, CanOutputs bool
 }
 
 // remoteControl is the session with the computer whose page shows.
@@ -290,7 +292,9 @@ func (rc *Remote) View(id string) RemoteView {
 	case ctl.session != nil:
 		v.Step = RemoteConnected
 		v.State, v.At, v.HasState = ctl.session.State()
-		v.CanQueue, v.CanHandOver = ctl.session.Can(remote.FeatureQueue), ctl.session.Can(remote.FeatureHandOver)
+		s := ctl.session
+		v.CanQueue, v.CanHandOver, v.CanBring = s.Can(remote.FeatureQueue), s.Can(remote.FeatureHandOver), s.Can(remote.FeatureBring)
+		v.CanModes, v.CanOutputs = s.Can(remote.FeatureModes), s.Can(remote.FeatureOutputs)
 		return v
 	case !isFound:
 		v.Step = RemoteAway

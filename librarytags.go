@@ -729,7 +729,7 @@ func (s *shell) tagListView(c *ui.Context, open *bool, tags []library.Tag) {
 // opens it.
 func (s *shell) tagRow(c *ui.Context, t library.Tag, keys []string) {
 	k := &s.lk
-	row := ui.ButtonBase(c.Key("tag-row-" + t.ID)).Row().Gap(12).AlignItems(ui.Center).PaddingY(10).PaddingX(12).
+	row := s.buttonBase(c.Key("tag-row-" + t.ID)).Row().Gap(12).AlignItems(ui.Center).PaddingY(10).PaddingX(12).
 		Radius(k.radiusSm).Label(locales.LibraryTagsRow(t.Name, len(t.Items))).Cursor(ui.CursorPointer)
 	if row.Hovered() {
 		row.Background(k.hover)
@@ -827,7 +827,7 @@ func (s *shell) tagSwatches(c *ui.Context, t library.Tag) {
 		for _, h := range tagPalette {
 			on := h.name == chosen
 			name := locales.LibraryTagsColourName(h.name)
-			b := ui.ButtonBase(c.Key("tag-colour-"+h.name)).Size(34, 34).Radius(17).Center().Role(ui.RoleRadio).Checked(on).
+			b := s.buttonBase(c.Key("tag-colour-"+h.name)).Size(34, 34).Radius(17).Center().Role(ui.RoleRadio).Checked(on).
 				Label(name).Tooltip(name).Cursor(ui.CursorPointer)
 			switch {
 			case on:

@@ -54,17 +54,21 @@ var errNotAsked = errors.New("lyrics: not asked")
 // would beat: synced, timed word by word while the user prefers those,
 // or a track the source says is instrumental. Plain lyrics that show for
 // a music video, in place of its song's synced lyrics, keep the note of
-// those, which says why.
-func (c *Catalog) askLyrics(ctx context.Context, track media.Track, q lyrics.Query, set settings.Lyrics) (lyrics.Lyrics, error) {
+// those, which says why. Each answer is kept in asked, which the lyrics
+// panel tells (lyricspick.go), with the key of the one chosen; seen is
+// the version of the timing of music videos' lyrics the lookup saw.
+func (c *Catalog) askLyrics(ctx context.Context, track media.Track, q lyrics.Query, set settings.Lyrics, asked *lyricsAsked, seen int64) (lyrics.Lyrics, error) {
 	var best lyrics.Lyrics
-	found, note := false, ""
+	found, note, chosen := false, "", ""
 	var errs []error
+	defer func() { asked.chose(chosen, false) }()
 	for _, s := range set.SourceOrder() {
 		ask := lyricsLookups[s.Key]
 		if s.Off || ask == nil {
 			continue
 		}
 		l, err := ask(c, ctx, track, q)
+		asked.put(s.Key, lyricsAnswer{l: l, err: err, seen: seen})
 		if err != nil {
 			if !lyricsNone(err) && !errors.Is(err, lyrics.ErrNotFoundYet) {
 				log.Printf("mixmusic: the lyrics of %s, on %s: %v", track.ID, s.Key, err)
@@ -76,7 +80,7 @@ func (c *Catalog) askLyrics(ctx context.Context, track media.Track, q lyrics.Que
 			note = l.Note
 		}
 		if !found || betterLyrics(l, best, set.LyricsPreferWords) {
-			best, found = l, true
+			best, found, chosen = l, true, s.Key
 		}
 		if best.Instrumental || best.Synced && (!set.LyricsPreferWords || best.WordTimed()) {
 			break

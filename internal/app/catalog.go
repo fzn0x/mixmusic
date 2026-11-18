@@ -442,8 +442,9 @@ func (c *Catalog) videoLength(ctx context.Context, video media.Track) time.Durat
 }
 
 // onlineLyrics returns the lyrics of a track from the sources of lyrics
-// that are on, in the user's order (askLyrics), as Lyrics asks them.
-func (c *Catalog) onlineLyrics(ctx context.Context, track media.Track) (lyrics.Lyrics, error) {
+// that are on, in the user's order (askLyrics), as Lyrics asks them,
+// keeping their answers in asked.
+func (c *Catalog) onlineLyrics(ctx context.Context, track media.Track, asked *lyricsAsked) (lyrics.Lyrics, error) {
 	set := c.a.settings.Get().Lyrics
 	kept := track.ID + " " + lyricsSetup(set)
 	if l, ok := c.a.lyricsMemo.get(kept); ok {
@@ -456,7 +457,7 @@ func (c *Catalog) onlineLyrics(ctx context.Context, track media.Track) (lyrics.L
 	q := lyricsQuery(track)
 	q.VideoID = c.videoID(track)
 	seen := c.a.lyricsTiming.version.Load()
-	l, err := c.askLyrics(ctx, track, q, set)
+	l, err := c.askLyrics(ctx, track, q, set, asked, seen)
 	if err != nil {
 		// A track LRCLIB was too busy to look everywhere for, or that a
 		// source out of reach may have, reads the same, but the lyrics

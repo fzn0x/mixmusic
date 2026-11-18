@@ -69,9 +69,44 @@ func (c *Catalog) Transcript(ctx context.Context, episode media.Track) (lyrics.L
 	return l, nil
 }
 
+// captionLyricsIn returns the lyrics of a track from the captions of its
+// video in the language lang, as YouTube tells it ("pt-BR"), of those its
+// uploader wrote: the caption track the listener picked (#598).
+func (c *Catalog) captionLyricsIn(ctx context.Context, track media.Track, lang string) (lyrics.Lyrics, error) {
+	if track.Source == media.SourceLocal || c.a.captions == nil {
+		return lyrics.Lyrics{}, errNotAsked
+	}
+	ctx, cancel := context.WithTimeout(ctx, captionsWait)
+	defer cancel()
+	lines, got, err := c.captionsBy(ctx, track, func(tracks []stream.CaptionTrack) (stream.CaptionTrack, bool) {
+		for _, t := range tracks {
+			if !t.Speech && t.Language == lang {
+				return t, true
+			}
+		}
+		return stream.CaptionTrack{}, false
+	})
+	if err != nil {
+		return lyrics.Lyrics{}, err
+	}
+	l := lyrics.Timed(lines, CaptionsSource)
+	l.Language = languageOf(got)
+	return l, nil
+}
+
 // captionsOf returns the lines of the captions of track's recording on
 // YouTube that lyrics come from (captionTrack), and their language.
 func (c *Catalog) captionsOf(ctx context.Context, track media.Track, speech bool) ([]lyrics.Line, string, error) {
+	return c.captionsBy(ctx, track, func(tracks []stream.CaptionTrack) (stream.CaptionTrack, bool) {
+		return captionTrack(tracks, c.a.settings.Get().LyricsCaptionLanguage, speech)
+	})
+}
+
+// captionsBy returns the lines of the captions of track's recording on
+// YouTube that choose takes of its caption tracks, and their language. It
+// keeps the caption tracks its uploader wrote, which the lyrics panel
+// lists by their language (captionList).
+func (c *Catalog) captionsBy(ctx context.Context, track media.Track, choose func([]stream.CaptionTrack) (stream.CaptionTrack, bool)) ([]lyrics.Line, string, error) {
 	yt, err := c.youtubeRecording(ctx, track)
 	if err != nil {
 		return nil, "", err
@@ -89,7 +124,8 @@ func (c *Catalog) captionsOf(ctx context.Context, track media.Track, speech bool
 		// Another recording: its captions wouldn't keep time with the track.
 		return nil, "", lyrics.ErrNotFound
 	}
-	t, ok := captionTrack(caps.Tracks, c.a.settings.Get().LyricsCaptionLanguage, speech)
+	c.keepCaptions(id, caps.Tracks)
+	t, ok := choose(caps.Tracks)
 	if !ok {
 		return nil, "", lyrics.ErrNotFound
 	}
@@ -102,6 +138,21 @@ func (c *Catalog) captionsOf(ctx context.Context, track media.Track, speech bool
 		return nil, "", lyrics.ErrNotFound
 	}
 	return lines, t.Language, nil
+}
+
+// keepCaptions keeps the caption tracks of the video of ID id that its
+// uploader wrote, in their order, for captionList.
+func (c *Catalog) keepCaptions(id string, tracks []stream.CaptionTrack) {
+	if c.a.captionLists == nil {
+		return
+	}
+	var made []stream.CaptionTrack
+	for _, t := range tracks {
+		if !t.Speech {
+			made = append(made, t)
+		}
+	}
+	c.a.captionLists.put(id, made)
 }
 
 // captionTrack returns the captions of tracks that lyrics come from:

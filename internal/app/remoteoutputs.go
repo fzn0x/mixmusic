@@ -23,12 +23,13 @@ import (
 var remoteSoundsEvery = 10 * time.Second
 
 // remoteSounds are this computer's sound outputs, as listed last for the
-// computers that control it.
+// computers that control it, and why the last listing failed, if it did.
 type remoteSounds struct {
 	mu      sync.Mutex
 	devices []OutputDevice
 	at      time.Time
 	listing bool
+	failed  string
 }
 
 // remoteSounds returns this computer's sound outputs, as listed last, and
@@ -44,15 +45,18 @@ func (a *App) remoteSounds() []OutputDevice {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 			devices, err := (&Player{a}).OutputDevices(ctx)
-			if err != nil {
-				log.Printf("mixmusic: remote control: listing the sound outputs: %v", err)
-			}
 			r.mu.Lock()
+			defer r.mu.Unlock()
 			r.listing, r.at = false, time.Now()
 			if err == nil {
-				r.devices = devices
+				r.devices, r.failed = devices, ""
+				return
 			}
-			r.mu.Unlock()
+			// The log tells a failure once, not every listing.
+			if err.Error() != r.failed {
+				log.Printf("mixmusic: remote control: listing the sound outputs: %v", err)
+			}
+			r.failed = err.Error()
 		}()
 	}
 	return r.devices

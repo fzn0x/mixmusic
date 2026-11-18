@@ -446,7 +446,9 @@ people who speak them.
   messages that parse, keys en.json has, in order, the placeholders and
   the cases. `bunx mygo dev -lang <tag>` runs the app in the language.
 - **The pull request.** One that adds or fixes a translation changes its
-  file alone, with no entry in changelog.d.
+  file alone, with no entry in changelog.d. CI then checks the catalogs and
+  runs the tests of the packages that read them, on Linux alone, rather
+  than every check and build; main's CI runs everything after the merge.
 
 ## Translations of the README
 

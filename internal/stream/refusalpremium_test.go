@@ -85,7 +85,7 @@ func TestRefusedAsksAgainAtPremium(t *testing.T) {
 		switch {
 		case c.plays && (err != nil || !s.AsAccount || s.Route != RouteAccount):
 			t.Errorf("%s: not played as the account: %+v, %v", c.name, s, err)
-		case !c.plays && (err == nil || err.Error() != want.Error()):
+		case !c.plays && (err == nil || !strings.HasPrefix(err.Error(), want.Error())):
 			t.Errorf("%s: %v, want the signed-out failure %v", c.name, err, want)
 		}
 		if n := asAccountRuns(y); n != c.asAccount {

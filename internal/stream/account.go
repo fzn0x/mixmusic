@@ -81,16 +81,16 @@ func (r *Resolver) ForgetRefusals() {
 
 // accountStream has yt-dlp find the stream of a video as the user's YouTube
 // Music account, for Premium's higher bitrate, when accountSession gives
-// a session to ask as. It reports false when it didn't ask, or found no
-// stream the engine plays: the stream is found signed out then, as
-// without the switch, so a track never fails for it; and, as the third,
-// that it didn't ask only for a refusal mark (accountSession). again asks
-// once more, after the signed-out ways (againAsAccount). The log tells
-// how it went, never the session nor the stream's URL.
-func (r *Resolver) accountStream(ctx context.Context, videoID string, quality Quality, again bool) (Stream, bool, bool) {
-	cookies, pastMark := r.accountSession(videoID, quality, again)
+// a session to ask as. It tells how the try went: why it didn't ask, or
+// why it found no stream the engine plays, when it didn't take one: the
+// stream is found signed out then, as without the switch, so a track
+// never fails for it. again asks once more, after the signed-out ways
+// (againAsAccount). The log tells how it went, never the session nor the
+// stream's URL.
+func (r *Resolver) accountStream(ctx context.Context, videoID string, quality Quality, again bool) (Stream, accountTry) {
+	cookies, skip := r.accountSession(videoID, quality, again)
 	if cookies == nil {
-		return Stream{}, false, pastMark
+		return Stream{}, accountTry{skip: skip}
 	}
 	more, then := "", "it's found signed out"
 	if again {
@@ -99,6 +99,9 @@ func (r *Resolver) accountStream(ctx context.Context, videoID string, quality Qu
 	start := time.Now()
 	actx, cancel := context.WithTimeout(ctx, accountTimeout)
 	s, err := r.ytdlpAsAccount(actx, videoID, quality, cookies)
+	if err != nil && ctx.Err() == nil && errors.Is(actx.Err(), context.DeadlineExceeded) {
+		err = fmt.Errorf("yt-dlp gave no answer in %s", accountTimeout)
+	}
 	cancel()
 	if err == nil {
 		err = takenAsAccount(s)
@@ -107,7 +110,7 @@ func (r *Resolver) accountStream(ctx context.Context, videoID string, quality Qu
 	if err != nil {
 		log.Printf("mixmusic: yt-dlp found no stream of %s as your YouTube Music account%s in %s (%s); %s",
 			videoID, more, took, strings.TrimPrefix(err.Error(), "stream: "), then)
-		return Stream{}, false, false
+		return Stream{}, accountTry{err: err}
 	}
 	s.AsAccount = true
 	if s.Surround != nil {
@@ -115,7 +118,7 @@ func (r *Resolver) accountStream(ctx context.Context, videoID string, quality Qu
 	}
 	log.Printf("mixmusic: found the stream of %s as your YouTube Music account%s in %s with yt-dlp: %s at %.0f kbit/s",
 		videoID, more, took, s.Codec, s.Bitrate)
-	return s, true, false
+	return s, accountTry{}
 }
 
 // againAsAccount has yt-dlp find the stream of a video as the account once
@@ -125,12 +128,11 @@ func (r *Resolver) accountStream(ctx context.Context, videoID string, quality Qu
 // the wall with a stream that plays, as after a move to another network.
 // It asks once a resolve, so a track whose stream YouTube refuses again
 // fails rather than asks on.
-func (r *Resolver) againAsAccount(ctx context.Context, videoID string, quality Quality, err error) (Stream, bool) {
+func (r *Resolver) againAsAccount(ctx context.Context, videoID string, quality Quality, err error) (Stream, accountTry) {
 	if ctx.Err() != nil || !signInWall(err) {
-		return Stream{}, false
+		return Stream{}, accountTry{skip: accountOnce}
 	}
-	s, ok, _ := r.accountStream(ctx, videoID, quality, true)
-	return s, ok
+	return r.accountStream(ctx, videoID, quality, true)
 }
 
 // signInWalls are parts of yt-dlp's errors, as plainErrors has them, of a
@@ -157,38 +159,73 @@ func signInWall(err error) bool {
 }
 
 // accountSession returns the session to ask for the stream of a video as,
-// or nil to ask signed out: while the user asks for it (SetAsAccount) and
-// Session gives one yt-dlp takes for a signed-in one, of the best quality,
-// which alone gains from Premium, with a JavaScript runtime, unless
-// YouTube refused the stream of the video found as the account less than
-// refusalMark ago, as the same session. again asks for such a video
-// alone: once more, after the signed-out ways (againAsAccount). pastMark
-// tells that it returns nil only for that mark: it would return the
-// session otherwise.
-func (r *Resolver) accountSession(videoID string, quality Quality, again bool) (cookies []*http.Cookie, pastMark bool) {
+// or nil to ask signed out, with why (one of the Account constants,
+// accountMarked or accountOnce): while the user asks for it (SetAsAccount)
+// and session gives one, of the best quality, which alone gains from
+// Premium, with a JavaScript runtime, unless YouTube refused the stream
+// of the video found as the account less than refusalMark ago, as the
+// same session. again asks for such a video alone: once more, after the
+// signed-out ways (againAsAccount).
+func (r *Resolver) accountSession(videoID string, quality Quality, again bool) ([]*http.Cookie, string) {
 	r.mu.Lock()
 	on := r.asAccount
 	r.mu.Unlock()
-	// The clients yt-dlp asks as for an account need a challenge solved,
-	// which takes a runtime, as the 5.1 audio does.
-	if !on || r.Session == nil || quality != QualityBest || !r.findsSurround() {
-		return nil, false
+	if !on {
+		return nil, AccountOff
 	}
-	cookies = r.Session()
+	cookies, skip := r.session()
 	r.mu.Lock()
 	refused := r.marked(videoID, sessionKey(cookies))
 	r.mu.Unlock()
-	if refused != again || len(cookies) == 0 {
-		return nil, refused && !again && signedInFor(cookies)
+	switch {
+	case skip != "":
+		return nil, skip
+	case quality != QualityBest:
+		return nil, AccountSaver
+	// The clients yt-dlp asks as for an account need a challenge solved,
+	// which takes a runtime, as the 5.1 audio does.
+	case !r.findsSurround():
+		return nil, AccountNoTools
+	case refused && !again:
+		return nil, accountMarked
+	case !refused && again:
+		return nil, accountOnce
 	}
-	if !signedInFor(cookies) {
+	return cookies, ""
+}
+
+// session returns the session of the user's YouTube Music account that
+// yt-dlp asks as, which Session gives, or nil, with why there is none: as
+// NoSession tells, else AccountSignedOut; and AccountEnded for one yt-dlp
+// doesn't take for a signed-in one, which the log tells once.
+func (r *Resolver) session() ([]*http.Cookie, string) {
+	var cookies []*http.Cookie
+	if r.Session != nil {
+		cookies = r.Session()
+	}
+	switch {
+	case len(cookies) == 0:
+		if r.NoSession != nil {
+			if why := r.NoSession(); why != "" {
+				return nil, why
+			}
+		}
+		return nil, AccountSignedOut
+	case !signedInFor(cookies):
 		r.noLogin.Do(func() {
 			log.Print("mixmusic: the YouTube Music session lacks its LOGIN_INFO or SAPISID cookie, without which yt-dlp asks signed out: " +
 				"streams are found signed out; signing in to YouTube Music again may bring them")
 		})
-		return nil, false
+		return nil, AccountEnded
 	}
-	return cookies, false
+	return cookies, ""
+}
+
+// signedOut reports whether MixMusic isn't signed in to YouTube Music, as
+// session tells.
+func (r *Resolver) signedOut() bool {
+	_, why := r.session()
+	return why == AccountSignedOut
 }
 
 // signedInFor reports whether yt-dlp takes cookies for a signed-in session,

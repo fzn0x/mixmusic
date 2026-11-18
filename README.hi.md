@@ -112,6 +112,8 @@
 - **ListenBrainz:** यही, Last.fm के साथ या उसके बिना, ListenBrainz पर या आपके
   अपने किसी सर्वर पर, जैसे Maloja। लाइक किए गाने दोनों में से किसी पर भी love के
   रूप में जा सकते हैं।
+- **Libre.fm:** यही, Libre.fm पर या किसी दूसरे GNU FM सर्वर पर, बिना कोई API
+  अकाउंट बनाए।
 - **Discord:** आपकी प्रोफ़ाइल दिखाती है कि क्या चल रहा है, उसकी आर्टवर्क और
   बचे हुए समय के साथ।
 - **अपडेट:** MixMusic शुरू होने पर और हर कुछ घंटों में नई रिलीज़ देखता है,
@@ -271,6 +273,8 @@ Flatpak नहीं है, वह चल रहा गाना तभी द�
   MixMusic को मंज़ूरी दें।
 - **ListenBrainz:** अपनी [ListenBrainz सेटिंग](https://listenbrainz.org/settings/)
   का, या अपने सर्वर का, user token Settings › Accounts में पेस्ट करें।
+- **Libre.fm:** Settings › Accounts में जोड़ें, और अपने ब्राउज़र में Libre.fm के
+  पेज पर, या किसी दूसरे GNU FM सर्वर के पेज पर, MixMusic को मंज़ूरी दें।
 - **Discord:** जब तक Discord ऐप चल रहा है, आपकी प्रोफ़ाइल दिखाती है कि आप क्या
   सुन रहे हैं। इसे Settings › Desktop में बंद करें।
 
@@ -485,6 +489,7 @@ MixMusic का अपना कोई अकाउंट, सर्वर, anal
 - **Last.fm,** जोड़ने के बाद: आप क्या सुनते हैं।
 - **ListenBrainz,** या उसकी API वाला आपका अपना सर्वर, जोड़ने के बाद: आप क्या
   सुनते हैं।
+- **Libre.fm,** या कोई दूसरा GNU FM सर्वर, जोड़ने के बाद: आप क्या सुनते हैं।
 - **Discord,** जब तक आप इसे बंद न करें: जो चल रहा है, आपके कंप्यूटर के Discord
   ऐप को भेजा जाता है, जो उसे आपकी प्रोफ़ाइल पर दिखाता है।
 
@@ -557,6 +562,10 @@ MixMusic इन प्रोजेक्ट पर बना है:
   **[Archivo](https://github.com/Omnibus-Type/Archivo)**, विंडो के फ़ॉन्ट।
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**,
   जिसके HCT कलर साइंस का पोर्ट Material थीम के रंग हैं।
+- **[FCast](https://docs.fcast.org)**,
+  वह खुला प्रोटोकॉल जिससे MixMusic FCast रिसीवर पर
+  चलाता है। MixMusic उसका एक स्वतंत्र कार्यान्वयन है, और FUTO से जुड़ा नहीं है;
+  FCast FUTO का पंजीकृत ट्रेडमार्क है।
 - **[Kevin MacLeod](https://incompetech.com)**, जिनका संगीत,
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) के तहत, वेबसाइट पर
   बजता है।

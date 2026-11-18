@@ -86,6 +86,7 @@
 - `mixmusic://` 链接。
 - **Last.fm**：你听的每首歌都会记录到你的个人资料中，离线时产生的 scrobble 会在恢复联网后补发。
 - **ListenBrainz**：同样如此，可以和 Last.fm 一起用，也可以单独用，记录到 ListenBrainz 或你自己的服务器，例如 Maloja。喜欢的歌曲也可以作为 love 发送到其中任意一个。
+- **Libre.fm**：同样如此，记录到 Libre.fm 或其他 GNU FM 服务器，不用创建 API 账号。
 - **Discord**：你的个人资料上会显示正在播放的歌曲，以及它的封面和剩余时间。
 - **更新**：MixMusic 在启动时以及之后每隔几小时检查一次新版本，验证它的签名，在你确认后安装；你也可以选择让它自动安装。
 
@@ -168,6 +169,7 @@ Flatpak 版在沙盒中运行 MixMusic。沙盒能访问网络、声音服务器
 - **Spotify**：Spotify 规定一个应用最多只能服务五个用户，而且只有在应用的所有者订阅了 Premium 时才行，所以你需要用自己创建的 Spotify 应用登录。只需两分钟：[docs/spotify.md](docs/spotify.md) 会一步步带你完成。
 - **Last.fm**：在 [last.fm/api/account/create](https://www.last.fm/api/account/create) 创建一个 API 账号（名称随意，不用填回调 URL），把它的 API key 和 shared secret 粘贴到 Settings › Accounts 中，然后在浏览器中授权 MixMusic。
 - **ListenBrainz**：把你的 [ListenBrainz 设置](https://listenbrainz.org/settings/)中的 user token，或你自己服务器上的 user token，粘贴到 Settings › Accounts 中。
+- **Libre.fm**：在 Settings › Accounts 中连接，然后在浏览器中，于 Libre.fm 的页面（或其他 GNU FM 服务器的页面）上批准 MixMusic。
 - **Discord**：Discord 应用运行时，你的个人资料上会显示你正在听的内容。可以在 Settings › Desktop（设置 › 桌面）中关闭。
 
 遇到问题？[docs/troubleshooting.md](docs/troubleshooting.md) 列出了常见问题和已知问题。
@@ -325,6 +327,7 @@ MixMusic 没有自己的账号体系、服务器、统计分析或遥测。它�
 - **GitHub**：启动时以及之后每隔几小时检查一次新版本，可以在 Settings › About（设置 › 关于）中关闭；打开市场时获取社区注册表；下载 yt-dlp；以及第一次在日文歌词旁打开罗马音时，下载汉字读音词典（11.7 MB）。罗马音在你的电脑上生成：歌词不会被发送出去。
 - **Last.fm**（连接之后）：你播放的内容。
 - **ListenBrainz** 或你自己的兼容其 API 的服务器（连接之后）：你播放的内容。
+- **Libre.fm** 或其他 GNU FM 服务器（连接之后）：你播放的内容。
 - **Discord**（除非你关闭）：正在播放的内容，发送给你电脑上的 Discord 应用，由它显示在你的个人资料上。
 
 它在你电脑上保存的内容：
@@ -360,6 +363,7 @@ MixMusic 基于以下项目构建：
 - **[FFmpeg](https://ffmpeg.org)**：解码器的测试以它作为对照。
 - **[Selawik](https://github.com/microsoft/Selawik)**、**[Quicksand](https://github.com/andrew-paglinawan/QuicksandFamily)**、**[Roboto Flex](https://github.com/googlefonts/roboto-flex)** 和 **[Archivo](https://github.com/Omnibus-Type/Archivo)**：窗口中使用的字体。
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**：Material 主题的颜色移植自它的 HCT 色彩科学。
+- **[FCast](https://docs.fcast.org)**：MixMusic 用来在 FCast 接收器上播放的开放协议。MixMusic 是它的独立实现，与 FUTO 没有关联；FCast 是 FUTO 的注册商标。
 - **[Kevin MacLeod](https://incompetech.com)**：网站中播放的是他的音乐，采用 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 许可。
 
 ## 参与贡献

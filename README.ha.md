@@ -120,6 +120,8 @@ biyu. MixMusic yana haɗa ayyukan biyu a cikin mai kunnawa guda ɗaya:
 - **ListenBrainz:** haka ma, tare da Last.fm ko ba tare da shi ba, zuwa
   ListenBrainz ko sabarka ta kanka, kamar Maloja. Waƙoƙin da ka so za su
   iya zuwa kowanne daga cikinsu a matsayin loves.
+- **Libre.fm:** haka ma, zuwa Libre.fm ko wata sabar GNU FM, ba tare da ka
+  ƙirƙiri asusun API ba.
 - **Discord:** bayananka suna nuna abin da ake kunnawa, tare da hotonsa da
   lokacin da ya rage.
 - **Sabuntawa:** MixMusic yana duba sabuwar fitarwa a farawa da kuma bayan
@@ -288,6 +290,8 @@ yake aiki a kwamfutarka.
 - **ListenBrainz:** liƙa user token na
   [saitunan ListenBrainz ɗinka](https://listenbrainz.org/settings/), ko na
   sabarka ta kanka, a Settings › Accounts.
+- **Libre.fm:** haɗa shi a Settings › Accounts, sannan ka amince da MixMusic
+  a shafin Libre.fm a burauzarka, ko na wata sabar GNU FM.
 - **Discord:** muddin manhajar Discord tana aiki, bayananka suna nuna abin da
   kake saurara. Kashe shi a Settings › Desktop.
 
@@ -508,6 +512,8 @@ da:
 - **Last.fm,** da zarar ka haɗa shi: abin da kake kunnawa.
 - **ListenBrainz,** ko sabarka ta kanka mai API ɗinsa, da zarar ka haɗa
   shi: abin da kake kunnawa.
+- **Libre.fm,** ko wata sabar GNU FM, da zarar ka haɗa shi: abin da kake
+  kunnawa.
 - **Discord,** sai dai ka kashe shi: abin da ake kunnawa, ana aika shi zuwa
   manhajar Discord a kwamfutarka, wadda take nuna shi a bayananka.
 
@@ -589,6 +595,11 @@ An gina MixMusic a kan waɗannan ayyuka:
   **[Archivo](https://github.com/Omnibus-Type/Archivo)**, haruffan tagogi.
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**,
   wanda launukan jigogin Material fassarar kimiyyar launi ta HCT ɗinsa ne.
+- **[FCast](https://docs.fcast.org)**,
+  buɗaɗɗiyar yarjejeniyar sadarwa wadda MixMusic yake
+  amfani da ita wajen kunna waƙa a kan masu karɓar FCast. MixMusic aiwatarwa
+  ce mai zaman kanta ta ita, kuma ba shi da alaƙa da FUTO; FCast alamar
+  kasuwanci ce mai rijista ta FUTO.
 - **[Kevin MacLeod](https://incompetech.com)**, wanda kiɗansa, a ƙarƙashin
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), yake kunnawa a
   shafin yanar gizo.

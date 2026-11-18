@@ -82,8 +82,12 @@ yt-dlp runs twice at most for a track, a quick way first:
 - **The full run** asks as yt-dlp's default apps, with the JavaScript
   runtime: when the quick run finds no audio, and at once when the player
   API said that the visionOS app gets no stream of the video, as of one
-  made for children. It alone finds 5.1 surround mixes, so a track the
-  quick run found offers none.
+  made for children. It alone finds 5.1 surround mixes. With "Play 5.1
+  surround when a track has it" on, a track the quick run found starts
+  in stereo at once, while the full run looks for its mix behind it, once
+  a track: the 5.1 button shows when it finds one, and the track goes on
+  in 5.1 from where it is. Before 0.5.12, such a track offered no 5.1.
+  With 5.1 off, the quick run is all that runs.
 - **The log** says which run found the stream, and how long each took.
   Before 0.5.11, yt-dlp ran the full way only.
 

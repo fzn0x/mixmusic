@@ -61,7 +61,13 @@
   runtime, which alone finds 5.1 audio (`findSurround`); at once when the
   player API told the visionOS client that the video has no stream for it
   (`quickHelps`). The log tells which run found a stream, and how long
-  each took.
+  each took. While 5.1 is on (`Resolver.SetSurround`), a stream the quick
+  run found has the full run look for its 5.1 audio behind it, once, as
+  `Resolve` hands it out, never for a download, which keeps the stereo
+  audio alone (`resolveStereo`): the stream doesn't wait, and the 5.1
+  audio found goes with it as the TV client's late answer does
+  (`lookBehind`, `keepTold`, `Resolver.Told`, `surroundbehind.go`,
+  #540), its URL found already.
   While the user asks for their account's audio (`Resolver.SetAsAccount`,
   `account.go`, #471), the resolver asks yt-dlp as the account before
   any of that (`accountStream`): the full way, with the session the app

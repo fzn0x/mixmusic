@@ -226,6 +226,8 @@ type Resolver struct {
 	// surrounds are the 5.1 surround audio yt-dlp found of videos whose
 	// stream YouTube's player API gave.
 	surrounds map[string]*resolution
+	// surround is set while 5.1 surround is on (SetSurround).
+	surround bool
 }
 
 // resolution is the result of resolving a video, shared by every caller
@@ -235,8 +237,13 @@ type resolution struct {
 	stream Stream
 	err    error
 	// surround is the 5.1 surround audio YouTube's TV app told of after
-	// the stream was found, under the resolver's mutex (hear).
+	// the stream was found, or yt-dlp's full run found behind its quick
+	// run, under the resolver's mutex (keepTold).
 	surround *Stream
+	// lookedBehind is set once the full run looks for the 5.1 surround
+	// audio of a stream the quick run found, under the resolver's mutex
+	// (lookBehind).
+	lookedBehind bool
 }
 
 // fresh reports whether a resolution that ended found a stream that isn't
@@ -265,8 +272,20 @@ func (r *Resolver) SetQuality(q Quality) {
 	}
 }
 
-// Resolve returns the audio stream of a video.
+// Resolve returns the audio stream of a video. While 5.1 is on, one that
+// yt-dlp's quick run found has the full run look for its 5.1 audio behind
+// it (lookBehind).
 func (r *Resolver) Resolve(ctx context.Context, videoID string) (Stream, error) {
+	s, err := r.resolveStereo(ctx, videoID)
+	if err == nil && s.Route == RouteQuick && s.Surround == nil {
+		r.lookBehind(videoID)
+	}
+	return s, err
+}
+
+// resolveStereo is Resolve for what keeps the stereo audio alone, a
+// download: no 5.1 audio is looked for behind it.
+func (r *Resolver) resolveStereo(ctx context.Context, videoID string) (Stream, error) {
 	if !ValidVideoID(videoID) {
 		return Stream{}, ErrBadVideoID
 	}

@@ -1,0 +1,6 @@
+[
+  {"ts": "2024-12-01T08:00:00Z", "ms_played": 200000, "master_metadata_track_name": "Gulls at Dawn", "master_metadata_album_artist_name": "Ola Brine", "master_metadata_album_album_name": "Live at the Pier", "spotify_track_uri": "spotify:track:0gullsAtDawn0000000002"},
+  {"ts": "2024-12-01T08:05:00Z", "ms_played": 200000, "master_metadata_track_name": "Gulls at Dawn", "master_metadata_album_artist_name": "Ola Brine", "master_metadata_album_album_name": "Live at the Pier", "spotify_track_uri": "spotify:track:0gullsAtDawn0000000002"},
+  {"ts": "2024-12-01T08:10:00Z", "ms_played": 200000, "master_metadata_track_name": "Gulls at Dawn", "master_metadata_album_artist_name": "Ola Brine", "master_metadata_album_album_name": "Live at the Pier", "spotify_track_uri": "spotify:track:0gullsAtDawn0000000002"},
+  {"ts": "2024-12-01T08:15:00Z", "ms_played": 60000, "master_metadata_track_name": null, "episode_name": "A Show", "spotify_track_uri": null}
+]

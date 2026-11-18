@@ -19,6 +19,8 @@ Library, in the sidebar or with Alt+2 (⌥2 on macOS), has these pivots, each wi
 - **Disliked:** the songs you disliked, once there are any.
 - **Spotify** and **YouTube Music:** your library on each service you signed in to.
 
+**Edit tabs**, the pencil at the end of the pivots, lists them to put in your own order: drag one onto another, or press <kbd>Alt</kbd> <kbd>↑</kbd> and <kbd>Alt</kbd> <kbd>↓</kbd> (<kbd>⌥</kbd> on macOS) on it. Its × hides a pivot you don't use, which waits under Hidden with Show; a hidden pivot still opens from a link or a command that leads to it, as Liked songs does from the sidebar. Reset puts them back as they come. `settings.json` keeps them as `libraryTabs`. Pivots that don't apply stay out, as they do anyway: Spotify and YouTube Music while you're signed out, Disliked while it's empty.
+
 ## Liked songs
 
 Like a track with the heart in the player bar, on the now playing page, in the [mini player](desktop.md#the-mini-player) or on its row, with Add to liked songs in its menu, or with Ctrl+L (⌘L on macOS) for the track playing. The heart again, or Remove from liked songs, takes it back.
@@ -49,6 +51,29 @@ A mix is a playlist of MixMusic's own, which holds tracks of every service.
 - **Put a mix in order** by dragging a track onto another, which it takes the place of: a line shows where it goes. From the keyboard, <kbd>Tab</kbd> to a track's play button, then <kbd>Alt</kbd> <kbd>↑</kbd> and <kbd>Alt</kbd> <kbd>↓</kbd> (<kbd>⌥</kbd> <kbd>↑</kbd> and <kbd>⌥</kbd> <kbd>↓</kbd> on macOS) move it a place up or down, and the focus goes with it. The mix keeps its new order at once. While its tracks show sorted or searched, they don't move: choose the mix's own order in Sort and clear the search first.
 
 Your mixes show in the sidebar under Your mixes, with how many tracks each holds, and on Home's Your mixes tile and shelf.
+
+### The order of your mixes
+
+Your mixes keep the order you put them in. A new mix goes first, and changing one doesn't move it: a rename, a new cover, adding, removing or moving its tracks only make it the latest in Recently changed. Updating from a version before 0.5.12, they start in the order they had, the last changed first, so nothing moves.
+
+- **Move a mix** by dragging it onto another, in Library › Mixes or in the sidebar's Your mixes: it takes that one's place. From the keyboard, <kbd>Tab</kbd> to it, then <kbd>Alt</kbd> with the arrows (<kbd>⌥</kbd> on macOS) moves it a place, and the focus goes with it. A move works while the mixes show in Your order, searched or not: a move made while you search keeps the place of every mix the search hides.
+- **Sort** them above Library › Mixes: Your order, Recently changed, Recently added, Title or Track count. The button beside it turns the last four the other way, as Newest first and Oldest first, or A to Z and Z to A. `settings.json` keeps the choice as `mixesSort` and `mixesDescending`.
+- **That order holds** wherever mixes are listed: the sidebar, Add to mix, Home's Your mixes shelf, Edit home's One of your mixes, the assistants, and `api.library.mixes()` for [plugins](plugins.md).
+- **Search** them with the box above Library › Mixes, or the one above the sidebar's Your mixes: it keeps the mixes whose names hold every word you type, regardless of case and accents. <kbd>Esc</kbd> clears it.
+
+### Pin to top
+
+**Pin to top**, in the menu of a mix, of a playlist of Spotify or YouTube Music in your library (yours, saved or one you collaborate on), of an album you saved and of an artist you follow, or in the More menu of its page, puts it first in every list it's in, in any sort: in the Library, in the sidebar and in Add to mix, with a pin by its name. **Unpin**, in the same menus, puts it back in its place.
+
+- **In the sidebar,** the playlists, albums and artists you pin show under Liked songs and Downloads, before your mixes, and open their pages. Pins move among themselves by drag, or with <kbd>Alt</kbd> and the arrows, in any sort.
+- **Liked songs and Downloads** drag anywhere among the pins and the mixes of the sidebar too. **Hide from the sidebar**, in their menu, takes them out of it; the menu of the Your mixes title shows them again. `settings.json` keeps where they are as `sidebarPlaces`.
+- **As many as you like:** pins have no cap, and keep their order.
+
+### Hide from library
+
+**Hide from library**, in the menu of a playlist or a saved album in Library › Spotify or Library › YouTube Music, takes it out of MixMusic's library, and changes nothing on the service: unlike Remove from library on a saved YouTube Music playlist, which takes it out of your library on YouTube Music. **Hidden**, at the foot of the page, lists what you hid, with **Show again**.
+
+MixMusic keeps your pins and what you hid in `library.json` in your [data folder](data-and-privacy.md#the-data-folder), by ID. One of a service goes only once that service listed your whole library without it, under the account or [brand channel](accounts.md#several-google-accounts-and-brand-channels) you pinned or hid it under: never while the list loads, fails, comes in part or you're signed out, nor while another brand channel is chosen. An artist you follow in MixMusic keeps their pin while you do. Deleting a mix takes its pin with it.
 
 ### A mix's cover
 
@@ -88,7 +113,8 @@ Signed in to YouTube Music, Library › YouTube Music has your Playlists, with a
 - **Take a track out** of a playlist of yours with Remove from this playlist, in its menu on the playlist's page. Of one you collaborate on, YouTube Music lets you take out the tracks you added alone, which have it.
 - **Put a playlist of yours in order**, or one you collaborate on, as you do a mix, once its tracks are all read: it changes on YouTube Music too. When YouTube Music refuses a move, a toast says so and the playlist shows as YouTube keeps it.
 - **Delete a playlist you made** with Delete from YouTube Music…, in the More menu of its page or of its tile in Library › YouTube Music. It asks first, since the playlist goes from YouTube too and can't come back: to keep its tracks, copy it into a mix first. Mixes copied from it, and the queue, keep their tracks.
-- **A playlist you saved** has Remove from library on its tile instead, which takes it out of your library without asking: saving it again undoes it.
+- **A playlist you saved** has Remove from library on its tile instead, which takes it out of your library without asking: saving it again undoes it. To keep it on YouTube Music and out of MixMusic's library, [Hide from library](#hide-from-library) instead.
+- **Search and sort** your playlists with the box and Sort above them: YouTube Music's order, Title or Track count, each way. They search and sort the Playlists you collaborate on too, and `settings.json` keeps the sort, for Spotify's as well, as `playlistsSort` and `playlistsDescending`.
 - **Suggestions:** below the tracks of a playlist of yours, once they're all loaded, Suggestions has five songs YouTube Music suggests adding to it, leaving out those you dislike. Each plays alone from its cover, and Add puts it at the playlist's end at once; Refresh shows five more, and adding the last brings them too. They aren't the playlist's: Play and Shuffle leave them out. While you search the playlist's tracks, they hide.
 - **Keep a song without liking it** with Add to library in its menu: it goes to Songs in your library, as YouTube Music's own Save to library does, and stays out of your likes, which shape what YouTube Music recommends. Remove from library in its menu takes it out. Spotify keeps no such songs apart from those you like.
 
@@ -97,6 +123,7 @@ Signed in to YouTube Music, Library › YouTube Music has your Playlists, with a
 Signed in to Spotify, Library › Spotify has your Playlists, the Playlists you collaborate on, your Albums, the Artists you follow, and Liked on Spotify.
 
 - **Save** an album or a playlist, and **follow** an artist, from their pages, as for YouTube Music: it happens on Spotify.
+- **Search and sort** your playlists, and those you collaborate on, as in Library › YouTube Music: Spotify's order, Title or Track count. [Pin](#pin-to-top) and [hide](#hide-from-library) them, and your albums, from their menus.
 - **Add a track** of Spotify's with Add to Spotify playlist in its menu, then one of your playlists, or one you collaborate on, which names who made it. Spotify's playlists hold Spotify's tracks alone: to mix in YouTube Music's, copy the playlist into a mix.
 - **All of them show,** however many playlists, albums, artists and podcasts you keep on Spotify: MixMusic reads every page of each list, and tries a page that fails again a few times. A list that still came in part shows what came, and says how much, as "Showing 200 of 250 playlists", with Try again; so do Add to Spotify playlist and Add a shelf. Home's Spotify shelves show your first 50 playlists and albums, so that Home doesn't wait.
 - **Put a playlist in order** as you do a mix, your own or one you collaborate on, once its tracks are all read: it changes on Spotify too, one move at a time. A playlist that holds what MixMusic doesn't show, as podcast episodes or the local files of Spotify's app, doesn't move. When Spotify refuses a move, a toast says so and the playlist shows as Spotify keeps it.

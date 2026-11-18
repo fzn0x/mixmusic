@@ -315,7 +315,7 @@ export interface MixMusicAPI {
     isDisliked(trackId: string): boolean;
     /** Dislikes a track, or takes the dislike back: a track is liked or disliked, not both. MixMusic keeps the dislike, and sends a YouTube Music track's there when the user signed in. While Settings › Playback skips the songs the user dislikes, the queue passes over the track, and moves on from it at once when it plays. */
     setDisliked(track: Track, disliked: boolean): Promise<void>;
-    /** The playlists made in MixMusic. */
+    /** The playlists made in MixMusic, without their tracks, in the order the user sorted them in Library › Mixes, those they pinned first. */
     mixes(): Playlist[];
     createMix(title: string, tracks?: Track[]): Promise<Playlist>;
   };

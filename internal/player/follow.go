@@ -96,7 +96,9 @@ func (p *Player) mayFollow(cur, next Item) bool {
 		return false
 	}
 	return p.out.Stream == nil && p.loaded && !p.crossfading && p.s.Error == "" && p.s.Source != nil &&
-		p.s.Source.Mode == ModeStream && next.UID != cur.UID && next.Skip == "" && p.mayStart(next)
+		p.s.Source.Mode == ModeStream && next.UID != cur.UID && next.Skip == "" && p.mayStart(next) &&
+		// The last track the sleep timer lets play ends the music (#594).
+		!p.sleepLast()
 }
 
 // Followed takes in the engine playing the track of url on the sample after

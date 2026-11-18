@@ -112,6 +112,8 @@ func TestFollowDisarms(t *testing.T) {
 			func(h *harness) { h.p.Disliked("yt:b", false) }},
 		{"a crossfade under way", func(h *harness) { h.on(func(p *Player) { p.crossfading = true }) },
 			func(h *harness) { h.on(func(p *Player) { p.crossfading = false }) }},
+		{"the sleep timer's last track", func(h *harness) { h.p.StartSleep(SleepTimer{Mode: SleepTracks, N: 1}) },
+			func(h *harness) { h.p.CancelSleep(false) }},
 	} {
 		t.Run(c.what, func(t *testing.T) {
 			h := followHarness(t, tracks("a", "b", "c"), func(f *fakeServices) { f.settings.SkipDisliked = true })

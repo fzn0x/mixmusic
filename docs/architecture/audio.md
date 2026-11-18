@@ -39,6 +39,17 @@
   after the volume: `FadeAway` takes it to silence on an equal-power
   curve, cos(πt/2), and holds it there, tracks that start meanwhile too,
   until `FadeBack`, so that the volume the user set never moves.
+  A track Preload loads armed by its `Cue.Follow` follows the one that
+  plays on the sample after its last one (`follow.go`, #600): as the
+  active deck has played all it holds, its stretch too, or reaches the
+  part that ends its track, the audio thread fills the rest of the quantum
+  from the armed deck, at full level and with no fade-in, without
+  allocating or waiting, and makes it the active deck. The loop then tells
+  `Followed` (`FollowEvents`) in place of `Playing(false)` and `Ended`.
+  With `Cue.Glide`, it starts at the loudness of the deck it follows and
+  glides to its own. Preload of the track the idle deck holds takes a new
+  cue alone, and Load, Crossfade, Stop and Unload disarm it. The stretch's
+  windows stay within the track, whose end plays as it is.
   `MIXMUSIC_STRETCH_WAV=<dir> go test ./internal/audio -run StretchListen`
   writes the test files at each speed, to listen to. `Stretches`
   decodes stretches of a file as a deck plays them, from the frame a seek

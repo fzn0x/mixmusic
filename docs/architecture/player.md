@@ -89,6 +89,17 @@
   song of the same album, right after the current one in the queue's own
   order, plays without one; a Spotify track only when both recordings
   are songs, as the next one's preparation tells (`preparedNext`).
+- **The next track on the next sample** (`follow.go`, #600): the next
+  entry's audio the player preloads (`holdAhead`) is armed to follow the
+  current track on the engine's other deck, at its kind's speed, and at
+  the current track's loudness for a song of the same album. After each
+  task, the player tells the engine again when that changed (`arm`): the
+  next entry must be the one the queue plays next, the engine must play
+  the current stream here, with no crossfade under way, and the stream
+  may refuse (`Joiner`), as a room's host's does while guests listen. As
+  the engine follows (`Followed`), the next entry becomes current as after
+  a crossfade (`becomeCurrent`); a Followed the state no longer lets moves
+  on as an end does, and one after a load changes nothing.
 - **5.1 surround** (`surroundready.go`): a stream plays its 5.1 audio
   while the settings ask for it, once the app tells it plays at once
   (`Surrounds.SurroundReady`). Until then the engine plays its stereo

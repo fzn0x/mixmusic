@@ -16,6 +16,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/volume"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // hereLoad is how long the page of MixMusic's own Spotify device may take
@@ -101,7 +102,7 @@ func (h *spotifyHere) page(ctx context.Context) (*mygo.Page, error) {
 	case <-loaded:
 		return win.Page(), nil
 	case <-ctx.Done():
-		return nil, errors.New("MixMusic's Spotify player didn't load")
+		return nil, worded("MixMusic's Spotify player didn't load", locales.SpotifyHereNotLoaded(), nil)
 	}
 }
 
@@ -143,14 +144,15 @@ func (h *spotifyHere) close() {
 }
 
 // eval runs code in the page and decodes what it returns; what it throws
-// is the page's own error, as it words it.
+// is the page's own error, as it words it, of the problem it names
+// (pageError).
 func eval[T any](ctx context.Context, page *mygo.Page, code string) (T, error) {
 	var out T
 	v, err := page.EvalContext(ctx, code)
 	if err != nil {
 		var evalErr *mygo.EvalError
 		if errors.As(err, &evalErr) {
-			return out, errors.New(strings.TrimPrefix(evalErr.Message, "Error: "))
+			return out, pageError(strings.TrimPrefix(evalErr.Message, "Error: "))
 		}
 		return out, err
 	}
@@ -206,9 +208,9 @@ func (d hereDevice) Play(ctx context.Context, t media.Track, at time.Duration) e
 func (d hereDevice) PlayAhead(ctx context.Context, t media.Track, at time.Duration, ahead []media.Track) error {
 	switch a := d.h.a; {
 	case !a.spotify.SignedIn():
-		return errors.New("sign in to Spotify in Settings › Accounts to play it")
+		return worded("sign in to Spotify in Settings › Accounts to play it", locales.SpotifyHereSignIn(), nil)
 	case !a.spotify.Granted("streaming"):
-		return errors.New("sign in to Spotify again in Settings › Accounts, for MixMusic to play it itself")
+		return worded("sign in to Spotify again in Settings › Accounts, for MixMusic to play it itself", locales.SpotifyHereSignInAgain(), nil)
 	}
 	page, err := d.h.page(ctx)
 	if err != nil {

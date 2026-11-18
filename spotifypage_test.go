@@ -85,3 +85,19 @@ func TestSpotifyPageDecryptsWithFairPlay(t *testing.T) {
 		t.Errorf("WebView2 asked for %v, want Widevine alone", got)
 	}
 }
+
+// TestSpotifyPageNamesItsProblems throws a problem of the page of
+// MixMusic's own Spotify device with its name in brackets, which MixMusic
+// says in its language (#800): here, of a webview without EME, again once
+// it is known.
+func TestSpotifyPageNamesItsProblems(t *testing.T) {
+	vm := spotifyPage(t, true, nil)
+	for range 2 {
+		if _, err := vm.RunString(`var thrown = "pending"; mm.device().then(() => (thrown = "none"), (e) => (thrown = e.message));`); err != nil {
+			t.Fatal(err)
+		}
+		if got := vm.Get("thrown").Export(); got != "[drm] this computer's webview can't play Spotify's protected audio" {
+			t.Errorf("the page threw %q", got)
+		}
+	}
+}

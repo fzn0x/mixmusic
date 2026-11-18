@@ -204,7 +204,9 @@ func (p *Player) SetShuffle(on bool) { p.do(func() { p.setShuffle(on) }) }
 // ToggleShuffle shuffles or unshuffles.
 func (p *Player) ToggleShuffle() { p.do(func() { p.setShuffle(!p.s.Shuffle) }) }
 
-// CycleRepeat repeats the queue, then the track, then nothing.
+// CycleRepeat repeats the queue, then the track, then nothing. A queue
+// that repeats has no radio after it: the radio found ahead leaves it
+// (radioahead.go).
 func (p *Player) CycleRepeat() {
 	p.do(func() {
 		switch p.s.Repeat {
@@ -214,6 +216,9 @@ func (p *Player) CycleRepeat() {
 			p.s.Repeat = RepeatOne
 		default:
 			p.s.Repeat = RepeatOff
+		}
+		if p.s.Repeat != RepeatOff {
+			p.dropRadioAhead()
 		}
 		p.report()
 		p.emit(StateChange)

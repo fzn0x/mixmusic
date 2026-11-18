@@ -77,7 +77,8 @@ type Item struct {
 	// UID tells apart two entries of the same track.
 	UID   string
 	Track media.Track
-	// Radio is set for tracks autoplay added after the queue ran out.
+	// Radio is set for tracks a radio added at the end of the queue, as
+	// autoplay's, while the last track played or once it ended.
 	Radio bool
 	// Skip tells why the queue passes over the entry as it moves on, as
 	// SkipDisliked or SkipMadeWithAI, or is "" for one that plays.
@@ -535,6 +536,9 @@ type Player struct {
 	// passing is what the player keeps of passing over entries as it moves
 	// on.
 	passing passState
+	// radioAhead is autoplay's radio asked for while the last entry of the
+	// queue plays, or nil (radioahead.go).
+	radioAhead *radioAhead
 	// parts is what it keeps of the parts of tracks it passes over
 	// (parts.go).
 	parts partState

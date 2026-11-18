@@ -194,9 +194,13 @@ func (p *Player) ToggleMute() {
 // its 5.1 surround audio or its stereo audio as they ask, the queue
 // passes over the tracks the user disliked, and those YouTube labels as
 // made with AI, or no longer, as they say, and the track playing takes
-// the speed of its kind.
+// the speed of its kind. With autoplay off, the radio found ahead leaves
+// the queue (radioahead.go).
 func (p *Player) SettingsChanged(s settings.Settings) {
 	p.do(func() {
+		if !s.Autoplay {
+			p.dropRadioAhead()
+		}
 		if s.Surround != p.surround {
 			p.switchAudio(s.Surround)
 		}
@@ -671,7 +675,8 @@ func (p *Player) retryStream(why error) {
 	})
 }
 
-// onProgress counts the play, prepares the next track, and crossfades.
+// onProgress counts the play, prepares the next track, or asks for
+// autoplay's radio after the last one, and crossfades.
 func (p *Player) onProgress() {
 	entry, ok := p.s.Current()
 	if !ok {
@@ -718,6 +723,12 @@ func (p *Player) onProgress() {
 				p.lookUp(src) // its parts, as its stream is found
 			}
 		})
+	}
+	if !hasNext && pos > prepareAfter {
+		// The last track: autoplay's radio after it is found now, so that
+		// its first track is found, downloaded and faded into as any next
+		// one is (radioahead.go).
+		p.askRadioAhead()
 	}
 	if hasNext && next.UID != entry.UID && p.prefetched != next.UID && pos > prefetchAfter && p.retry.n == 0 {
 		p.prefetched = next.UID

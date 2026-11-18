@@ -191,7 +191,7 @@ func (p *Player) pastEnd(m *move) {
 		return
 	}
 	token := p.loadToken
-	p.extendWithRadio(seed, func(added bool, err error) {
+	then := func(added bool, err error) {
 		switch {
 		case token != p.loadToken:
 		case added:
@@ -204,7 +204,12 @@ func (p *Player) pastEnd(m *move) {
 		default:
 			p.stopMove(m, locales.PlayerAutoplayNothingNew(m.what()))
 		}
-	})
+	}
+	// The radio asked for as the last track played may still be on its
+	// way (radioahead.go).
+	if !p.waitRadioAhead(seed, then) {
+		p.extendWithRadio(seed, then)
+	}
 }
 
 // goTo plays the entry at i, which the move m reached, unless its label,

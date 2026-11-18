@@ -115,7 +115,7 @@ The Queue button by the player, or Ctrl+J (⌘J), shows Up next at the right of 
 
 A radio plays tracks like one you choose, from YouTube Music.
 
-- **Autoplay,** in Settings › Playback › Sound and on by default: when the queue runs out, a radio of what you played carries on.
+- **Autoplay,** in Settings › Playback › Sound and on by default: when the queue runs out, a radio of what you played carries on. Its songs join Up next while the last song plays, so the radio's first song starts as that one ends, or fades in under it with Crossfade on. Turning Autoplay off, or Repeat on, before the radio plays takes its songs out again.
 - **Start radio,** in a track's menu or a list's More menu, plays the track, then a radio of it. The command palette's "Start a radio of what plays" does it for the track playing; [Settings › Shortcuts](settings.md#change-a-shortcut) can give it a key.
 - **What a radio plays:** songs like the one it started from, leaving out the songs you dislike and, while Skip songs made with AI is on, passing over those YouTube labels as made with AI. It passes over other uploads and the music videos of songs already in the queue, and leaves out covers, mashups and other uploads unless it has nothing else. The radio of a music video starts from its song, so it carries on with songs, not more videos.
 - A queue that ends on a podcast episode stops, rather than start a radio.

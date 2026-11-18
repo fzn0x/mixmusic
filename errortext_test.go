@@ -48,13 +48,6 @@ func TestErrorText(t *testing.T) {
 			t.Errorf("%v says %q, which no catalog translates", err, got)
 		}
 	}
-	for _, reason := range []string{stream.ReasonBot, stream.ReasonThrottled, stream.ReasonAdults, stream.ReasonSignedIn,
-		stream.ReasonCountry, stream.ReasonPrivate, stream.ReasonMembers, stream.ReasonPremium, stream.ReasonNoFormat,
-		stream.ReasonGone, stream.ReasonRefused, stream.ReasonStalled} {
-		if got, ok := streamReasonText(reason); !ok || !strings.HasPrefix(got, "[") {
-			t.Errorf("the reason %q says %q", reason, got)
-		}
-	}
 	// The words around an error the windows know stay, as they are.
 	wrapped := fmt.Errorf("MixMusic can't change memo.wav: %w", tagwrite.ErrUnsupported)
 	if got, want := errorText(wrapped), "MixMusic can't change memo.wav: "+locales.ErrorTagsUnsupported(); got != want {

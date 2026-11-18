@@ -21,7 +21,7 @@ func (s *System) LogsFolder() string { return s.a.opts.LogsDir }
 // OpenLogsFolder opens the folder of the log in the file manager.
 func (s *System) OpenLogsFolder() error {
 	if s.a.opts.LogsDir == "" {
-		return fmt.Errorf("MixMusic keeps no log here")
+		return errNoLogs
 	}
 	return mygo.Shell.OpenPath(s.a.opts.LogsDir)
 }

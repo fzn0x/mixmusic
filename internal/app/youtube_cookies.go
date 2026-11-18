@@ -125,7 +125,9 @@ func (b cookieBrowser) spec(profile, goos, home string, getenv func(string) stri
 		dirs := b.dirs(goos, home, getenv)
 		i := slices.IndexFunc(dirs, isDir)
 		if i < 0 {
-			return "", fmt.Errorf("MixMusic didn't find the profiles of %s: give the folder of one", b.name)
+			name := b.name
+			return "", wordedLater(fmt.Sprintf("MixMusic didn't find the profiles of %s: give the folder of one", name),
+				func() string { return locales.AccountSettingsCookiesNoProfiles(name) }, nil)
 		}
 		dir := dirs[i]
 		if profile != "" {
@@ -205,7 +207,9 @@ func (s *Accounts) YouTubeImportCookies(ctx context.Context, browser, profile st
 	case undecrypted:
 		return AccountsStatus{}, b.problem(tools.ErrCookiesSealed, false)
 	}
-	return AccountsStatus{}, fmt.Errorf("%s has no signed-in YouTube Music session: sign in to music.youtube.com in it, close it, then import again", b.name)
+	name := b.name
+	return AccountsStatus{}, wordedLater(fmt.Sprintf("%s has no signed-in YouTube Music session: sign in to music.youtube.com in it, close it, then import again", name),
+		func() string { return locales.AccountSettingsCookiesNoSession(name) }, nil)
 }
 
 // browserCookies has yt-dlp copy the cookies of a browser, as yt-dlp
@@ -258,7 +262,8 @@ func removeCookieExports() {
 func (s *Accounts) YouTubePasteCookies(ctx context.Context, text string) (AccountsStatus, error) {
 	cookies := pastedCookies(text, time.Now())
 	if !youtube.HasSigningCookie(cookies) {
-		return AccountsStatus{}, errors.New("that isn't a signed-in YouTube Music cookie header: copy the Cookie header of a request to music.youtube.com, from a tab signed in to it")
+		return AccountsStatus{}, wordedLater("that isn't a signed-in YouTube Music cookie header: copy the Cookie header of a request to music.youtube.com, from a tab signed in to it",
+			locales.AccountSettingsCookiesBadHeader, nil)
 	}
 	return s.a.youtubeSignIn(ctx, cookies)
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/egoist/mygo/ui"
 
+	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/locales"
@@ -486,9 +487,10 @@ func (s *shell) lyricsCredit(c *ui.Context, ly lyrics.Lyrics) {
 // <name>".
 func (s *shell) creditParts(c *ui.Context, ly lyrics.Lyrics) {
 	k := &s.lk
-	credit := locales.LyricsCreditFrom(mark(0, ly.Source))
+	source := lyricsSourceName(ly.Source)
+	credit := locales.LyricsCreditFrom(mark(0, source))
 	if ly.By != "" {
-		credit = locales.LyricsCreditFromBy(mark(0, ly.Source), mark(1, ly.By))
+		credit = locales.LyricsCreditFromBy(mark(0, source), mark(1, ly.By))
 	}
 	// The source and the one who gave them link to their pages, where the
 	// source asks for it.
@@ -647,4 +649,14 @@ func (s *shell) startRadio(t media.Track) {
 			s.p.PlayRadio(t, found)
 		})
 	}()
+}
+
+// lyricsSourceName is the name of where lyrics came from, as the window
+// says it: the services' own names, and YouTube's captions in its
+// language.
+func lyricsSourceName(source string) string {
+	if source == app.CaptionsSource {
+		return locales.LyricsSourceCaptionsName()
+	}
+	return source
 }

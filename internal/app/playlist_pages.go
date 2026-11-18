@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // PlaylistStart returns a playlist with its first page of tracks, of any
@@ -53,7 +54,9 @@ func (a *App) wholePlaylist(ctx context.Context, id string) (media.Playlist, err
 		return p, err
 	}
 	if p, err = a.readOn(ctx, p, nil); err != nil {
-		return p, fmt.Errorf("only %d of the tracks of %s could be read: %w", len(p.Tracks), p.Title, err)
+		n, title := len(p.Tracks), p.Title
+		return p, wordedLater(fmt.Sprintf("only %d of the tracks of %s could be read: %v", n, title, err),
+			func() string { return locales.PlaylistReadPartialNamed(n, title, ErrorText(err)) }, err)
 	}
 	return p, nil
 }

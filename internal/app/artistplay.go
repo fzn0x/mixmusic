@@ -8,7 +8,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
@@ -54,7 +53,7 @@ func (c *Catalog) songsReader(a media.Artist) songsRead {
 func (c *Catalog) PlayArtistID(ctx context.Context, p *player.Player, id string, shuffled bool) error {
 	a, err := c.Artist(ctx, id)
 	if err != nil {
-		return fmt.Errorf("the artist couldn't be opened: %w", err)
+		return wordedLater("the artist couldn't be opened: "+err.Error(), func() string { return locales.ArtistPlayCouldntOpen(ErrorText(err)) }, err)
 	}
 	return c.PlayArtist(ctx, p, a, shuffled)
 }

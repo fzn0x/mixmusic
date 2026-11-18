@@ -423,6 +423,12 @@ func (w *Watcher) noted() {
 	w.last = now
 }
 
+// WhyUnwatchable is why a folder isn't watched, as Watcher.Unwatched says
+// it in English, when the system doesn't tell which of ErrNetworkDrive,
+// ErrRemovableDrive, ErrWatchLimit or ErrCantWatch; it says those by the
+// error's words, which start with theirs.
+const WhyUnwatchable = "the system can't watch it"
+
 // whyUnwatched words why a folder can't be watched, as Settings tells it.
 func whyUnwatched(err error) string {
 	for _, known := range []error{ErrNetworkDrive, ErrRemovableDrive, ErrWatchLimit, ErrCantWatch} {
@@ -430,5 +436,5 @@ func whyUnwatched(err error) string {
 			return err.Error()
 		}
 	}
-	return "the system can't watch it"
+	return WhyUnwatchable
 }

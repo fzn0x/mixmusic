@@ -20,8 +20,9 @@ import (
 // and Unison's are: lyrics never wait long on it.
 const captionsWait = 3 * time.Second
 
-// captionsSource names the captions where their lyrics show.
-const captionsSource = "YouTube captions"
+// CaptionsSource names the captions where their lyrics show, in English:
+// the windows say it in their language.
+const CaptionsSource = "YouTube captions"
 
 // captionLyrics returns the lyrics of a track from the captions of its
 // video on YouTube, in the language Settings chooses when the video has
@@ -39,7 +40,7 @@ func (c *Catalog) captionLyrics(ctx context.Context, track media.Track, _ lyrics
 	if err != nil {
 		return lyrics.Lyrics{}, err
 	}
-	l := lyrics.Timed(lines, captionsSource)
+	l := lyrics.Timed(lines, CaptionsSource)
 	l.Language = languageOf(lang)
 	return l, nil
 }
@@ -63,7 +64,7 @@ func (c *Catalog) Transcript(ctx context.Context, episode media.Track) (lyrics.L
 		}
 		return lyrics.Lyrics{}, err
 	}
-	l := lyrics.Timed(lines, captionsSource)
+	l := lyrics.Timed(lines, CaptionsSource)
 	l.Language = languageOf(lang)
 	return l, nil
 }

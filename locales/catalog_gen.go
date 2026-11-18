@@ -80,6 +80,22 @@ func (msgs Messages) AboutLicenses() string {
 	return Catalog.Format(msgs.locale, "aboutLicenses", nil)
 }
 
+// AboutNoLogs says "MixMusic keeps no log here"
+// in the language the app shows.
+//
+// Why the log's folder didn't open or memory use wasn't recorded, as a
+// toast: this copy of MixMusic keeps no log.
+func AboutNoLogs() string { return In(i18n.Locale()).AboutNoLogs() }
+
+// AboutNoLogs says "MixMusic keeps no log here"
+// in the language of msgs.
+//
+// Why the log's folder didn't open or memory use wasn't recorded, as a
+// toast: this copy of MixMusic keeps no log.
+func (msgs Messages) AboutNoLogs() string {
+	return Catalog.Format(msgs.locale, "aboutNoLogs", nil)
+}
+
 // AboutNoticeAac says "SharpJaad, which decodes AAC audio"
 // in the language the app shows.
 func AboutNoticeAac() string { return In(i18n.Locale()).AboutNoticeAac() }
@@ -382,6 +398,24 @@ func (msgs Messages) AccountSettingsBrowserClosed(browser string) string {
 	return Catalog.Format(msgs.locale, "accountSettingsBrowserClosed", map[string]any{"browser": browser})
 }
 
+// AccountSettingsCantKeepSignIn says "Windows didn't let MixMusic keep your sign-in: {error}"
+// in the language the app shows.
+//
+// Why a sign-in wasn't kept, in Settings › Accounts, on Windows without
+// its Credential Manager. {error} is the system's own words.
+func AccountSettingsCantKeepSignIn(error string) string {
+	return In(i18n.Locale()).AccountSettingsCantKeepSignIn(error)
+}
+
+// AccountSettingsCantKeepSignIn says "Windows didn't let MixMusic keep your sign-in: {error}"
+// in the language of msgs.
+//
+// Why a sign-in wasn't kept, in Settings › Accounts, on Windows without
+// its Credential Manager. {error} is the system's own words.
+func (msgs Messages) AccountSettingsCantKeepSignIn(error string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsCantKeepSignIn", map[string]any{"error": error})
+}
+
 // AccountSettingsCharsPlaceholder says "32 letters and digits"
 // in the language the app shows.
 func AccountSettingsCharsPlaceholder() string {
@@ -426,6 +460,26 @@ func (msgs Messages) AccountSettingsConnectedLastfm() string {
 	return Catalog.Format(msgs.locale, "accountSettingsConnectedLastfm", nil)
 }
 
+// AccountSettingsCookiesBadHeader says "that isn't a signed-in YouTube Music cookie header: copy the Cookie header of a request to music.youtube.com, from a …"
+// in the language the app shows.
+//
+// Why the pasted cookie header didn't sign in to YouTube Music, in Settings
+// › Accounts. Cookie header is the name of an HTTP header: keep it as
+// browsers' developer tools show it.
+func AccountSettingsCookiesBadHeader() string {
+	return In(i18n.Locale()).AccountSettingsCookiesBadHeader()
+}
+
+// AccountSettingsCookiesBadHeader says "that isn't a signed-in YouTube Music cookie header: copy the Cookie header of a request to music.youtube.com, from a …"
+// in the language of msgs.
+//
+// Why the pasted cookie header didn't sign in to YouTube Music, in Settings
+// › Accounts. Cookie header is the name of an HTTP header: keep it as
+// browsers' developer tools show it.
+func (msgs Messages) AccountSettingsCookiesBadHeader() string {
+	return Catalog.Format(msgs.locale, "accountSettingsCookiesBadHeader", nil)
+}
+
 // AccountSettingsCookiesDenied says "the system keeps the cookies of {browser} from MixMusic"
 // in the language the app shows.
 //
@@ -442,6 +496,42 @@ func AccountSettingsCookiesDenied(browser string) string {
 // Settings › Accounts. {browser} is the browser's name.
 func (msgs Messages) AccountSettingsCookiesDenied(browser string) string {
 	return Catalog.Format(msgs.locale, "accountSettingsCookiesDenied", map[string]any{"browser": browser})
+}
+
+// AccountSettingsCookiesNoProfiles says "MixMusic didn't find the profiles of {browser}: give the folder of one"
+// in the language the app shows.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func AccountSettingsCookiesNoProfiles(browser string) string {
+	return In(i18n.Locale()).AccountSettingsCookiesNoProfiles(browser)
+}
+
+// AccountSettingsCookiesNoProfiles says "MixMusic didn't find the profiles of {browser}: give the folder of one"
+// in the language of msgs.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func (msgs Messages) AccountSettingsCookiesNoProfiles(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsCookiesNoProfiles", map[string]any{"browser": browser})
+}
+
+// AccountSettingsCookiesNoSession says "{browser} has no signed-in YouTube Music session: sign in to music.youtube.com in it, close it, then import again"
+// in the language the app shows.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func AccountSettingsCookiesNoSession(browser string) string {
+	return In(i18n.Locale()).AccountSettingsCookiesNoSession(browser)
+}
+
+// AccountSettingsCookiesNoSession says "{browser} has no signed-in YouTube Music session: sign in to music.youtube.com in it, close it, then import again"
+// in the language of msgs.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func (msgs Messages) AccountSettingsCookiesNoSession(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsCookiesNoSession", map[string]any{"browser": browser})
 }
 
 // AccountSettingsCookiesNone says "MixMusic found no cookies of {browser}: is it installed? For a profile kept elsewhere, give its folder"
@@ -1200,6 +1290,26 @@ func (msgs Messages) AccountSettingsYouTubeAgain(error string) string {
 	return Catalog.Format(msgs.locale, "accountSettingsYouTubeAgain", map[string]any{"error": error})
 }
 
+// AccountSettingsYouTubeAnsweredAsAccount says "YouTube Music answered as the account {account}, not as its channel {channel}: MixMusic goes on as before"
+// in the language the app shows.
+//
+// Why switching to a YouTube channel failed, as a toast, in Settings ›
+// Accounts. {account} is the Google account's name; {channel} is the
+// channel's.
+func AccountSettingsYouTubeAnsweredAsAccount(account string, channel string) string {
+	return In(i18n.Locale()).AccountSettingsYouTubeAnsweredAsAccount(account, channel)
+}
+
+// AccountSettingsYouTubeAnsweredAsAccount says "YouTube Music answered as the account {account}, not as its channel {channel}: MixMusic goes on as before"
+// in the language of msgs.
+//
+// Why switching to a YouTube channel failed, as a toast, in Settings ›
+// Accounts. {account} is the Google account's name; {channel} is the
+// channel's.
+func (msgs Messages) AccountSettingsYouTubeAnsweredAsAccount(account string, channel string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsYouTubeAnsweredAsAccount", map[string]any{"account": account, "channel": channel})
+}
+
 // AccountSettingsYouTubeBrowser says "Browser"
 // in the language the app shows.
 func AccountSettingsYouTubeBrowser() string { return In(i18n.Locale()).AccountSettingsYouTubeBrowser() }
@@ -1440,6 +1550,42 @@ func AccountSettingsYouTubeNoAccount() string {
 // in the language of msgs.
 func (msgs Messages) AccountSettingsYouTubeNoAccount() string {
 	return Catalog.Format(msgs.locale, "accountSettingsYouTubeNoAccount", nil)
+}
+
+// AccountSettingsYouTubeNotAccepted says "YouTube Music didn't accept the sign-in: {error}"
+// in the language the app shows.
+//
+// Why signing in to YouTube Music failed, in Settings › Accounts. {error}
+// is why, often in YouTube's own words.
+func AccountSettingsYouTubeNotAccepted(error string) string {
+	return In(i18n.Locale()).AccountSettingsYouTubeNotAccepted(error)
+}
+
+// AccountSettingsYouTubeNotAccepted says "YouTube Music didn't accept the sign-in: {error}"
+// in the language of msgs.
+//
+// Why signing in to YouTube Music failed, in Settings › Accounts. {error}
+// is why, often in YouTube's own words.
+func (msgs Messages) AccountSettingsYouTubeNotAccepted(error string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsYouTubeNotAccepted", map[string]any{"error": error})
+}
+
+// AccountSettingsYouTubeNotChannel says "that isn't a channel of the account"
+// in the language the app shows.
+//
+// Why switching to a YouTube channel failed, as a toast, in Settings ›
+// Accounts.
+func AccountSettingsYouTubeNotChannel() string {
+	return In(i18n.Locale()).AccountSettingsYouTubeNotChannel()
+}
+
+// AccountSettingsYouTubeNotChannel says "that isn't a channel of the account"
+// in the language of msgs.
+//
+// Why switching to a YouTube channel failed, as a toast, in Settings ›
+// Accounts.
+func (msgs Messages) AccountSettingsYouTubeNotChannel() string {
+	return Catalog.Format(msgs.locale, "accountSettingsYouTubeNotChannel", nil)
 }
 
 // AccountSettingsYouTubePasteButton says "sign in with it"
@@ -2232,6 +2378,24 @@ func (msgs Messages) AppearanceUseTheme() string {
 	return Catalog.Format(msgs.locale, "appearanceUseTheme", nil)
 }
 
+// ArtistPlayCouldntOpen says "the artist couldn't be opened: {error}"
+// in the language the app shows.
+//
+// Why playing all of an artist's songs didn't start, as a toast. {error} is
+// why, often in the service's own words.
+func ArtistPlayCouldntOpen(error string) string {
+	return In(i18n.Locale()).ArtistPlayCouldntOpen(error)
+}
+
+// ArtistPlayCouldntOpen says "the artist couldn't be opened: {error}"
+// in the language of msgs.
+//
+// Why playing all of an artist's songs didn't start, as a toast. {error} is
+// why, often in the service's own words.
+func (msgs Messages) ArtistPlayCouldntOpen(error string) string {
+	return Catalog.Format(msgs.locale, "artistPlayCouldntOpen", map[string]any{"error": error})
+}
+
 // ArtistPlayFailed says "{artist}'s songs couldn't be loaded: {error}"
 // in the language the app shows.
 //
@@ -2350,6 +2514,22 @@ func AssistantsAbout() string { return In(i18n.Locale()).AssistantsAbout() }
 // in the language of msgs.
 func (msgs Messages) AssistantsAbout() string {
 	return Catalog.Format(msgs.locale, "assistantsAbout", nil)
+}
+
+// AssistantsCantListen says "MixMusic can't listen for AI assistants on this computer: {error}"
+// in the language the app shows.
+//
+// Why AI assistants can't connect, in the {problem} of assistantsProblem,
+// in Settings › AI assistants. {error} is the system's own words.
+func AssistantsCantListen(error string) string { return In(i18n.Locale()).AssistantsCantListen(error) }
+
+// AssistantsCantListen says "MixMusic can't listen for AI assistants on this computer: {error}"
+// in the language of msgs.
+//
+// Why AI assistants can't connect, in the {problem} of assistantsProblem,
+// in Settings › AI assistants. {error} is the system's own words.
+func (msgs Messages) AssistantsCantListen(error string) string {
+	return Catalog.Format(msgs.locale, "assistantsCantListen", map[string]any{"error": error})
 }
 
 // AssistantsCommand says "Command"
@@ -3998,6 +4178,22 @@ func (msgs Messages) CollabShelfTitle() string {
 	return Catalog.Format(msgs.locale, "collabShelfTitle", nil)
 }
 
+// CollabSignInFirst says "sign in to that service in Settings › Accounts to change its playlists"
+// in the language the app shows.
+//
+// Why a playlist's collaborators or sharing didn't change, in the {error}
+// of the collab messages: the user isn't signed in to its service.
+func CollabSignInFirst() string { return In(i18n.Locale()).CollabSignInFirst() }
+
+// CollabSignInFirst says "sign in to that service in Settings › Accounts to change its playlists"
+// in the language of msgs.
+//
+// Why a playlist's collaborators or sharing didn't change, in the {error}
+// of the collab messages: the user isn't signed in to its service.
+func (msgs Messages) CollabSignInFirst() string {
+	return Catalog.Format(msgs.locale, "collabSignInFirst", nil)
+}
+
 // CollabSpotifyBody says "Spotify keeps collaborative playlists off your profile: {title} leaves it. Those you send its link to can then add to…"
 // in the language the app shows.
 func CollabSpotifyBody(title string) string { return In(i18n.Locale()).CollabSpotifyBody(title) }
@@ -4088,6 +4284,22 @@ func CollabTracks(count int) string { return In(i18n.Locale()).CollabTracks(coun
 // in the language of msgs.
 func (msgs Messages) CollabTracks(count int) string {
 	return Catalog.Format(msgs.locale, "collabTracks", map[string]any{"count": count})
+}
+
+// CollabUnlistedNow says "{error}; the playlist is unlisted now"
+// in the language the app shows.
+//
+// Why inviting to a playlist failed, in the {error} of collabInviteFailed,
+// after it was unlisted. {error} is why, often in the service's own words.
+func CollabUnlistedNow(error string) string { return In(i18n.Locale()).CollabUnlistedNow(error) }
+
+// CollabUnlistedNow says "{error}; the playlist is unlisted now"
+// in the language of msgs.
+//
+// Why inviting to a playlist failed, in the {error} of collabInviteFailed,
+// after it was unlisted. {error} is why, often in the service's own words.
+func (msgs Messages) CollabUnlistedNow(error string) string {
+	return Catalog.Format(msgs.locale, "collabUnlistedNow", map[string]any{"error": error})
 }
 
 // CollabUnlisting says "Making {title} unlisted: YouTube Music takes up to half a minute before it lets collaborators in"
@@ -4842,6 +5054,62 @@ func ComputerEmptyTitle() string { return In(i18n.Locale()).ComputerEmptyTitle()
 // in the language of msgs.
 func (msgs Messages) ComputerEmptyTitle() string {
 	return Catalog.Format(msgs.locale, "computerEmptyTitle", nil)
+}
+
+// ComputerFolderDenied says "MixMusic isn't allowed to read it"
+// in the language the app shows.
+//
+// Why a music folder can't be read, in the {problem} of
+// computerSettingsProblem, in Settings › This computer: the system
+// doesn't let MixMusic read it.
+func ComputerFolderDenied() string { return In(i18n.Locale()).ComputerFolderDenied() }
+
+// ComputerFolderDenied says "MixMusic isn't allowed to read it"
+// in the language of msgs.
+//
+// Why a music folder can't be read, in the {problem} of
+// computerSettingsProblem, in Settings › This computer: the system
+// doesn't let MixMusic read it.
+func (msgs Messages) ComputerFolderDenied() string {
+	return Catalog.Format(msgs.locale, "computerFolderDenied", nil)
+}
+
+// ComputerFolderMissing says "It isn't there: its drive may be unplugged"
+// in the language the app shows.
+//
+// Why a music folder can't be read, in the {problem} of
+// computerSettingsProblem, in Settings › This computer: it isn't where it
+// was, as on a drive unplugged. computerSettingsProblem puts a full stop
+// after it, so it ends without one, and without a question mark.
+func ComputerFolderMissing() string { return In(i18n.Locale()).ComputerFolderMissing() }
+
+// ComputerFolderMissing says "It isn't there: its drive may be unplugged"
+// in the language of msgs.
+//
+// Why a music folder can't be read, in the {problem} of
+// computerSettingsProblem, in Settings › This computer: it isn't where it
+// was, as on a drive unplugged. computerSettingsProblem puts a full stop
+// after it, so it ends without one, and without a question mark.
+func (msgs Messages) ComputerFolderMissing() string {
+	return Catalog.Format(msgs.locale, "computerFolderMissing", nil)
+}
+
+// ComputerFolderUnreadable says "It can't be read"
+// in the language the app shows.
+//
+// Why a music folder can't be read, in the {problem} of
+// computerSettingsProblem, in Settings › This computer, for another
+// reason.
+func ComputerFolderUnreadable() string { return In(i18n.Locale()).ComputerFolderUnreadable() }
+
+// ComputerFolderUnreadable says "It can't be read"
+// in the language of msgs.
+//
+// Why a music folder can't be read, in the {problem} of
+// computerSettingsProblem, in Settings › This computer, for another
+// reason.
+func (msgs Messages) ComputerFolderUnreadable() string {
+	return Catalog.Format(msgs.locale, "computerFolderUnreadable", nil)
 }
 
 // ComputerFromFolders says "From {count, plural, one {# folder} other {# folders}} · "
@@ -5616,6 +5884,24 @@ func (msgs Messages) CrossfadeTitle() string {
 	return Catalog.Format(msgs.locale, "crossfadeTitle", nil)
 }
 
+// DesktopSettingsAutostartAskFailed says "couldn't ask the desktop to start MixMusic at login: {error}"
+// in the language the app shows.
+//
+// Why Start at login (desktopSettingsLogin) didn't turn on, as a toast, for
+// MixMusic installed from Flathub. {error} is the system's own words.
+func DesktopSettingsAutostartAskFailed(error string) string {
+	return In(i18n.Locale()).DesktopSettingsAutostartAskFailed(error)
+}
+
+// DesktopSettingsAutostartAskFailed says "couldn't ask the desktop to start MixMusic at login: {error}"
+// in the language of msgs.
+//
+// Why Start at login (desktopSettingsLogin) didn't turn on, as a toast, for
+// MixMusic installed from Flathub. {error} is the system's own words.
+func (msgs Messages) DesktopSettingsAutostartAskFailed(error string) string {
+	return Catalog.Format(msgs.locale, "desktopSettingsAutostartAskFailed", map[string]any{"error": error})
+}
+
 // DesktopSettingsAutostartReason says "MixMusic starts when you log in, as you chose in its settings"
 // in the language the app shows.
 //
@@ -5810,6 +6096,22 @@ func DesktopSettingsNoBackgroundPortal() string {
 // desktops.
 func (msgs Messages) DesktopSettingsNoBackgroundPortal() string {
 	return Catalog.Format(msgs.locale, "desktopSettingsNoBackgroundPortal", nil)
+}
+
+// DesktopSettingsNoJsonApp says "no app on this computer opens .json files, so MixMusic showed settings.json in its folder"
+// in the language the app shows.
+//
+// Toast after Open settings.json, in Settings › Desktop, when no app
+// opens .json files. settings.json is the file's name.
+func DesktopSettingsNoJsonApp() string { return In(i18n.Locale()).DesktopSettingsNoJsonApp() }
+
+// DesktopSettingsNoJsonApp says "no app on this computer opens .json files, so MixMusic showed settings.json in its folder"
+// in the language of msgs.
+//
+// Toast after Open settings.json, in Settings › Desktop, when no app
+// opens .json files. settings.json is the file's name.
+func (msgs Messages) DesktopSettingsNoJsonApp() string {
+	return Catalog.Format(msgs.locale, "desktopSettingsNoJsonApp", nil)
 }
 
 // DesktopSettingsNotificationsAbout says "Tell what starts playing while MixMusic is in the background."
@@ -7394,6 +7696,22 @@ func (msgs Messages) DownloadsMovedTo(folder string) string {
 	return Catalog.Format(msgs.locale, "downloadsMovedTo", map[string]any{"folder": folder})
 }
 
+// DownloadsNoFolder says "MixMusic keeps no downloads here"
+// in the language the app shows.
+//
+// Why the downloads' folder didn't open, as a toast: this copy of MixMusic
+// keeps no downloads.
+func DownloadsNoFolder() string { return In(i18n.Locale()).DownloadsNoFolder() }
+
+// DownloadsNoFolder says "MixMusic keeps no downloads here"
+// in the language of msgs.
+//
+// Why the downloads' folder didn't open, as a toast: this copy of MixMusic
+// keeps no downloads.
+func (msgs Messages) DownloadsNoFolder() string {
+	return Catalog.Format(msgs.locale, "downloadsNoFolder", nil)
+}
+
 // DownloadsNoMatch says "No download matches “{query}”."
 // in the language the app shows.
 func DownloadsNoMatch(query string) string { return In(i18n.Locale()).DownloadsNoMatch(query) }
@@ -8602,6 +8920,22 @@ func (msgs Messages) ErrorLocalFilesRemovableDrive() string {
 	return Catalog.Format(msgs.locale, "errorLocalFilesRemovableDrive", nil)
 }
 
+// ErrorLocalFilesWatchFailed says "the system can't watch it"
+// in the language the app shows.
+//
+// Why MixMusic can't watch a music folder for changes, in the {reason} of
+// computerUnwatched, for a reason the system doesn't tell.
+func ErrorLocalFilesWatchFailed() string { return In(i18n.Locale()).ErrorLocalFilesWatchFailed() }
+
+// ErrorLocalFilesWatchFailed says "the system can't watch it"
+// in the language of msgs.
+//
+// Why MixMusic can't watch a music folder for changes, in the {reason} of
+// computerUnwatched, for a reason the system doesn't tell.
+func (msgs Messages) ErrorLocalFilesWatchFailed() string {
+	return Catalog.Format(msgs.locale, "errorLocalFilesWatchFailed", nil)
+}
+
 // ErrorLocalFilesWatchLimit says "the system's limit on watched folders is reached"
 // in the language the app shows.
 //
@@ -9462,6 +9796,24 @@ func (msgs Messages) ExploreNoPlaylists() string {
 	return Catalog.Format(msgs.locale, "exploreNoPlaylists", nil)
 }
 
+// ExploreNoneOnYouTube says "none of these tracks is on YouTube Music"
+// in the language the app shows.
+//
+// Why a playlist wasn't made or shared on YouTube Music, in the {error} of
+// exploreCouldntCreate and collabShareFailed: none of its tracks is there,
+// as songs on this computer.
+func ExploreNoneOnYouTube() string { return In(i18n.Locale()).ExploreNoneOnYouTube() }
+
+// ExploreNoneOnYouTube says "none of these tracks is on YouTube Music"
+// in the language of msgs.
+//
+// Why a playlist wasn't made or shared on YouTube Music, in the {error} of
+// exploreCouldntCreate and collabShareFailed: none of its tracks is there,
+// as songs on this computer.
+func (msgs Messages) ExploreNoneOnYouTube() string {
+	return Catalog.Format(msgs.locale, "exploreNoneOnYouTube", nil)
+}
+
 // ExploreNothingHere says "YouTube Music shows nothing here right now."
 // in the language the app shows.
 func ExploreNothingHere() string { return In(i18n.Locale()).ExploreNothingHere() }
@@ -9568,6 +9920,20 @@ func ExportMenu() string { return In(i18n.Locale()).ExportMenu() }
 // in the language of msgs.
 func (msgs Messages) ExportMenu() string {
 	return Catalog.Format(msgs.locale, "exportMenu", nil)
+}
+
+// ExportNotOnComputer says "this track isn't downloaded, nor on this computer"
+// in the language the app shows.
+//
+// Why a track didn't export, in the {error} of exportFailed.
+func ExportNotOnComputer() string { return In(i18n.Locale()).ExportNotOnComputer() }
+
+// ExportNotOnComputer says "this track isn't downloaded, nor on this computer"
+// in the language of msgs.
+//
+// Why a track didn't export, in the {error} of exportFailed.
+func (msgs Messages) ExportNotOnComputer() string {
+	return Catalog.Format(msgs.locale, "exportNotOnComputer", nil)
 }
 
 // ExportOnlyDownloaded says "Only tracks downloaded or on this computer export"
@@ -11526,6 +11892,20 @@ func (msgs Messages) LibraryAddedToQueue(title string) string {
 	return Catalog.Format(msgs.locale, "libraryAddedToQueue", map[string]any{"title": title})
 }
 
+// LibraryAlbumNoPlaylist says "this album can't be saved: YouTube Music gave no playlist of its tracks"
+// in the language the app shows.
+//
+// Why a YouTube Music album wasn't saved to the library, as a toast.
+func LibraryAlbumNoPlaylist() string { return In(i18n.Locale()).LibraryAlbumNoPlaylist() }
+
+// LibraryAlbumNoPlaylist says "this album can't be saved: YouTube Music gave no playlist of its tracks"
+// in the language of msgs.
+//
+// Why a YouTube Music album wasn't saved to the library, as a toast.
+func (msgs Messages) LibraryAlbumNoPlaylist() string {
+	return Catalog.Format(msgs.locale, "libraryAlbumNoPlaylist", nil)
+}
+
 // LibraryAlbums says "Albums"
 // in the language the app shows.
 //
@@ -12120,6 +12500,22 @@ func (msgs Messages) LibraryShuffle() string {
 	return Catalog.Format(msgs.locale, "libraryShuffle", nil)
 }
 
+// LibrarySignInToKeep says "sign in to that service in Settings › Accounts to keep it in your library there"
+// in the language the app shows.
+//
+// Why an album, artist or playlist wasn't saved to the library of its
+// service, as a toast: the user isn't signed in to it.
+func LibrarySignInToKeep() string { return In(i18n.Locale()).LibrarySignInToKeep() }
+
+// LibrarySignInToKeep says "sign in to that service in Settings › Accounts to keep it in your library there"
+// in the language of msgs.
+//
+// Why an album, artist or playlist wasn't saved to the library of its
+// service, as a toast: the user isn't signed in to it.
+func (msgs Messages) LibrarySignInToKeep() string {
+	return Catalog.Format(msgs.locale, "librarySignInToKeep", nil)
+}
+
 // LibrarySongAdded says "Added {title} to your library on YouTube Music"
 // in the language the app shows.
 func LibrarySongAdded(title string) string { return In(i18n.Locale()).LibrarySongAdded(title) }
@@ -12224,6 +12620,24 @@ func ListenBrainzSettingsAboutServer(server string) string {
 // in the language of msgs.
 func (msgs Messages) ListenBrainzSettingsAboutServer(server string) string {
 	return Catalog.Format(msgs.locale, "listenBrainzSettingsAboutServer", map[string]any{"server": server})
+}
+
+// ListenBrainzSettingsCheckFailed says "MixMusic couldn't check the token with the server, so nothing was kept: check its address and your connection ({error})"
+// in the language the app shows.
+//
+// Why connecting to ListenBrainz or a server of its API failed, in Settings
+// › Accounts. {error} is the system's own words.
+func ListenBrainzSettingsCheckFailed(error string) string {
+	return In(i18n.Locale()).ListenBrainzSettingsCheckFailed(error)
+}
+
+// ListenBrainzSettingsCheckFailed says "MixMusic couldn't check the token with the server, so nothing was kept: check its address and your connection ({error})"
+// in the language of msgs.
+//
+// Why connecting to ListenBrainz or a server of its API failed, in Settings
+// › Accounts. {error} is the system's own words.
+func (msgs Messages) ListenBrainzSettingsCheckFailed(error string) string {
+	return Catalog.Format(msgs.locale, "listenBrainzSettingsCheckFailed", map[string]any{"error": error})
 }
 
 // ListenBrainzSettingsChecking says "checking the token…"
@@ -12790,6 +13204,24 @@ func (msgs Messages) LocalTagsBadImage(error string) string {
 	return Catalog.Format(msgs.locale, "localTagsBadImage", map[string]any{"error": error})
 }
 
+// LocalTagsCantChange says "MixMusic can't change {file}: {error}"
+// in the language the app shows.
+//
+// Why a song's tags didn't change, as a toast. {file} is the file's name;
+// {error} is why.
+func LocalTagsCantChange(file string, error string) string {
+	return In(i18n.Locale()).LocalTagsCantChange(file, error)
+}
+
+// LocalTagsCantChange says "MixMusic can't change {file}: {error}"
+// in the language of msgs.
+//
+// Why a song's tags didn't change, as a toast. {file} is the file's name;
+// {error} is why.
+func (msgs Messages) LocalTagsCantChange(file string, error string) string {
+	return Catalog.Format(msgs.locale, "localTagsCantChange", map[string]any{"file": file, "error": error})
+}
+
 // LocalTagsChooseCoverTitle says "Choose a cover"
 // in the language the app shows.
 //
@@ -12816,6 +13248,24 @@ func LocalTagsChooseImage() string { return In(i18n.Locale()).LocalTagsChooseIma
 // Button that chooses a cover image. Lowercase.
 func (msgs Messages) LocalTagsChooseImage() string {
 	return Catalog.Format(msgs.locale, "localTagsChooseImage", nil)
+}
+
+// LocalTagsCouldntSave says "couldn't save {file}: {error}"
+// in the language the app shows.
+//
+// Why a song's tags weren't saved, in the Edit info dialog and its toast.
+// {file} is the file's name; {error} is why.
+func LocalTagsCouldntSave(file string, error string) string {
+	return In(i18n.Locale()).LocalTagsCouldntSave(file, error)
+}
+
+// LocalTagsCouldntSave says "couldn't save {file}: {error}"
+// in the language of msgs.
+//
+// Why a song's tags weren't saved, in the Edit info dialog and its toast.
+// {file} is the file's name; {error} is why.
+func (msgs Messages) LocalTagsCouldntSave(file string, error string) string {
+	return Catalog.Format(msgs.locale, "localTagsCouldntSave", map[string]any{"file": file, "error": error})
 }
 
 // LocalTagsCover says "Cover"
@@ -13080,6 +13530,22 @@ func LocalTagsNone() string { return In(i18n.Locale()).LocalTagsNone() }
 // No cover. Shown in the Cover row.
 func (msgs Messages) LocalTagsNone() string {
 	return Catalog.Format(msgs.locale, "localTagsNone", nil)
+}
+
+// LocalTagsNotOnComputer says "this song isn't a file on this computer"
+// in the language the app shows.
+//
+// Why a song's tags didn't change, as a toast: it isn't one of the files on
+// this computer.
+func LocalTagsNotOnComputer() string { return In(i18n.Locale()).LocalTagsNotOnComputer() }
+
+// LocalTagsNotOnComputer says "this song isn't a file on this computer"
+// in the language of msgs.
+//
+// Why a song's tags didn't change, as a toast: it isn't one of the files on
+// this computer.
+func (msgs Messages) LocalTagsNotOnComputer() string {
+	return Catalog.Format(msgs.locale, "localTagsNotOnComputer", nil)
 }
 
 // LocalTagsRemoveCover says "remove the cover"
@@ -15184,6 +15650,40 @@ func (msgs Messages) MarketplaceWarningAsks(permissions string) string {
 	return Catalog.Format(msgs.locale, "marketplaceWarningAsks", map[string]any{"permissions": permissions})
 }
 
+// MemoryCantRecord says "can't record memory use: {error}"
+// in the language the app shows.
+//
+// Why recording memory use didn't start, as a toast, in Settings › About.
+// {error} is the system's own words.
+func MemoryCantRecord(error string) string { return In(i18n.Locale()).MemoryCantRecord(error) }
+
+// MemoryCantRecord says "can't record memory use: {error}"
+// in the language of msgs.
+//
+// Why recording memory use didn't start, as a toast, in Settings › About.
+// {error} is the system's own words.
+func (msgs Messages) MemoryCantRecord(error string) string {
+	return Catalog.Format(msgs.locale, "memoryCantRecord", map[string]any{"error": error})
+}
+
+// MemoryCantSaveProfile says "can't save a heap profile: {error}"
+// in the language the app shows.
+//
+// Why a heap profile wasn't saved, as a toast, in Settings › About.
+// {error} is the system's own words.
+func MemoryCantSaveProfile(error string) string {
+	return In(i18n.Locale()).MemoryCantSaveProfile(error)
+}
+
+// MemoryCantSaveProfile says "can't save a heap profile: {error}"
+// in the language of msgs.
+//
+// Why a heap profile wasn't saved, as a toast, in Settings › About.
+// {error} is the system's own words.
+func (msgs Messages) MemoryCantSaveProfile(error string) string {
+	return Catalog.Format(msgs.locale, "memoryCantSaveProfile", map[string]any{"error": error})
+}
+
 // MemoryHeapAbout says "Saves where MixMusic's Go code holds memory now, as heap-<time>.pprof beside memory.log. The newest five are kept."
 // in the language the app shows.
 func MemoryHeapAbout() string { return In(i18n.Locale()).MemoryHeapAbout() }
@@ -15736,6 +16236,22 @@ func (msgs Messages) MixCoverCancel() string {
 	return Catalog.Format(msgs.locale, "mixCoverCancel", nil)
 }
 
+// MixCoverCantRead says "couldn't read the image: {error}"
+// in the language the app shows.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed.
+// {error} is the system's own words.
+func MixCoverCantRead(error string) string { return In(i18n.Locale()).MixCoverCantRead(error) }
+
+// MixCoverCantRead says "couldn't read the image: {error}"
+// in the language of msgs.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed.
+// {error} is the system's own words.
+func (msgs Messages) MixCoverCantRead(error string) string {
+	return Catalog.Format(msgs.locale, "mixCoverCantRead", map[string]any{"error": error})
+}
+
 // MixCoverChange says "Change cover…"
 // in the language the app shows.
 func MixCoverChange() string { return In(i18n.Locale()).MixCoverChange() }
@@ -15788,6 +16304,22 @@ func (msgs Messages) MixCoverFailed(title string, error string) string {
 	return Catalog.Format(msgs.locale, "mixCoverFailed", map[string]any{"title": title, "error": error})
 }
 
+// MixCoverGifTooLarge says "the GIF is too large for a cover: choose one of fewer or smaller frames"
+// in the language the app shows.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// moving image is too large.
+func MixCoverGifTooLarge() string { return In(i18n.Locale()).MixCoverGifTooLarge() }
+
+// MixCoverGifTooLarge says "the GIF is too large for a cover: choose one of fewer or smaller frames"
+// in the language of msgs.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// moving image is too large.
+func (msgs Messages) MixCoverGifTooLarge() string {
+	return Catalog.Format(msgs.locale, "mixCoverGifTooLarge", nil)
+}
+
 // MixCoverImages says "Images"
 // in the language the app shows.
 func MixCoverImages() string { return In(i18n.Locale()).MixCoverImages() }
@@ -15806,6 +16338,22 @@ func MixCoverIntro(title string) string { return In(i18n.Locale()).MixCoverIntro
 // in the language of msgs.
 func (msgs Messages) MixCoverIntro(title string) string {
 	return Catalog.Format(msgs.locale, "mixCoverIntro", map[string]any{"title": title})
+}
+
+// MixCoverNotImage says "a cover is a PNG, JPEG, GIF or WebP image"
+// in the language the app shows.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// file chosen isn't such an image.
+func MixCoverNotImage() string { return In(i18n.Locale()).MixCoverNotImage() }
+
+// MixCoverNotImage says "a cover is a PNG, JPEG, GIF or WebP image"
+// in the language of msgs.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// file chosen isn't such an image.
+func (msgs Messages) MixCoverNotImage() string {
+	return Catalog.Format(msgs.locale, "mixCoverNotImage", nil)
 }
 
 // MixCoverSongs says "use the songs' covers"
@@ -15836,6 +16384,72 @@ func MixCoverTitle() string { return In(i18n.Locale()).MixCoverTitle() }
 // in the language of msgs.
 func (msgs Messages) MixCoverTitle() string {
 	return Catalog.Format(msgs.locale, "mixCoverTitle", nil)
+}
+
+// MixCoverTooLarge says "the image is too large for a cover: choose one under 40 MB"
+// in the language the app shows.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// file is too large.
+func MixCoverTooLarge() string { return In(i18n.Locale()).MixCoverTooLarge() }
+
+// MixCoverTooLarge says "the image is too large for a cover: choose one under 40 MB"
+// in the language of msgs.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// file is too large.
+func (msgs Messages) MixCoverTooLarge() string {
+	return Catalog.Format(msgs.locale, "mixCoverTooLarge", nil)
+}
+
+// MixCoverTooManyPixels says "the image is too large for a cover"
+// in the language the app shows.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// image has too many pixels.
+func MixCoverTooManyPixels() string { return In(i18n.Locale()).MixCoverTooManyPixels() }
+
+// MixCoverTooManyPixels says "the image is too large for a cover"
+// in the language of msgs.
+//
+// Why a mix's cover didn't change, in the {error} of mixCoverFailed: the
+// image has too many pixels.
+func (msgs Messages) MixCoverTooManyPixels() string {
+	return Catalog.Format(msgs.locale, "mixCoverTooManyPixels", nil)
+}
+
+// MixCoverTrackFailed says "couldn't get the cover of {title}: {error}"
+// in the language the app shows.
+//
+// Why a mix's cover didn't change to a song's, in the {error} of
+// mixCoverFailed. {title} is the song's title; {error} is why.
+func MixCoverTrackFailed(title string, error string) string {
+	return In(i18n.Locale()).MixCoverTrackFailed(title, error)
+}
+
+// MixCoverTrackFailed says "couldn't get the cover of {title}: {error}"
+// in the language of msgs.
+//
+// Why a mix's cover didn't change to a song's, in the {error} of
+// mixCoverFailed. {title} is the song's title; {error} is why.
+func (msgs Messages) MixCoverTrackFailed(title string, error string) string {
+	return Catalog.Format(msgs.locale, "mixCoverTrackFailed", map[string]any{"title": title, "error": error})
+}
+
+// MixCoverTrackNone says "{title} has no cover"
+// in the language the app shows.
+//
+// Why a mix's cover didn't change to a song's, in the {error} of
+// mixCoverFailed. {title} is the song's title.
+func MixCoverTrackNone(title string) string { return In(i18n.Locale()).MixCoverTrackNone(title) }
+
+// MixCoverTrackNone says "{title} has no cover"
+// in the language of msgs.
+//
+// Why a mix's cover didn't change to a song's, in the {error} of
+// mixCoverFailed. {title} is the song's title.
+func (msgs Messages) MixCoverTrackNone(title string) string {
+	return Catalog.Format(msgs.locale, "mixCoverTrackNone", map[string]any{"title": title})
 }
 
 // MixCoverUse says "Use the cover of {title}"
@@ -18288,6 +18902,26 @@ func (msgs Messages) PlaylistReadPartialFirst(n int, noun string, error string) 
 	return Catalog.Format(msgs.locale, "playlistReadPartialFirst", map[string]any{"n": n, "noun": noun, "error": error})
 }
 
+// PlaylistReadPartialNamed says "Only {n, plural, one {# track} other {# tracks}} of {title} could be loaded: {error}"
+// in the language the app shows.
+//
+// Toast when playing or downloading a whole playlist read only some of its
+// tracks. {title} is the playlist's name; {error} is why, often in the
+// service's own words.
+func PlaylistReadPartialNamed(n int, title string, error string) string {
+	return In(i18n.Locale()).PlaylistReadPartialNamed(n, title, error)
+}
+
+// PlaylistReadPartialNamed says "Only {n, plural, one {# track} other {# tracks}} of {title} could be loaded: {error}"
+// in the language of msgs.
+//
+// Toast when playing or downloading a whole playlist read only some of its
+// tracks. {title} is the playlist's name; {error} is why, often in the
+// service's own words.
+func (msgs Messages) PlaylistReadPartialNamed(n int, title string, error string) string {
+	return Catalog.Format(msgs.locale, "playlistReadPartialNamed", map[string]any{"n": n, "title": title, "error": error})
+}
+
 // PlaylistReadPartialOf says "Only {n} of this {noun, select, mix {mix} playlist {playlist} other {list}}'s {count, plural, one {# track} other {# …"
 // in the language the app shows.
 func PlaylistReadPartialOf(n int, noun string, count int, error string) string {
@@ -19516,6 +20150,38 @@ func (msgs Messages) RemoteControlled() string {
 	return Catalog.Format(msgs.locale, "remoteControlled", nil)
 }
 
+// RemoteErrorAnnounce says "Remote control can't announce this computer on the network: {error}"
+// in the language the app shows.
+//
+// Toast when remote control couldn't turn on. {error} is the system's own
+// words, often in English.
+func RemoteErrorAnnounce(error string) string { return In(i18n.Locale()).RemoteErrorAnnounce(error) }
+
+// RemoteErrorAnnounce says "Remote control can't announce this computer on the network: {error}"
+// in the language of msgs.
+//
+// Toast when remote control couldn't turn on. {error} is the system's own
+// words, often in English.
+func (msgs Messages) RemoteErrorAnnounce(error string) string {
+	return Catalog.Format(msgs.locale, "remoteErrorAnnounce", map[string]any{"error": error})
+}
+
+// RemoteErrorFile says "MixMusic couldn't open remote.json, where it keeps the computers paired: {error}"
+// in the language the app shows.
+//
+// Toast when remote control couldn't turn on or forget a computer.
+// remote.json is a file's name; {error} is the system's own words.
+func RemoteErrorFile(error string) string { return In(i18n.Locale()).RemoteErrorFile(error) }
+
+// RemoteErrorFile says "MixMusic couldn't open remote.json, where it keeps the computers paired: {error}"
+// in the language of msgs.
+//
+// Toast when remote control couldn't turn on or forget a computer.
+// remote.json is a file's name; {error} is the system's own words.
+func (msgs Messages) RemoteErrorFile(error string) string {
+	return Catalog.Format(msgs.locale, "remoteErrorFile", map[string]any{"error": error})
+}
+
 // RemoteErrorHandOverLate says "{name} didn't answer in time: what plays here plays on"
 // in the language the app shows.
 //
@@ -19548,6 +20214,42 @@ func RemoteErrorKeyBusy() string { return In(i18n.Locale()).RemoteErrorKeyBusy()
 // apart.
 func (msgs Messages) RemoteErrorKeyBusy() string {
 	return Catalog.Format(msgs.locale, "remoteErrorKeyBusy", nil)
+}
+
+// RemoteErrorKeyKeep says "Couldn't keep this computer's key: {error}"
+// in the language the app shows.
+//
+// Toast or problem when remote control or a room couldn't start: the key
+// that tells this computer apart couldn't be saved. {error} is the system's
+// own words.
+func RemoteErrorKeyKeep(error string) string { return In(i18n.Locale()).RemoteErrorKeyKeep(error) }
+
+// RemoteErrorKeyKeep says "Couldn't keep this computer's key: {error}"
+// in the language of msgs.
+//
+// Toast or problem when remote control or a room couldn't start: the key
+// that tells this computer apart couldn't be saved. {error} is the system's
+// own words.
+func (msgs Messages) RemoteErrorKeyKeep(error string) string {
+	return Catalog.Format(msgs.locale, "remoteErrorKeyKeep", map[string]any{"error": error})
+}
+
+// RemoteErrorKeyRead says "Couldn't read this computer's key: {error}"
+// in the language the app shows.
+//
+// Toast or problem when remote control or a room couldn't start: the key
+// that tells this computer apart couldn't be read. {error} is the system's
+// own words.
+func RemoteErrorKeyRead(error string) string { return In(i18n.Locale()).RemoteErrorKeyRead(error) }
+
+// RemoteErrorKeyRead says "Couldn't read this computer's key: {error}"
+// in the language of msgs.
+//
+// Toast or problem when remote control or a room couldn't start: the key
+// that tells this computer apart couldn't be read. {error} is the system's
+// own words.
+func (msgs Messages) RemoteErrorKeyRead(error string) string {
+	return Catalog.Format(msgs.locale, "remoteErrorKeyRead", map[string]any{"error": error})
 }
 
 // RemoteErrorListen says "Remote control can't listen on the network: {error}"
@@ -26762,6 +27464,22 @@ func (msgs Messages) UpdatesBuildRpm() string {
 	return Catalog.Format(msgs.locale, "updatesBuildRpm", nil)
 }
 
+// UpdatesCantReplace says "this copy of MixMusic can't replace its own files: download the new version instead"
+// in the language the app shows.
+//
+// Why an update didn't install, as a toast: this copy, as a package of the
+// system's, doesn't update itself.
+func UpdatesCantReplace() string { return In(i18n.Locale()).UpdatesCantReplace() }
+
+// UpdatesCantReplace says "this copy of MixMusic can't replace its own files: download the new version instead"
+// in the language of msgs.
+//
+// Why an update didn't install, as a toast: this copy, as a package of the
+// system's, doesn't update itself.
+func (msgs Messages) UpdatesCantReplace() string {
+	return Catalog.Format(msgs.locale, "updatesCantReplace", nil)
+}
+
 // UpdatesCheckAbout says "At start and every few hours, from the releases on GitHub.{asks}{last}"
 // in the language the app shows.
 func UpdatesCheckAbout(asks string, last string) string {
@@ -26904,6 +27622,22 @@ func (msgs Messages) UpdatesDownloading() string {
 	return Catalog.Format(msgs.locale, "updatesDownloading", nil)
 }
 
+// UpdatesDownloadingAlready says "the update is downloading already"
+// in the language the app shows.
+//
+// Why an update didn't start installing, as a toast: it is downloading
+// already.
+func UpdatesDownloadingAlready() string { return In(i18n.Locale()).UpdatesDownloadingAlready() }
+
+// UpdatesDownloadingAlready says "the update is downloading already"
+// in the language of msgs.
+//
+// Why an update didn't start installing, as a toast: it is downloading
+// already.
+func (msgs Messages) UpdatesDownloadingAlready() string {
+	return Catalog.Format(msgs.locale, "updatesDownloadingAlready", nil)
+}
+
 // UpdatesDownloadingPercent says "downloading {percent}%"
 // in the language the app shows.
 func UpdatesDownloadingPercent(percent int) string {
@@ -26916,6 +27650,22 @@ func (msgs Messages) UpdatesDownloadingPercent(percent int) string {
 	return Catalog.Format(msgs.locale, "updatesDownloadingPercent", map[string]any{"percent": percent})
 }
 
+// UpdatesFileFailed says "the update's file didn't download: GitHub answered {status}"
+// in the language the app shows.
+//
+// Why an update didn't install, as a toast. {status} is GitHub's answer, as
+// 404 Not Found, in English.
+func UpdatesFileFailed(status string) string { return In(i18n.Locale()).UpdatesFileFailed(status) }
+
+// UpdatesFileFailed says "the update's file didn't download: GitHub answered {status}"
+// in the language of msgs.
+//
+// Why an update didn't install, as a toast. {status} is GitHub's answer, as
+// 404 Not Found, in English.
+func (msgs Messages) UpdatesFileFailed(status string) string {
+	return Catalog.Format(msgs.locale, "updatesFileFailed", map[string]any{"status": status})
+}
+
 // UpdatesFlathub says " A new version comes from Flathub, through your software center."
 // in the language the app shows.
 func UpdatesFlathub() string { return In(i18n.Locale()).UpdatesFlathub() }
@@ -26924,6 +27674,60 @@ func UpdatesFlathub() string { return In(i18n.Locale()).UpdatesFlathub() }
 // in the language of msgs.
 func (msgs Messages) UpdatesFlathub() string {
 	return Catalog.Format(msgs.locale, "updatesFlathub", nil)
+}
+
+// UpdatesGitHubAnswered says "GitHub answered {status}"
+// in the language the app shows.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates. {status} is GitHub's answer, as 503 Service Unavailable, in
+// English.
+func UpdatesGitHubAnswered(status string) string {
+	return In(i18n.Locale()).UpdatesGitHubAnswered(status)
+}
+
+// UpdatesGitHubAnswered says "GitHub answered {status}"
+// in the language of msgs.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates. {status} is GitHub's answer, as 503 Service Unavailable, in
+// English.
+func (msgs Messages) UpdatesGitHubAnswered(status string) string {
+	return Catalog.Format(msgs.locale, "updatesGitHubAnswered", map[string]any{"status": status})
+}
+
+// UpdatesGitHubLimit says "GitHub limits how often it answers: try again in an hour"
+// in the language the app shows.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates.
+func UpdatesGitHubLimit() string { return In(i18n.Locale()).UpdatesGitHubLimit() }
+
+// UpdatesGitHubLimit says "GitHub limits how often it answers: try again in an hour"
+// in the language of msgs.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates.
+func (msgs Messages) UpdatesGitHubLimit() string {
+	return Catalog.Format(msgs.locale, "updatesGitHubLimit", nil)
+}
+
+// UpdatesGitHubUnreachable says "GitHub didn't answer: {error}"
+// in the language the app shows.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates. {error} is why, often the system's own words.
+func UpdatesGitHubUnreachable(error string) string {
+	return In(i18n.Locale()).UpdatesGitHubUnreachable(error)
+}
+
+// UpdatesGitHubUnreachable says "GitHub didn't answer: {error}"
+// in the language of msgs.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates. {error} is why, often the system's own words.
+func (msgs Messages) UpdatesGitHubUnreachable(error string) string {
+	return Catalog.Format(msgs.locale, "updatesGitHubUnreachable", map[string]any{"error": error})
 }
 
 // UpdatesGroup says "Updates"
@@ -27014,6 +27818,22 @@ func UpdatesNewest() string { return In(i18n.Locale()).UpdatesNewest() }
 // in the language of msgs.
 func (msgs Messages) UpdatesNewest() string {
 	return Catalog.Format(msgs.locale, "updatesNewest", nil)
+}
+
+// UpdatesNotReady says "no update is ready to install yet: try again in a few minutes"
+// in the language the app shows.
+//
+// Why an update didn't install, as a toast: GitHub lists the new version
+// before its files are there.
+func UpdatesNotReady() string { return In(i18n.Locale()).UpdatesNotReady() }
+
+// UpdatesNotReady says "no update is ready to install yet: try again in a few minutes"
+// in the language of msgs.
+//
+// Why an update didn't install, as a toast: GitHub lists the new version
+// before its files are there.
+func (msgs Messages) UpdatesNotReady() string {
+	return Catalog.Format(msgs.locale, "updatesNotReady", nil)
 }
 
 // UpdatesOffers says " A new version offers its download."
@@ -27168,6 +27988,22 @@ func UpdatesRestartNow() string { return In(i18n.Locale()).UpdatesRestartNow() }
 // in the language of msgs.
 func (msgs Messages) UpdatesRestartNow() string {
 	return Catalog.Format(msgs.locale, "updatesRestartNow", nil)
+}
+
+// UpdatesUnreadable says "the newest version's details couldn't be read"
+// in the language the app shows.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates: GitHub's answer wasn't what MixMusic reads.
+func UpdatesUnreadable() string { return In(i18n.Locale()).UpdatesUnreadable() }
+
+// UpdatesUnreadable says "the newest version's details couldn't be read"
+// in the language of msgs.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates: GitHub's answer wasn't what MixMusic reads.
+func (msgs Messages) UpdatesUnreadable() string {
+	return Catalog.Format(msgs.locale, "updatesUnreadable", nil)
 }
 
 // UpdatesWhatsNew says "what's new"
@@ -27464,6 +28300,26 @@ func (msgs Messages) YoutubeBrowserChoose() string {
 	return Catalog.Format(msgs.locale, "youtubeBrowserChoose", nil)
 }
 
+// YoutubeBrowserCouldntOpen says "MixMusic couldn't open {browser}: {error}"
+// in the language the app shows.
+//
+// Why signing in to YouTube Music in a browser failed, in Settings ›
+// Accounts. {browser} is the browser's name; {error} is the system's own
+// words.
+func YoutubeBrowserCouldntOpen(browser string, error string) string {
+	return In(i18n.Locale()).YoutubeBrowserCouldntOpen(browser, error)
+}
+
+// YoutubeBrowserCouldntOpen says "MixMusic couldn't open {browser}: {error}"
+// in the language of msgs.
+//
+// Why signing in to YouTube Music in a browser failed, in Settings ›
+// Accounts. {browser} is the browser's name; {error} is the system's own
+// words.
+func (msgs Messages) YoutubeBrowserCouldntOpen(browser string, error string) string {
+	return Catalog.Format(msgs.locale, "youtubeBrowserCouldntOpen", map[string]any{"browser": browser, "error": error})
+}
+
 // YoutubeBrowserDidntSignIn says "MixMusic didn't sign in to YouTube Music"
 // in the language the app shows.
 func YoutubeBrowserDidntSignIn() string { return In(i18n.Locale()).YoutubeBrowserDidntSignIn() }
@@ -27490,6 +28346,22 @@ func YoutubeBrowserForm() string { return In(i18n.Locale()).YoutubeBrowserForm()
 // it, and give the words and synonyms people search for in your language.
 func (msgs Messages) YoutubeBrowserForm() string {
 	return Catalog.Format(msgs.locale, "youtubeBrowserForm", nil)
+}
+
+// YoutubeBrowserGone says "MixMusic no longer finds {browser} on this computer"
+// in the language the app shows.
+//
+// Why signing in to YouTube Music in a browser failed, in Settings ›
+// Accounts. {browser} is the browser's name, as Firefox.
+func YoutubeBrowserGone(browser string) string { return In(i18n.Locale()).YoutubeBrowserGone(browser) }
+
+// YoutubeBrowserGone says "MixMusic no longer finds {browser} on this computer"
+// in the language of msgs.
+//
+// Why signing in to YouTube Music in a browser failed, in Settings ›
+// Accounts. {browser} is the browser's name, as Firefox.
+func (msgs Messages) YoutubeBrowserGone(browser string) string {
+	return Catalog.Format(msgs.locale, "youtubeBrowserGone", map[string]any{"browser": browser})
 }
 
 // YoutubeBrowserHint says "Closing the browser, or cancel, ends the sign-in, as do 10 minutes without one. MixMusic reads the new profile alone,…"

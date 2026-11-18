@@ -11,26 +11,37 @@ import (
 // the windows show, in the interface's language (#800).
 
 // wordedError is an error of text, in English, which the windows show as
-// said, wrapping the error it tells of, if any.
+// say says, wrapping the error it tells of, if any.
 type wordedError struct {
-	text, said string
-	err        error
+	text string
+	say  func() string
+	err  error
 }
 
-func worded(text, said string, err error) error { return &wordedError{text, said, err} }
-func (e *wordedError) Error() string            { return e.text }
-func (e *wordedError) Unwrap() error            { return e.err }
+func worded(text, said string, err error) error {
+	return &wordedError{text, func() string { return said }, err}
+}
+
+// wordedLater is worded, whose words say gives when the windows show it, in
+// the language of then: for an error a state keeps, which the windows show
+// later.
+func wordedLater(text string, say func() string, err error) error {
+	return &wordedError{text, say, err}
+}
+func (e *wordedError) Error() string { return e.text }
+func (e *wordedError) Unwrap() error { return e.err }
 
 // ErrorWords is err as the windows show it: the words of the first error
-// of its chain that MixMusic says in the interface's language, or err's
-// own.
+// of its chain that MixMusic says in the interface's language, alone; or,
+// for an error of the services or the system, ErrorText; or err's own
+// words.
 func ErrorWords(err error) string {
 	var w *wordedError
 	switch {
 	case err == nil:
 		return ""
 	case errors.As(err, &w):
-		return w.said
+		return w.say()
 	}
 	for _, known := range ownErrors {
 		if errors.Is(err, known) {
@@ -38,12 +49,13 @@ func ErrorWords(err error) string {
 			return said
 		}
 	}
-	return err.Error()
+	return ErrorText(err)
 }
 
 // ownErrors are MixMusic's errors WordsOf has words for, besides the
 // worded ones.
-var ownErrors = []error{errListenBrainzToken, errPlainRemote, errSpotifyEpisode, errSpotifyShows}
+var ownErrors = []error{errListenBrainzToken, errPlainRemote, errSpotifyEpisode, errSpotifyShows, errNotCover, errNoLogs,
+	errSignInToCollaborate, errNotSignedIn, ErrNoJSONApp}
 
 // WordsOf is err itself, not the errors it wraps, as the windows show it,
 // when MixMusic says it in the interface's language: the words of a worded
@@ -51,7 +63,7 @@ var ownErrors = []error{errListenBrainzToken, errPlainRemote, errSpotifyEpisode,
 // of each error of a chain.
 func WordsOf(err error) (string, bool) {
 	if w, ok := err.(*wordedError); ok {
-		return w.said, true
+		return w.say(), true
 	}
 	switch err {
 	case errListenBrainzToken:
@@ -62,6 +74,16 @@ func WordsOf(err error) (string, bool) {
 		return locales.PodcastsSpotifyOnly(locales.PodcastsSettingsPlayback()), true
 	case errSpotifyShows:
 		return locales.PodcastsSpotifySignIn(), true
+	case errNotCover:
+		return locales.MixCoverNotImage(), true
+	case errNoLogs:
+		return locales.AboutNoLogs(), true
+	case errSignInToCollaborate:
+		return locales.CollabSignInFirst(), true
+	case errNotSignedIn:
+		return locales.LibrarySignInToKeep(), true
+	case ErrNoJSONApp:
+		return locales.DesktopSettingsNoJsonApp(), true
 	}
 	return "", false
 }

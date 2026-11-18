@@ -10,6 +10,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/spotify"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // errNotSignedIn is returned for following or saving on a service the user
@@ -174,7 +175,7 @@ func (c *Collection) SetSaved(ctx context.Context, kind, id, playlistID string, 
 		}
 		if kind == "album" {
 			if playlistID == "" {
-				return errors.New("this album cannot be saved: YouTube Music gave no playlist of its tracks")
+				return wordedLater("this album cannot be saved: YouTube Music gave no playlist of its tracks", locales.LibraryAlbumNoPlaylist, nil)
 			}
 			native = playlistID
 		}

@@ -438,7 +438,7 @@ func (rc *Remote) Pair(id string) {
 	ctx, cancel := context.WithTimeout(context.Background(), remotePairFor)
 	p := &remotePairing{id: id, name: f.found.Name, step: RemotePairing, codes: make(chan string, 1), cancel: cancel}
 	if err != nil {
-		p.step, p.problem = RemoteUnpaired, err.Error()
+		p.step, p.problem = RemoteUnpaired, RemoteErrorText(err)
 	}
 	r.pairing = p
 	r.mu.Unlock()

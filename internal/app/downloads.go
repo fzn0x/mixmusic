@@ -4,7 +4,6 @@ package app
 
 import (
 	"context"
-	"errors"
 	"path/filepath"
 
 	"github.com/egoist/mygo"
@@ -116,7 +115,7 @@ func (d *Downloads) Default() string { return d.a.defaultDownloads() }
 func (d *Downloads) OpenFolder() error {
 	dir := d.a.downloads.Folder()
 	if dir == "" {
-		return errors.New("MixMusic keeps no downloads here")
+		return wordedLater("MixMusic keeps no downloads here", locales.DownloadsNoFolder, nil)
 	}
 	return mygo.Shell.OpenPath(dir)
 }

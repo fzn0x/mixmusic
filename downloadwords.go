@@ -91,7 +91,7 @@ func downloadMoveError(err error) string {
 	case errors.Is(err, downloads.ErrCacheFolder):
 		return locales.DownloadsMoveCacheFolder()
 	case errors.As(err, &write):
-		return locales.DownloadsMoveCantWrite(write.Folder, write.Err.Error())
+		return locales.DownloadsMoveCantWrite(write.Folder, errorText(write.Err))
 	}
-	return err.Error()
+	return errorText(err)
 }

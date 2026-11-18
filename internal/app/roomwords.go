@@ -37,10 +37,12 @@ func RoomErrorText(err error) string {
 		return locales.RoomErrorListen(causeOf(err, errRoomListen))
 	case errors.Is(err, errRoomAnnounce):
 		return locales.RoomErrorAnnounce(causeOf(err, errRoomAnnounce))
+	case errors.Is(err, errKeyBusy):
+		return locales.RemoteErrorKeyBusy()
 	case err == nil:
 		return ""
 	}
-	return err.Error()
+	return ErrorText(err)
 }
 
 // peerError is an error of the computer named name, which remote control
@@ -77,7 +79,7 @@ func RemoteErrorText(err error) string {
 	case err == nil:
 		return ""
 	}
-	return err.Error()
+	return ErrorText(err)
 }
 
 // causeOf is the words of err after those of lead, which it wraps first:

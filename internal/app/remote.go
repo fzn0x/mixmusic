@@ -28,6 +28,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/remote"
 	"github.com/fzn0x/mixmusic/internal/store"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // RemoteOptions configure remote control in place of the network and the
@@ -162,7 +163,8 @@ func (a *App) remoteFile() (*store.File[remoteFile], error) {
 	r.once.Do(func() {
 		r.file, r.fileErr = store.Open(filepath.Join(a.opts.DataDir, "remote.json"), remoteFile{})
 		if r.fileErr != nil {
-			r.fileErr = fmt.Errorf("opening remote.json: %w", r.fileErr)
+			inner := r.fileErr
+			r.fileErr = wordedLater("opening remote.json: "+inner.Error(), func() string { return locales.RemoteErrorFile(ErrorText(inner)) }, inner)
 		}
 	})
 	return r.file, r.fileErr
@@ -228,14 +230,14 @@ func (a *App) identity(wait bool) (*remote.Identity, error) {
 		}
 		log.Printf("mixmusic: the remote control key doesn't read (%v): making another, which the computers paired don't know", err)
 	} else if !errors.Is(err, mygo.ErrSecretNotFound) {
-		return nil, fmt.Errorf("reading this computer's key: %w", err)
+		return nil, wordedLater("reading this computer's key: "+err.Error(), func() string { return locales.RemoteErrorKeyRead(ErrorText(err)) }, err)
 	}
 	id, err := remote.NewIdentity()
 	if err != nil {
 		return nil, err
 	}
 	if err := keep.Save(remoteKey{Seed: id.Seed()}); err != nil {
-		return nil, fmt.Errorf("keeping this computer's key: %w", err)
+		return nil, wordedLater("keeping this computer's key: "+err.Error(), func() string { return locales.RemoteErrorKeyKeep(ErrorText(err)) }, err)
 	}
 	r.id.Store(id)
 	return id, nil
@@ -425,7 +427,8 @@ func (a *App) startRemote() error {
 	stop, err := o.Discovery.Announce(remote.Announcement{ID: id.Fingerprint().ID(), Name: o.Name, Port: port})
 	if err != nil {
 		srv.Close()
-		return fmt.Errorf("remote control can't announce this computer on the network: %w", err)
+		return wordedLater("remote control can't announce this computer on the network: "+err.Error(),
+			func() string { return locales.RemoteErrorAnnounce(ErrorText(err)) }, err)
 	}
 	r.server, r.unannounce = srv, stop
 	log.Printf("mixmusic: remote control: on, at port %d, as %s", port, o.Name)

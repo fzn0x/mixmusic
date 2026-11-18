@@ -9,6 +9,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/youtube"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // youtubeVideoID returns the video of a track on YouTube Music: its own, or
@@ -59,7 +60,7 @@ func (c *Collection) createOnYouTube(ctx context.Context, title string, tracks [
 		}
 	}
 	if len(tracks) > 0 && len(ids) == 0 {
-		return media.Playlist{}, errors.New("none of these tracks is on YouTube Music")
+		return media.Playlist{}, wordedLater("none of these tracks is on YouTube Music", locales.ExploreNoneOnYouTube, nil)
 	}
 	id, err := c.a.youtube.CreatePlaylistAs(ctx, title, ids, privacy)
 	if err != nil {

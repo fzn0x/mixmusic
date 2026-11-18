@@ -10,6 +10,7 @@ package app
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"os"
 	"strings"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/mcp"
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // assistantHost keeps the server of AI assistants, made at its first use.
@@ -82,7 +84,7 @@ func (a *App) applyAssistants(s settings.Settings) {
 	}
 	if err := srv.Start(); err != nil {
 		log.Printf("mixmusic: AI assistants: %v", err)
-		why := err.Error()
+		why := assistantProblem(err)
 		h.problem.Store(&why)
 		notify()
 		return
@@ -184,4 +186,13 @@ func assistantConfig(cmd string, args []string, env map[string]string) string {
 		return ""
 	}
 	return string(data)
+}
+
+// assistantProblem is why the AI assistants' server didn't start, as
+// Settings says it.
+func assistantProblem(err error) string {
+	if errors.Is(err, mcp.ErrListen) {
+		return locales.AssistantsCantListen(causeOf(err, mcp.ErrListen))
+	}
+	return ErrorText(err)
 }

@@ -3,7 +3,6 @@ package app
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,6 +11,7 @@ import (
 	"github.com/egoist/mygo"
 
 	"github.com/fzn0x/mixmusic/internal/store"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // keeper is the system's credential store, mygo.Secrets: tests fake it.
@@ -139,7 +139,8 @@ func (s *secretStore) save(data []byte) error {
 	case s.seal != nil:
 		if serr := s.writeSealed(data); serr != nil {
 			log.Printf("mixmusic: the Credential Manager can't keep %s: %v", s.key, err)
-			return fmt.Errorf("Windows did not let MixMusic keep your sign-in: %w", serr)
+			return wordedLater("Windows did not let MixMusic keep your sign-in: "+serr.Error(),
+				func() string { return locales.AccountSettingsCantKeepSignIn(ErrorText(serr)) }, serr)
 		}
 		removeFile(s.plain)
 		s.tell("store", "mixmusic: the Credential Manager can't keep %s (%v): keeping it encrypted for the Windows user in %s", s.key, err, filepath.Base(s.sealed))

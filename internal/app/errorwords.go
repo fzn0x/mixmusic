@@ -22,8 +22,9 @@ func (e *wordedError) Error() string            { return e.text }
 func (e *wordedError) Unwrap() error            { return e.err }
 
 // ErrorWords is err as the windows show it: the words of the first error
-// of its chain that MixMusic says in the interface's language, or err's
-// own.
+// of its chain that MixMusic says in the interface's language, alone; or,
+// for an error of the services or the system, ErrorText; or err's own
+// words.
 func ErrorWords(err error) string {
 	var w *wordedError
 	switch {
@@ -38,7 +39,7 @@ func ErrorWords(err error) string {
 			return said
 		}
 	}
-	return err.Error()
+	return ErrorText(err)
 }
 
 // ownErrors are MixMusic's errors WordsOf has words for, besides the

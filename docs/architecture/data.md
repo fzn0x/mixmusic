@@ -10,6 +10,8 @@ track, a file each, 10,000 at most),
 `queue.json`, `positions.json` (where the user left podcasts' episodes),
 `local-files.json` (the index of the music on the computer),
 `local-copies.json` (the copies of one song among its files, [copies.md](copies.md)),
+`lyrics-offsets/` (how far the user moved a track's lyrics, a file each,
+10,000 at most),
 `addons/`, `bin/` (yt-dlp), the YouTube session
 (`youtube-session.bin`, encrypted with a key of the system's credential
 store, which also keeps the Spotify token and the Last.fm connection), the

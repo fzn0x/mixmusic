@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"slices"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 
@@ -133,12 +134,12 @@ func (x lyricsExtra) words(i int, line lyrics.Line, text, roman string) (shown, 
 
 // lyricsRoman shows a line in Latin letters under its line, smaller and
 // muted; the words given, of the line sung now, light up as they are
-// sung.
-func (s *shell) lyricsRoman(c *ui.Context, text string, size float32, words []lyrics.Word) {
+// sung, by the lyrics' time, which shift moves (lyricsShift).
+func (s *shell) lyricsRoman(c *ui.Context, text string, size float32, words []lyrics.Word, shift time.Duration) {
 	k := &s.lk
 	e := ui.Text(c, text).FontSize(size).TextColor(k.muted)
 	if len(words) > 0 {
-		s.sungText(c, e, text, ui.Font{Family: k.body, Size: size, Weight: 400}, k.accent, k.muted, words, 0, 0)
+		s.sungText(c, e, text, ui.Font{Family: k.body, Size: size, Weight: 400}, k.accent, k.muted, words, shift, 0, 0)
 	}
 }
 

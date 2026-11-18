@@ -259,6 +259,7 @@ func (s *shell) lyricsSwitches(c *ui.Context, t media.Track, ly lyrics.Lyrics, l
 				s.set.LyricsPlain = mode == 1
 				s.save()
 			}
+			s.songTiming(c, ly, where)
 		}
 		s.lyricsSourceButton(c, t, &ly, where)
 		if canTranslate {

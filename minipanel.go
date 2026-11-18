@@ -446,7 +446,7 @@ func (s *shell) miniLyrics(c *ui.Context) {
 		return
 	}
 	lines := ly.Lines
-	pos := s.st.Position + lyricsLead(s.st.Speed)
+	pos := s.lyricsAt(t, ly)
 	at := sort.Search(len(lines), func(i int) bool { return ms(lines[i].TimeMs) > pos }) - 1
 	latin, how := s.latinLines(t, ly)
 	line := func(i int) string { return notchLine(lines, latin, how, i) }
@@ -456,7 +456,7 @@ func (s *shell) miniLyrics(c *ui.Context) {
 		if at >= 0 && text == lines[at].Text {
 			words = lines[at].Words
 		}
-		s.lyricsText(c, text, k.size(1.25), k.accent, words, 0, 0).MinWidth(0)
+		s.lyricsText(c, text, k.size(1.25), k.accent, words, s.lyricsShift(t, ly), 0, 0).MinWidth(0)
 		if under := notchUnder(latin, how, at); under != "" {
 			ui.Text(c, under).FontSize(k.smallSize()).TextColor(k.muted).MinWidth(0)
 		}

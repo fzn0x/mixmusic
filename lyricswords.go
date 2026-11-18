@@ -29,21 +29,23 @@ import (
 
 // lyricsText is the text of a line of lyrics, at size in ink, with padX
 // and padY around it. The words given, those of the line sung now, light
-// up as they are sung.
-func (s *shell) lyricsText(c *ui.Context, text string, size float32, ink ui.Color, words []lyrics.Word, padX, padY float32) ui.Element {
+// up as they are sung, by the lyrics' time, which shift moves
+// (lyricsShift).
+func (s *shell) lyricsText(c *ui.Context, text string, size float32, ink ui.Color, words []lyrics.Word, shift time.Duration, padX, padY float32) ui.Element {
 	k := &s.lk
 	e := ui.Text(c, text).FontSize(size).FontWeight(k.leadWeight()).TextColor(ink).Padding(padY, padX)
 	if len(words) == 0 {
 		return e
 	}
-	return s.sungText(c, e, text, ui.Font{Family: k.body, Size: size, Weight: k.leadWeight()}, ink, k.text, words, padX, padY)
+	return s.sungText(c, e, text, ui.Font{Family: k.body, Size: size, Weight: k.leadWeight()}, ink, k.text, words, shift, padX, padY)
 }
 
 // sungText makes e, the text element of a line of lyrics in font, light
 // its words up as they are sung: the part sung in lit, the rest in dim. A
 // line in Latin letters under its line lights so too (lyricsromanize.go).
-func (s *shell) sungText(c *ui.Context, e ui.Element, text string, font ui.Font, lit, dim ui.Color, words []lyrics.Word, padX, padY float32) ui.Element {
-	return s.sungTextWith(c, e, text, font, lit, dim, words, padX, padY, sungOptions{})
+// shift moves the lyrics' time from the song's (lyricsShift).
+func (s *shell) sungText(c *ui.Context, e ui.Element, text string, font ui.Font, lit, dim ui.Color, words []lyrics.Word, shift time.Duration, padX, padY float32) ui.Element {
+	return s.sungTextWith(c, e, text, font, lit, dim, words, padX, padY, sungOptions{shift: shift})
 }
 
 // sungOptions say what more a line lit word by word does. Its zero value is
@@ -55,6 +57,9 @@ type sungOptions struct {
 	// state is the state of a player the line follows, in place of the real
 	// one: the preview in Settings plays a made-up song.
 	state *player.State
+	// shift is how far the lyrics show moved from the song's time, earlier
+	// above 0 (lyricsShift).
+	shift time.Duration
 }
 
 // sungTextWith is sungText for the options o.
@@ -65,6 +70,9 @@ func (s *shell) sungTextWith(c *ui.Context, e ui.Element, text string, font ui.F
 	}
 	l := ui.Local(e, "sung", func() sungLine { return sungLine{} })
 	clock := l.follow(st, c.Now())
+	// The words light at the lyrics' time: the song's, moved by their
+	// timing, with no lead.
+	clock.pos += o.shift
 	dir, still := c.Direction(), c.Preferences().ReduceMotion
 	return e.Font(font.Family).FontWeight(font.Weight).TextColor(lit.Alpha(0)).Draw(func(p *ui.Painter, r ui.Rect) {
 		g := l.layout(sungKey{text, font, r.W - 2*padX, dir}, words)

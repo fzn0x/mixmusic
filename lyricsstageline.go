@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/player"
@@ -33,6 +35,8 @@ type stageLine struct {
 	ball bool
 	// next is the line after, which the ball goes on to.
 	next ballNext
+	// shift is how far the lyrics show moved (lyricsShift).
+	shift time.Duration
 }
 
 // ballNext is the line after the one sung, as the ball goes on to it: set
@@ -67,7 +71,7 @@ func (s *shell) stageLine(c *ui.Context, a stageLine) {
 	col := s.stageLineView(c, stageLineView{
 		style: a.style, scale: 1, text: a.text, roman: a.roman, meaning: a.meaning,
 		words: a.words, active: active, opacity: opacity, blur: blur, ball: a.ball,
-		rig: &s.stage.ball, line: a.index, motion: s.set.LyricsBallMotion, next: a.next,
+		rig: &s.stage.ball, line: a.index, motion: s.set.LyricsBallMotion, next: a.next, shift: a.shift,
 	})
 	if a.glide && active {
 		// Once, in the frame the song goes on to this line: the lyrics glide
@@ -78,7 +82,7 @@ func (s *shell) stageLine(c *ui.Context, a stageLine) {
 	if a.synced && !s.st.Loading {
 		col.Cursor(ui.CursorPointer)
 		if col.Clicked() {
-			s.p.Seek(ms(a.line.TimeMs))
+			s.seekLine(a.line, a.shift)
 		}
 	}
 }
@@ -113,6 +117,9 @@ type stageLineView struct {
 	next   ballNext
 	// feed is what the line gives the rig, set as the line is built.
 	feed *ballFeed
+	// shift is how far the lyrics show moved from the song's time
+	// (lyricsShift): none in the preview.
+	shift time.Duration
 }
 
 // stageLineView builds a line of lyrics in the style, and returns it. The
@@ -188,7 +195,7 @@ func (s *shell) stageLineText(c *ui.Context, v stageLineView, size float32) {
 			return plain(lit)
 		}
 		e := ui.Text(c, v.text).FontSize(size).LineHeight(st.leading).TextColor(lit)
-		o := sungOptions{state: v.state}
+		o := sungOptions{state: v.state, shift: v.shift}
 		if ball && v.feed != nil {
 			o.ball = v.feed
 		}

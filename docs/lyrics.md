@@ -116,6 +116,18 @@ Lyrics timed word by word, as Unison has many, light each word of the line sung 
 
 Lines shown in Latin letters made on your computer light word by word too. Romaji, and Arabic's romanization from Unison, don't: shown in place of the line, they light a whole line at a time, as lyrics timed line by line do. While your system asks for [less motion](look-and-feel.md#reduced-motion), each word lights whole as it starts.
 
+## Timing
+
+Some lyrics are timed a little early or late for the song that plays, and some headphones, as Bluetooth ones, sound late in ways your system doesn't tell MixMusic. Move the lyrics earlier or later, and keep it.
+
+- **This song:** above synced lyrics, in the panel and on the now playing page, beside Synced and Plain text, two arrows move them: ← (Earlier) shows the lyrics 0.05 s earlier, and → (Later) 0.05 s later, or 1 s with Shift. The line sung now changes at once. Between the arrows, the timing shows in words, as "0.35 s earlier" or "as timed"; click it, and type it in milliseconds: above 0 is earlier, below 0 later, and Enter or leaving it keeps it. **Reset** shows while the lyrics are moved. The arrows show only while the lyrics show synced.
+- **Kept for these lyrics:** the timing is kept for the track, for the lyrics of the source it was set for. When another source's lyrics show, as when one can't be reached, they show as timed. Each caption language of a video is lyrics of its own. MixMusic keeps the timings of 10,000 tracks in `lyrics-offsets/`, in the [data folder](data-and-privacy.md#the-data-folder), the least used going past that, and writes a change a few seconds after the last press, or as it quits.
+- **Every song:** **Lyrics timing**, in Settings › Playback › Lyrics, moves the lyrics of every song, for an output that sounds late: the slider goes 10 s either way, earlier to the left and later to the right, in steps of 0.05 s, and its field takes one typed in milliseconds as far as 120 s, which the slider then shows at its end. **Reset** shows while it isn't 0. It adds to each song's timing. As it is a delay of the sound, it grows with the [speed](playing-music.md#speed): 0.2 s later is 0.3 s of the song at 1.5×. A song's own timing doesn't.
+- **As far as 120 s,** earlier or later, every control stops. A timing typed stays as it is, between the steps too.
+- **Everywhere the line sung shows:** the panel, the now playing page, the [full-screen lyrics](#full-screen-lyrics), the mini player and the [notch player](desktop.md#the-player-around-the-notch) follow the timing, and so do the words lit [word by word](#word-by-word). Clicking a line plays the song from its time less the timing, never before the start, so that it is the line sung then.
+- **Under the timing:** an LRC file's own `[offset:]` still applies, and the timing adds to how far MixMusic times a [music video's lyrics](#music-videos) to it. Lyrics that show without their times, as plain lyrics, have no timing.
+- **Plugins** get the timing with the lyrics, as `offsetMs`.
+
 ## Full-screen lyrics
 
 The full-screen lyrics cover the window with the lyrics of the track playing. Its cover, blurred and darkened, is the ground. At the left are the buttons of the player (the previous track, play or pause, and the next track), the cover, and under it the title and the artist. In the middle are the lyrics: the line sung now large and white, lit word by word where its words have times, with a ball hopping over its words, and the lines away from it dimmer and, in most styles, blurrier the farther they lie. At the right, beside the lyrics' scroll bar, are the covers of the tracks next in the queue. The ink is white whatever your theme, as the ground is dark.

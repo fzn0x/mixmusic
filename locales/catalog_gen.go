@@ -18854,6 +18854,252 @@ func (msgs Messages) LyricsTimeVideosTitle() string {
 	return Catalog.Format(msgs.locale, "lyricsTimeVideosTitle", nil)
 }
 
+// LyricsTimingDescription says "Moves the synced lyrics of every song earlier or later, for an output that sounds late, as Bluetooth headphones may. …"
+// in the language the app shows.
+//
+// In Settings › Playback › Lyrics, under lyricsTimingTitle: what the
+// setting does.
+func LyricsTimingDescription() string { return In(i18n.Locale()).LyricsTimingDescription() }
+
+// LyricsTimingDescription says "Moves the synced lyrics of every song earlier or later, for an output that sounds late, as Bluetooth headphones may. …"
+// in the language of msgs.
+//
+// In Settings › Playback › Lyrics, under lyricsTimingTitle: what the
+// setting does.
+func (msgs Messages) LyricsTimingDescription() string {
+	return Catalog.Format(msgs.locale, "lyricsTimingDescription", nil)
+}
+
+// LyricsTimingEarlier says "Earlier"
+// in the language the app shows.
+//
+// For screen readers: the button, an arrow, before the timing above synced
+// lyrics, which shows this song's lyrics a little earlier.
+func LyricsTimingEarlier() string { return In(i18n.Locale()).LyricsTimingEarlier() }
+
+// LyricsTimingEarlier says "Earlier"
+// in the language of msgs.
+//
+// For screen readers: the button, an arrow, before the timing above synced
+// lyrics, which shows this song's lyrics a little earlier.
+func (msgs Messages) LyricsTimingEarlier() string {
+	return Catalog.Format(msgs.locale, "lyricsTimingEarlier", nil)
+}
+
+// LyricsTimingEarlierBy says "{seconds} s earlier"
+// in the language the app shows.
+//
+// In the timing field above synced lyrics, and in Settings › Playback ›
+// Lyrics › Lyrics timing: how far the lyrics show moved earlier.
+// {seconds} is a number of seconds, with up to three decimals, as 0.35; "s"
+// is the symbol of seconds.
+func LyricsTimingEarlierBy(seconds string) string {
+	return In(i18n.Locale()).LyricsTimingEarlierBy(seconds)
+}
+
+// LyricsTimingEarlierBy says "{seconds} s earlier"
+// in the language of msgs.
+//
+// In the timing field above synced lyrics, and in Settings › Playback ›
+// Lyrics › Lyrics timing: how far the lyrics show moved earlier.
+// {seconds} is a number of seconds, with up to three decimals, as 0.35; "s"
+// is the symbol of seconds.
+func (msgs Messages) LyricsTimingEarlierBy(seconds string) string {
+	return Catalog.Format(msgs.locale, "lyricsTimingEarlierBy", map[string]any{"seconds": seconds})
+}
+
+// LyricsTimingEarlierTip says "Show the lyrics earlier: 0.05 s a press, or 1 s with Shift"
+// in the language the app shows.
+//
+// The tip of lyricsTimingEarlier, above synced lyrics. Shift is the key of
+// the keyboard.
+func LyricsTimingEarlierTip() string { return In(i18n.Locale()).LyricsTimingEarlierTip() }
+
+// LyricsTimingEarlierTip says "Show the lyrics earlier: 0.05 s a press, or 1 s with Shift"
+// in the language of msgs.
+//
+// The tip of lyricsTimingEarlier, above synced lyrics. Shift is the key of
+// the keyboard.
+func (msgs Messages) LyricsTimingEarlierTip() string {
+	return Catalog.Format(msgs.locale, "lyricsTimingEarlierTip", nil)
+}
+
+// LyricsTimingEvery says "Lyrics timing of every song"
+// in the language the app shows.
+//
+// For screen readers: the slider of lyricsTimingTitle, in Settings ›
+// Playback › Lyrics, which moves the lyrics of every song earlier, to its
+// start, or later, to its end.
+func LyricsTimingEvery() string { return In(i18n.Locale()).LyricsTimingEvery() }
+
+// LyricsTimingEvery says "Lyrics timing of every song"
+// in the language of msgs.
+//
+// For screen readers: the slider of lyricsTimingTitle, in Settings ›
+// Playback › Lyrics, which moves the lyrics of every song earlier, to its
+// start, or later, to its end.
+func (msgs Messages) LyricsTimingEvery() string {
+	return Catalog.Format(msgs.locale, "lyricsTimingEvery", nil)
+}
+
+// LyricsTimingEveryField says "Lyrics timing of every song, in milliseconds"
+// in the language the app shows.
+//
+// For screen readers: the field beside the slider of lyricsTimingTitle, in
+// Settings › Playback › Lyrics, which shows the timing in words
+// (lyricsTimingEarlierBy) and takes it typed in milliseconds.
+func LyricsTimingEveryField() string { return In(i18n.Locale()).LyricsTimingEveryField() }
+
+// LyricsTimingEveryField says "Lyrics timing of every song, in milliseconds"
+// in the language of msgs.
+//
+// For screen readers: the field beside the slider of lyricsTimingTitle, in
+// Settings › Playback › Lyrics, which shows the timing in words
+// (lyricsTimingEarlierBy) and takes it typed in milliseconds.
+func (msgs Messages) LyricsTimingEveryField() string {
+	return Catalog.Format(msgs.locale, "lyricsTimingEveryField", nil)
+}
+
+// LyricsTimingField says "Lyrics timing, in milliseconds"
+// in the language the app shows.
+//
+// For screen readers: the field between the Earlier and Later buttons above
+// synced lyrics, which shows this song's timing in words
+// (lyricsTimingEarlierBy) and takes it typed in milliseconds.
+func LyricsTimingField() string { return In(i18n.Locale()).LyricsTimingField() }
+
+// LyricsTimingField says "Lyrics timing, in milliseconds"
+// in the language of msgs.
+//
+// For screen readers: the field between the Earlier and Later buttons above
+// synced lyrics, which shows this song's timing in words
+// (lyricsTimingEarlierBy) and takes it typed in milliseconds.
+func (msgs Messages) LyricsTimingField() string {
+	return Catalog.Format(msgs.locale, "lyricsTimingField", nil)
+}
+
+// LyricsTimingFieldTip says "Type it in milliseconds: above 0 shows the lyrics earlier, below 0 later"
+// in the language the app shows.
+//
+// The tip of the fields of the lyrics' timing, above synced lyrics and in
+// Settings › Playback › Lyrics › Lyrics timing.
+func LyricsTimingFieldTip() string { return In(i18n.Locale()).LyricsTimingFieldTip() }
+
+// LyricsTimingFieldTip says "Type it in milliseconds: above 0 shows the lyrics earlier, below 0 later"
+// in the language of msgs.
+//
+// The tip of the fields of the lyrics' timing, above synced lyrics and in
+// Settings › Playback › Lyrics › Lyrics timing.
+func (msgs Messages) LyricsTimingFieldTip() string {
+	return Catalog.Format(msgs.locale, "lyricsTimingFieldTip", nil)
+}
+
+// LyricsTimingLater says "Later"
+// in the language the app shows.
+//
+// For screen readers: the button, an arrow, after the timing above synced
+// lyrics, which shows this song's lyrics a little later.
+func LyricsTimingLater() string { return In(i18n.Locale()).LyricsTimingLater() }
+
+// LyricsTimingLater says "Later"
+// in the language of msgs.
+//
+// For screen readers: the button, an arrow, after the timing above synced
+// lyrics, which shows this song's lyrics a little later.
+func (msgs Messages) LyricsTimingLater() string {
+	return Catalog.Format(msgs.locale, "lyricsTimingLater", nil)
+}
+
+// LyricsTimingLaterBy says "{seconds} s later"
+// in the language the app shows.
+//
+// In the timing field above synced lyrics, and in Settings › Playback ›
+// Lyrics › Lyrics timing: how far the lyrics show moved later. {seconds}
+// is a number of seconds, with up to three decimals, as 0.35; "s" is the
+// symbol of seconds.
+func LyricsTimingLaterBy(seconds string) string {
+	return In(i18n.Locale()).LyricsTimingLaterBy(seconds)
+}
+
+// LyricsTimingLaterBy says "{seconds} s later"
+// in the language of msgs.
+//
+// In the timing field above synced lyrics, and in Settings › Playback ›
+// Lyrics › Lyrics timing: how far the lyrics show moved later. {seconds}
+// is a number of seconds, with up to three decimals, as 0.35; "s" is the
+// symbol of seconds.
+func (msgs Messages) LyricsTimingLaterBy(seconds string) string {
+	return Catalog.Format(msgs.locale, "lyricsTimingLaterBy", map[string]any{"seconds": seconds})
+}
+
+// LyricsTimingLaterTip says "Show the lyrics later: 0.05 s a press, or 1 s with Shift"
+// in the language the app shows.
+//
+// The tip of lyricsTimingLater, above synced lyrics. Shift is the key of
+// the keyboard.
+func LyricsTimingLaterTip() string { return In(i18n.Locale()).LyricsTimingLaterTip() }
+
+// LyricsTimingLaterTip says "Show the lyrics later: 0.05 s a press, or 1 s with Shift"
+// in the language of msgs.
+//
+// The tip of lyricsTimingLater, above synced lyrics. Shift is the key of
+// the keyboard.
+func (msgs Messages) LyricsTimingLaterTip() string {
+	return Catalog.Format(msgs.locale, "lyricsTimingLaterTip", nil)
+}
+
+// LyricsTimingNone says "as timed"
+// in the language the app shows.
+//
+// In the timing field above synced lyrics, and in Settings › Playback ›
+// Lyrics › Lyrics timing: the lyrics aren't moved, and show at the times
+// their source gave them. Lowercase: the Blend layout capitalises it.
+func LyricsTimingNone() string { return In(i18n.Locale()).LyricsTimingNone() }
+
+// LyricsTimingNone says "as timed"
+// in the language of msgs.
+//
+// In the timing field above synced lyrics, and in Settings › Playback ›
+// Lyrics › Lyrics timing: the lyrics aren't moved, and show at the times
+// their source gave them. Lowercase: the Blend layout capitalises it.
+func (msgs Messages) LyricsTimingNone() string {
+	return Catalog.Format(msgs.locale, "lyricsTimingNone", nil)
+}
+
+// LyricsTimingReset says "reset"
+// in the language the app shows.
+//
+// A link beside the timing above synced lyrics, and beside the slider of
+// Settings › Playback › Lyrics › Lyrics timing, while the lyrics show
+// moved: shows them as timed again. Lowercase, as the other links there.
+func LyricsTimingReset() string { return In(i18n.Locale()).LyricsTimingReset() }
+
+// LyricsTimingReset says "reset"
+// in the language of msgs.
+//
+// A link beside the timing above synced lyrics, and beside the slider of
+// Settings › Playback › Lyrics › Lyrics timing, while the lyrics show
+// moved: shows them as timed again. Lowercase, as the other links there.
+func (msgs Messages) LyricsTimingReset() string {
+	return Catalog.Format(msgs.locale, "lyricsTimingReset", nil)
+}
+
+// LyricsTimingTitle says "Lyrics timing"
+// in the language the app shows.
+//
+// In Settings › Playback › Lyrics: the title of the setting that moves
+// the synced lyrics of every song earlier or later.
+func LyricsTimingTitle() string { return In(i18n.Locale()).LyricsTimingTitle() }
+
+// LyricsTimingTitle says "Lyrics timing"
+// in the language of msgs.
+//
+// In Settings › Playback › Lyrics: the title of the setting that moves
+// the synced lyrics of every song earlier or later.
+func (msgs Messages) LyricsTimingTitle() string {
+	return Catalog.Format(msgs.locale, "lyricsTimingTitle", nil)
+}
+
 // LyricsTranslate says "translate"
 // in the language the app shows.
 func LyricsTranslate() string { return In(i18n.Locale()).LyricsTranslate() }

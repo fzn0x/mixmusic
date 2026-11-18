@@ -5818,6 +5818,74 @@
   },
   "lyricsTimeVideosNoteTiming": "Timing these lyrics to the video…",
   "lyricsTimeVideosTitle": "Time lyrics to music videos",
+  "lyricsTimingDescription": "Moves the synced lyrics of every song earlier or later, for an output that sounds late, as Bluetooth headphones may. It adds to the timing above a song's lyrics.",
+  "@lyricsTimingDescription": {
+    "description": "In Settings › Playback › Lyrics, under lyricsTimingTitle: what the setting does."
+  },
+  "lyricsTimingEarlier": "Earlier",
+  "@lyricsTimingEarlier": {
+    "description": "For screen readers: the button, an arrow, before the timing above synced lyrics, which shows this song's lyrics a little earlier."
+  },
+  "lyricsTimingEarlierBy": "{seconds} s earlier",
+  "@lyricsTimingEarlierBy": {
+    "description": "In the timing field above synced lyrics, and in Settings › Playback › Lyrics › Lyrics timing: how far the lyrics show moved earlier. {seconds} is a number of seconds, with up to three decimals, as 0.35; \"s\" is the symbol of seconds.",
+    "placeholders": {
+      "seconds": {
+        "type": "String",
+        "example": "0.35"
+      }
+    }
+  },
+  "lyricsTimingEarlierTip": "Show the lyrics earlier: 0.05 s a press, or 1 s with Shift",
+  "@lyricsTimingEarlierTip": {
+    "description": "The tip of lyricsTimingEarlier, above synced lyrics. Shift is the key of the keyboard."
+  },
+  "lyricsTimingEvery": "Lyrics timing of every song",
+  "@lyricsTimingEvery": {
+    "description": "For screen readers: the slider of lyricsTimingTitle, in Settings › Playback › Lyrics, which moves the lyrics of every song earlier, to its start, or later, to its end."
+  },
+  "lyricsTimingEveryField": "Lyrics timing of every song, in milliseconds",
+  "@lyricsTimingEveryField": {
+    "description": "For screen readers: the field beside the slider of lyricsTimingTitle, in Settings › Playback › Lyrics, which shows the timing in words (lyricsTimingEarlierBy) and takes it typed in milliseconds."
+  },
+  "lyricsTimingField": "Lyrics timing, in milliseconds",
+  "@lyricsTimingField": {
+    "description": "For screen readers: the field between the Earlier and Later buttons above synced lyrics, which shows this song's timing in words (lyricsTimingEarlierBy) and takes it typed in milliseconds."
+  },
+  "lyricsTimingFieldTip": "Type it in milliseconds: above 0 shows the lyrics earlier, below 0 later",
+  "@lyricsTimingFieldTip": {
+    "description": "The tip of the fields of the lyrics' timing, above synced lyrics and in Settings › Playback › Lyrics › Lyrics timing."
+  },
+  "lyricsTimingLater": "Later",
+  "@lyricsTimingLater": {
+    "description": "For screen readers: the button, an arrow, after the timing above synced lyrics, which shows this song's lyrics a little later."
+  },
+  "lyricsTimingLaterBy": "{seconds} s later",
+  "@lyricsTimingLaterBy": {
+    "description": "In the timing field above synced lyrics, and in Settings › Playback › Lyrics › Lyrics timing: how far the lyrics show moved later. {seconds} is a number of seconds, with up to three decimals, as 0.35; \"s\" is the symbol of seconds.",
+    "placeholders": {
+      "seconds": {
+        "type": "String",
+        "example": "0.35"
+      }
+    }
+  },
+  "lyricsTimingLaterTip": "Show the lyrics later: 0.05 s a press, or 1 s with Shift",
+  "@lyricsTimingLaterTip": {
+    "description": "The tip of lyricsTimingLater, above synced lyrics. Shift is the key of the keyboard."
+  },
+  "lyricsTimingNone": "as timed",
+  "@lyricsTimingNone": {
+    "description": "In the timing field above synced lyrics, and in Settings › Playback › Lyrics › Lyrics timing: the lyrics aren't moved, and show at the times their source gave them. Lowercase: the Blend layout capitalises it."
+  },
+  "lyricsTimingReset": "reset",
+  "@lyricsTimingReset": {
+    "description": "A link beside the timing above synced lyrics, and beside the slider of Settings › Playback › Lyrics › Lyrics timing, while the lyrics show moved: shows them as timed again. Lowercase, as the other links there."
+  },
+  "lyricsTimingTitle": "Lyrics timing",
+  "@lyricsTimingTitle": {
+    "description": "In Settings › Playback › Lyrics: the title of the setting that moves the synced lyrics of every song earlier or later."
+  },
   "lyricsTranslate": "translate",
   "lyricsTranslateLyrics": "Translate lyrics",
   "lyricsTranslateTip": "Shows each line's translation under it. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google translate them.",

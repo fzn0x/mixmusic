@@ -278,7 +278,7 @@ func (o *castOut) loadFailure(err error, fetched bool) string {
 	return "The cast device couldn't play the track: " + err.Error()
 }
 
-func (o *castOut) Preload(url string) { o.preload(url) }
+func (o *castOut) Preload(rawURL string) { o.preload(rawURL) }
 
 // Crossfade plays url at once: a cast device plays one stream at a time.
 // The player doesn't crossfade on one.

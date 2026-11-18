@@ -19,7 +19,8 @@ func browse(t *testing.T, r *casttest.Responder) []cast.Device {
 }
 
 // TestBrowse finds the cast devices that answer, by name, sorted, with
-// their model and where they speak the protocol, but groups of speakers.
+// their model and where they speak the protocol: a group of speakers too,
+// on its own port, as a group.
 func TestBrowse(t *testing.T) {
 	r := casttest.NewResponder(t,
 		casttest.Entry{ID: "b2", Name: "Living Room TV", Model: "Chromecast", Port: 8009},
@@ -28,6 +29,7 @@ func TestBrowse(t *testing.T) {
 	)
 	got := browse(t, r)
 	want := []cast.Device{
+		{ID: "c3", Name: "Everywhere", Model: "Google Cast Group", Host: "127.0.0.1", Port: 32187, Group: true},
 		{ID: "a1", Name: "kitchen", Model: "Google Nest Mini", Host: "192.168.1.20", Port: 8010},
 		{ID: "b2", Name: "Living Room TV", Model: "Chromecast", Host: "127.0.0.1", Port: 8009},
 	}
@@ -39,7 +41,7 @@ func TestBrowse(t *testing.T) {
 			t.Errorf("device %d: %+v, want %+v", i, got[i], want[i])
 		}
 	}
-	if got[1].Addr() != "127.0.0.1:8009" {
+	if got[2].Addr() != "127.0.0.1:8009" {
 		t.Errorf("address %q", got[1].Addr())
 	}
 }

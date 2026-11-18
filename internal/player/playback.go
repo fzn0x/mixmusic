@@ -543,10 +543,10 @@ func (p *Player) fellBack(why error) {
 // failWith tells that a track can't play, for err, and moves on after a
 // moment: to the next track, or to a radio when it was the last. After
 // maxFailures in a row it stops, as nothing seems to play. Its notice
-// says err as the windows do, in their words: its log and the state keep
-// its English.
+// says err as the windows do, in their words, and offers the playback
+// settings when they change it: its log and the state keep its English.
 func (p *Player) failWith(err error) {
-	message, said := err.Error(), p.errorWords.say(err)
+	message, said, settings := err.Error(), p.errorWords.say(err), p.errorWords.inSettings(err)
 	cur, ok := p.s.Current()
 	p.askedAt = time.Time{}
 	p.unsounded = false
@@ -572,7 +572,7 @@ func (p *Player) failWith(err error) {
 		// goes, and the details last until MixMusic closes.
 		log.Printf("mixmusic: couldn't play %s: %s", cur.Track.ID, message)
 	}
-	p.notify(Notice{Message: why, Error: true, Failure: p.keepFailure(err, stop)})
+	p.notify(Notice{Message: why, Error: true, Failure: p.keepFailure(err, stop), Settings: settings})
 	if stop {
 		return
 	}

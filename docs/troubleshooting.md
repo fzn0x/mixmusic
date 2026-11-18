@@ -31,15 +31,21 @@ your home folder, which a path shows as `~`.
 The last 10 stay until MixMusic closes, in
 [Settings › About](settings.md#about) › Recent playback errors, each with
 its **details**. The keyboard reaches **details** in the toast with
-<kbd>Tab</kbd>, and **copy** has the focus as the details open.
+<kbd>Tab</kbd>, and **copy** has the focus as the details open. A track
+the playback settings can make play, as one YouTube plays only to
+signed-in viewers, offers **settings** in its toast instead, which opens
+Settings › Playback; its details stay in Settings › About.
 
 ## Common problems
 
 - **A YouTube Music track doesn't play.** It says why: some are not
-  available in your country, or only to signed-in adults on YouTube's own
-  website. Some YouTube plays only to signed-in viewers:
+  available in your country. Some YouTube plays only to signed-in viewers,
+  signed-in adults or a channel's members, which
   [Play audio as your account](playing-music.md#play-audio-as-your-account)
-  plays those. The log says why too. The tracks MixMusic can't find the audio of itself, such as those
+  may play: the toast says whether your account was asked, and
+  [what to change](streams.md#when-a-track-needs-an-account) when it
+  wasn't, with **settings**, which opens Settings › Playback. The log says
+  why too. The tracks MixMusic can't find the audio of itself, such as those
   made for children, [need yt-dlp](streams.md#when-yt-dlp-is-needed): check
   Settings › Playback that it is installed, and a JavaScript runtime found. MixMusic updates the yt-dlp it
   installed every day, as an old one stops finding streams; one of your

@@ -124,6 +124,9 @@ func serviceErrorText(err error) (string, bool) {
 	case err == librefm.ErrNotServer:
 		return locales.ErrorLibrefmNotServer(), true
 	}
+	if txt, ok := streamAccountText(stream.Reason(err), stream.Account(err)); ok {
+		return txt, true
+	}
 	if txt, ok := streamReasonText(stream.Reason(err)); ok {
 		return txt, true
 	}
@@ -156,7 +159,7 @@ func streamReasonText(reason string) (string, bool) {
 	case stream.ReasonAdults:
 		return locales.ErrorStreamAdults(), true
 	case stream.ReasonSignedIn:
-		return locales.ErrorStreamSignedIn(), true
+		return locales.ErrorStreamSignedInOnly(), true
 	case stream.ReasonCountry:
 		return locales.ErrorStreamCountry(), true
 	case stream.ReasonPrivate:
@@ -173,6 +176,39 @@ func streamReasonText(reason string) (string, bool) {
 		return locales.ErrorStreamRefused(), true
 	case stream.ReasonStalled:
 		return locales.ErrorStreamStalled(), true
+	}
+	return "", false
+}
+
+// streamAccountText is why a track YouTube plays only to some signed-in
+// viewers didn't play, of the reason, as the windows say it, with how
+// asking as the user's account went (stream.Account): what to change for
+// the account to be asked, or that it was too (#577).
+func streamAccountText(reason, account string) (string, bool) {
+	why, ok := streamReasonText(reason)
+	if !ok {
+		return "", false
+	}
+	switch account {
+	case stream.AccountOff:
+		if reason == stream.ReasonSignedIn {
+			return locales.ErrorStreamSignedIn(), true
+		}
+		return locales.ErrorStreamAccountOff(why), true
+	case stream.AccountSignIn:
+		return locales.ErrorStreamAccountSignIn(why), true
+	case stream.AccountSignedOut:
+		return locales.ErrorStreamAccountSignedOut(why), true
+	case stream.AccountEnded:
+		return locales.ErrorStreamAccountEnded(why), true
+	case stream.AccountNotFirst:
+		return locales.ErrorStreamAccountNotFirst(why), true
+	case stream.AccountSaver:
+		return locales.ErrorStreamAccountSaver(why), true
+	case stream.AccountNoTools:
+		return locales.ErrorStreamAccountNoTools(why), true
+	case stream.AccountRefused:
+		return locales.ErrorStreamAccountRefused(why), true
 	}
 	return "", false
 }

@@ -219,6 +219,11 @@ type Resolver struct {
 	// session that yt-dlp asks for streams as, while SetAsAccount asks for
 	// that: nil asks signed out.
 	Session func() []*http.Cookie
+	// NoSession, when set, tells why Session gives no session: one of
+	// AccountSignedOut, AccountEnded and AccountNotFirst; "" counts as
+	// signed out. The failure of a track YouTube plays only to some
+	// signed-in viewers tells what to change (Account).
+	NoSession func() string
 
 	mu      sync.Mutex
 	quality Quality
@@ -442,25 +447,32 @@ func (r *Resolver) Forget(videoID string) {
 
 // resolve finds the stream of a video as the user's account first, while
 // they ask for that (accountStream), else the signed-out ways
-// (signedOutWays). A stream those find only because a refusal mark sent
-// the video past the account is told so (pastMark).
+// (signedOutWays), and as the account once more after YouTube's sign-in
+// wall, for a video whose stream found so it refused (againAsAccount). A
+// stream the signed-out ways find only because a refusal mark sent the
+// video past the account is told so (pastMark). A failure tells how
+// asking as the account went (asAccountFailure).
 func (r *Resolver) resolve(ctx context.Context, videoID string, quality Quality) (Stream, error) {
-	s, ok, pastMark := r.accountStream(ctx, videoID, quality, false)
-	if ok {
+	s, first := r.accountStream(ctx, videoID, quality, false)
+	if first.took() {
 		return s, nil
 	}
 	s, err := r.signedOutWays(ctx, videoID, quality)
-	// Not one found as the account once more (againAsAccount).
-	s.pastMark = pastMark && err == nil && !s.AsAccount
-	return s, err
+	if err == nil {
+		s.pastMark = first.skip == accountMarked
+		return s, nil
+	}
+	s, again := r.againAsAccount(ctx, videoID, quality, err)
+	if again.took() {
+		return s, nil
+	}
+	return Stream{}, r.asAccountFailure(err, first, again)
 }
 
 // signedOutWays finds the stream of a video through the direct route, when
-// the resolver has it, else with yt-dlp, quickly first (findWithYTDLP),
-// and as the user's account once more after YouTube's sign-in wall, for a
-// video whose stream found so it refused (againAsAccount). The log tells
-// when it took a while, and why and how yt-dlp found it, never the
-// stream's URL, which carries the user's IP address.
+// the resolver has it, else with yt-dlp, quickly first (findWithYTDLP).
+// The log tells when it took a while, and why and how yt-dlp found it,
+// never the stream's URL, which carries the user's IP address.
 func (r *Resolver) signedOutWays(ctx context.Context, videoID string, quality Quality) (Stream, error) {
 	start := time.Now()
 	var direct error
@@ -483,9 +495,6 @@ func (r *Resolver) signedOutWays(ctx context.Context, videoID string, quality Qu
 	}
 	s, run, err := r.findWithYTDLP(ctx, videoID, quality, direct)
 	if err != nil {
-		if s, ok := r.againAsAccount(ctx, videoID, quality, err); ok {
-			return s, nil
-		}
 		// Without yt-dlp, why YouTube gave the direct route no stream is
 		// the better answer, when it is a plain one.
 		var refused playabilityError
@@ -613,12 +622,14 @@ var plainErrors = []struct {
 }{
 	{"not a bot", "YouTube asks to confirm this is not a bot; try again in a while", ErrThrottled},
 	{"try again later", "YouTube is turning down requests from this network for now; try again in a while", ErrThrottled},
-	{"confirm your age", "YouTube plays this track only to signed-in adults, on its own website", ErrUnavailable},
-	{"age-restricted", "YouTube plays this track only to signed-in adults, on its own website", ErrUnavailable},
-	{"inappropriate for some users", "YouTube plays this track only to signed-in adults, on its own website", ErrUnavailable},
+	{"confirm your age", "YouTube plays this track only to signed-in adults", ErrUnavailable},
+	{"age-restricted", "YouTube plays this track only to signed-in adults", ErrUnavailable},
+	{"inappropriate for some users", "YouTube plays this track only to signed-in adults", ErrUnavailable},
 	// YouTube's LOGIN_REQUIRED of a video it plays only to signed-in
 	// viewers, as M83's "Midnight City", rather than its check of bots.
-	{"please sign in", "YouTube plays this track only to signed-in viewers; Play audio as your account, in Settings › Playback, can play it", ErrUnavailable},
+	// The resolver tells what to change for the account to be asked
+	// (asAccountFailure).
+	{"please sign in", "YouTube plays this track only to signed-in viewers", ErrUnavailable},
 	{"in your country", "this track is not available in your country", ErrUnavailable},
 	{"private video", "this track is private", ErrUnavailable},
 	{"members-only", "only the members of its channel can play this track", ErrUnavailable},

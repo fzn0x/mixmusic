@@ -28,11 +28,22 @@ type failureView struct {
 const failureToastTime = 8 * time.Second
 
 // failureToast tells of a track that couldn't play, as the player's
-// notice n does, with Details, which Tab reaches.
-func (s *shell) failureToast(c *ui.Context, n player.Notice) {
+// notice n does, with Details, which Tab reaches. When the playback
+// settings change why, as for a track YouTube plays only to signed-in
+// viewers whose words tell what to change (#577), it offers Settings ›
+// Playback in its place: a toast has one action, and the details stay in
+// Settings › About.
+func (s *shell) failureToast(c *ui.Context, n player.Notice) { c.AddToast(s.failureToastOf(n)) }
+
+// failureToastOf is the toast of the failure the notice n tells of.
+func (s *shell) failureToastOf(n player.Notice) ui.Toast {
 	id := n.Failure
-	c.AddToast(ui.Toast{ID: n.Message, Title: n.Message, Type: "error", Timeout: failureToastTime,
-		Action: "details", OnAction: func() { s.showFailure(id) }})
+	t := ui.Toast{ID: n.Message, Title: n.Message, Type: "error", Timeout: failureToastTime,
+		Action: "details", OnAction: func() { s.showFailure(id) }}
+	if n.Settings {
+		t.Action, t.OnAction = locales.ShellToastSettings(), func() { s.navigate("/settings/playback") }
+	}
+	return t
 }
 
 // showFailure shows the details of the failure id.

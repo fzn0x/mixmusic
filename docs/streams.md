@@ -66,10 +66,11 @@ runtime, in Settings › Playback › Tools;
 the first page of this section. When yt-dlp finds no stream, MixMusic says
 why in plain words, such as "this track is not available in your
 country", "only the members of its channel can play this track",
-"YouTube plays this track only to signed-in adults, on its own website",
-or "YouTube plays this track only to signed-in viewers", which
-[Play audio as your account](#as-your-account) can play. The log keeps
-each track that couldn't play, with why.
+"YouTube plays this track only to signed-in adults", or "YouTube plays
+this track only to signed-in viewers". Of a track YouTube plays only to
+some signed-in viewers, it also says whether your account was asked, and
+[what to change](#when-a-track-needs-an-account) when it wasn't. The log
+keeps each track that couldn't play, with why.
 
 yt-dlp runs twice at most for a track, a quick way first:
 
@@ -135,6 +136,32 @@ does, and what it risks.
   asks as your account.
 - **The log** says when a stream was found as your account, in how long,
   and its codec and bitrate, or why it wasn't. It never names the session.
+
+### When a track needs an account
+
+YouTube plays some tracks only to signed-in viewers, signed-in adults, a
+channel's members or YouTube Music Premium's members. When one doesn't
+play, MixMusic says why, and how asking as your account went:
+
+- **The switch off.** Signed in, that Play audio as your account can play
+  a track for signed-in viewers, or, of the others, that your account
+  wasn't asked. Signed out, to sign in to YouTube Music, then turn the
+  switch on.
+- **The switch on, your account not asked.** What to change: sign in to
+  YouTube Music, or sign in again once YouTube ended the session; use the
+  first Google account of your session, which yt-dlp asks as; set Quality
+  to best; or install yt-dlp and a JavaScript runtime, in Settings ›
+  Playback › Tools. The words never tell you to turn on the switch while
+  it is on.
+- **Your account asked too.** That YouTube didn't give it to your account
+  either: its run failed, took longer than 30 seconds, or found nothing
+  that plays, or YouTube refused the stream it found a while ago.
+
+While there is something to change, the toast offers **settings**, which
+opens Settings › Playback, in place of **details**: the track's details
+stay in Settings › About › Recent playback errors. They start with a step
+"As your account": asked, and why it failed, or not asked, and why. With
+the switch on, the details of every track that couldn't play have it.
 
 ## Formats and quality
 

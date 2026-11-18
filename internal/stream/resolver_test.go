@@ -123,15 +123,15 @@ func TestPlainError(t *testing.T) {
 	}
 	for msg, want := range map[string]plain{
 		"yt-dlp: pFptt7Cargc: Requested format is not available. Use --list-formats for a list of available formats": {"YouTube gave no audio for this track; updating yt-dlp in Settings › Playback often fixes it", nil},
-		"yt-dlp: pFptt7Cargc: Sign in to confirm your age. This video may be inappropriate for some users.":          {"YouTube plays this track only to signed-in adults, on its own website", ErrUnavailable},
+		"yt-dlp: pFptt7Cargc: Sign in to confirm your age. This video may be inappropriate for some users.":          {"YouTube plays this track only to signed-in adults", ErrUnavailable},
 		"yt-dlp: pFptt7Cargc: Sign in to confirm you’re not a bot. Use --cookies-from-browser":                       {"YouTube asks to confirm this is not a bot; try again in a while", ErrThrottled},
 		"yt-dlp: pFptt7Cargc: Video unavailable. The uploader has not made this video available in your country":     {"this track is not available in your country", ErrUnavailable},
 		"yt-dlp: pFptt7Cargc: Video unavailable. This content isn't available, try again later.":                     {"YouTube is turning down requests from this network for now; try again in a while", ErrThrottled},
 		"yt-dlp: w3XzgjlKFjc: Video unavailable":                                                                     {"this track is no longer on YouTube Music", ErrUnavailable},
 		"yt-dlp: pFptt7Cargc: Private video. Sign in if you've been granted access to this video":                    {"this track is private", ErrUnavailable},
 		"yt-dlp: pFptt7Cargc: Join this channel to get access to members-only content like this video":               {"only the members of its channel can play this track", ErrUnavailable},
-		"yt-dlp: K8v_DaCcORQ: Please sign in. This helps protect our community. Use --cookies-from-browser":          {"YouTube plays this track only to signed-in viewers; Play audio as your account, in Settings › Playback, can play it", ErrUnavailable},
-		"Please sign in": {"YouTube plays this track only to signed-in viewers; Play audio as your account, in Settings › Playback, can play it", ErrUnavailable},
+		"yt-dlp: K8v_DaCcORQ: Please sign in. This helps protect our community. Use --cookies-from-browser":          {"YouTube plays this track only to signed-in viewers", ErrUnavailable},
+		"Please sign in": {"YouTube plays this track only to signed-in viewers", ErrUnavailable},
 		"yt-dlp: unable to download webpage: HTTP Error 500": {"", nil},
 	} {
 		if got, kind := plainError(msg); got != want.text || kind != want.kind {
@@ -259,7 +259,8 @@ func TestResolveSaysWhyWithoutYTDLP(t *testing.T) {
 	r.Direct = f.direct()
 	r.Run = func(context.Context, ...string) ([]byte, error) { return nil, tools.ErrNoYTDLP }
 	f.answersWith("-age")
-	if _, err := r.Resolve(context.Background(), songID); err == nil || err.Error() != "YouTube plays this track only to signed-in adults, on its own website" {
+	if _, err := r.Resolve(context.Background(), songID); err == nil || Reason(err) != ReasonAdults ||
+		!strings.HasPrefix(err.Error(), "YouTube plays this track only to signed-in adults; ") {
 		t.Errorf("age-restricted, without yt-dlp: %v", err)
 	}
 	// YouTube gives the direct route nothing of a video made for children,

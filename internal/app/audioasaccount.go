@@ -1,6 +1,10 @@
 package app
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/fzn0x/mixmusic/internal/stream"
+)
 
 // audioAsAccountSession returns the cookies of the user's YouTube Music
 // session for the resolver to ask for streams as, while "Play audio as
@@ -11,8 +15,23 @@ import "net/http"
 // session, which may not be the account the user chose, nor one that
 // has Premium.
 func (a *App) audioAsAccountSession() []*http.Cookie {
-	if !a.youtube.SignedIn() || a.youtube.Rejected() || a.youtube.AuthUser() != 0 {
+	if a.noAudioAsAccountSession() != "" {
 		return nil
 	}
 	return a.youtube.Cookies()
+}
+
+// noAudioAsAccountSession tells why audioAsAccountSession gives no
+// session, for the words of a track YouTube plays only to some signed-in
+// viewers (stream.Resolver.NoSession): "" while it gives one.
+func (a *App) noAudioAsAccountSession() string {
+	switch {
+	case !a.youtube.SignedIn():
+		return stream.AccountSignedOut
+	case a.youtube.Rejected():
+		return stream.AccountEnded
+	case a.youtube.AuthUser() != 0:
+		return stream.AccountNotFirst
+	}
+	return ""
 }

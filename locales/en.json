@@ -832,8 +832,14 @@
   "audioAccount2Offer": "Your YouTube Music account has Premium, whose audio has a higher bitrate. MixMusic can ask for each track's audio as your account to play it. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before.",
   "audioAccount2Title": "play audio as your account",
   "audioAccount2TurnOn": "turn on",
-  "audioAsAccountDesc": "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before.",
-  "audioAsAccountSignIn": "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before. Sign in to YouTube Music in accounts first.",
+  "audioAsAccountDesc": "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account, which also plays the tracks YouTube plays only to signed-in viewers. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before.",
+  "@audioAsAccountDesc": {
+    "description": "In Settings › Playback › Sound, under Play audio as your account (audioAsAccountTitle): what the switch brings and what it risks."
+  },
+  "audioAsAccountSignIn": "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account, which also plays the tracks YouTube plays only to signed-in viewers. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before. Sign in to YouTube Music in accounts first.",
+  "@audioAsAccountSignIn": {
+    "description": "In Settings › Playback › Sound, under Play audio as your account (audioAsAccountTitle), while the user isn't signed in to YouTube Music: what the switch brings and what it risks, as audioAsAccountDesc, and to sign in first."
+  },
   "audioAsAccountTitle": "Play audio as your account",
   "backupAbout": "Saves your library, settings and add-ons in a file, to restore here or on another computer.",
   "@backupAbout": {
@@ -3836,9 +3842,81 @@
   "@errorSpotifyTooMany": {
     "description": "An error of Spotify, as a toast or inside a message that leads it."
   },
-  "errorStreamAdults": "YouTube plays this track only to signed-in adults, on its own website",
+  "errorStreamAccountEnded": "{why}; sign in to YouTube Music again, in Settings › Accounts, for your account to be asked",
+  "@errorStreamAccountEnded": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay: YouTube plays it only to some signed-in viewers, Play audio as your account is on, and YouTube ended the YouTube Music session, or it lacks what asking as the account needs, so the user's account wasn't asked for the audio. {why} is errorStreamSignedInOnly, errorStreamAdults, errorStreamMembers or errorStreamPremium.",
+    "placeholders": {
+      "why": {
+        "type": "String"
+      }
+    }
+  },
+  "errorStreamAccountNoTools": "{why}; asking as your account takes yt-dlp and a JavaScript runtime, in Settings › Playback › Tools",
+  "@errorStreamAccountNoTools": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay: YouTube plays it only to some signed-in viewers, Play audio as your account is on, and yt-dlp or a JavaScript runtime is missing, which asking for the audio as the user's account takes. Tools is the group toolSettingsGroup. yt-dlp is a program's name: keep it. {why} is errorStreamSignedInOnly, errorStreamAdults, errorStreamMembers or errorStreamPremium.",
+    "placeholders": {
+      "why": {
+        "type": "String"
+      }
+    }
+  },
+  "errorStreamAccountNotFirst": "{why}; your account is asked only while MixMusic uses the first Google account of your session, in Settings › Accounts",
+  "@errorStreamAccountNotFirst": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay: YouTube plays it only to some signed-in viewers, Play audio as your account is on, and MixMusic uses another Google account of the YouTube Music session than its first, which alone the audio is asked for as. {why} is errorStreamSignedInOnly, errorStreamAdults, errorStreamMembers or errorStreamPremium.",
+    "placeholders": {
+      "why": {
+        "type": "String"
+      }
+    }
+  },
+  "errorStreamAccountOff": "{why}; your account wasn't asked, as Play audio as your account is off, in Settings › Playback",
+  "@errorStreamAccountOff": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay: YouTube plays it only to some signed-in viewers, and the switch Play audio as your account (audioAsAccountTitle) is off. {why} is errorStreamAdults, errorStreamMembers or errorStreamPremium. Name the switch as audioAsAccountTitle does.",
+    "placeholders": {
+      "why": {
+        "type": "String"
+      }
+    }
+  },
+  "errorStreamAccountRefused": "{why}; YouTube didn't give it to your account either",
+  "@errorStreamAccountRefused": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay: YouTube plays it only to some signed-in viewers, and the audio was asked for as the user's account too, which YouTube didn't give either. {why} is errorStreamSignedInOnly, errorStreamAdults, errorStreamMembers or errorStreamPremium.",
+    "placeholders": {
+      "why": {
+        "type": "String"
+      }
+    }
+  },
+  "errorStreamAccountSaver": "{why}; your account is asked only at the best Quality, in Settings › Playback",
+  "@errorStreamAccountSaver": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay: YouTube plays it only to some signed-in viewers, Play audio as your account is on, and Quality is data saver, which never asks for the audio as the user's account. Quality is the setting playbackQuality, and best its value playbackQualityBest: name them as those do. {why} is errorStreamSignedInOnly, errorStreamAdults, errorStreamMembers or errorStreamPremium.",
+    "placeholders": {
+      "why": {
+        "type": "String"
+      }
+    }
+  },
+  "errorStreamAccountSignIn": "{why}; sign in to YouTube Music in Settings › Accounts, then turn on Play audio as your account in Settings › Playback",
+  "@errorStreamAccountSignIn": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay: YouTube plays it only to some signed-in viewers, MixMusic isn't signed in to YouTube Music, and the switch Play audio as your account (audioAsAccountTitle) is off. {why} is errorStreamSignedInOnly, errorStreamAdults, errorStreamMembers or errorStreamPremium. Name the switch as audioAsAccountTitle does.",
+    "placeholders": {
+      "why": {
+        "type": "String"
+      }
+    }
+  },
+  "errorStreamAccountSignedOut": "{why}; sign in to YouTube Music in Settings › Accounts for your account to be asked",
+  "@errorStreamAccountSignedOut": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay: YouTube plays it only to some signed-in viewers, Play audio as your account is on, and MixMusic isn't signed in to YouTube Music, so the user's account wasn't asked for the audio. {why} is errorStreamSignedInOnly, errorStreamAdults, errorStreamMembers or errorStreamPremium.",
+    "placeholders": {
+      "why": {
+        "type": "String"
+      }
+    }
+  },
+  "errorStreamAdults": "YouTube plays this track only to signed-in adults",
   "@errorStreamAdults": {
-    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay, and as {why} of the errorStreamAccount messages."
   },
   "errorStreamBadVideoID": "that isn't a YouTube video",
   "@errorStreamBadVideoID": {
@@ -3862,7 +3940,7 @@
   },
   "errorStreamMembers": "only the members of its channel can play this track",
   "@errorStreamMembers": {
-    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay, and as {why} of the errorStreamAccount messages."
   },
   "errorStreamNetwork": "the network failed",
   "@errorStreamNetwork": {
@@ -3882,7 +3960,7 @@
   },
   "errorStreamPremium": "only YouTube Music Premium members can play this track",
   "@errorStreamPremium": {
-    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay, and as {why} of the errorStreamAccount messages."
   },
   "errorStreamPrivate": "this track is private",
   "@errorStreamPrivate": {
@@ -3894,7 +3972,11 @@
   },
   "errorStreamSignedIn": "YouTube plays this track only to signed-in viewers; Play audio as your account, in Settings › Playback, can play it",
   "@errorStreamSignedIn": {
-    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay, while Play audio as your account (audioAsAccountTitle) is off and the user is signed in to YouTube Music. Name the switch as audioAsAccountTitle does."
+  },
+  "errorStreamSignedInOnly": "YouTube plays this track only to signed-in viewers",
+  "@errorStreamSignedInOnly": {
+    "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it, as playerCouldntPlay, and as {why} of the errorStreamAccount messages."
   },
   "errorStreamStalled": "YouTube stopped sending the audio, as happens when the connection drops; check the connection and play the track again",
   "@errorStreamStalled": {
@@ -4280,6 +4362,10 @@
         "type": "String"
       }
     }
+  },
+  "failureWayAsAccount": "As your account",
+  "@failureWayAsAccount": {
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: asking YouTube for its audio as the user's YouTube Music account, as Play audio as your account (audioAsAccountTitle) does. It starts a line of what was tried, before how it went."
   },
   "failureWayFile": "The file",
   "@failureWayFile": {

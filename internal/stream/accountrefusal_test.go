@@ -128,7 +128,7 @@ func TestRefusedAsksAgainOnlyAtTheSignInWall(t *testing.T) {
 		switch {
 		case c.again && (err != nil || !s.AsAccount):
 			t.Errorf("%s: not asked again: %+v, %v", c.name, s, err)
-		case !c.again && (err == nil || err.Error() != signedOut.Error()):
+		case !c.again && (err == nil || !strings.HasPrefix(err.Error(), signedOut.Error())):
 			t.Errorf("%s: %v, want the signed-out failure %v", c.name, err, signedOut)
 		}
 		want := map[bool]int{true: 2, false: 1}[c.again]
@@ -189,7 +189,7 @@ func TestRefusedAskedAgainFails(t *testing.T) {
 	r.Forget(testID) // as after YouTube refused its URL
 	for i := range 2 {
 		_, err := r.Resolve(context.Background(), testID)
-		if want := signInRequired(); err == nil || err.Error() != want.Error() {
+		if want := signInRequired(); err == nil || !strings.HasPrefix(err.Error(), want.Error()) || Account(err) != AccountRefused {
 			t.Errorf("resolve %d after the refusal: %v, want %v", i+1, err, want)
 		}
 		if n := asAccountRuns(y); n != 2+i {

@@ -34,11 +34,11 @@ const (
 
 // plainReasons are the reasons of plainErrors, by their plain words.
 var plainReasons = map[string]string{
-	"YouTube asks to confirm this is not a bot; try again in a while":                                                     ReasonBot,
-	"YouTube is turning down requests from this network for now; try again in a while":                                    ReasonThrottled,
-	"YouTube plays this track only to signed-in adults, on its own website":                                               ReasonAdults,
-	"YouTube plays this track only to signed-in viewers; Play audio as your account, in Settings › Playback, can play it": ReasonSignedIn,
-	"this track is not available in your country":                                                                         ReasonCountry,
+	"YouTube asks to confirm this is not a bot; try again in a while":                             ReasonBot,
+	"YouTube is turning down requests from this network for now; try again in a while":            ReasonThrottled,
+	"YouTube plays this track only to signed-in adults":                                           ReasonAdults,
+	"YouTube plays this track only to signed-in viewers":                                          ReasonSignedIn,
+	"this track is not available in your country":                                                 ReasonCountry,
 	"this track is private":                                                                       ReasonPrivate,
 	"only the members of its channel can play this track":                                         ReasonMembers,
 	"only YouTube Music Premium members can play this track":                                      ReasonPremium,

@@ -219,6 +219,9 @@ func (s *shell) stageClose(c *ui.Context) {
 // stageCredit names where the lyrics come from, as lyricsCredit does, in
 // the stage's ink: their licence asks for it wherever they show.
 func (s *shell) stageCredit(c *ui.Context, ly lyrics.Lyrics) {
+	if ly.Source == "" {
+		return
+	}
 	ui.RichText(c).FontSize(s.lk.captionSize()).TextColor(stageDim).Padding(16, 28).Children(func() {
 		s.creditParts(c, ly)
 	})

@@ -87,6 +87,9 @@ type Options struct {
 	// told of, a second when zero: tests shorten it, at once when
 	// negative.
 	ProblemWait time.Duration
+	// LyricsURLs, when set, has LRCLIB, Unison and Better Lyrics asked at
+	// these addresses in place of their own: tests set it.
+	LyricsURLs *LyricsURLs
 	// RomajiURL is where the dictionary of the readings of kanji, which
 	// romaji downloads, comes from: romaji.DictionaryURL when empty. Tests
 	// give their own.
@@ -125,6 +128,10 @@ type Options struct {
 	// picks, set it.
 	OverlayListen OverlayListen
 }
+
+// LyricsURLs are the addresses of the APIs of the sources of lyrics, as
+// lyrics.Client's BaseURL and its likes have them.
+type LyricsURLs struct{ LRCLIB, Unison, BetterLyrics string }
 
 // App is MixMusic.
 type App struct {
@@ -170,6 +177,14 @@ type App struct {
 	addons       *addons.Manager
 	storage      *addons.Storage
 	lyricsMemo   *memo[lyrics.Lyrics]
+	// lyricsPicks keeps the lyrics the listener picked for tracks,
+	// lyricsAsked what the sources answered for them, captionLists the
+	// caption tracks of their videos, and lyricsTold who is told of a pick
+	// (lyricspick.go).
+	lyricsPicks  *lyricsPicks
+	lyricsAsked  *memo[*lyricsAsked]
+	captionLists *memo[[]stream.CaptionTrack]
+	lyricsTold   lyricsTold
 	// lyricsTiming times music videos' lyrics to them (lyricsvideo.go).
 	lyricsTiming lyricsTiming
 	related      *memo[[]media.Shelf]
@@ -380,6 +395,12 @@ func New(opts Options) (*App, error) {
 	a.translations = newTranslations(filepath.Join(opts.CacheDir, "lyrics-translations"))
 	a.romaji = newRomaji(opts, userAgent)
 	a.lyricsMemo = newMemo[lyrics.Lyrics](200)
+	a.lyricsPicks = newLyricsPicks(filepath.Join(opts.DataDir, "lyrics-picks"))
+	a.lyricsAsked = newMemo[*lyricsAsked](200)
+	a.captionLists = newMemo[[]stream.CaptionTrack](200)
+	if u := opts.LyricsURLs; u != nil {
+		a.lyrics.BaseURL, a.unison.BaseURL, a.betterLyrics.BaseURL = u.LRCLIB, u.Unison, u.BetterLyrics
+	}
 	a.related = newMemo[[]media.Shelf](100)
 	a.episodeDetails = newMemo[media.EpisodeDetails](100)
 	a.artStore = artwork.NewStore(filepath.Join(opts.CacheDir, "artwork"), artworkLimit)

@@ -4497,6 +4497,22 @@
       }
     }
   },
+  "lyricsEditAbout": "Correct a word or a line. A time in brackets, as [01:02.50], is when the line after it is sung, and one in angle brackets, as <01:02.50>, when the word after it is. Your edit shows for this track until you pick another source or Automatic.",
+  "@lyricsEditAbout": {
+    "description": "At the top of lyricsEditTitle. Keep the times as they are written: [01:02.50] and <01:02.50>. \"Automatic\" is lyricsSourceAutomatic."
+  },
+  "lyricsEditEmpty": "These lyrics have no words to keep.",
+  "@lyricsEditEmpty": {
+    "description": "In lyricsEditTitle, under the text box, when the listener saves it with no words in it."
+  },
+  "lyricsEditLabel": "Lyrics",
+  "@lyricsEditLabel": {
+    "description": "For screen readers: the text box of lyricsEditTitle, which holds the lyrics to correct."
+  },
+  "lyricsEditTitle": "Edit lyrics",
+  "@lyricsEditTitle": {
+    "description": "The title of the dialog lyricsSourceEdit opens: the lyrics shown, as text to correct."
+  },
   "lyricsFullScreen": "Full-screen lyrics",
   "lyricsInstrumental": "This track is instrumental.",
   "lyricsKanjiDownloading": "The readings of kanji are downloading: kanji show as they are until then.",
@@ -4574,6 +4590,44 @@
   "lyricsRomanizeOnly": "romanized only",
   "lyricsRomanizeTip": "Shows the lyrics in Latin letters too. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google romanize them.",
   "lyricsRomanizeUnder": "romanized under",
+  "lyricsSearchAbout": "Every lyrics source that is on gets this title and artist. YouTube Music and YouTube captions look up the track that plays instead.",
+  "@lyricsSearchAbout": {
+    "description": "At the top of lyricsSearchTitle: what the sources are sent. YouTube Music and YouTube captions are names."
+  },
+  "lyricsSearchArtist": "Artist",
+  "@lyricsSearchArtist": {
+    "description": "In lyricsSearchTitle: the label of the field of the artist to search for."
+  },
+  "lyricsSearchGo": "search",
+  "@lyricsSearchGo": {
+    "description": "In lyricsSearchTitle: the button that asks the sources for the title and artist in the fields. Lowercase, as the labels of buttons are."
+  },
+  "lyricsSearchLooking": "Asking the lyrics sources…",
+  "@lyricsSearchLooking": {
+    "description": "In lyricsSearchTitle, while the sources are asked for the title and artist."
+  },
+  "lyricsSearchSongTitle": "Title",
+  "@lyricsSearchSongTitle": {
+    "description": "In lyricsSearchTitle: the label of the field of the song's title to search for."
+  },
+  "lyricsSearchTitle": "Search lyrics by title and artist",
+  "@lyricsSearchTitle": {
+    "description": "The title of the dialog lyricsSourceSearch opens: a title and an artist to change, and what each lyrics source found for them."
+  },
+  "lyricsSearchUse": "show these",
+  "@lyricsSearchUse": {
+    "description": "In lyricsSearchTitle, the button on a result: shows these lyrics for the track that plays, and keeps the source, title and artist for it. Lowercase, as the labels of buttons are."
+  },
+  "lyricsSearchUseFrom": "Show the lyrics from {source}",
+  "@lyricsSearchUseFrom": {
+    "description": "For screen readers: the lyricsSearchUse button on a result of lyricsSearchTitle. {source} is the source's name.",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Unison"
+      }
+    }
+  },
   "lyricsSettingsDesc": "The translate switch beside the lyrics shows them in this language. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google translate them; nothing is sent while it's off. Lyrics in other scripts show in Latin letters made on this computer, which sends nothing: Japanese in romaji, and the others by the standard of their language. Only Arabic's go to Unison, which romanizes them with the vowels Arabic doesn't write.",
   "lyricsSettingsGroup": "Lyrics",
   "lyricsSettingsSystemLanguage": "System language ({language})",
@@ -4619,10 +4673,72 @@
   "lyricsShareStory": "save for a story",
   "lyricsShowAs": "Show lyrics as",
   "lyricsShowInLatin": "Show lyrics in Latin letters",
+  "lyricsSource": "source",
+  "@lyricsSource": {
+    "description": "Above the lyrics, in the lyrics panel and on the now playing page, beside \"synced\" and \"plain text\", and under \"No lyrics found for this track.\": the label before the button that names where the lyrics come from and opens the menu of the lyrics sources. Lowercase, as the other labels there."
+  },
+  "lyricsSourceAutomatic": "Automatic",
+  "@lyricsSourceAutomatic": {
+    "description": "First in the menu of the lyrics sources, and on its button while it is chosen: the lyrics MixMusic finds by itself, asking the sources in the order of Settings › Playback › Lyrics sources."
+  },
   "lyricsSourceBetterLyricsSent": "Lyrics timed word by word. Gets the title, first artist, album and length of tracks that have an album.",
+  "lyricsSourceCaptionTrack": "{source} ({language})",
+  "@lyricsSourceCaptionTrack": {
+    "description": "In the menu of the lyrics sources, and on its button: a caption track the uploader of the video wrote, by its language. {source} is lyricsSourceCaptionsName, {language} the name of the language, as lyricsLangGerman.",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "YouTube captions"
+      },
+      "language": {
+        "type": "String",
+        "example": "German"
+      }
+    }
+  },
   "lyricsSourceCaptionsName": "YouTube captions",
   "lyricsSourceCaptionsSent": "The captions of the video that plays, never those made from speech. Gets the video ID, signed out.",
+  "lyricsSourceEdit": "Edit lyrics…",
+  "@lyricsSourceEdit": {
+    "description": "In the menu of the lyrics sources: opens lyricsEditTitle, a dialog with the lyrics shown as text, to correct them."
+  },
+  "lyricsSourceEdited": "Your edit",
+  "@lyricsSourceEdited": {
+    "description": "In the menu of the lyrics sources, and on its button: the lyrics the listener edited with lyricsSourceEdit, which show for the track until another choice replaces them."
+  },
+  "lyricsSourceFound": "{shown, select, yes {Showing} other {Found}}, {timing, select, words {timed word by word} lines {timed by line} other {not timed}}, {count, plural, one {# line} other {# lines}}",
+  "@lyricsSourceFound": {
+    "description": "Under a source in the menu of the lyrics sources, and under a result of lyricsSearchTitle: the lyrics it found. {shown} is yes for the lyrics that show now; {timing} is words for lyrics timed word by word, lines for lyrics timed line by line, and anything else (plain, the other case) for lyrics without times; {count} counts the lines with words.",
+    "placeholders": {
+      "shown": {
+        "type": "String",
+        "example": "yes"
+      },
+      "timing": {
+        "type": "String",
+        "example": "lines"
+      },
+      "count": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "lyricsSourceInstrumental": "Says the track is instrumental",
+  "@lyricsSourceInstrumental": {
+    "description": "Under a source in the menu of the lyrics sources, and under a result of lyricsSearchTitle: the source has the track as an instrumental, without words."
+  },
   "lyricsSourceLRCLIBSent": "Gets the title, artists, album and length; for a music video, its song's.",
+  "lyricsSourceLabel": "Lyrics source: {name}",
+  "@lyricsSourceLabel": {
+    "description": "For screen readers: the button after lyricsSource, which opens the menu of the lyrics sources. {name} is what the button shows: a source's name, lyricsSourceAutomatic or lyricsSourceEdited.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "LRCLIB"
+      }
+    }
+  },
   "lyricsSourceLastOn": "{name}, the last source on",
   "@lyricsSourceLastOn": {
     "placeholders": {
@@ -4630,6 +4746,14 @@
         "type": "String"
       }
     }
+  },
+  "lyricsSourceNotAsked": "Not asked yet",
+  "@lyricsSourceNotAsked": {
+    "description": "Under a source in the menu of the lyrics sources: MixMusic didn't send it the track, as an earlier source had lyrics. Picking it asks it then."
+  },
+  "lyricsSourceNotFound": "Not found",
+  "@lyricsSourceNotFound": {
+    "description": "Under a source in the menu of the lyrics sources, and under a result of lyricsSearchTitle: the source has no lyrics of the track, or can't look it up."
   },
   "lyricsSourceOff": "off",
   "lyricsSourceOn": "on",
@@ -4644,7 +4768,33 @@
       }
     }
   },
+  "lyricsSourceSearch": "Search by title and artist…",
+  "@lyricsSourceSearch": {
+    "description": "In the menu of the lyrics sources: opens lyricsSearchTitle, a dialog that asks every source for another title and artist."
+  },
+  "lyricsSourceSearched": "{source}: {title} by {artist}",
+  "@lyricsSourceSearched": {
+    "description": "In the menu of the lyrics sources: the result of lyricsSourceSearch the listener picked, asked again each time the track plays. {source} is the source's name, {title} and {artist} what the listener searched for.",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "LRCLIB"
+      },
+      "title": {
+        "type": "String",
+        "example": "Paper Kites"
+      },
+      "artist": {
+        "type": "String",
+        "example": "Ada Field"
+      }
+    }
+  },
   "lyricsSourceUnisonSent": "Gets the video ID, or the title, artists, album and length.",
+  "lyricsSourceUnreachable": "Can't be reached",
+  "@lyricsSourceUnreachable": {
+    "description": "Under a source in the menu of the lyrics sources, and under a result of lyricsSearchTitle: the source couldn't be reached, or answered with an error. Picking it asks it again."
+  },
   "lyricsSourceYouTubeMusicSent": "Gets the video ID of the track, or of its recording there.",
   "lyricsSourcesAbout": "MixMusic asks the sources that are on, one at a time, from the top, until one has synced lyrics. Drag a source onto another to move it there, or press Alt+Up or Alt+Down on it.",
   "lyricsSourcesReset": "reset to default",

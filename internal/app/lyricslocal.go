@@ -24,22 +24,29 @@ import (
 // maxLRC bounds the bytes of a .lrc file that is read.
 const maxLRC = 1 << 20
 
-// Lyrics returns the lyrics of a track. Those a file of this computer
-// holds (localLyrics) come first: synced, they are final; plain, they
-// give way only to synced lyrics of the sources, and stay when the
-// sources have none or can't be reached. Other tracks' come from the
-// sources of lyrics that are on (onlineLyrics).
+// Lyrics returns the lyrics of a track. Those the listener picked
+// (pickedLyrics) come first. Then those a file of this computer holds
+// (localLyrics): synced, they are final; plain, they give way only to
+// synced lyrics of the sources, and stay when the sources have none or
+// can't be reached. Other tracks' come from the sources of lyrics that
+// are on (onlineLyrics).
 func (c *Catalog) Lyrics(ctx context.Context, track media.Track) (lyrics.Lyrics, error) {
+	if l, ok, err := c.pickedLyrics(ctx, track); ok {
+		return l, err
+	}
+	asked := c.askedOf(track, c.a.settings.Get().Lyrics)
 	local, ok := c.localLyrics(track)
 	if !ok {
-		return c.onlineLyrics(ctx, track)
+		return c.onlineLyrics(ctx, track, asked)
 	}
 	if local.Synced {
+		asked.chose("", true)
 		return local, nil
 	}
-	if l, err := c.onlineLyrics(ctx, track); err == nil && l.Synced {
+	if l, err := c.onlineLyrics(ctx, track, asked); err == nil && l.Synced {
 		return l, nil
 	}
+	asked.chose("", true)
 	return local, nil
 }
 

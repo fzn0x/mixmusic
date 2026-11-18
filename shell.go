@@ -65,6 +65,7 @@ func (s *shell) view(c *ui.Context) {
 	s.tagDialog(c)
 	s.moveDialog(c)
 	s.copiesDialog(c)
+	s.lyricsPickDialogs(c)
 	s.promptDialog(c)
 	s.failureDialog(c)
 	s.remoteCodeDialog(c)

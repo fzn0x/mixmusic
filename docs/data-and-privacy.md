@@ -75,6 +75,9 @@ AppImage or archive copy's.
   [Listen with friends](listen-with-friends.md), yours as it was as you
   joined. A room keeps nothing else.
 - `positions.json`: where you left the latest 500 podcast episodes.
+- `lyrics-picks/`: the [lyrics source](lyrics.md#pick-another-source) you
+  picked for a track, the title and artist you searched its lyrics by,
+  or the lyrics you edited, a file each, for 10,000 tracks at most.
 - `lastfm-queue.json`: the scrobbles still to send, as while offline.
 - `listenbrainz-queue.json`: the same for ListenBrainz, and
   `listenbrainz-recordings.json` the IDs ListenBrainz gave the recordings
@@ -186,6 +189,7 @@ Where the credential store can't keep a secret:
 | [Lyrics timed to a music video](lyrics.md#music-videos), while "Time lyrics to music videos" is on | YouTube's player API (`www.youtube.com`) and media servers, signed out | the video IDs of the music video and of its song, once a video, for stretches of their audio: of the song, only those compared. No play is reported |
 | Lyrics, the same way | YouTube Music | the video ID of the track that plays, or of its recording there |
 | Lyrics, the same way, and the transcript of a podcast episode | YouTube (`www.youtube.com`), signed out | the video ID of the track that plays, or of its recording there, for its captions |
+| [Search by title and artist…](lyrics.md#pick-another-source), when you search | every source on, at once | the title and artist you give, with the album and length of the track that plays; YouTube Music and YouTube captions get the track's video ID, as above |
 | Lyrics of a track on this computer | the sources on, but YouTube captions | its title, artists, album and length, as its tags tell, unless they name no artist or [its file holds synced lyrics](lyrics.md#songs-on-this-computer); never its file, nor the lyrics it holds |
 | Translate, or romanized Arabic, while it's on beside the lyrics | Unison, which has Google translate them | the lyrics of the track that plays, with its video ID |
 | Romaji, the first time you turn it on | GitHub | a download of the dictionary of kanji readings; the lyrics stay on your computer |

@@ -30,24 +30,32 @@ func (t *toldLater) now() (*Stream, bool) {
 }
 
 // hear waits for the TV client's answer of a video's 5.1 surround audio,
-// later, which came after res found the video's stream, keeps it with
-// that stream, and tells Told. When yt-dlp couldn't find that audio,
-// without a JavaScript runtime, it isn't kept, as resolve does with an
-// answer that came in time.
+// later, which came after res found the video's stream, and keeps it with
+// that stream (keepTold).
 func (r *Resolver) hear(videoID string, res *resolution, later *toldLater) {
 	<-later.done
-	s := later.surround
-	if s == nil {
-		return
+	if later.surround != nil {
+		r.keepTold(videoID, res, later.surround)
 	}
+}
+
+// keepTold keeps s, the 5.1 surround audio of a video found after res
+// found the video's stream, with that stream, and tells Told, while res is
+// the video's stream the resolver holds: not once it was forgotten. When
+// yt-dlp couldn't find that audio, without a JavaScript runtime, it isn't
+// kept, as resolve does with an answer that came in time.
+func (r *Resolver) keepTold(videoID string, res *resolution, s *Stream) {
 	if s.URL == "" && !r.findsSurround() {
 		log.Printf("mixmusic: YouTube has 5.1 surround audio of %s, which takes yt-dlp and a JavaScript runtime to play", videoID)
 		return
 	}
 	r.mu.Lock()
-	res.surround = s
+	held := r.calls[videoID] == res
+	if held {
+		res.surround = s
+	}
 	r.mu.Unlock()
-	if r.Told != nil {
+	if held && r.Told != nil {
 		r.Told(videoID)
 	}
 }

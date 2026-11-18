@@ -7,7 +7,6 @@ package app
 
 import (
 	"context"
-	"errors"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -141,7 +140,7 @@ func (d *Downloads) Export(ctx context.Context, tracks []media.Track, dir string
 func (a *App) exportOne(ctx context.Context, t media.Track, dir string, albums *albumPages, parts *partLookups) (string, error) {
 	path, own := a.exportFile(t)
 	if path == "" {
-		return "", errors.New("it isn't downloaded, nor on this computer")
+		return "", wordedLater("it isn't downloaded, nor on this computer", locales.ExportNotOnComputer, nil)
 	}
 	names := make([]string, 0, len(t.Artists))
 	for _, ar := range t.Artists {

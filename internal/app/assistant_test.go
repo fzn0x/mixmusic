@@ -519,7 +519,7 @@ func TestAssistantWithoutPlayer(t *testing.T) {
 func TestAssistantTools(t *testing.T) {
 	a := newQuietApp(t, nil)
 	tools := a.assistantTools()
-	want := []string{"now_playing", "get_queue", "play", "pause", "next_track", "previous_track", "seek", "set_volume",
+	want := []string{"now_playing", "get_queue", "play", "pause", "next_track", "previous_track", "seek", "set_volume", "sleep_timer",
 		"search", "play_result", "list_playlists", "play_playlist"}
 	var names []string
 	for _, tool := range tools {

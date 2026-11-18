@@ -41,6 +41,8 @@ var GlobalCommands = []GlobalCommand{
 	{"player.mute", "Mute"},
 	{"player.like", "Like what plays"},
 	{"player.dislike", "Dislike what plays"},
+	{"player.sleepLast", "Sleep timer: last length"},
+	{"player.sleepCancel", "Sleep timer: cancel"},
 	{"app.show", "Show MixMusic"},
 }
 
@@ -269,6 +271,14 @@ func (a *App) globalCommand(id string) {
 		a.command(PlayerCommand{Command: CommandLike})
 	case "player.dislike":
 		a.command(PlayerCommand{Command: CommandDislike})
+	case "player.sleepLast":
+		if p := a.goPlayer.Load(); p != nil {
+			a.sleepLast(p)
+		}
+	case "player.sleepCancel":
+		if p := a.goPlayer.Load(); p != nil {
+			p.CancelSleep(false)
+		}
 	case "app.show":
 		// At once, in the press's callback: on Wayland the window shown
 		// then takes the focus with the press's activation token.

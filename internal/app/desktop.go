@@ -254,6 +254,7 @@ func (a *App) trayMenu() []*mygo.MenuItem {
 		{Label: locales.TrayPlayPause(), Click: cmd(CommandToggle)},
 		{Label: locales.TrayNext(), Click: cmd(CommandNext)},
 		{Label: locales.TrayPrevious(), Click: cmd(CommandPrevious)},
+		a.sleepTrayItem(),
 		mygo.Separator(),
 		{Label: locales.TrayShowMixMusic(), Click: func(*mygo.MenuItem, *mygo.Window) { a.showMain() }},
 		{Label: locales.TrayMiniPlayer(), Click: func(*mygo.MenuItem, *mygo.Window) { a.showMini() }},

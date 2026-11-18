@@ -156,6 +156,7 @@ func (a *App) assistantTools() []mcp.Tool {
 				`"additionalProperties":false}`),
 			Description: "Sets MixMusic's volume: give percent, or by_percent, not both. It unmutes.",
 			Call:        a.toolVolume},
+		a.sleepTool(),
 		{Name: "search", Title: "Search", ReadOnly: true, OpenWorld: true,
 			Input: json.RawMessage(`{"type":"object","properties":{` +
 				`"query":{"type":"string","minLength":1,"maxLength":200,"description":"What to look for: a title, an artist, an album, words of a song."},` +

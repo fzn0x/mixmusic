@@ -88,6 +88,7 @@ func (s *shell) commands() []command {
 	}
 	cmds = append(cmds, s.themeCommands...)
 	cmds = append(cmds, s.lyricStyleCommands()...)
+	cmds = append(cmds, s.sleepCommands()...)
 	for _, pc := range s.plugins.Commands() {
 		cmds = append(cmds, command{pc.ID, pc.Title, pc.Shortcut, locales.CmdGroupPlugins(), pc.Run})
 	}

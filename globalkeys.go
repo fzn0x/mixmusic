@@ -50,6 +50,10 @@ func globalCommandTitle(gc app.GlobalCommand) string {
 		return locales.CmdPlayerLike()
 	case "player.dislike":
 		return locales.CmdPlayerDislike()
+	case "player.sleepLast":
+		return locales.CmdSleepLast()
+	case "player.sleepCancel":
+		return locales.CmdSleepCancel()
 	case "app.show":
 		return locales.GlobalKeysShowApp()
 	}

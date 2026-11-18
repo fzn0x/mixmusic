@@ -19,6 +19,7 @@
   "lyricsSources": [],
   "lyricsPreferWords": false,
   "lyricsTimeVideos": true,
+  "lyricsOffset": 0,
   "lyricsCaptionLanguage": "",
   "lyricsStyle": "spotlight",
   "lyricsSize": 1,

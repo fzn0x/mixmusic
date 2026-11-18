@@ -57,6 +57,20 @@ const (
 	LyricsSizeStep = 0.1
 )
 
+// The bounds of the timing of lyrics, in milliseconds (LyricsOffset, and
+// each song's own), and the steps the controls move it by: the slider of
+// Settings goes LyricsOffsetSlider either way, and a timing typed goes as
+// far as MaxLyricsOffset.
+const (
+	MaxLyricsOffset    = 120_000
+	LyricsOffsetSlider = 10_000
+	LyricsOffsetStep   = 50
+)
+
+// CleanLyricsOffset is the timing of lyrics ms, in milliseconds, within
+// MaxLyricsOffset either way.
+func CleanLyricsOffset(ms int) int { return min(max(ms, -MaxLyricsOffset), MaxLyricsOffset) }
+
 // LyricBallMotion chooses how the ball of the full-screen lyrics goes from the
 // last word of a line to the first of the next, where it hops from word to
 // word over each line as the words are sung.
@@ -104,6 +118,13 @@ type Lyrics struct {
 	// starts in it, comparing the two recordings' audio, and moves each
 	// line by that much (#565). Off, they keep the song's times.
 	LyricsTimeVideos bool `json:"lyricsTimeVideos"`
+	// LyricsOffset moves the synced lyrics of every song, in milliseconds:
+	// earlier above 0, as an LRC [offset:] tag does, and later below, for an
+	// output that sounds late, as Bluetooth headphones may (#610). It adds
+	// to the timing each song has of its own, and, as a delay of the output,
+	// grows with the speed the track plays at. From -MaxLyricsOffset to
+	// MaxLyricsOffset.
+	LyricsOffset int `json:"lyricsOffset"`
 	// LyricsCaptionLanguage is the language of the captions lyrics come
 	// from, a code of ISO 639-1 as "ja", when the video has captions in
 	// it; "" is the video's own.
@@ -157,6 +178,7 @@ func (l Lyrics) clean() Lyrics {
 		l.LyricsSize = 1
 	}
 	l.LyricsSize = math.Round(l.LyricsSize*10) / 10
+	l.LyricsOffset = CleanLyricsOffset(l.LyricsOffset)
 	if !slices.Contains(LyricBallMotions, l.LyricsBallMotion) {
 		l.LyricsBallMotion = LyricBallMotions[0]
 	}

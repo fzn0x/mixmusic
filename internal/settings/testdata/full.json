@@ -34,6 +34,7 @@
   ],
   "lyricsPreferWords": true,
   "lyricsTimeVideos": false,
+  "lyricsOffset": -250,
   "lyricsCaptionLanguage": "de",
   "lyricsStyle": "bold",
   "lyricsSize": 1.3,

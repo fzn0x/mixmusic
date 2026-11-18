@@ -16,9 +16,15 @@ func watchNextTabs(n node) []node {
 // Radio returns the start of a radio: a mix of tracks like the one given,
 // which YouTube Music plays after it. The first track is the one given.
 func (c *Client) Radio(ctx context.Context, videoID string) ([]media.Track, error) {
+	return c.RadioOf(ctx, videoID, "RDAMVM"+videoID)
+}
+
+// RadioOf returns the start of the radio playlistID (RD…), as a link to
+// it plays it from videoID: that track first, then the radio's.
+func (c *Client) RadioOf(ctx context.Context, videoID, playlistID string) ([]media.Track, error) {
 	n, err := c.call(ctx, "next", map[string]any{
 		"videoId":                       videoID,
-		"playlistId":                    "RDAMVM" + videoID,
+		"playlistId":                    playlistID,
 		"isAudioOnly":                   true,
 		"enablePersistentPlaylistPanel": true,
 		"tunerSettingValue":             "AUTOMIX_SETTING_NORMAL",

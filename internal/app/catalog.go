@@ -41,10 +41,10 @@ func emptyResults() media.SearchResults {
 }
 
 // Search searches YouTube Music, and Spotify when the user signed in, and
-// keeps the query among the recent searches.
+// keeps the query among the recent searches, unless it is a link (#614).
 func (c *Catalog) Search(ctx context.Context, query string) (SearchResponse, error) {
 	res, err := c.search(ctx, query)
-	if query = strings.TrimSpace(query); err == nil && query != "" {
+	if query = strings.TrimSpace(query); err == nil && query != "" && !media.IsLink(query) {
 		c.a.library.AddSearch(query)
 	}
 	return res, err
@@ -262,15 +262,24 @@ const relayTries = 3
 // them out.
 func (c *Catalog) Radio(ctx context.Context, track media.Track) ([]media.Track, error) {
 	tracks, err := c.radioOf(ctx, track)
-	// While the settings hide explicit content, the radio leaves out its
-	// explicit songs and videos (#427).
-	if err == nil && c.a.settings.Get().HideExplicit {
-		tracks = media.WithoutExplicit(tracks)
-	}
-	if err != nil || !c.a.settings.Get().SkipDisliked {
+	if err != nil {
 		return tracks, err
 	}
-	return withoutDisliked(tracks, c.a.library.Disliked()), nil
+	return c.keptOfRadio(tracks), nil
+}
+
+// keptOfRadio is tracks, a radio's, without what the settings leave out
+// of radios: while they hide explicit content, its explicit songs and
+// videos (#427), and while they skip the songs the user disliked, those.
+func (c *Catalog) keptOfRadio(tracks []media.Track) []media.Track {
+	set := c.a.settings.Get()
+	if set.HideExplicit {
+		tracks = media.WithoutExplicit(tracks)
+	}
+	if set.SkipDisliked {
+		tracks = withoutDisliked(tracks, c.a.library.Disliked())
+	}
+	return tracks
 }
 
 // withoutDisliked leaves out of tracks the songs of disliked: the same

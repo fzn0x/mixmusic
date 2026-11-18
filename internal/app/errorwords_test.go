@@ -30,7 +30,7 @@ func TestErrorWords(t *testing.T) {
 	}
 	errs = append(errs, errListenBrainzToken, fmt.Errorf("connecting: %w", errPlainRemote), fmt.Errorf("connecting: %w", errPlainGNUFM),
 		worded("connect to Last.fm first", locales.AccountSettingsLastfmConnectFirst(), nil),
-		errSpotifyEpisode, fmt.Errorf("opening: %w", errSpotifyShows))
+		errSpotifyEpisode, fmt.Errorf("opening: %w", errSpotifyShows), errSpotifyLinks)
 	for _, err := range errs {
 		if got := ErrorWords(err); !bracketed(got) {
 			t.Errorf("%v says %q, which no catalog translates", err, got)

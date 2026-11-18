@@ -1,0 +1,259 @@
+{
+ "contents": {
+  "twoColumnBrowseResultsRenderer": {
+   "secondaryContents": {
+    "sectionListRenderer": {
+     "contents": [
+      {
+       "musicPlaylistShelfRenderer": {
+        "collapsedItemCount": 8,
+        "contents": [
+         {
+          "musicResponsiveListItemRenderer": {
+           "fixedColumns": [
+            {
+             "musicResponsiveListItemFixedColumnRenderer": {
+              "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH",
+              "size": "MUSIC_RESPONSIVE_LIST_ITEM_FIXED_COLUMN_SIZE_SMALL",
+              "text": {
+               "runs": [
+                {
+                 "text": "2:28"
+                }
+               ]
+              }
+             }
+            }
+           ],
+           "flexColumns": [
+            {
+             "musicResponsiveListItemFlexColumnRenderer": {
+              "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH",
+              "text": {
+               "runs": [
+                {
+                 "navigationEndpoint": {
+                  "watchEndpoint": {
+                   "playerParams": "0gcJCTUC0OBS9m0t",
+                   "playlistId": "OLAK5uy_mByMItZzRVpiPOPfqNdCyzqCEs1k7Ow14",
+                   "videoId": "GeaZ4BIhyhs",
+                   "watchEndpointMusicSupportedConfigs": {
+                    "watchEndpointMusicConfig": {
+                     "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+                    }
+                   }
+                  }
+                 },
+                 "text": "GG"
+                }
+               ]
+              }
+             }
+            },
+            {
+             "musicResponsiveListItemFlexColumnRenderer": {
+              "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH",
+              "text": {
+               "runs": [
+                {
+                 "navigationEndpoint": {
+                  "browseEndpoint": {
+                   "browseEndpointContextSupportedConfigs": {
+                    "browseEndpointContextMusicConfig": {
+                     "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                    }
+                   },
+                   "browseId": "UCbM50mQtG58vhLZonicYUrQ"
+                  }
+                 },
+                 "text": "DJT"
+                }
+               ]
+              }
+             }
+            },
+            {
+             "musicResponsiveListItemFlexColumnRenderer": {
+              "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_MEDIUM",
+              "text": {
+               "runs": [
+                {
+                 "navigationEndpoint": {
+                  "browseEndpoint": {
+                   "browseEndpointContextSupportedConfigs": {
+                    "browseEndpointContextMusicConfig": {
+                     "pageType": "MUSIC_PAGE_TYPE_ALBUM"
+                    }
+                   },
+                   "browseId": "MPREb_I0lA998lMLT"
+                  }
+                 },
+                 "text": "Q-ENA II"
+                }
+               ]
+              }
+             }
+            }
+           ],
+           "playlistItemData": {
+            "playlistSetVideoId": "9940682F665020B6",
+            "videoId": "GeaZ4BIhyhs",
+            "voteSortValue": 1758601099
+           },
+           "thumbnail": {
+            "musicThumbnailRenderer": {
+             "thumbnail": {
+              "thumbnails": [
+               {
+                "height": 60,
+                "url": "https://yt3.googleusercontent.com/9XQ6lKJM8e4Npw6qXrzVGez2UekcQJuaYDoGoPDpXTWw0o5sgTXoUfPuLGxPUQJNIgjRvxWrUf5Iw0Uy1Q=w60-h60-l90-rj",
+                "width": 60
+               },
+               {
+                "height": 120,
+                "url": "https://yt3.googleusercontent.com/9XQ6lKJM8e4Npw6qXrzVGez2UekcQJuaYDoGoPDpXTWw0o5sgTXoUfPuLGxPUQJNIgjRvxWrUf5Iw0Uy1Q=w120-h120-l90-rj",
+                "width": 120
+               }
+              ]
+             },
+             "thumbnailCrop": "MUSIC_THUMBNAIL_CROP_UNSPECIFIED",
+             "thumbnailScale": "MUSIC_THUMBNAIL_SCALE_ASPECT_FIT"
+            }
+           }
+          }
+         },
+         {
+          "musicResponsiveListItemRenderer": {
+           "fixedColumns": [
+            {
+             "musicResponsiveListItemFixedColumnRenderer": {
+              "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH",
+              "size": "MUSIC_RESPONSIVE_LIST_ITEM_FIXED_COLUMN_SIZE_SMALL",
+              "text": {
+               "runs": [
+                {
+                 "text": "3:01"
+                }
+               ]
+              }
+             }
+            }
+           ],
+           "flexColumns": [
+            {
+             "musicResponsiveListItemFlexColumnRenderer": {
+              "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH",
+              "text": {
+               "runs": [
+                {
+                 "navigationEndpoint": {
+                  "watchEndpoint": {
+                   "playlistId": "OLAK5uy_mByMItZzRVpiPOPfqNdCyzqCEs1k7Ow14",
+                   "videoId": "OEobRiNMY4c",
+                   "watchEndpointMusicSupportedConfigs": {
+                    "watchEndpointMusicConfig": {
+                     "musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+                    }
+                   }
+                  }
+                 },
+                 "text": "Black"
+                }
+               ]
+              }
+             }
+            },
+            {
+             "musicResponsiveListItemFlexColumnRenderer": {
+              "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH",
+              "text": {
+               "runs": [
+                {
+                 "navigationEndpoint": {
+                  "browseEndpoint": {
+                   "browseEndpointContextSupportedConfigs": {
+                    "browseEndpointContextMusicConfig": {
+                     "pageType": "MUSIC_PAGE_TYPE_ARTIST"
+                    }
+                   },
+                   "browseId": "UCbM50mQtG58vhLZonicYUrQ"
+                  }
+                 },
+                 "text": "DJT"
+                }
+               ]
+              }
+             }
+            },
+            {
+             "musicResponsiveListItemFlexColumnRenderer": {
+              "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_MEDIUM",
+              "text": {
+               "runs": [
+                {
+                 "navigationEndpoint": {
+                  "browseEndpoint": {
+                   "browseEndpointContextSupportedConfigs": {
+                    "browseEndpointContextMusicConfig": {
+                     "pageType": "MUSIC_PAGE_TYPE_ALBUM"
+                    }
+                   },
+                   "browseId": "MPREb_I0lA998lMLT"
+                  }
+                 },
+                 "text": "Q-ENA II"
+                }
+               ]
+              }
+             }
+            }
+           ],
+           "playlistItemData": {
+            "playlistSetVideoId": "DF5819E1B26686B5",
+            "videoId": "OEobRiNMY4c",
+            "voteSortValue": 1758601099
+           },
+           "thumbnail": {
+            "musicThumbnailRenderer": {
+             "thumbnail": {
+              "thumbnails": [
+               {
+                "height": 60,
+                "url": "https://yt3.googleusercontent.com/9XQ6lKJM8e4Npw6qXrzVGez2UekcQJuaYDoGoPDpXTWw0o5sgTXoUfPuLGxPUQJNIgjRvxWrUf5Iw0Uy1Q=w60-h60-l90-rj",
+                "width": 60
+               },
+               {
+                "height": 120,
+                "url": "https://yt3.googleusercontent.com/9XQ6lKJM8e4Npw6qXrzVGez2UekcQJuaYDoGoPDpXTWw0o5sgTXoUfPuLGxPUQJNIgjRvxWrUf5Iw0Uy1Q=w120-h120-l90-rj",
+                "width": 120
+               }
+              ]
+             },
+             "thumbnailCrop": "MUSIC_THUMBNAIL_CROP_UNSPECIFIED",
+             "thumbnailScale": "MUSIC_THUMBNAIL_SCALE_ASPECT_FIT"
+            }
+           }
+          }
+         }
+        ],
+        "targetId": "OLAK5uy_mByMItZzRVpiPOPfqNdCyzqCEs1k7Ow14"
+       }
+      }
+     ],
+     "targetId": "VLOLAK5uy_mByMItZzRVpiPOPfqNdCyzqCEs1k7Ow14"
+    }
+   },
+   "tabs": [
+    {
+     "tabRenderer": {
+      "content": {
+       "sectionListRenderer": {
+        "targetId": "VLOLAK5uy_mByMItZzRVpiPOPfqNdCyzqCEs1k7Ow14_header"
+       }
+      }
+     }
+    }
+   ]
+  }
+ }
+}

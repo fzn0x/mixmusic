@@ -178,6 +178,9 @@ type shell struct {
 	seeking bool
 	seekTo  float64
 	volume  float64
+	// linkOpens is the link the search box or the palette opens once it
+	// is read (links.go).
+	linkOpens *media.Link
 
 	// narrow is set while the window is at most narrowWidth wide, which
 	// folds the rail; narrowFold is the fold the user gave it there.

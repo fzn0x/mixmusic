@@ -331,6 +331,10 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 		if local || p.Saved || p.Editable || p.Collaborative || s.pinned(p.ID) {
 			menu = s.withPin(menu, playlistMark(p))
 		}
+		// It goes in a folder of the sidebar too (railfolders.go).
+		if local || p.Saved || p.Editable || p.Collaborative || s.svc.Collection.FolderOf(p.ID) != "" {
+			menu = s.withFolders(menu, playlistMark(p))
+		}
 		if local {
 			base := menu
 			menu = func(m *ui.Menu) {

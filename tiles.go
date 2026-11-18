@@ -363,7 +363,8 @@ func (s *shell) playlistTileWith(c *ui.Context, key string, p media.Playlist, mo
 }
 
 // playlistTileOf is playlistTileWith, which moves lets the user move, if
-// set (tileExtras). A mix's menu pins it, or unpins it.
+// set (tileExtras). A mix's menu pins it, or unpins it, and puts it in a
+// folder of the sidebar (railfolders.go).
 func (s *shell) playlistTileOf(c *ui.Context, key string, p media.Playlist, more func(m *ui.Menu, p media.Playlist), moves func(tile ui.Element)) {
 	var parts []string
 	if p.Owner != "" {
@@ -388,6 +389,7 @@ func (s *shell) playlistTileOf(c *ui.Context, key string, p media.Playlist, more
 		s.changeCoverItem(m, p)
 		if p.Source == media.SourceLocal {
 			s.pinItem(m, playlistMark(p))
+			s.folderItems(m, playlistMark(p))
 		}
 		if more != nil {
 			more(m, p)

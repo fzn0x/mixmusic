@@ -14,6 +14,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/builtin"
 	"github.com/fzn0x/mixmusic/internal/app"
+	"github.com/fzn0x/mixmusic/internal/backup"
 	"github.com/fzn0x/mixmusic/internal/diag"
 	"github.com/fzn0x/mixmusic/internal/sysproxy"
 )
@@ -92,6 +93,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// A restore staged before the restart swaps in now, before anything
+	// opens the files it replaces (#592).
+	restored := backup.Apply(dataDir)
 	home, _ := os.UserHomeDir()
 	a, err := app.New(app.Options{
 		DataDir:      dataDir,
@@ -105,6 +109,8 @@ func main() {
 		Interface:    Open,
 		Mini:         OpenMini,
 		Notch:        OpenNotch,
+		BackupsDir:   portableBackups(portable),
+		Restored:     &restored,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -143,4 +149,14 @@ func defaultDownloadsDir(goos, portable, dataDir, cacheDir, home, xdgDataHome st
 		base = filepath.Join(home, ".local", "share")
 	}
 	return filepath.Join(base, filepath.Base(dataDir), "downloads")
+}
+
+// portableBackups is the folder of the automatic backups of a portable
+// copy, which keeps everything in its own folder: "" for others, whose
+// backups go to the Documents folder.
+func portableBackups(portable string) string {
+	if portable == "" {
+		return ""
+	}
+	return filepath.Join(portable, "backups")
 }

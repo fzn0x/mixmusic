@@ -103,7 +103,8 @@ func TestSelectTracks(t *testing.T) {
 	if want := titlesOf(0, 3); !slices.Equal(queued, want) {
 		t.Errorf("the queue holds %q, want %q", queued, want)
 	}
-	if !tt.HasText("Added 2 tracks to the queue") {
+	// Nothing played: they play (#618).
+	if !tt.HasText("Playing 2 tracks") {
 		t.Errorf("the window shows %q", tt.Texts())
 	}
 	tt.Key(0, ui.KeyEscape)

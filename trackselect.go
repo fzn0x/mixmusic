@@ -324,8 +324,7 @@ func init() { addPickAction(10, (*shell).queuePicked) }
 // queuePicked is the bar's Add to queue.
 func (s *shell) queuePicked(c *ui.Context, tracks []media.Track) {
 	if s.button(c, "picks-queue", locales.TrackSelectAddQueue(), false).Label(locales.TrackSelectAddQueueLabel()).Clicked() {
-		s.p.Enqueue(tracks)
-		s.notes = append(s.notes, notice(locales.TrackSelectQueued(len(tracks))))
+		s.addToQueue(tracks, locales.TrackSelectQueued(len(tracks)), locales.QueueButtonPlayingTracks(len(tracks)))
 	}
 }
 

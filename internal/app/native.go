@@ -19,10 +19,14 @@ import (
 	"github.com/fzn0x/mixmusic/internal/audio/output"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/stream"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
-// errNoNative is returned where the system has no audio engine.
+// errNoNative is why MixMusic can't play where the system has no audio
+// engine: noNative returns it, in the windows' words.
 var errNoNative = errors.New("MixMusic's audio engine isn't available on this system")
+
+func noNative() error { return worded(errNoNative.Error(), locales.PlayerNoEngine(), errNoNative) }
 
 // engineEvents passes the engine's events to the player, once there is one.
 type engineEvents struct{ a *App }
@@ -167,9 +171,9 @@ func (a *App) startNative(channels int, render func([]float32, int), failed func
 	})
 	switch {
 	case errors.Is(err, output.ErrNoDevice):
-		return nil, errors.New("no audio output device")
+		return nil, audio.ErrNoOutput
 	case err != nil:
-		return nil, fmt.Errorf("the audio device couldn't start (%v)", err)
+		return nil, worded(fmt.Sprintf("the audio device couldn't start (%v)", err), locales.ErrorAudioCantStart(err.Error()), nil)
 	}
 	return s, nil
 }

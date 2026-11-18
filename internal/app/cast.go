@@ -248,7 +248,7 @@ func (p *Player) StopCasting() { p.a.stopCasting() }
 func (a *App) castTo(ctx context.Context, id string) error {
 	gp := a.goPlayer.Load()
 	if gp == nil {
-		return errNoNative
+		return noNative()
 	}
 	c := &a.cast
 	c.mu.Lock()

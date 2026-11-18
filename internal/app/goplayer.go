@@ -30,7 +30,7 @@ func (a *App) startGoPlayer() (*player.Player, error) {
 	}
 	e := a.nativeEngine()
 	if e == nil {
-		return nil, errNoNative
+		return nil, noNative()
 	}
 	queue, err := store.Open(filepath.Join(a.opts.DataDir, "queue.json"), player.Saved{})
 	if err != nil {

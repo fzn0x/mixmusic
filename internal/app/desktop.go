@@ -118,7 +118,7 @@ func (a *App) openMain(hidden bool) *mygo.Window {
 	if _, err := a.startGoPlayer(); err != nil {
 		log.Printf("mixmusic: can't play: %v", err)
 		_, _ = mygo.Dialog.Message(mygo.MessageOptions{Type: mygo.MessageError, Title: "MixMusic",
-			Message: locales.PlayerCantPlayHere(), Detail: err.Error()})
+			Message: locales.PlayerCantPlayHere(), Detail: ErrorWords(err)})
 		mygo.App.Quit()
 		return nil
 	}

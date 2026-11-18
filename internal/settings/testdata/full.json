@@ -217,7 +217,34 @@
         "crossfeed": 0,
         "width": 120
       }
-    ]
+    ],
+    "headphones": {
+      "id": "oratory1990/over-ear/1MORE SonoFlow",
+      "name": "1MORE SonoFlow",
+      "source": "oratory1990",
+      "rig": "",
+      "preamp": -5.9,
+      "filters": [
+        {
+          "type": "LSC",
+          "fc": 105,
+          "gain": 0.6,
+          "q": 0.7
+        },
+        {
+          "type": "PK",
+          "fc": 127,
+          "gain": -3.6,
+          "q": 0.21
+        },
+        {
+          "type": "HP",
+          "fc": 20,
+          "gain": 0,
+          "q": 0.7071
+        }
+      ]
+    }
   },
   "volumeCurve": "linear",
   "volume": 0.5,

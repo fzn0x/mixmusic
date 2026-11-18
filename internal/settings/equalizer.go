@@ -74,6 +74,9 @@ type Equalizer struct {
 	Width int `json:"width"`
 	// Presets are the user's own, as they saved them.
 	Presets []EqualizerPreset `json:"presets"`
+	// Headphones is the correction of the user's headphones, which plays
+	// after the bands, whether the equalizer is on or not (#616).
+	Headphones Headphones `json:"headphones"`
 }
 
 // EqualizerPreset is a preset of the user's: what Save as… keeps of the
@@ -118,6 +121,7 @@ func defaultEqualizer() Equalizer {
 	e.Effects = true
 	e.Width = 100
 	e.Presets = []EqualizerPreset{}
+	e.Headphones = noHeadphones()
 	return e
 }
 
@@ -155,6 +159,7 @@ func (e Equalizer) clean() Equalizer {
 		}
 	}
 	e.Presets = presets
+	e.Headphones = e.Headphones.clean()
 	return e
 }
 

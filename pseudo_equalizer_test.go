@@ -44,7 +44,7 @@ func TestPseudoLocaleEqualizer(t *testing.T) {
 		t.Errorf("no dialog: %q", tt.Texts())
 	}
 	checkPseudo(t, "The dialog of Save as…", tt.Texts(), "Desk")
-	clickButton(t, s, tt, xa.EqualizerSave())
+	eqButton(t, s, tt, xa.EqualizerSave())
 	if !tt.HasText(xa.EqualizerReplaceMessage()) {
 		t.Errorf("no question: %q", tt.Texts())
 	}
@@ -55,8 +55,8 @@ func TestPseudoLocaleEqualizer(t *testing.T) {
 
 	// A name too long says so.
 	click(t, s, tt, xa.EqualizerSaveAs())
-	typeName(s, tt, strings.Repeat("x", settings.MaxPresetName+1))
-	clickButton(t, s, tt, xa.EqualizerSave())
+	eqTypeName(s, tt, strings.Repeat("x", settings.MaxPresetName+1))
+	eqButton(t, s, tt, xa.EqualizerSave())
 	if !tt.HasText(xa.EqualizerNameTooLong(settings.MaxPresetName)) {
 		t.Errorf("no toast: %q", tt.Texts())
 	}

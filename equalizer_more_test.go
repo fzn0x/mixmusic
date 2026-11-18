@@ -22,9 +22,9 @@ import (
 // eqSaved is the equalizer settings.json keeps.
 func eqSaved(s *shell) settings.Equalizer { return s.svc.Preferences.Get().Equalizer }
 
-// clickButton clicks the button named name, which a link of the same name
+// eqButton clicks the button named name, which a link of the same name
 // may sit beside.
-func clickButton(t *testing.T, s *shell, tt *ui.Tester, name string) {
+func eqButton(t *testing.T, s *shell, tt *ui.Tester, name string) {
 	t.Helper()
 	a, ok := tt.AccessByRole(ui.RoleButton, name)
 	if !ok {
@@ -35,9 +35,9 @@ func clickButton(t *testing.T, s *shell, tt *ui.Tester, name string) {
 	tt.Frame()
 }
 
-// typeName empties the field of the dialog that asks for a name, and
+// eqTypeName empties the field of the dialog that asks for a name, and
 // types name there.
-func typeName(s *shell, tt *ui.Tester, name string) {
+func eqTypeName(s *shell, tt *ui.Tester, name string) {
 	for range len([]rune(s.naming.value)) {
 		tt.Key(0, ui.KeyBackspace)
 	}
@@ -62,8 +62,8 @@ func TestEqualizerPresetsOfYourOwn(t *testing.T) {
 	tt.Frame()
 
 	click(t, s, tt, "Save as…")
-	typeName(s, tt, "Desk")
-	clickButton(t, s, tt, "Save")
+	eqTypeName(s, tt, "Desk")
+	eqButton(t, s, tt, "Save")
 	until(t, s, tt, "the preset saved", func() bool { return eqSaved(s).Chosen() == 0 })
 	p := eqSaved(s).Presets[0]
 	if p.Name != "Desk" || p.Balance != -30 || !slices.Equal(p.Gains, []float64{4, 3, 2, 0, -1, 0, 2, 3, 4, 4}) {
@@ -96,12 +96,12 @@ func TestEqualizerPresetsOfYourOwn(t *testing.T) {
 	if s.naming == nil || s.naming.value != "Desk" {
 		t.Fatalf("the dialog doesn't start from the preset's name: %+v", s.naming)
 	}
-	typeName(s, tt, "DESK")
-	clickButton(t, s, tt, "Save")
+	eqTypeName(s, tt, "DESK")
+	eqButton(t, s, tt, "Save")
 	if !tt.HasText("Replace Desk?") {
 		t.Fatalf("no question: %q", tt.Texts())
 	}
-	clickButton(t, s, tt, "Replace")
+	eqButton(t, s, tt, "Replace")
 	until(t, s, tt, "the preset replaced", func() bool {
 		q := eqSaved(s)
 		return len(q.Presets) == 1 && q.Presets[0].Name == "DESK" && q.Presets[0].Gains[0] == 6
@@ -113,8 +113,8 @@ func TestEqualizerPresetsOfYourOwn(t *testing.T) {
 		{"bass BOOST", "A built-in preset is called Bass boost. Choose another name."},
 	} {
 		click(t, s, tt, "Save as…")
-		typeName(s, tt, c.name)
-		clickButton(t, s, tt, "Save")
+		eqTypeName(s, tt, c.name)
+		eqButton(t, s, tt, "Save")
 		if !tt.HasText(c.why) || s.naming == nil || s.naming.value != c.name {
 			t.Errorf("%q: the window shows %q", c.name, tt.Texts())
 		}
@@ -127,15 +127,15 @@ func TestEqualizerPresetsOfYourOwn(t *testing.T) {
 	}
 
 	click(t, s, tt, "Rename…")
-	typeName(s, tt, "Night")
-	clickButton(t, s, tt, "Rename")
+	eqTypeName(s, tt, "Night")
+	eqButton(t, s, tt, "Rename")
 	until(t, s, tt, "the preset renamed", func() bool { q := eqSaved(s); return q.Presets[0].Name == "Night" && q.Chosen() == 0 })
 
 	click(t, s, tt, "Delete")
 	if !tt.HasText("Delete Night?") {
 		t.Fatalf("no question: %q", tt.Texts())
 	}
-	clickButton(t, s, tt, "Delete")
+	eqButton(t, s, tt, "Delete")
 	until(t, s, tt, "the preset deleted", func() bool { q := eqSaved(s); return len(q.Presets) == 0 && q.Preset == "custom" })
 	if q := eqSaved(s); q.Gains[0] != 6 || q.Balance != -30 {
 		t.Errorf("deleting the preset changed the sound: %+v", q)
@@ -179,7 +179,7 @@ func TestEqualizerExportImport(t *testing.T) {
 	openFileDialog = func(mygo.OpenDialogOptions) ([]string, error) { return []string{path + ".json"}, nil }
 	click(t, s, tt, "Import…")
 	until(t, s, tt, "the question", func() bool { return tt.HasText("Replace 1 preset?") })
-	clickButton(t, s, tt, "Replace")
+	eqButton(t, s, tt, "Replace")
 	until(t, s, tt, "the presets imported", func() bool { return len(eqSaved(s).Presets) == 2 && tt.HasText("Imported 2 presets") })
 
 	bad := filepath.Join(dir, "settings.json")

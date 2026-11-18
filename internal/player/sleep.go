@@ -21,6 +21,7 @@ package player
 // one inside that window.
 
 import (
+	"fmt"
 	"math"
 	"time"
 
@@ -43,6 +44,13 @@ const (
 
 // MaxSleepTracks is the most tracks a timer of SleepTracks waits for.
 const MaxSleepTracks = 20
+
+// The minutes the sleep timer's menus offer: the lengths it starts at,
+// and the minutes it adds to one that runs.
+var (
+	SleepLengths = []int{5, 10, 15, 30, 45, 60, 90}
+	SleepAdds    = []int{5, 15}
+)
 
 // SleepTimer is a sleep timer to start.
 type SleepTimer struct {
@@ -130,7 +138,7 @@ type sleepState struct {
 
 // StartSleep starts the sleep timer t, in place of the one that runs, if
 // any: a fade under way comes back, and the music plays on. A timer of
-// minutes keeps its length as the one chosen last.
+// minutes the user started keeps its length as the one chosen last.
 func (p *Player) StartSleep(t SleepTimer) { p.do(func() { p.startSleep(t, false) }) }
 
 // AddSleep has the sleep timer that runs stop the music minutes later: a
@@ -197,7 +205,7 @@ func (p *Player) startSleep(t SleepTimer, bedtime bool) {
 		n := min(max(t.N, 1), settings.MaxSleepMinutes)
 		sl.Ends = time.Now().Add(time.Duration(n) * 60 * sleepSecond)
 		what = locales.SleepInMinutes(n)
-		if k, ok := p.svc.(sleepKeeper); ok && !bedtime {
+		if k, ok := p.svc.(sleepKeeper); ok && !bedtime && !t.Assistant {
 			go k.KeepSleepMinutes(n)
 		}
 	case SleepTracks:
@@ -563,6 +571,36 @@ func (p *Player) fader() (Fader, bool) {
 	}
 	f, ok := s.(Fader)
 	return f, ok
+}
+
+// SleepLine says what the sleep timer that runs does, as the first line
+// of its menus: how long a timer of minutes has left from now, or at the
+// end of what it stops the music. It is "" while none runs.
+func (s State) SleepLine(now time.Time) string {
+	sl := s.Sleep
+	switch {
+	case sl == nil:
+		return ""
+	case !sl.Ending():
+		left, _ := s.SleepLeft(now)
+		return locales.SleepStopsIn(SleepClock(left))
+	case sl.Finishing || sl.Mode == SleepTracks && sl.Tracks <= 1:
+		return locales.SleepStopsAtTrack()
+	case sl.Mode == SleepTracks:
+		return locales.SleepStopsAfterTracks(sl.Tracks)
+	}
+	return locales.SleepStopsAtQueue()
+}
+
+// SleepClock writes how long the sleep timer has left, to the second,
+// rounded up: as 0:59, 12:34 or 1:02:03.
+func SleepClock(d time.Duration) string {
+	total := int(max((d+time.Second-1)/time.Second, 0))
+	h, m, sec := total/3600, total/60%60, total%60
+	if h > 0 {
+		return fmt.Sprintf("%d:%02d:%02d", h, m, sec)
+	}
+	return fmt.Sprintf("%d:%02d", m, sec)
 }
 
 // SleepLeft is how long the sleep timer runs on from now, as heard: until

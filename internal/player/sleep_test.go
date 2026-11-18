@@ -103,6 +103,15 @@ func TestSleepMinutes(t *testing.T) {
 		defer mu.Unlock()
 		return slices.Equal(kept, []int{1})
 	})
+	// One an AI assistant set changes no setting.
+	h.p.StartSleep(SleepTimer{Mode: SleepMinutes, N: 7, Assistant: true})
+	h.wait("the timer on", func(p *Player) bool { return p.s.Sleep != nil })
+	time.Sleep(10 * time.Millisecond)
+	mu.Lock()
+	if !slices.Equal(kept, []int{1}) {
+		t.Errorf("kept %v", kept)
+	}
+	mu.Unlock()
 }
 
 // keeper is the fake services, which keep the length of the timer.
@@ -522,5 +531,37 @@ func TestSleepLeft(t *testing.T) {
 	st.Index, st.Sleep, st.Repeat, st.Speed = 4, &Sleep{Mode: SleepQueue}, RepeatOff, 1
 	if got, _ := st.SleepLeft(now); got != 150*time.Second {
 		t.Errorf("in the radio, %v left", got)
+	}
+}
+
+// TestSleepLine says what the timer does, and how long it has left to the
+// second, rounded up.
+func TestSleepLine(t *testing.T) {
+	now := time.Now()
+	st := State{Queue: []Item{{UID: "a", Track: track("a")}}, Duration: 200 * time.Second, Speed: 1}
+	if st.SleepLine(now) != "" {
+		t.Error("a line with no timer")
+	}
+	for _, c := range []struct {
+		sleep Sleep
+		want  string
+	}{
+		{Sleep{Mode: SleepMinutes, Ends: now.Add(12*time.Minute + 33500*time.Millisecond)}, "Stops in 12:34"},
+		{Sleep{Mode: SleepMinutes, Ends: now.Add(62*time.Minute + 3*time.Second)}, "Stops in 1:02:03"},
+		{Sleep{Mode: SleepMinutes, Finishing: true}, "Stops at the end of this track"},
+		{Sleep{Mode: SleepTracks, Tracks: 1}, "Stops at the end of this track"},
+		{Sleep{Mode: SleepTracks, Tracks: 4}, "Stops after 4 tracks"},
+		{Sleep{Mode: SleepQueue}, "Stops at the end of the queue"},
+	} {
+		st.Sleep = &c.sleep
+		if got := st.SleepLine(now); got != c.want {
+			t.Errorf("%+v says %q, want %q", c.sleep, got, c.want)
+		}
+	}
+	for d, want := range map[time.Duration]string{0: "0:00", -time.Second: "0:00", time.Millisecond: "0:01", 59 * time.Second: "0:59",
+		time.Hour: "1:00:00"} {
+		if got := SleepClock(d); got != want {
+			t.Errorf("%v writes as %q, want %q", d, got, want)
+		}
 	}
 }

@@ -32,7 +32,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/banner.webp" alt="MixMusic 0.5.9 a yanayinsa na asali, tsarin Blend tare da jigon Mix, a tsaye a kan wani fage mai duhu yana fuskantarka: a tsakiya ana kunna アイドル na YOASOBI, an zagaye shi da hoda, tare da romaji a ƙasan kowane layi na kalmomin waƙar da ƙaramin mai kunnawa a gabansa; a hagu akwai bincike, a dama kuma mix ɗin da ke cikin ɗakin waƙoƙi" />
+  <img src="docs/banner.webp" alt="MixMusic a yanayinsa na asali, tsarin Blend tare da jigon Mix, a tsaye a kan wani fage mai duhu yana fuskantarka: a tsakiya ana kunna アイドル na YOASOBI, an zagaye shi da hoda, tare da romaji a ƙasan kowane layi na kalmomin waƙar da ƙaramin mai kunnawa a gabansa; a hagu akwai bincike, a dama kuma mix ɗin da ke cikin ɗakin waƙoƙi" />
 </p>
 
 ## Dalilin MixMusic

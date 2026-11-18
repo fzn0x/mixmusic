@@ -32,7 +32,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/banner.webp" alt="MixMusic 0.5.9 com a aparência padrão, o layout Blend com o tema Mix, de pé sobre um palco escuro e de frente para você: no meio, tocando agora アイドル, do YOASOBI, contornado em rosa, com romaji embaixo de cada linha da letra e o mini player na frente; uma busca à esquerda e os mixes da biblioteca à direita" />
+  <img src="docs/banner.webp" alt="MixMusic com a aparência padrão, o layout Blend com o tema Mix, de pé sobre um palco escuro e de frente para você: no meio, tocando agora アイドル, do YOASOBI, contornado em rosa, com romaji embaixo de cada linha da letra e o mini player na frente; uma busca à esquerda e os mixes da biblioteca à direita" />
 </p>
 
 ## Por que o MixMusic

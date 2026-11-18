@@ -30,7 +30,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/banner.webp" alt="MixMusic 0.5.9 in its default look, the Blend layout with the Mix theme, standing upright on a dark stage and facing you: now playing アイドル by YOASOBI in the middle, outlined in pink, with romaji under each line of its lyrics and the mini player in front of it; a search on the left and the library's mixes on the right" />
+  <img src="docs/banner.webp" alt="MixMusic in its default look, the Blend layout with the Mix theme, standing upright on a dark stage and facing you: now playing アイドル by YOASOBI in the middle, outlined in pink, with romaji under each line of its lyrics and the mini player in front of it; a search on the left and the library's mixes on the right" />
 </p>
 
 ## Why MixMusic

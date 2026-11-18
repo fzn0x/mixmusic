@@ -400,8 +400,10 @@ func (s *shell) videoSleeve(c *ui.Context, t, rec media.Track, size float32) {
 			}
 			return
 		}
-		shown := v.status.Src == src.Src && v.status.Shown
-		web := ui.WebView(c.Key("video "+src.Src), v.view).Absolute().Left(0).Top(0).Size(w, h).Label(locales.VideoMusicVideo(t.Title))
+		// A stream of the same video at another size, as on a display of
+		// another scale, takes over from the one that showed with no fade.
+		shown := videoOf(v.status.Src) == videoOf(src.Src) && v.status.Shown
+		web := ui.WebView(c.Key("video "+videoOf(src.Src)), v.view).Absolute().Left(0).Top(0).Size(w, h).Label(locales.VideoMusicVideo(t.Title))
 		target := float32(0)
 		if shown {
 			target = 1
@@ -430,6 +432,12 @@ func (s *shell) videoSource(rec media.Track) *loaded[app.VideoSource] {
 	}
 	w, h := videoShape(videoAspect(rec.Artwork, nil), videoFrame)
 	pw, ph := s.artPixels(w), s.artPixels(h)
+	// A stream of the size wanted, or larger, goes on, as on a display of
+	// fewer pixels than the one it was asked for: another would stop the
+	// picture while it loads.
+	if l := v.lastSrc; l != nil && v.lastTrack == rec.ID && !l.Loop && l.Width >= pw && l.Height >= ph {
+		return &loaded[app.VideoSource]{done: true, value: *l}
+	}
 	families := v.families
 	key := "video:" + rec.ID + ":" + strconv.Itoa(pw) + "x" + strconv.Itoa(ph)
 	l := fetch(s, key, func(ctx context.Context) (app.VideoSource, error) {
@@ -445,6 +453,13 @@ func (s *shell) videoSource(rec media.Track) *loaded[app.VideoSource] {
 		return &loaded[app.VideoSource]{done: true, value: *v.lastSrc}
 	}
 	return l
+}
+
+// videoOf is the video the stream at src is of, whatever its size:
+// VideoPath tells the size in its query alone.
+func videoOf(src string) string {
+	video, _, _ := strings.Cut(src, "?")
+	return video
 }
 
 // videoCover is the thumbnail of a music video, filling a frame of w × h.

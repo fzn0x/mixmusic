@@ -14,6 +14,11 @@ import (
 	"github.com/fzn0x/mixmusic/locales"
 )
 
+// sleepTester is a window wide enough for the moon beside every button
+// of the player bar, Spotify Connect's devices among them, as a Linux
+// install has: in a narrower one, it gives way while no timer runs.
+func sleepTester(t *testing.T, s *shell) *ui.Tester { return testerOf(t, s, 1440, 820) }
+
 // sleepMinutesLeft is how long the timer of minutes that runs has left,
 // or -1.
 func sleepMinutesLeft(st player.State) time.Duration {
@@ -54,7 +59,7 @@ func openSleepMenu(t *testing.T, s *shell, tt *ui.Tester) {
 // timer does, more minutes and Cancel.
 func TestSleepMenu(t *testing.T) {
 	s := playing(t)
-	tt := tester(t, s)
+	tt := sleepTester(t, s)
 	if got := sleepLabel(tt); got != "Sleep timer" {
 		t.Fatalf("the moon button is %q: %q", got, tt.Texts())
 	}
@@ -111,7 +116,7 @@ func TestSleepMenu(t *testing.T) {
 // few tracks, which the menu checks, and remembers Let the track finish.
 func TestSleepMenuEnds(t *testing.T) {
 	s := playing(t)
-	tt := tester(t, s)
+	tt := sleepTester(t, s)
 	openSleepMenu(t, s, tt)
 	click(t, s, tt, "End of this track")
 	s.settle(t, func(st player.State) bool {
@@ -152,7 +157,7 @@ func TestSleepMenuEnds(t *testing.T) {
 // down what isn't a length it takes.
 func TestSleepMenuMinutes(t *testing.T) {
 	s := playing(t)
-	tt := tester(t, s)
+	tt := sleepTester(t, s)
 	openSleepMenu(t, s, tt)
 	invalid := locales.SleepMinutesInvalid(9999)
 	field := "Length of the sleep timer, in minutes"
@@ -193,7 +198,7 @@ func TestSleepMenuLive(t *testing.T) {
 	s := newTestShell(t)
 	s.p.PlayTracks([]media.Track{liveRadio}, 0)
 	s.settle(t, func(st player.State) bool { return st.Live && st.Playing })
-	tt := tester(t, s)
+	tt := sleepTester(t, s)
 	openSleepMenu(t, s, tt)
 	for _, item := range []string{"End of this track", "End of the queue", "Let the track finish"} {
 		if showsExactly(tt, item) {
@@ -287,7 +292,13 @@ func TestSleepSettings(t *testing.T) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 1600)
 	show(s, tt, "/settings/playback")
-	for _, txt := range []string{"Sleep timer", "Fade out", "30 s", "120 s", "Let the track finish", "Start the sleep timer by itself"} {
+	// The group's heading, as the layout writes headings: not the moon's
+	// label, which gives way to the device button where Spotify Connect is
+	// the default, as on Linux.
+	if !showsExactly(tt, s.lk.words(locales.SleepTimerTitle())) {
+		t.Errorf("Settings › Playback has no group %q: %q", s.lk.words(locales.SleepTimerTitle()), tt.Texts())
+	}
+	for _, txt := range []string{"Fade out", "30 s", "120 s", "Let the track finish", "Start the sleep timer by itself"} {
 		if !showsExactly(tt, txt) {
 			t.Errorf("Settings › Playback doesn't show %q", txt)
 		}
@@ -299,6 +310,8 @@ func TestSleepSettings(t *testing.T) {
 		t.Errorf("Fade out offers no Off: %q", tt.Texts())
 	}
 	click(t, s, tt, "60 s")
+	// Below the rows of Spotify Connect, on Linux, it is out of view.
+	reveal(tt, "Start the sleep timer by itself")
 	clickSwitch(t, s, tt, "Start the sleep timer by itself")
 	got := s.svc.Preferences.Get().SleepTimer
 	if got.Fade != 60 || !got.Bedtime {

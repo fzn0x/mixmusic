@@ -5633,7 +5633,7 @@ func (msgs Messages) DesktopSettingsAutostartReason() string {
 // DesktopSettingsAutostartRefused says "the desktop didn't let MixMusic start at login: allow it to run in the background in your system's settings for apps,…"
 // in the language the app shows.
 //
-// Why Open at login didn't turn on, as a toast.
+// Why Start at login (desktopSettingsLogin) didn't turn on, as a toast.
 func DesktopSettingsAutostartRefused() string {
 	return In(i18n.Locale()).DesktopSettingsAutostartRefused()
 }
@@ -5641,7 +5641,7 @@ func DesktopSettingsAutostartRefused() string {
 // DesktopSettingsAutostartRefused says "the desktop didn't let MixMusic start at login: allow it to run in the background in your system's settings for apps,…"
 // in the language of msgs.
 //
-// Why Open at login didn't turn on, as a toast.
+// Why Start at login (desktopSettingsLogin) didn't turn on, as a toast.
 func (msgs Messages) DesktopSettingsAutostartRefused() string {
 	return Catalog.Format(msgs.locale, "desktopSettingsAutostartRefused", nil)
 }
@@ -5649,13 +5649,13 @@ func (msgs Messages) DesktopSettingsAutostartRefused() string {
 // DesktopSettingsAutostartStays says "the desktop still starts MixMusic at login"
 // in the language the app shows.
 //
-// Why Open at login didn't turn off, as a toast.
+// Why Start at login (desktopSettingsLogin) didn't turn off, as a toast.
 func DesktopSettingsAutostartStays() string { return In(i18n.Locale()).DesktopSettingsAutostartStays() }
 
 // DesktopSettingsAutostartStays says "the desktop still starts MixMusic at login"
 // in the language of msgs.
 //
-// Why Open at login didn't turn off, as a toast.
+// Why Start at login (desktopSettingsLogin) didn't turn off, as a toast.
 func (msgs Messages) DesktopSettingsAutostartStays() string {
 	return Catalog.Format(msgs.locale, "desktopSettingsAutostartStays", nil)
 }
@@ -5788,20 +5788,22 @@ func (msgs Messages) DesktopSettingsMediaKeysTitle() string {
 	return Catalog.Format(msgs.locale, "desktopSettingsMediaKeysTitle", nil)
 }
 
-// DesktopSettingsNoBackgroundPortal says "this desktop has no Background portal, which starts MixMusic at login from its Flatpak: add MixMusic to the apps your…"
+// DesktopSettingsNoBackgroundPortal says "this desktop has no Background portal, which a Flatpak app needs to start at login: add MixMusic to the apps your des…"
 // in the language the app shows.
 //
-// Why Open at login didn't turn on, as a toast. The Background portal is a
-// part of Linux desktops.
+// Why Start at login (desktopSettingsLogin) didn't turn on, as a toast, for
+// MixMusic installed from Flathub. The Background portal is a part of Linux
+// desktops.
 func DesktopSettingsNoBackgroundPortal() string {
 	return In(i18n.Locale()).DesktopSettingsNoBackgroundPortal()
 }
 
-// DesktopSettingsNoBackgroundPortal says "this desktop has no Background portal, which starts MixMusic at login from its Flatpak: add MixMusic to the apps your…"
+// DesktopSettingsNoBackgroundPortal says "this desktop has no Background portal, which a Flatpak app needs to start at login: add MixMusic to the apps your des…"
 // in the language of msgs.
 //
-// Why Open at login didn't turn on, as a toast. The Background portal is a
-// part of Linux desktops.
+// Why Start at login (desktopSettingsLogin) didn't turn on, as a toast, for
+// MixMusic installed from Flathub. The Background portal is a part of Linux
+// desktops.
 func (msgs Messages) DesktopSettingsNoBackgroundPortal() string {
 	return Catalog.Format(msgs.locale, "desktopSettingsNoBackgroundPortal", nil)
 }
@@ -6956,18 +6958,20 @@ func (msgs Messages) DownloadsHoldFailing(reason string) string {
 	return Catalog.Format(msgs.locale, "downloadsHoldFailing", map[string]any{"reason": reason})
 }
 
-// DownloadsHoldMetered says "Waiting for a connection that isn't metered, as Settings › Playback asks"
+// DownloadsHoldMetered says "Waiting for a connection that isn't metered, as set in Settings › Playback"
 // in the language the app shows.
 //
 // Why the downloads wait, on the downloads page: the connection is metered,
-// as a phone's hotspot.
+// as a phone's hotspot, and downloadSettingsMetered, in Settings ›
+// Playback, is off.
 func DownloadsHoldMetered() string { return In(i18n.Locale()).DownloadsHoldMetered() }
 
-// DownloadsHoldMetered says "Waiting for a connection that isn't metered, as Settings › Playback asks"
+// DownloadsHoldMetered says "Waiting for a connection that isn't metered, as set in Settings › Playback"
 // in the language of msgs.
 //
 // Why the downloads wait, on the downloads page: the connection is metered,
-// as a phone's hotspot.
+// as a phone's hotspot, and downloadSettingsMetered, in Settings ›
+// Playback, is off.
 func (msgs Messages) DownloadsHoldMetered() string {
 	return Catalog.Format(msgs.locale, "downloadsHoldMetered", nil)
 }
@@ -7636,18 +7640,22 @@ func (msgs Messages) DownloadsReasonNoMatch() string {
 	return Catalog.Format(msgs.locale, "downloadsReasonNoMatch", nil)
 }
 
-// DownloadsReasonNoMatcher says "nothing here finds the recordings of Spotify tracks"
+// DownloadsReasonNoMatcher says "MixMusic can't look for Spotify tracks on YouTube Music here"
 // in the language the app shows.
 //
-// Why a Spotify track couldn't download: it goes in the {reason} of
-// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+// Why a Spotify track couldn't download: MixMusic downloads a Spotify
+// track's recording on YouTube Music, and nothing here can look for it. It
+// goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and
+// downloadsHoldFailing.
 func DownloadsReasonNoMatcher() string { return In(i18n.Locale()).DownloadsReasonNoMatcher() }
 
-// DownloadsReasonNoMatcher says "nothing here finds the recordings of Spotify tracks"
+// DownloadsReasonNoMatcher says "MixMusic can't look for Spotify tracks on YouTube Music here"
 // in the language of msgs.
 //
-// Why a Spotify track couldn't download: it goes in the {reason} of
-// downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing.
+// Why a Spotify track couldn't download: MixMusic downloads a Spotify
+// track's recording on YouTube Music, and nothing here can look for it. It
+// goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and
+// downloadsHoldFailing.
 func (msgs Messages) DownloadsReasonNoMatcher() string {
 	return Catalog.Format(msgs.locale, "downloadsReasonNoMatcher", nil)
 }
@@ -8868,14 +8876,14 @@ func (msgs Messages) ErrorStreamNoAudio() string {
 	return Catalog.Format(msgs.locale, "errorStreamNoAudio", nil)
 }
 
-// ErrorStreamNoCaptions says "YouTube tells of no captions of this video"
+// ErrorStreamNoCaptions says "YouTube has no captions for this video"
 // in the language the app shows.
 //
 // Why a video has no lyrics from its captions, as a toast or inside a
 // message that leads it.
 func ErrorStreamNoCaptions() string { return In(i18n.Locale()).ErrorStreamNoCaptions() }
 
-// ErrorStreamNoCaptions says "YouTube tells of no captions of this video"
+// ErrorStreamNoCaptions says "YouTube has no captions for this video"
 // in the language of msgs.
 //
 // Why a video has no lyrics from its captions, as a toast or inside a
@@ -9024,14 +9032,14 @@ func (msgs Messages) ErrorTagsCover() string {
 	return Catalog.Format(msgs.locale, "errorTagsCover", nil)
 }
 
-// ErrorTagsFolderReadOnly says "MixMusic can't write in its folder"
+// ErrorTagsFolderReadOnly says "MixMusic can't write in the file's folder"
 // in the language the app shows.
 //
 // Why a file's tags didn't change, as a toast or inside a message that
 // leads it.
 func ErrorTagsFolderReadOnly() string { return In(i18n.Locale()).ErrorTagsFolderReadOnly() }
 
-// ErrorTagsFolderReadOnly says "MixMusic can't write in its folder"
+// ErrorTagsFolderReadOnly says "MixMusic can't write in the file's folder"
 // in the language of msgs.
 //
 // Why a file's tags didn't change, as a toast or inside a message that
@@ -9168,16 +9176,18 @@ func (msgs Messages) ErrorToolsNoYTDLP() string {
 	return Catalog.Format(msgs.locale, "errorToolsNoYTDLP", nil)
 }
 
-// ErrorYouTubeAlreadyInPlaylist says "YouTube Music did not add it: it's in that playlist already"
+// ErrorYouTubeAlreadyInPlaylist says "YouTube Music didn't add the track: that playlist has it already"
 // in the language the app shows.
 //
-// An error of YouTube Music, as a toast or inside a message that leads it.
+// An error of YouTube Music, as a toast or inside a message that leads it:
+// the track added to a playlist is in it already.
 func ErrorYouTubeAlreadyInPlaylist() string { return In(i18n.Locale()).ErrorYouTubeAlreadyInPlaylist() }
 
-// ErrorYouTubeAlreadyInPlaylist says "YouTube Music did not add it: it's in that playlist already"
+// ErrorYouTubeAlreadyInPlaylist says "YouTube Music didn't add the track: that playlist has it already"
 // in the language of msgs.
 //
-// An error of YouTube Music, as a toast or inside a message that leads it.
+// An error of YouTube Music, as a toast or inside a message that leads it:
+// the track added to a playlist is in it already.
 func (msgs Messages) ErrorYouTubeAlreadyInPlaylist() string {
 	return Catalog.Format(msgs.locale, "errorYouTubeAlreadyInPlaylist", nil)
 }
@@ -9196,18 +9206,18 @@ func (msgs Messages) ErrorYouTubeNoSongList() string {
 	return Catalog.Format(msgs.locale, "errorYouTubeNoSongList", nil)
 }
 
-// ErrorYouTubeNotFound says "YouTube Music didn't find it"
+// ErrorYouTubeNotFound says "YouTube Music didn't find what MixMusic asked for"
 // in the language the app shows.
 //
 // An error of YouTube Music, as a toast or inside a message that leads it:
-// what was asked for isn't there.
+// what MixMusic asked for, as a song, an album or a playlist, isn't there.
 func ErrorYouTubeNotFound() string { return In(i18n.Locale()).ErrorYouTubeNotFound() }
 
-// ErrorYouTubeNotFound says "YouTube Music didn't find it"
+// ErrorYouTubeNotFound says "YouTube Music didn't find what MixMusic asked for"
 // in the language of msgs.
 //
 // An error of YouTube Music, as a toast or inside a message that leads it:
-// what was asked for isn't there.
+// what MixMusic asked for, as a song, an album or a playlist, isn't there.
 func (msgs Messages) ErrorYouTubeNotFound() string {
 	return Catalog.Format(msgs.locale, "errorYouTubeNotFound", nil)
 }
@@ -9244,14 +9254,14 @@ func (msgs Messages) ErrorYouTubeSignedOut() string {
 // in the language the app shows.
 //
 // The badge of an explicit track: a letter in a small box beside its title,
-// as E in English. Keep it one or two characters.
+// as “e” in English. Keep it one or two characters.
 func ExplicitBadge() string { return In(i18n.Locale()).ExplicitBadge() }
 
 // ExplicitBadge says "e"
 // in the language of msgs.
 //
 // The badge of an explicit track: a letter in a small box beside its title,
-// as E in English. Keep it one or two characters.
+// as “e” in English. Keep it one or two characters.
 func (msgs Messages) ExplicitBadge() string {
 	return Catalog.Format(msgs.locale, "explicitBadge", nil)
 }
@@ -9982,16 +9992,18 @@ func (msgs Messages) FailureWayPlayerAPI() string {
 // in the language the app shows.
 //
 // A way MixMusic tried to play a track that couldn't play, in the failure
-// details: Spotify's own player inside MixMusic, as Settings › Playback
-// calls it. It starts a line of what was tried.
+// details: Spotify's own player inside MixMusic, which Settings ›
+// Playback calls “In MixMusic, from Spotify” (playbackFromSpotify). It
+// starts a line of what was tried.
 func FailureWaySpotifyHere() string { return In(i18n.Locale()).FailureWaySpotifyHere() }
 
 // FailureWaySpotifyHere says "Spotify in MixMusic"
 // in the language of msgs.
 //
 // A way MixMusic tried to play a track that couldn't play, in the failure
-// details: Spotify's own player inside MixMusic, as Settings › Playback
-// calls it. It starts a line of what was tried.
+// details: Spotify's own player inside MixMusic, which Settings ›
+// Playback calls “In MixMusic, from Spotify” (playbackFromSpotify). It
+// starts a line of what was tried.
 func (msgs Messages) FailureWaySpotifyHere() string {
 	return Catalog.Format(msgs.locale, "failureWaySpotifyHere", nil)
 }
@@ -19632,13 +19644,13 @@ func (msgs Messages) RemoteNoteStopped(name string) string {
 	return Catalog.Format(msgs.locale, "remoteNoteStopped", map[string]any{"name": name})
 }
 
-// RemoteNoteUnfinished says "Didn't pair with {name}: the pairing didn't finish, as it stopped answering"
+// RemoteNoteUnfinished says "Didn't pair with {name}: it stopped answering before the pairing finished"
 // in the language the app shows.
 //
 // Toast when the pairing with the computer named {name} didn't finish.
 func RemoteNoteUnfinished(name string) string { return In(i18n.Locale()).RemoteNoteUnfinished(name) }
 
-// RemoteNoteUnfinished says "Didn't pair with {name}: the pairing didn't finish, as it stopped answering"
+// RemoteNoteUnfinished says "Didn't pair with {name}: it stopped answering before the pairing finished"
 // in the language of msgs.
 //
 // Toast when the pairing with the computer named {name} didn't finish.
@@ -19646,7 +19658,7 @@ func (msgs Messages) RemoteNoteUnfinished(name string) string {
 	return Catalog.Format(msgs.locale, "remoteNoteUnfinished", map[string]any{"name": name})
 }
 
-// RemoteNoteUnfinishedSlow says "Didn't pair with {name}: the pairing didn't finish, as keeping it took longer than {name} waits"
+// RemoteNoteUnfinishedSlow says "Didn't pair with {name}, which stopped waiting: this computer took too long to keep the pairing"
 // in the language the app shows.
 //
 // Toast when the pairing with the computer named {name} didn't finish, as
@@ -19655,7 +19667,7 @@ func RemoteNoteUnfinishedSlow(name string) string {
 	return In(i18n.Locale()).RemoteNoteUnfinishedSlow(name)
 }
 
-// RemoteNoteUnfinishedSlow says "Didn't pair with {name}: the pairing didn't finish, as keeping it took longer than {name} waits"
+// RemoteNoteUnfinishedSlow says "Didn't pair with {name}, which stopped waiting: this computer took too long to keep the pairing"
 // in the language of msgs.
 //
 // Toast when the pairing with the computer named {name} didn't finish, as
@@ -19906,13 +19918,13 @@ func (msgs Messages) RemoteProblemOlder(name string) string {
 	return Catalog.Format(msgs.locale, "remoteProblemOlder", map[string]any{"name": name})
 }
 
-// RemoteProblemTooLong says "The pairing took too long. Pair again for a new code."
+// RemoteProblemTooLong says "The pairing took too long. Pair again to get a new code."
 // in the language the app shows.
 //
 // Why the pairing for remote control failed.
 func RemoteProblemTooLong() string { return In(i18n.Locale()).RemoteProblemTooLong() }
 
-// RemoteProblemTooLong says "The pairing took too long. Pair again for a new code."
+// RemoteProblemTooLong says "The pairing took too long. Pair again to get a new code."
 // in the language of msgs.
 //
 // Why the pairing for remote control failed.
@@ -21526,16 +21538,20 @@ func (msgs Messages) RoomReachNoAnswer(port string) string {
 	return Catalog.Format(msgs.locale, "roomReachNoAnswer", map[string]any{"port": port})
 }
 
-// RoomReachNoRouter says "MixMusic asks no router here."
+// RoomReachNoRouter says "MixMusic doesn't ask a router to open a port for the room here."
 // in the language the app shows.
 //
-// Why friends outside the network can't reach the room, on its page.
+// Why friends outside the network may not reach the room, on its page:
+// MixMusic didn't ask the router to forward the room's port to this
+// computer.
 func RoomReachNoRouter() string { return In(i18n.Locale()).RoomReachNoRouter() }
 
-// RoomReachNoRouter says "MixMusic asks no router here."
+// RoomReachNoRouter says "MixMusic doesn't ask a router to open a port for the room here."
 // in the language of msgs.
 //
-// Why friends outside the network can't reach the room, on its page.
+// Why friends outside the network may not reach the room, on its page:
+// MixMusic didn't ask the router to forward the room's port to this
+// computer.
 func (msgs Messages) RoomReachNoRouter() string {
 	return Catalog.Format(msgs.locale, "roomReachNoRouter", nil)
 }
@@ -22406,16 +22422,18 @@ func (msgs Messages) RoomSongsOff(host string) string {
 	return Catalog.Format(msgs.locale, "roomSongsOff", map[string]any{"host": host})
 }
 
-// RoomSongsTooMany says "You added many songs: wait a moment, or for {host} to answer those waiting"
+// RoomSongsTooMany says "You added many songs at once: wait a moment, or until {host} answers the ones already waiting"
 // in the language the app shows.
 //
-// Toast for a guest who gave too many songs at once.
+// Toast for a guest who gave too many songs at once. The songs a guest adds
+// wait for the host, {host}, to take or turn them down.
 func RoomSongsTooMany(host string) string { return In(i18n.Locale()).RoomSongsTooMany(host) }
 
-// RoomSongsTooMany says "You added many songs: wait a moment, or for {host} to answer those waiting"
+// RoomSongsTooMany says "You added many songs at once: wait a moment, or until {host} answers the ones already waiting"
 // in the language of msgs.
 //
-// Toast for a guest who gave too many songs at once.
+// Toast for a guest who gave too many songs at once. The songs a guest adds
+// wait for the host, {host}, to take or turn them down.
 func (msgs Messages) RoomSongsTooMany(host string) string {
 	return Catalog.Format(msgs.locale, "roomSongsTooMany", map[string]any{"host": host})
 }

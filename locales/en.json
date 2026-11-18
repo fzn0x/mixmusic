@@ -1677,11 +1677,11 @@
   },
   "desktopSettingsAutostartRefused": "the desktop didn't let MixMusic start at login: allow it to run in the background in your system's settings for apps, then turn this on again",
   "@desktopSettingsAutostartRefused": {
-    "description": "Why Open at login didn't turn on, as a toast."
+    "description": "Why Start at login (desktopSettingsLogin) didn't turn on, as a toast."
   },
   "desktopSettingsAutostartStays": "the desktop still starts MixMusic at login",
   "@desktopSettingsAutostartStays": {
-    "description": "Why Open at login didn't turn off, as a toast."
+    "description": "Why Start at login (desktopSettingsLogin) didn't turn off, as a toast."
   },
   "desktopSettingsBackgroundReason": "MixMusic plays on in the tray when you close its window",
   "@desktopSettingsBackgroundReason": {
@@ -1706,9 +1706,9 @@
   "desktopSettingsLogin": "Start at login",
   "desktopSettingsMediaKeysAbout": "The keyboard's play, next and previous keys control MixMusic. Keys of your own that work everywhere are in Settings › Shortcuts.",
   "desktopSettingsMediaKeysTitle": "Media keys",
-  "desktopSettingsNoBackgroundPortal": "this desktop has no Background portal, which starts MixMusic at login from its Flatpak: add MixMusic to the apps your desktop starts at login instead",
+  "desktopSettingsNoBackgroundPortal": "this desktop has no Background portal, which a Flatpak app needs to start at login: add MixMusic to the apps your desktop starts at login instead",
   "@desktopSettingsNoBackgroundPortal": {
-    "description": "Why Open at login didn't turn on, as a toast. The Background portal is a part of Linux desktops."
+    "description": "Why Start at login (desktopSettingsLogin) didn't turn on, as a toast, for MixMusic installed from Flathub. The Background portal is a part of Linux desktops."
   },
   "desktopSettingsNotificationsAbout": "Tell what starts playing while MixMusic is in the background.",
   "desktopSettingsNotificationsTitle": "Notifications",
@@ -2057,9 +2057,9 @@
       }
     }
   },
-  "downloadsHoldMetered": "Waiting for a connection that isn't metered, as Settings › Playback asks",
+  "downloadsHoldMetered": "Waiting for a connection that isn't metered, as set in Settings › Playback",
   "@downloadsHoldMetered": {
-    "description": "Why the downloads wait, on the downloads page: the connection is metered, as a phone's hotspot."
+    "description": "Why the downloads wait, on the downloads page: the connection is metered, as a phone's hotspot, and downloadSettingsMetered, in Settings › Playback, is off."
   },
   "downloadsHoldMoving": "Moving to {folder}",
   "@downloadsHoldMoving": {
@@ -2305,9 +2305,9 @@
   "@downloadsReasonNoMatch": {
     "description": "Why a Spotify track couldn't download: its recording on YouTube Music, which downloads in its place, wasn't found. It goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
   },
-  "downloadsReasonNoMatcher": "nothing here finds the recordings of Spotify tracks",
+  "downloadsReasonNoMatcher": "MixMusic can't look for Spotify tracks on YouTube Music here",
   "@downloadsReasonNoMatcher": {
-    "description": "Why a Spotify track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
+    "description": "Why a Spotify track couldn't download: MixMusic downloads a Spotify track's recording on YouTube Music, and nothing here can look for it. It goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
   },
   "downloadsReasonNotYouTube": "only tracks of YouTube Music, and Spotify tracks through their recording there, download",
   "@downloadsReasonNotYouTube": {
@@ -2678,7 +2678,7 @@
   "@errorStreamNoAudio": {
     "description": "Why a track's audio wasn't found, as a toast or inside a message that leads it."
   },
-  "errorStreamNoCaptions": "YouTube tells of no captions of this video",
+  "errorStreamNoCaptions": "YouTube has no captions for this video",
   "@errorStreamNoCaptions": {
     "description": "Why a video has no lyrics from its captions, as a toast or inside a message that leads it."
   },
@@ -2718,7 +2718,7 @@
   "@errorTagsCover": {
     "description": "Why a file's cover didn't change, as a toast or inside a message that leads it."
   },
-  "errorTagsFolderReadOnly": "MixMusic can't write in its folder",
+  "errorTagsFolderReadOnly": "MixMusic can't write in the file's folder",
   "@errorTagsFolderReadOnly": {
     "description": "Why a file's tags didn't change, as a toast or inside a message that leads it."
   },
@@ -2754,17 +2754,17 @@
   "@errorToolsNoYTDLP": {
     "description": "An error, as a toast or inside a message that leads it. yt-dlp is a program's name."
   },
-  "errorYouTubeAlreadyInPlaylist": "YouTube Music did not add it: it's in that playlist already",
+  "errorYouTubeAlreadyInPlaylist": "YouTube Music didn't add the track: that playlist has it already",
   "@errorYouTubeAlreadyInPlaylist": {
-    "description": "An error of YouTube Music, as a toast or inside a message that leads it."
+    "description": "An error of YouTube Music, as a toast or inside a message that leads it: the track added to a playlist is in it already."
   },
   "errorYouTubeNoSongList": "YouTube Music lists no more than the top songs of this artist",
   "@errorYouTubeNoSongList": {
     "description": "An error of YouTube Music, as a toast or inside a message that leads it."
   },
-  "errorYouTubeNotFound": "YouTube Music didn't find it",
+  "errorYouTubeNotFound": "YouTube Music didn't find what MixMusic asked for",
   "@errorYouTubeNotFound": {
-    "description": "An error of YouTube Music, as a toast or inside a message that leads it: what was asked for isn't there."
+    "description": "An error of YouTube Music, as a toast or inside a message that leads it: what MixMusic asked for, as a song, an album or a playlist, isn't there."
   },
   "errorYouTubeSessionRejected": "YouTube Music no longer accepts this sign-in",
   "@errorYouTubeSessionRejected": {
@@ -2776,7 +2776,7 @@
   },
   "explicitBadge": "e",
   "@explicitBadge": {
-    "description": "The badge of an explicit track: a letter in a small box beside its title, as E in English. Keep it one or two characters."
+    "description": "The badge of an explicit track: a letter in a small box beside its title, as “e” in English. Keep it one or two characters."
   },
   "explicitHideDesc": "Songs, albums and videos marked explicit don't show in the search, on Home, on artists' pages or in radios, and never play. Your playlists, liked songs, library and queue list them dimmed.",
   "explicitHideTitle": "Hide explicit content",
@@ -3069,7 +3069,7 @@
   },
   "failureWaySpotifyHere": "Spotify in MixMusic",
   "@failureWaySpotifyHere": {
-    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: Spotify's own player inside MixMusic, as Settings › Playback calls it. It starts a line of what was tried."
+    "description": "A way MixMusic tried to play a track that couldn't play, in the failure details: Spotify's own player inside MixMusic, which Settings › Playback calls “In MixMusic, from Spotify” (playbackFromSpotify). It starts a line of what was tried."
   },
   "failureWayStream": "The stream",
   "@failureWayStream": {
@@ -6125,7 +6125,7 @@
       }
     }
   },
-  "remoteNoteUnfinished": "Didn't pair with {name}: the pairing didn't finish, as it stopped answering",
+  "remoteNoteUnfinished": "Didn't pair with {name}: it stopped answering before the pairing finished",
   "@remoteNoteUnfinished": {
     "description": "Toast when the pairing with the computer named {name} didn't finish.",
     "placeholders": {
@@ -6134,7 +6134,7 @@
       }
     }
   },
-  "remoteNoteUnfinishedSlow": "Didn't pair with {name}: the pairing didn't finish, as keeping it took longer than {name} waits",
+  "remoteNoteUnfinishedSlow": "Didn't pair with {name}, which stopped waiting: this computer took too long to keep the pairing",
   "@remoteNoteUnfinishedSlow": {
     "description": "Toast when the pairing with the computer named {name} didn't finish, as this computer took too long to keep it.",
     "placeholders": {
@@ -6294,7 +6294,7 @@
       }
     }
   },
-  "remoteProblemTooLong": "The pairing took too long. Pair again for a new code.",
+  "remoteProblemTooLong": "The pairing took too long. Pair again to get a new code.",
   "@remoteProblemTooLong": {
     "description": "Why the pairing for remote control failed."
   },
@@ -7000,9 +7000,9 @@
       }
     }
   },
-  "roomReachNoRouter": "MixMusic asks no router here.",
+  "roomReachNoRouter": "MixMusic doesn't ask a router to open a port for the room here.",
   "@roomReachNoRouter": {
-    "description": "Why friends outside the network can't reach the room, on its page."
+    "description": "Why friends outside the network may not reach the room, on its page: MixMusic didn't ask the router to forward the room's port to this computer."
   },
   "roomReachPortTaken": "Port {kept}, kept for rooms, is taken by another program: the room listens at port {port} instead, which a port forwarded by hand doesn't reach.",
   "@roomReachPortTaken": {
@@ -7282,9 +7282,9 @@
       }
     }
   },
-  "roomSongsTooMany": "You added many songs: wait a moment, or for {host} to answer those waiting",
+  "roomSongsTooMany": "You added many songs at once: wait a moment, or until {host} answers the ones already waiting",
   "@roomSongsTooMany": {
-    "description": "Toast for a guest who gave too many songs at once.",
+    "description": "Toast for a guest who gave too many songs at once. The songs a guest adds wait for the host, {host}, to take or turn them down.",
     "placeholders": {
       "host": {
         "type": "String"

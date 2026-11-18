@@ -13,11 +13,14 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"log"
 	"mime"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -25,6 +28,7 @@ import (
 
 	"golang.org/x/net/netutil"
 
+	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/stream"
 	"github.com/fzn0x/mixmusic/internal/upnp"
 )
@@ -43,15 +47,22 @@ type castServer struct {
 
 	mu sync.Mutex
 	// served are the addresses handed to the device, past the token,
-	// by what they serve (castFormats).
-	served map[string]castServed
+	// by what they serve (castFormats); refused is set once a request
+	// from another address was turned away.
+	served  map[string]castServed
+	refused bool
 }
 
 // castServed is what an address handed to a device serves: a path of the
-// proxy, or the file of a song on this computer, as contentType.
+// proxy, or the file of a song on this computer, as contentType, or the
+// cover of one, when cover is set. of is the stream whose audio or cover
+// it is, as the player plays it: the address serves it only while that
+// stream is cast or queued (keep).
 type castServed struct {
 	path, file  string
 	contentType string
+	cover       bool
+	of          string
 }
 
 // castConns is how many connections at once a renderer's server takes:
@@ -88,9 +99,33 @@ func serveCast(local, device net.IP, proxy http.Handler, dlna bool) (*castServer
 
 // serve hands the device the address at, past the token, which serves c.
 func (s *castServer) serve(at string, c castServed) {
+	c.of = streamKey(c.of)
 	s.mu.Lock()
 	s.served[at] = c
 	s.mu.Unlock()
+}
+
+// keep serves, of the addresses handed to the device, only those of the
+// streams of: the track cast, and the one queued on the device after it.
+// The device can fetch no other file of this computer, nor its cover.
+func (s *castServer) keep(of ...string) {
+	for i := range of {
+		of[i] = streamKey(of[i])
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for at, c := range s.served {
+		if c.of == "" || !slices.Contains(of, c.of) {
+			delete(s.served, at)
+		}
+	}
+}
+
+// streamKey is the address of a stream the player plays, without its
+// query, which changes as it tries again.
+func streamKey(rawURL string) string {
+	key, _, _ := strings.Cut(rawURL, "?")
+	return key
 }
 
 // ours reports whether an address a device plays is one this server
@@ -113,6 +148,7 @@ var errNotCast = errors.New("not found")
 func (s *castServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	host, _, _ := net.SplitHostPort(r.RemoteAddr)
 	if ip := net.ParseIP(host); ip == nil || !ip.Equal(s.device) {
+		s.turnedAway()
 		http.Error(w, "forbidden", http.StatusForbidden)
 		return
 	}
@@ -122,6 +158,11 @@ func (s *castServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mu.Unlock()
 	if !ok || !handed && !strings.HasPrefix(path, "yt/") {
 		http.Error(w, errNotCast.Error(), http.StatusNotFound)
+		return
+	}
+	if c.cover {
+		// A cover is no audio: it comes whole, as its file's kind.
+		serveCastFile(w, r, c.file)
 		return
 	}
 	s.fetched.Add(1)
@@ -145,7 +186,21 @@ func (s *castServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.proxy.ServeHTTP(w, r2)
 }
 
-// serveCastFile serves the file of a song on this computer, by ranges.
+// turnedAway logs, once, that a request from an address other than the
+// device's was turned away: a member of a group of speakers that fetches
+// in place of the one cast to would be.
+func (s *castServer) turnedAway() {
+	s.mu.Lock()
+	first := !s.refused
+	s.refused = true
+	s.mu.Unlock()
+	if first {
+		log.Printf("mixmusic: the cast server turned away a request from an address other than the device's")
+	}
+}
+
+// serveCastFile serves the file of a song on this computer, or its cover,
+// by ranges, as the type of its extension.
 func serveCastFile(w http.ResponseWriter, r *http.Request, file string) {
 	f, err := os.Open(file)
 	if err != nil {
@@ -158,7 +213,7 @@ func serveCastFile(w http.ResponseWriter, r *http.Request, file string) {
 		http.Error(w, errNotCast.Error(), http.StatusNotFound)
 		return
 	}
-	http.ServeContent(w, r, "", info.ModTime(), f)
+	http.ServeContent(w, r, file, info.ModTime(), f)
 }
 
 // typedWriter answers with the content type the device was told of, in
@@ -187,6 +242,25 @@ func (w *typedWriter) Write(b []byte) (int, error) {
 func (w *typedWriter) Flush() {
 	if f, ok := w.ResponseWriter.(http.Flusher); ok {
 		f.Flush()
+	}
+}
+
+// castArt serves server's device the cover the index keeps of t, a song
+// on this computer, while its stream (of) is cast or queued, and returns
+// its address: "" for a track with none.
+func (a *App) castArt(server *castServer) func(t media.Track, of string) string {
+	return func(t media.Track, of string) string {
+		if a.localFiles == nil {
+			return ""
+		}
+		for _, img := range t.Artwork {
+			if file, ok := a.localFiles.ArtFile(img.URL); ok {
+				at := "/art/" + filepath.Base(file)
+				server.serve(at, castServed{file: file, cover: true, of: of})
+				return server.url(at)
+			}
+		}
+		return ""
 	}
 }
 

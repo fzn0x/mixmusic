@@ -31,9 +31,12 @@ const (
 )
 
 // ModelOf is what the windows show a device as beside its name: its model,
-// or, for a device that names none, what kind it is.
+// or, for a device that names none, what kind it is, and for a group of
+// speakers, that it is one.
 func ModelOf(d CastDevice) string {
 	switch {
+	case d.Group:
+		return locales.CastGroupModel()
 	case d.Model != "":
 		return d.Model
 	case d.Kind == CastRenderer:
@@ -47,6 +50,8 @@ func ModelOf(d CastDevice) string {
 // englishModel is ModelOf for the log, which stays English.
 func englishModel(d CastDevice) string {
 	switch {
+	case d.Group:
+		return "speaker group"
 	case d.Model != "":
 		return d.Model
 	case d.Kind == CastRenderer:

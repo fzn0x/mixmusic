@@ -1510,6 +1510,20 @@
   "@castDeviceGone": {
     "description": "A notice, as casting starts to a device that has left the network."
   },
+  "castFLACBeyond": "{device} plays FLAC only up to 96 kHz and 24 bits, which this file goes beyond",
+  "@castFLACBeyond": {
+    "description": "Where a song on this computer couldn't play, as it was cast to a Google Cast device, whose media player plays FLAC files of at most 96 kHz and 24 bits, and the file has a higher sample rate or more bits.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room TV"
+      }
+    }
+  },
+  "castGroupModel": "Speaker group",
+  "@castGroupModel": {
+    "description": "In the cast menu and the mini player's Cast section, beside the name of a Google Cast group of speakers, which plays as one device, in place of a device's model, as in \"Everywhere · Speaker group\"."
+  },
   "castLiveNotYet": "live streams don't play on cast devices yet",
   "@castLiveNotYet": {
     "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. The track is a live stream, and MixMusic casts to a device."
@@ -1620,6 +1634,16 @@
   "castUnreachableFirewall": "the cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets you allow the connection",
   "@castUnreachableFirewall": {
     "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. On Windows, the cast device never fetched the audio from this computer, as a firewall may keep it out."
+  },
+  "castWAVFloat": "{device} doesn't play WAV files of floating-point samples",
+  "@castWAVFloat": {
+    "description": "Where a song on this computer couldn't play, as it was cast to a Google Cast device, whose media player plays WAV files only of whole-number (integer PCM) samples, and the file's samples are floating-point numbers.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room TV"
+      }
+    }
   },
   "cleanVersionsDesc": "An album that comes explicit and clean shows its clean version, and its page opens on it. Its version switch still has the explicit one.",
   "cleanVersionsFixed": "On while explicit content is hidden: an album that comes explicit and clean shows its clean version alone.",

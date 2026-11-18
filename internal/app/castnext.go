@@ -32,6 +32,12 @@ func (o *castOut) preload(rawURL string) {
 	if err != nil {
 		return
 	}
+	o.mu.Lock()
+	if o.loadedURL != rawURL {
+		o.nextURL = rawURL
+	}
+	o.mu.Unlock()
+	o.serveOnly()
 	u, _ := url.Parse(rawURL)
 	m := cast.Media{URL: o.served(path) + query(u), ContentType: contentType, Autoplay: true}
 	o.do(func(ctx context.Context) {
@@ -43,7 +49,7 @@ func (o *castOut) preload(rawURL string) {
 		}
 		if o.upNext != nil {
 			if t := o.upNext(); t != nil {
-				describeMedia(&m, *t)
+				o.describe(&m, *t, rawURL)
 			}
 		}
 		if err := q.Next(ctx, m); err != nil {
@@ -52,13 +58,30 @@ func (o *castOut) preload(rawURL string) {
 	})
 }
 
-// describeMedia gives m what the device's screen shows of t.
-func describeMedia(m *cast.Media, t media.Track) {
+// describe gives m what the device's screen shows of t, the track of the
+// stream of: its cover too, online, or served by MixMusic for a song on
+// this computer (art).
+func (o *castOut) describe(m *cast.Media, t media.Track, of string) {
 	m.Title, m.Artist, m.Image = t.Title, t.ArtistNames(), coverOf(t)
+	if m.Image == "" && o.art != nil {
+		m.Image = o.art(t, of)
+	}
 	if t.Album != nil {
 		m.Album = t.Album.Name
 	}
 	m.Duration = time.Duration(t.DurationMs) * time.Millisecond
+}
+
+// serveOnly has the server serve the files of the stream cast and of the
+// one queued after it alone.
+func (o *castOut) serveOnly() {
+	if o.keep == nil {
+		return
+	}
+	o.mu.Lock()
+	of := []string{o.loadedURL, o.nextURL}
+	o.mu.Unlock()
+	o.keep(of...)
 }
 
 // pick returns the path a cast device fetches a stream's audio at, past

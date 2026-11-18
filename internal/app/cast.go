@@ -361,11 +361,12 @@ func (a *App) castEnded(out *castOut, err error) {
 	}
 	cur.end(false)
 	note := locales.CastStoppedLost(cur.device.Name)
+	var taken *cast.TakenError
 	switch {
 	case errors.Is(err, cast.ErrStopped):
 		note = locales.CastStoppedElsewhere(cur.device.Name)
-	case err != nil && strings.HasSuffix(err.Error(), "plays on the cast device now"):
-		note = locales.CastStoppedTaken(cur.device.Name, err.Error())
+	case errors.As(err, &taken):
+		note = locales.CastStoppedTaken(cur.device.Name, locales.CastTakenBy(taken.App))
 	}
 	log.Printf("mixmusic: casting stopped: %v", err)
 	a.notifyCast(note)

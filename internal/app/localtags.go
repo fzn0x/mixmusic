@@ -6,7 +6,6 @@ package app
 // library read them again at once, and the queue show them.
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -18,6 +17,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/tags"
 	"github.com/fzn0x/mixmusic/internal/tagwrite"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // FileTags are the tags of a file on this computer, as the dialog that
@@ -32,14 +32,15 @@ type FileTags struct {
 func pathOf(id string) (string, error) {
 	path, ok := localfiles.PathOf(id)
 	if !ok {
-		return "", errors.New("it isn't a song on this computer")
+		return "", wordedLater("it isn't a song on this computer", locales.LocalTagsNotOnComputer, nil)
 	}
 	return path, nil
 }
 
 // cantEdit words why the tags of the file at path can't be changed.
 func cantEdit(path string, err error) error {
-	return fmt.Errorf("MixMusic can't change %s: %w", filepath.Base(path), err)
+	return wordedLater(fmt.Sprintf("MixMusic can't change %s: %v", filepath.Base(path), err),
+		func() string { return locales.LocalTagsCantChange(filepath.Base(path), ErrorText(err)) }, err)
 }
 
 // EditableTags reads the tags of the file of a local track, for the dialog
@@ -229,7 +230,9 @@ func (l *LocalFiles) write(paths []string, edit func(path string) (tagwrite.Tags
 		t, fields := edit(path)
 		if err := tagwrite.Write(path, t, fields, writeOptions); err != nil {
 			if first == nil {
-				first = fmt.Errorf("couldn't save %s: %w", filepath.Base(path), err)
+				name := filepath.Base(path)
+				first = wordedLater(fmt.Sprintf("couldn't save %s: %v", name, err),
+					func() string { return locales.LocalTagsCouldntSave(name, ErrorText(err)) }, err)
 			}
 			continue
 		}

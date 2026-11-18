@@ -420,9 +420,10 @@ func (b *Backup) Added(dataDir string, folders map[string]string) (Counts, error
 // Applied is what the start found staged, and did.
 type Applied struct {
 	// Restored is set once a restore swapped in, and Undone once an undo
-	// did; Err tells why neither did, and every file went back.
-	Restored, Undone bool
-	Err              error
+	// did; Err tells why neither did, and every file went back, of an undo
+	// when Undo is set.
+	Restored, Undone, Undo bool
+	Err                    error
 	// Backup is when the backup restored was made.
 	Backup time.Time
 	// Downloads are the downloads to download again, if any.
@@ -453,7 +454,7 @@ func Apply(dataDir string) Applied {
 		os.RemoveAll(next)
 		return Applied{Err: err}
 	}
-	out := Applied{Backup: pl.Backup}
+	out := Applied{Backup: pl.Backup, Undo: pl.Undo}
 	aside := filepath.Join(restore, asideDir)
 	if err := swap(dataDir, next, aside, pl.Paths); err != nil {
 		os.RemoveAll(next)

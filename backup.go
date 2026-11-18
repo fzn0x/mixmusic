@@ -42,7 +42,6 @@ type backupView struct {
 	folders   map[string]string
 	download  bool
 	staging   bool
-	restart   bool
 
 	added    *backup.Counts
 	addedFor string

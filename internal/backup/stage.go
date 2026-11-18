@@ -461,15 +461,21 @@ func Apply(dataDir string) Applied {
 		out.Err = err
 		return out
 	}
+	defer os.RemoveAll(next)
 	if pl.Undo {
 		out.Undone = true
 		os.RemoveAll(aside)
+		return out
+	}
+	out.Restored = true
+	var l DownloadList
+	if readJSON(filepath.Join(next, DownloadsName), &l) == nil {
+		out.Downloads = &l
+	}
+	if len(pl.Paths) == 0 {
+		// Only downloads to download again: nothing to undo.
+		os.RemoveAll(aside)
 	} else {
-		out.Restored = true
-		var l DownloadList
-		if readJSON(filepath.Join(next, DownloadsName), &l) == nil {
-			out.Downloads = &l
-		}
 		undo := plan{Format: Format, Undo: true, Paths: pl.Paths, Backup: pl.Backup, App: pl.App, Restored: time.Now().Round(time.Second)}
 		err := writePlan(aside, undo)
 		if err == nil {
@@ -482,7 +488,6 @@ func Apply(dataDir string) Applied {
 			log.Printf("mixmusic: keeping what the restore replaced, for its undo: %v", err)
 		}
 	}
-	os.RemoveAll(next)
 	return out
 }
 

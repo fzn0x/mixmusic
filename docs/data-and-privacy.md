@@ -93,6 +93,12 @@ AppImage or archive copy's.
 - `youtube-session.bin`: your YouTube Music session, encrypted with a key
   that the credential store keeps.
 - `matugen.json`, when you follow the colours that matugen writes there.
+- `backups.json`: when the last [automatic backup](#back-up-and-restore)
+  was made, to which file, and a fingerprint of what it holds, so that
+  none is made while nothing changed.
+- `restore/`: a [restore](#back-up-and-restore) waiting for MixMusic to
+  restart, and what the last restore replaced, which **Undo the last
+  restore** puts back.
 
 ### The cache folder
 
@@ -243,7 +249,8 @@ Where the credential store can't keep a secret:
   the data, cache, logs and downloads folders above.
 
 **To bring your data to another copy**, as to another computer or into
-the Flatpak, quit both copies, copy `settings.json`, `library.json`,
+the Flatpak, [back it up](#back-up-and-restore) there and restore the
+file here. By hand, quit both copies, copy `settings.json`, `library.json`,
 `queue.json`, `positions.json` and the `addons` and `mix-covers` folders
 into the other copy's data folder, and sign in to your accounts again
 there: sign-ins stay in the credential store of the computer they were
@@ -256,5 +263,68 @@ is made anew each time the assistants' port turns on.
 
 **To keep everything in one folder**, as for a portable copy or a test
 run, start MixMusic with the environment variable
-`MIXMUSIC_DATA_DIR` set to a folder: it keeps its data, cache, logs and
-downloads in the `data`, `cache`, `logs` and `downloads` folders inside.
+`MIXMUSIC_DATA_DIR` set to a folder: it keeps its data, cache, logs,
+downloads and automatic backups in the `data`, `cache`, `logs`,
+`downloads` and `backups` folders inside.
+
+## Back up and restore
+
+Settings › Desktop › Backups, and **Back up MixMusic** and **Restore a
+backup** in the command palette:
+
+- **Back up…** saves a file, "MixMusic backup" and the day, where you
+  choose. You tick what it holds: your **library** (liked and disliked
+  songs, mixes and their covers, the history and the plays Stats counts,
+  searches, followed artists and podcasts, and linked copies of your
+  songs), your **settings**, your **add-ons** with what plugins keep, the
+  **queue and episode positions**, and a **list of downloads**, without
+  their audio.
+- **Never in a backup**: your sign-ins and the files that stand in for
+  the credential store, remote control's pairings and key, the AI
+  assistants' key, the scrobbles still to send (they would be sent
+  twice), the index of your music, yt-dlp, the cache, the logs and any
+  audio. A backup holds your history: keep it where only you can read it.
+- The file is a zip. Its `manifest.json` tells the version of the format
+  and of MixMusic that made it, when, on which system, the folders of
+  music and downloads it came from, and each file's size and SHA-256.
+- **Restore…** checks the file first: one from a newer MixMusic, one that
+  is damaged, larger than 512 MB or that unpacks to more than 2 GB, or
+  with a file that would land outside the data folder, is refused, saying
+  which. One of an older format is brought up to date.
+- Its preview tells when the backup was made, by which version, on which
+  system, and what each part holds, for you to tick what comes back. The
+  library either replaces the one here, or, with **Add to my library**,
+  joins it: likes, mixes and follows are joined, a mix both hold keeps the
+  copy changed last, the history is merged by time, the plays of Stats
+  are all kept, and a like or a dislike here stays as it is. The preview
+  counts what that adds.
+- What you tick replaces what is here once MixMusic restarts, before
+  anything opens it. Should a file fail to swap, every file goes back,
+  and a notice says why. **Undo the last restore** puts back what the
+  last restore replaced, as it was then.
+- This computer keeps its own folders of downloads, music and backups,
+  its yt-dlp and JavaScript runtime, its colours, its output device and
+  its Spotify device. Plugins come back switched off, for you to trust
+  them again. Sign in to your accounts again on another computer: sign-ins
+  stay in the credential store of the computer they were made on.
+- **Music on another computer**: your songs are known by where their
+  files are. When the backup's folders of music aren't this computer's,
+  the restore asks which folder here holds each, filled in where their
+  names match, whatever their case, and Windows' paths become those of
+  macOS or Linux. Likes, mixes, the history and the queue then find the
+  songs there; those without a folder show as missing.
+- **Download again**: with the list of downloads, a restore offers to
+  download the songs again. Albums, playlists and mixes downloaded whole
+  go on taking in their new songs.
+
+**Back up automatically** makes a backup daily, weekly, monthly or each
+time MixMusic quits. Off at first. One missed while MixMusic was closed
+is made a moment after it starts, and none is made while nothing
+changed. They go to "MixMusic backups" in your Documents folder, or the
+folder you choose: the Flatpak asks for one. **Keep** keeps the last 3,
+5 (at first), 10, 15 or 30 backups, all of them, or one file written
+over, and deletes only the backups it made. A folder that is missing,
+read-only, full or that the Flatpak no longer reaches shows an error,
+with a notice, and MixMusic tries again at its next start. A folder that
+OneDrive, iCloud Drive, Dropbox or Nextcloud syncs keeps a copy of your
+backups off this computer.

@@ -167,7 +167,7 @@ func (h *heardEvents) add(format string, args ...any) {
 
 func (h *heardEvents) Time(p, d time.Duration) { h.add("time") }
 func (h *heardEvents) Ended()                  { h.add("ended") }
-func (h *heardEvents) Error(m string)          { h.add("error %s", m) }
+func (h *heardEvents) Error(err error)         { h.add("error %s", err) }
 func (h *heardEvents) Playing(p bool)          { h.add("playing %v", p) }
 func (h *heardEvents) Buffering(b bool)        { h.add("buffering %v", b) }
 
@@ -327,7 +327,7 @@ func TestCastOutLoadFailure(t *testing.T) {
 	o, f, ev := newTestOut(t)
 	f.loadErr = &cast.RequestError{Type: "LOAD_FAILED"}
 	o.Load(streamURL("abcdefghijk"), audio.Cue{Autoplay: true})
-	ev.wait(t, "error "+castUnreachable)
+	ev.wait(t, "error "+castUnreachable().Error())
 	n := int64(1)
 	o.fetched = func() int64 { n++; return n }
 	o.Load(streamURL("abcdefghijk"), audio.Cue{Autoplay: true})

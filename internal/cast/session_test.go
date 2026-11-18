@@ -289,7 +289,9 @@ func TestSessionEnds(t *testing.T) {
 		h := newHeard()
 		open(t, d, h)
 		d.StopApp("YouTube")
-		if err := h.waitEnd(t); err == nil || (err.Error() != "YouTube plays on the cast device now" && !errors.Is(err, ErrStopped)) {
+		var taken *TakenError
+		err := h.waitEnd(t)
+		if !errors.Is(err, ErrStopped) && (!errors.As(err, &taken) || taken.App != "YouTube" || err.Error() != "YouTube plays on the cast device now") {
 			t.Errorf("ended for %v", err)
 		}
 	})

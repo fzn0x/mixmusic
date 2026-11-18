@@ -34,13 +34,14 @@ func TestFailureOfAStream(t *testing.T) {
 	h.p.Time(42*time.Second, 200*time.Second)
 	h.stream.silence("a")
 	useRetries(t, h, "a", 0)
-	h.p.Error("the stream failed")
+	h.p.Error(errors.New("the stream failed"))
 	h.wait("b playing", playing("b"))
 	f := h.failedOnce(1)
 	if len(f) != 1 || f[0].Track.ID != "yt:a" || f[0].At.Before(before) || f[0].Stopped || f[0].Recording.ID != "" {
 		t.Fatalf("failures %+v", f)
 	}
-	want := []Step{{"the stream", "YouTube refused it", 1}, {"the stream, tried again", "YouTube refused it", len(retryWaits)}}
+	want := []Step{{"the stream", "YouTube refused it", "YouTube refused it", 1},
+		{"the stream, tried again", "YouTube refused it", "YouTube refused it", len(retryWaits)}}
 	if !slices.Equal(f[0].Steps, want) {
 		t.Errorf("steps %+v, want %+v", f[0].Steps, want)
 	}
@@ -67,7 +68,7 @@ func TestFailuresInARow(t *testing.T) {
 	var got []string
 	for _, k := range f {
 		got = append(got, k.Track.ID)
-		if !slices.Equal(k.Steps, []Step{{"finding its stream", "offline.", 1}}) {
+		if !slices.Equal(k.Steps, []Step{{"finding its stream", "offline.", "offline.", 1}}) {
 			t.Errorf("%s: steps %+v", k.Track.ID, k.Steps)
 		}
 	}
@@ -116,9 +117,9 @@ type steppedErr struct{}
 
 func (steppedErr) Error() string { return "this track is private" }
 
-func (steppedErr) Steps() iter.Seq2[string, string] {
-	return func(yield func(string, string) bool) {
-		_ = yield("YouTube's player API", "LOGIN_REQUIRED") && yield("yt-dlp", "this track is private")
+func (steppedErr) Steps() iter.Seq2[string, error] {
+	return func(yield func(string, error) bool) {
+		_ = yield("YouTube's player API", errors.New("LOGIN_REQUIRED")) && yield("yt-dlp", errors.New("this track is private"))
 	}
 }
 
@@ -134,9 +135,9 @@ func TestFailureSteps(t *testing.T) {
 	h.p.PlayTracks([]media.Track{spotifyTrack("1")}, 0)
 	f := h.failedOnce(1)
 	want := []Step{
-		{"Spotify Connect", "no Spotify device is active.", 1},
-		{"YouTube's player API", "LOGIN_REQUIRED", 1},
-		{"yt-dlp", "this track is private", 1},
+		{"Spotify Connect", "no Spotify device is active.", "no Spotify device is active.", 1},
+		{"YouTube's player API", "LOGIN_REQUIRED", "LOGIN_REQUIRED", 1},
+		{"yt-dlp", "this track is private", "this track is private", 1},
 	}
 	if !slices.Equal(f[0].Steps, want) {
 		t.Errorf("steps %+v, want %+v", f[0].Steps, want)
@@ -157,10 +158,10 @@ func TestFailureOfYTDLP(t *testing.T) {
 	})
 	h.p.PlayTracks([]media.Track{track("a"), file}, 0)
 	f := h.failedOnce(2)
-	if want := []Step{{"yt-dlp", "ERROR: [youtube] a: Video unavailable", 1}}; !slices.Equal(f[1].Steps, want) {
+	if want := []Step{{"yt-dlp", "ERROR: [youtube] a: Video unavailable", "ERROR: [youtube] a: Video unavailable", 1}}; !slices.Equal(f[1].Steps, want) {
 		t.Errorf("yt-dlp's steps %+v", f[1].Steps)
 	}
-	if want := []Step{{"the file", "the file is gone", 1}}; !slices.Equal(f[0].Steps, want) {
+	if want := []Step{{"the file", "the file is gone", "the file is gone", 1}}; !slices.Equal(f[0].Steps, want) {
 		t.Errorf("the file's steps %+v", f[0].Steps)
 	}
 }
@@ -177,7 +178,7 @@ func TestFailuresKept(t *testing.T) {
 		src.Track = track("rec")
 		p.s.Source = &src
 		for i := range keptFailures + 2 {
-			id := p.keepFailure("it broke", false)
+			id := p.keepFailure(errors.New("it broke"), false)
 			if i == 0 {
 				first = id
 			}
@@ -190,7 +191,7 @@ func TestFailuresKept(t *testing.T) {
 	if _, ok := h.p.FailureOf(first); ok {
 		t.Error("the oldest is kept")
 	}
-	if want := []Step{{"the stream", "it broke", 1}}; !slices.Equal(f[0].Steps, want) {
+	if want := []Step{{"the stream", "it broke", "it broke", 1}}; !slices.Equal(f[0].Steps, want) {
 		t.Errorf("steps %+v", f[0].Steps)
 	}
 }

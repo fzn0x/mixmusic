@@ -29,4 +29,19 @@ func TestReasons(t *testing.T) {
 			t.Errorf("Reason(%v) = %q, want %q", err, got, want)
 		}
 	}
+	// The proxy's faults are of the reasons of what they wrap, and tell
+	// the rest.
+	for err, want := range map[error]ServeError{
+		errExpired:                              {},
+		errStalled:                              {},
+		statusError(http.StatusTooManyRequests): {Status: http.StatusTooManyRequests},
+		statusError(http.StatusServiceUnavailable):                                    {Status: http.StatusServiceUnavailable},
+		&url.Error{Op: "Get", URL: "https://example.com", Err: errors.New("refused")}: {Unreachable: true},
+	} {
+		se := serveError(err)
+		if se.Status != want.Status || se.Unreachable != want.Unreachable || se.Error() != plainFailure(err) || Reason(se) != Reason(err) ||
+			!errors.Is(se, err) {
+			t.Errorf("the fault of %v: %#v", err, se)
+		}
+	}
 }

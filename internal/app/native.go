@@ -19,10 +19,14 @@ import (
 	"github.com/fzn0x/mixmusic/internal/audio/output"
 	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/internal/stream"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
-// errNoNative is returned where the system has no audio engine.
+// errNoNative is why MixMusic can't play where the system has no audio
+// engine: noNative returns it, in the windows' words.
 var errNoNative = errors.New("MixMusic's audio engine isn't available on this system")
+
+func noNative() error { return worded(errNoNative.Error(), locales.PlayerNoEngine(), errNoNative) }
 
 // engineEvents passes the engine's events to the player, once there is one.
 type engineEvents struct{ a *App }
@@ -38,7 +42,7 @@ func (e engineEvents) to() audio.Events {
 
 func (e engineEvents) Time(position, duration time.Duration) { e.to().Time(position, duration) }
 func (e engineEvents) Ended()                                { e.to().Ended() }
-func (e engineEvents) Error(message string)                  { e.to().Error(message) }
+func (e engineEvents) Error(err error)                       { e.to().Error(engineWords(err)) }
 func (e engineEvents) Playing(playing bool)                  { e.to().Playing(playing) }
 func (e engineEvents) Buffering(buffering bool)              { e.to().Buffering(buffering) }
 
@@ -47,7 +51,7 @@ type noEvents struct{}
 
 func (noEvents) Time(time.Duration, time.Duration) {}
 func (noEvents) Ended()                            {}
-func (noEvents) Error(string)                      {}
+func (noEvents) Error(error)                       {}
 func (noEvents) Playing(bool)                      {}
 func (noEvents) Buffering(bool)                    {}
 
@@ -167,9 +171,9 @@ func (a *App) startNative(channels int, render func([]float32, int), failed func
 	})
 	switch {
 	case errors.Is(err, output.ErrNoDevice):
-		return nil, errors.New("no audio output device")
+		return nil, audio.ErrNoOutput
 	case err != nil:
-		return nil, fmt.Errorf("the audio device couldn't start (%v)", err)
+		return nil, worded(fmt.Sprintf("the audio device couldn't start (%v)", err), locales.ErrorAudioCantStart(err.Error()), nil)
 	}
 	return s, nil
 }

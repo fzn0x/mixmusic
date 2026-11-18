@@ -15,12 +15,32 @@ type bothFailed struct{ direct, ytdlp error }
 func (e bothFailed) Error() string { return e.ytdlp.Error() }
 func (e bothFailed) Unwrap() error { return e.ytdlp }
 
-// Steps tells what was tried, in turn, and why each failed.
-func (e bothFailed) Steps() iter.Seq2[string, string] {
-	return func(yield func(string, string) bool) {
-		if !yield("YouTube's player API", strings.TrimPrefix(loggable(e.direct).Error(), "stream: ")) {
+// Steps tells what was tried, in turn, and why each failed: as an error
+// whose words are without the prefix that names the step, and which the
+// windows say in their language (#800), as they do the error it wraps.
+func (e bothFailed) Steps() iter.Seq2[string, error] {
+	return func(yield func(string, error) bool) {
+		if !yield("YouTube's player API", trimmed(loggable(e.direct), "stream: ")) {
 			return
 		}
-		yield("yt-dlp", strings.TrimPrefix(e.ytdlp.Error(), "yt-dlp: "))
+		yield("yt-dlp", trimmed(e.ytdlp, "yt-dlp: "))
 	}
+}
+
+// trimmedError is an error told without the prefix of its words.
+type trimmedError struct {
+	text string
+	err  error
+}
+
+func (e trimmedError) Error() string { return e.text }
+func (e trimmedError) Unwrap() error { return e.err }
+
+// trimmed is err, told without prefix.
+func trimmed(err error, prefix string) error {
+	text, ok := strings.CutPrefix(err.Error(), prefix)
+	if !ok {
+		return err
+	}
+	return trimmedError{text, err}
 }

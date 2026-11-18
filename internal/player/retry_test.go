@@ -19,7 +19,7 @@ func retries(h *harness, id string) int { return h.stream.count("load url:yt:" +
 func useRetries(t *testing.T, h *harness, id string, from int) {
 	t.Helper()
 	for i := range retryWaits {
-		h.p.Error("the stream failed")
+		h.p.Error(errors.New("the stream failed"))
 		h.wait(fmt.Sprintf("try %d", from+i+1), func(p *Player) bool { return retries(h, id) == from+i+1 && p.loaded })
 	}
 }
@@ -58,7 +58,7 @@ func TestStreamRetryHolds(t *testing.T) {
 	}
 	h.p.Time(42*time.Second+retryHold, 200*time.Second)
 	h.wait("b preloaded again", func(*Player) bool { return h.stream.count("preload url:yt:b") == 2 })
-	h.p.Error("the stream failed")
+	h.p.Error(errors.New("the stream failed"))
 	h.wait("a tried once more", func(p *Player) bool { return retries(h, "a") == len(retryWaits)+1 && p.loaded })
 	if got := h.stream.lastLoad(); !strings.HasSuffix(got, " 52s true") {
 		t.Errorf("tried with %q", got)
@@ -110,10 +110,10 @@ func TestStreamErrorAtStart(t *testing.T) {
 	h.wait("a loading in the engine", func(p *Player) bool { return p.s.Index == 0 && p.loaded && p.s.Playing && p.s.Loading })
 	// The engine tells where the stream opens, and that it failed.
 	h.p.Time(0, 0)
-	h.p.Error("the stream failed")
+	h.p.Error(errors.New("the stream failed"))
 	h.wait("a tried", func(p *Player) bool { return retries(h, "a") == 1 && p.loaded })
 	h.p.Time(0, 0)
-	h.p.Error("the stream failed")
+	h.p.Error(errors.New("the stream failed"))
 	h.wait("b playing", playing("b"))
 	if n := h.notices(); len(n) != 1 || n[0].Message != "Couldn't play Song a: YouTube refused to send its audio" {
 		t.Errorf("notices %+v", n)
@@ -131,7 +131,7 @@ func TestStreamRetryWaits(t *testing.T) {
 		h.p.Time(42*time.Second, 200*time.Second)
 		// As the engine tells of a stream that failed.
 		h.p.Playing(false)
-		h.p.Error("the stream failed")
+		h.p.Error(errors.New("the stream failed"))
 		h.wait("a waiting", func(p *Player) bool { return p.s.Loading })
 		return h
 	}
@@ -186,7 +186,7 @@ func TestStreamRetryPaused(t *testing.T) {
 	h.p.Pause()
 	h.wait("a paused", func(p *Player) bool { return !p.s.Playing })
 	h.p.Playing(false)
-	h.p.Error("the stream failed")
+	h.p.Error(errors.New("the stream failed"))
 	h.wait("a tried", func(p *Player) bool { return retries(h, "a") == 1 && p.loaded })
 	if got := h.stream.lastLoad(); !strings.HasSuffix(got, " 42s false") {
 		t.Errorf("tried with %q", got)
@@ -212,7 +212,7 @@ func TestStreamRetryNotFound(t *testing.T) {
 	h.p.PlayTracks(tracks("a", "b"), 0)
 	h.wait("a playing", playing("a"))
 	h.p.Time(42*time.Second, 200*time.Second)
-	h.p.Error("the stream failed")
+	h.p.Error(errors.New("the stream failed"))
 	h.wait("b playing", playing("b"))
 	n := h.notices()
 	if len(n) != 1 || n[0].Message != "Couldn't play Song a: YouTube asks to confirm this is not a bot." {
@@ -246,7 +246,7 @@ func TestStreamErrorOfALoad(t *testing.T) {
 	h.wait("a playing", playing("a"))
 	h.p.Next()
 	h.wait("b loading", func(p *Player) bool { return p.s.Index == 1 && p.s.Loading })
-	h.p.Error("the stream failed")
+	h.p.Error(errors.New("the stream failed"))
 	h.on(func(p *Player) {
 		if p.retry.n != 0 {
 			t.Errorf("b tried for a's stream")

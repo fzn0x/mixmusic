@@ -20,12 +20,22 @@
         /** READY_MS is how long the player may take to connect. */
         const READY_MS = 20000;
 
-        /** problems say in plain words why Spotify can't play here. */
+        /**
+         * problems say in plain words why Spotify can't play here, by their
+         * names, which MixMusic says in its language (internal/app's
+         * hereProblems): fault puts the name in brackets before the words.
+         */
         const problems = {
-          initialization_error: "this computer's webview can't play Spotify's protected audio",
-          authentication_error: "sign in to Spotify again in Settings › Accounts, for MixMusic to play it itself",
-          account_error: "Spotify plays in MixMusic with Spotify Premium only",
+          drm: "this computer's webview can't play Spotify's protected audio",
+          signIn: "sign in to Spotify again in Settings › Accounts, for MixMusic to play it itself",
+          premium: "Spotify plays in MixMusic with Spotify Premium only",
+          noSDK: "Spotify's player did not load: is MixMusic online?",
+          noConnect: "Spotify's player did not connect",
         };
+        /** fault is the error of the problem of name. */
+        const fault = (name) => new Error(`[${name}] ${problems[name]}`);
+        /** kinds are the problems of the errors the player tells, by their kinds. */
+        const kinds = { initialization_error: "drm", authentication_error: "signIn", account_error: "premium" };
 
         let supported = null;
         /**
@@ -59,13 +69,14 @@
             script.onerror = () => {
               script.remove();
               sdk = null;
-              reject(new Error("Spotify's player did not load: is MixMusic online?"));
+              reject(fault("noSDK"));
             };
             document.head.append(script);
           }));
 
         let player = null;
         let deviceID = null;
+        /** problem names the problem that keeps Spotify from playing here, once found. */
         let problem = null;
         let gain = 0.64;
         /**
@@ -138,8 +149,8 @@
         }
 
         async function open() {
-          if (problem) throw new Error(problem);
-          if (!(await canPlay())) throw new Error((problem = problems.initialization_error));
+          if (problem) throw fault(problem);
+          if (!(await canPlay())) throw fault((problem = "drm"));
           await loadSDK();
           const p = new window.Spotify.Player({
             name: NAME,
@@ -148,13 +159,13 @@
           });
           player = p;
           return new Promise((resolve, reject) => {
-            const timer = setTimeout(() => reject(new Error("Spotify's player did not connect")), READY_MS);
-            for (const kind of ["initialization_error", "authentication_error", "account_error"]) {
+            const timer = setTimeout(() => reject(fault("noConnect")), READY_MS);
+            for (const [kind, name] of Object.entries(kinds)) {
               p.addListener(kind, ({ message }) => {
                 console.error(`spotify: ${kind}: ${message}`);
-                problem = problems[kind] ?? message;
+                problem = name;
                 clearTimeout(timer);
-                reject(new Error(problem));
+                reject(fault(problem));
                 if (player === p) close();
               });
             }
@@ -171,7 +182,7 @@
             // Offline, the SDK connects again by itself, and tells when ready.
             p.addListener("not_ready", ({ device_id }) => console.warn(`spotify: device ${device_id} went offline`));
             p.connect().then(
-              (ok) => ok || reject(new Error("Spotify's player did not connect")),
+              (ok) => ok || reject(fault("noConnect")),
               (err) => reject(err instanceof Error ? err : new Error(String(err))),
             );
           });

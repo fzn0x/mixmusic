@@ -85,7 +85,7 @@ func TestSourceRefused(t *testing.T) {
 	if err == nil {
 		t.Fatal("a refused stream opened")
 	}
-	if strings.HasPrefix(err.Error(), "stream:") || err.Error() == errLoad.Error() {
+	if strings.HasPrefix(err.Error(), "stream:") || err.Error() == ErrLoad.Error() {
 		t.Errorf("the error %q doesn't say why in plain words", err)
 	}
 }

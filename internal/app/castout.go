@@ -20,6 +20,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/internal/stream"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // These times are the cast output's; tests shorten them.
@@ -154,15 +155,15 @@ func videoOf(rawURL string) (videoID string, surround bool, err error) {
 		return "", false, err
 	}
 	if strings.HasPrefix(u.Path, stream.LivePath("")) {
-		return "", false, errLive
+		return "", false, worded(errLive.Error(), locales.CastLiveNotYet(), errLive)
 	}
 	if strings.HasPrefix(u.Path, "/file/") {
-		return "", false, errLocalCast
+		return "", false, worded(errLocalCast.Error(), locales.CastLocalFiles(), errLocalCast)
 	}
 	id, ok := strings.CutPrefix(u.Path, "/yt/")
 	id, surround = strings.CutSuffix(id, stream.SurroundSuffix)
 	if !ok || !stream.ValidVideoID(id) {
-		return "", false, errors.New("this track's audio can't play on a cast device")
+		return "", false, worded("this track's audio can't play on a cast device", locales.CastCantPlayAudio(), nil)
 	}
 	return id, surround, nil
 }
@@ -170,7 +171,7 @@ func videoOf(rawURL string) (videoID string, surround bool, err error) {
 func (o *castOut) Load(rawURL string, cue audio.Cue) error {
 	videoID, surround, err := videoOf(rawURL)
 	if err != nil {
-		go o.events.Error(err.Error())
+		go o.events.Error(err)
 		return nil
 	}
 	u, _ := url.Parse(rawURL)
@@ -250,27 +251,29 @@ func (o *castOut) load(gen int, m cast.Media, speed float64) {
 
 // castUnreachable tells of a cast device that couldn't reach MixMusic, as
 // a firewall keeps it out: on Windows, Settings › Desktop › Windows
-// Firewall tells why, and lets it in (#496).
-var castUnreachable = func() string {
+// Firewall tells why, and lets the user allow the connection (#496).
+func castUnreachable() error {
 	if firewall.Supported {
-		return "The cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets it in"
+		return worded("The cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets you allow the connection",
+			locales.CastUnreachableFirewall(), nil)
 	}
-	return "The cast device couldn't reach MixMusic: let MixMusic take connections from your network in the firewall"
-}()
+	return worded("The cast device couldn't reach MixMusic: let MixMusic take connections from your network in the firewall",
+		locales.CastUnreachable(), nil)
+}
 
-// loadFailure tells why a load failed, in the interface's words: a device
-// that never fetched the audio can't reach MixMusic.
-func (o *castOut) loadFailure(err error, fetched bool) string {
+// loadFailure tells why a load failed, in English and in the interface's
+// words: a device that never fetched the audio can't reach MixMusic.
+func (o *castOut) loadFailure(err error, fetched bool) error {
 	var re *cast.RequestError
 	switch {
 	case errors.As(err, &re) && re.Type == "LOAD_FAILED" && !fetched:
-		return castUnreachable
+		return castUnreachable()
 	case errors.As(err, &re) && re.Type == "LOAD_FAILED":
-		return "The cast device couldn't play this track's audio"
+		return worded("The cast device couldn't play this track's audio", locales.CastCouldntPlayAudio(), nil)
 	case errors.Is(err, context.DeadlineExceeded):
-		return "The cast device didn't answer"
+		return worded("The cast device didn't answer", locales.CastNoAnswer(), nil)
 	}
-	return "The cast device couldn't play the track: " + err.Error()
+	return worded("The cast device couldn't play the track: "+err.Error(), locales.CastCouldntPlay(err.Error()), nil)
 }
 
 func (o *castOut) Preload(string) {}
@@ -464,7 +467,7 @@ func (o *castOut) take(st cast.MediaStatus) {
 		o.events.Ended()
 		return
 	case failed:
-		o.events.Error("The cast device stopped playing this track's audio")
+		o.events.Error(worded("The cast device stopped playing this track's audio", locales.CastStoppedPlaying(), nil))
 		return
 	}
 	if tellBuffering {

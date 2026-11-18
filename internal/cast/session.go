@@ -118,6 +118,12 @@ type Session struct {
 // stopped, as from another sender or by its own timeout.
 var ErrStopped = errors.New("the cast device stopped playing from MixMusic")
 
+// A TakenError is why a session ends that another app took over on the
+// device: App names it, as the device does.
+type TakenError struct{ App string }
+
+func (e *TakenError) Error() string { return e.App + " plays on the cast device now" }
+
 // errNoMedia is why a command of the media fails before anything loaded.
 var errNoMedia = errors.New("cast: nothing loaded")
 
@@ -422,7 +428,7 @@ func (s *Session) onMessage(m message, h header) {
 		if app != "" && !st.runs(app) {
 			why := ErrStopped
 			if other := st.other(app); other != "" {
-				why = fmt.Errorf("%s plays on the cast device now", other)
+				why = &TakenError{App: other}
 			}
 			s.end(why)
 		}

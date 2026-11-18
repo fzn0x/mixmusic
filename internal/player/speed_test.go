@@ -1,6 +1,7 @@
 package player
 
 import (
+	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -42,7 +43,7 @@ func TestSpeedFromSettings(t *testing.T) {
 		t.Errorf("reported a speed of %v", now.Speed)
 	}
 	h.p.Time(40*time.Second, 200*time.Second)
-	h.p.Error("the stream failed")
+	h.p.Error(errors.New("the stream failed"))
 	h.wait("a tried again", func(p *Player) bool { return retries(h, "a") == 1 && p.loaded })
 	if got := h.stream.lastLoad(); !strings.HasSuffix(got, " 40s true speed 1.5") {
 		t.Errorf("tried again with %q", got)
@@ -205,7 +206,7 @@ func TestLiveTrackAtItsOwnSpeed(t *testing.T) {
 		t.Errorf("the live stream plays at %v; the stream did %q", s.Speed, h.stream.copy())
 	}
 	h.p.Time(time.Minute, 0)
-	h.p.Error("the network failed while loading the audio")
+	h.p.Error(errors.New("the network failed while loading the audio"))
 	h.wait("tried again", func(*Player) bool { return strings.HasPrefix(h.stream.lastLoad(), "load url:yt:liveRadio01?retry=") })
 	h.wait("live again", func(p *Player) bool { return p.s.Live && p.s.Playing })
 	if s, got := h.p.State(), h.stream.lastLoad(); s.Speed != 1 || !strings.HasSuffix(got, " 1m0s true") {

@@ -137,7 +137,7 @@ func (r *recorder) Time(position, duration time.Duration) {
 	r.mu.Unlock()
 }
 func (r *recorder) Ended()                   { r.add("ended") }
-func (r *recorder) Error(message string)     { r.add("error: " + message) }
+func (r *recorder) Error(err error)          { r.add("error: " + err.Error()) }
 func (r *recorder) Playing(playing bool)     { r.add(fmt.Sprint("playing ", playing)) }
 func (r *recorder) Buffering(buffering bool) { r.add(fmt.Sprint("buffering ", buffering)) }
 

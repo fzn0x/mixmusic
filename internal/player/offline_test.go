@@ -175,7 +175,7 @@ func TestWaitMidTrack(t *testing.T) {
 	h.p.Time(42*time.Second, 200*time.Second)
 	net.set(false)
 	h.p.Playing(false)
-	h.p.Error("the network failed while loading the audio")
+	h.p.Error(errors.New("the network failed while loading the audio"))
 	h.wait("a waiting", waiting("a", true))
 	if n := retries(h, "a"); n != 0 {
 		t.Errorf("tried %d times offline", n)
@@ -246,7 +246,7 @@ func TestStreamErrorOnline(t *testing.T) {
 	h.wait("a playing", playing("a"))
 	h.p.Time(42*time.Second, 200*time.Second)
 	useRetries(t, h, "a", 0)
-	h.p.Error("the stream failed")
+	h.p.Error(errors.New("the stream failed"))
 	h.wait("b playing", playing("b"))
 	if n := h.notices(); len(n) != 1 || n[0].Message != "Couldn't play Song a: YouTube refused it" {
 		t.Errorf("notices %+v", n)

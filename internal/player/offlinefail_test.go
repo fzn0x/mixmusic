@@ -49,12 +49,12 @@ func TestKeptTrackFails(t *testing.T) {
 			h.wait("a playing", playing("a"))
 			h.p.Time(42*time.Second, 200*time.Second)
 			h.p.Playing(false)
-			h.p.Error("Can't read the file")
+			h.p.Error(errors.New("Can't read the file"))
 			h.wait("a tried", func(p *Player) bool { return retries(h, "a") == 1 && p.loaded })
 			if got := h.stream.lastLoad(); !strings.HasSuffix(got, " 42s true") {
 				t.Errorf("tried with %q", got)
 			}
-			h.p.Error("Can't read the file")
+			h.p.Error(errors.New("Can't read the file"))
 			h.wait("b playing", playing("b"))
 			if n := h.notices(); len(n) != 1 || n[0].Message != "Couldn't play Song a: Can't read the file" {
 				t.Errorf("notices %+v", n)
@@ -67,7 +67,7 @@ func TestKeptTrackFails(t *testing.T) {
 			h.wait("a playing", playing("a"))
 			h.p.Time(42*time.Second, 200*time.Second)
 			h.p.Playing(false)
-			h.p.Error("the network failed while loading the audio")
+			h.p.Error(errors.New("the network failed while loading the audio"))
 			h.wait("b playing", playing("b"))
 			if n := h.notices(); len(n) != 1 || n[0].Message != "Couldn't play Song a: File not found" {
 				t.Errorf("notices %+v", n)
@@ -96,7 +96,7 @@ func TestRetryEndsBeforeItHolds(t *testing.T) {
 		h.p.Time(at, 200*time.Second)
 		h.stream.silence("a")
 		h.p.Playing(false)
-		h.p.Error("Can't read the file")
+		h.p.Error(errors.New("Can't read the file"))
 		h.wait("a tried", func(p *Player) bool { return retries(h, "a") == 1 && p.loaded })
 	}
 	t.Run("a file cut short", func(t *testing.T) {
@@ -141,7 +141,7 @@ func TestRetryEndsBeforeItHolds(t *testing.T) {
 		h.p.Time(42*time.Second, 200*time.Second)
 		h.stream.silence("a")
 		h.p.Playing(false)
-		h.p.Error("the stream failed")
+		h.p.Error(errors.New("the stream failed"))
 		h.wait("a tried", func(p *Player) bool { return retries(h, "a") == 1 && p.loaded })
 		h.p.Ended()
 		h.wait("b playing", playing("b"))
@@ -165,7 +165,7 @@ func TestStreamBesideKeptWaits(t *testing.T) {
 	h.p.Time(42*time.Second, 200*time.Second)
 	net.set(false)
 	h.p.Playing(false)
-	h.p.Error("the network failed while loading the audio")
+	h.p.Error(errors.New("the network failed while loading the audio"))
 	h.wait("a waiting", waiting("a", true))
 	if n := retries(h, "a"); n != 0 {
 		t.Errorf("tried %d times offline", n)

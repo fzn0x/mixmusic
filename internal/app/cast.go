@@ -248,7 +248,7 @@ func (p *Player) StopCasting() { p.a.stopCasting() }
 func (a *App) castTo(ctx context.Context, id string) error {
 	gp := a.goPlayer.Load()
 	if gp == nil {
-		return errNoNative
+		return noNative()
 	}
 	c := &a.cast
 	c.mu.Lock()
@@ -361,11 +361,12 @@ func (a *App) castEnded(out *castOut, err error) {
 	}
 	cur.end(false)
 	note := locales.CastStoppedLost(cur.device.Name)
+	var taken *cast.TakenError
 	switch {
 	case errors.Is(err, cast.ErrStopped):
 		note = locales.CastStoppedElsewhere(cur.device.Name)
-	case err != nil && strings.HasSuffix(err.Error(), "plays on the cast device now"):
-		note = locales.CastStoppedTaken(cur.device.Name, err.Error())
+	case errors.As(err, &taken):
+		note = locales.CastStoppedTaken(cur.device.Name, locales.CastTakenBy(taken.App))
 	}
 	log.Printf("mixmusic: casting stopped: %v", err)
 	a.notifyCast(note)
@@ -400,6 +401,6 @@ func (e castEvents) to() audio.Events {
 
 func (e castEvents) Time(position, duration time.Duration) { e.to().Time(position, duration) }
 func (e castEvents) Ended()                                { e.to().Ended() }
-func (e castEvents) Error(message string)                  { e.to().Error(message) }
+func (e castEvents) Error(err error)                       { e.to().Error(err) }
 func (e castEvents) Playing(playing bool)                  { e.to().Playing(playing) }
 func (e castEvents) Buffering(buffering bool)              { e.to().Buffering(buffering) }

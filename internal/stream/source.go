@@ -23,8 +23,9 @@ var (
 	errClosed      = errors.New("stream: source closed")
 	// errDropped stops a download the source no longer needs.
 	errDropped = errors.New("stream: download dropped")
-	// errLoad is why a download failed, when the proxy didn't say.
-	errLoad = errors.New("the network failed while loading the audio")
+	// ErrLoad is why a download of a video's audio failed, when the proxy
+	// didn't say.
+	ErrLoad = errors.New("the network failed while loading the audio")
 )
 
 // Source is the audio of a video as MixMusic's own player reads it: what
@@ -104,10 +105,10 @@ func (p *Proxy) open(ctx context.Context, videoID, path string, interrupted func
 		// The proxy says why once it returned.
 		<-served
 		s.Close()
-		if why := p.Failure(videoID); why != "" {
-			return nil, errors.New(why)
+		if err := p.Fault(videoID); err != nil {
+			return nil, err
 		}
-		return nil, errLoad
+		return nil, ErrLoad
 	}
 	return s, nil
 }
@@ -159,10 +160,10 @@ func (s *Source) finish(d *download) {
 	}
 	s.dl = nil
 	if s.size < 0 || s.reach(d.at) != s.size {
-		if why := s.p.Failure(s.videoID); why != "" {
-			s.err = errors.New(why)
+		if err := s.p.Fault(s.videoID); err != nil {
+			s.err = err
 		} else {
-			s.err = errLoad
+			s.err = ErrLoad
 		}
 	}
 	s.cond.Broadcast()

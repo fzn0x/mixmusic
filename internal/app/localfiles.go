@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io/fs"
 	"log"
 	"os"
@@ -29,8 +28,19 @@ import (
 // play on cast devices, which can't reach them.
 type LocalFiles struct{ a *App }
 
-// errFileMissing is why a local track whose file is gone doesn't play.
+// errFileMissing is why a local track whose file is gone doesn't play:
+// fileMissing returns it, in the windows' words.
 var errFileMissing = errors.New("File not found")
+
+func fileMissing() error {
+	return wordedLater(errFileMissing.Error(), locales.ErrorLocalFilesMissing, errFileMissing)
+}
+
+// notIndexed is why a track of id, which the index doesn't know, doesn't
+// play.
+func notIndexed(id string) error {
+	return worded("not a file of this computer: "+id, locales.ErrorLocalFilesNotIndexed(), nil)
+}
 
 // localScans keeps the scans of the index: one at a time, the folders it
 // scanned last, and its end, which Close waits for; and the watch of the
@@ -258,9 +268,9 @@ func (a *App) prepareFile(track media.Track) (PlaybackSource, error) {
 		path, ok := a.localFiles.FileOf(track.ID)
 		switch {
 		case !ok && localfiles.IsSong(track.ID):
-			return PlaybackSource{}, errFileMissing
+			return PlaybackSource{}, fileMissing()
 		case !ok:
-			return PlaybackSource{}, fmt.Errorf("not a file of this computer: %s", track.ID)
+			return PlaybackSource{}, notIndexed(track.ID)
 		}
 		id := localfiles.TrackID(path)
 		if info, err := os.Stat(path); err != nil || info.IsDir() {
@@ -268,7 +278,7 @@ func (a *App) prepareFile(track media.Track) (PlaybackSource, error) {
 			if localfiles.IsSong(track.ID) {
 				continue // its next copy
 			}
-			return PlaybackSource{}, errFileMissing
+			return PlaybackSource{}, fileMissing()
 		}
 		a.localFiles.Found(id)
 		_, native, _ := media.ParseID(id)
@@ -283,12 +293,12 @@ func (a *App) prepareFile(track media.Track) (PlaybackSource, error) {
 func (a *App) openFile(native string) (audio.Source, error) {
 	path, ok := localfiles.PathOf(media.ID(media.SourceFile, native))
 	if !ok {
-		return nil, fmt.Errorf("not a file of this computer: %s", native)
+		return nil, notIndexed(native)
 	}
 	f, err := store.OpenShared(path)
 	if err != nil {
 		a.localFiles.Gone(media.ID(media.SourceFile, native))
-		return nil, errFileMissing
+		return nil, fileMissing()
 	}
 	return newFileSource(f), nil
 }

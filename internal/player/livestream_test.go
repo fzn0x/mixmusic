@@ -2,6 +2,7 @@ package player
 
 import (
 	"context"
+	"errors"
 	"slices"
 	"strings"
 	"testing"
@@ -160,7 +161,7 @@ func TestLiveTrackTriedAgain(t *testing.T) {
 	h.p.PlayTracks([]media.Track{liveTrack("liveRadio01")}, 0)
 	h.wait("the stream playing", playing("liveRadio01"))
 	h.p.Time(time.Minute, 0)
-	h.p.Error("the network failed while loading the audio")
+	h.p.Error(errors.New("the network failed while loading the audio"))
 	h.wait("tried again", func(*Player) bool { return strings.HasPrefix(h.stream.lastLoad(), "load url:yt:liveRadio01?retry=") })
 	h.wait("live again", func(p *Player) bool { return p.s.Live && p.s.Playing })
 	if s := h.p.State(); !strings.HasSuffix(h.stream.lastLoad(), " 1m0s true") || s.Duration != 0 {

@@ -124,9 +124,9 @@ func (s *shell) saveLyricsCard(t media.Track, ly lyrics.Lyrics, size sharecard.S
 	switch {
 	case ly.Source == "":
 	case ly.By == "":
-		credit = locales.LyricsShareCredit(ly.Source)
+		credit = locales.LyricsShareCredit(lyricsSourceName(ly.Source))
 	default:
-		credit = locales.LyricsShareCreditBy(ly.Source, ly.By)
+		credit = locales.LyricsShareCreditBy(lyricsSourceName(ly.Source), ly.By)
 	}
 	s.saveCard(t.Title, t.Artwork, size, func(cover image.Image, size sharecard.Size) sharecard.Card {
 		c := sharecard.Card{Size: size, Colors: colors, Cover: cover, CoverAt: sharecard.CoverFoot}

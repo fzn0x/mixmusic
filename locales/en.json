@@ -4596,7 +4596,7 @@
   },
   "lyricsSourceFound": "{shown, select, yes {Showing} other {Found}}, {timing, select, words {timed word by word} lines {timed by line} other {not timed}}, {count, plural, one {# line} other {# lines}}",
   "@lyricsSourceFound": {
-    "description": "Under a source in the menu of the lyrics sources, and under a result of lyricsSearchTitle: the lyrics it found. {shown} is yes for the lyrics that show now; {timing} is words for lyrics timed word by word, lines for lyrics timed line by line, plain for lyrics without times; {count} counts the lines with words.",
+    "description": "Under a source in the menu of the lyrics sources, and under a result of lyricsSearchTitle: the lyrics it found. {shown} is yes for the lyrics that show now; {timing} is words for lyrics timed word by word, lines for lyrics timed line by line, and anything else (plain, the other case) for lyrics without times; {count} counts the lines with words.",
     "placeholders": {
       "shown": {
         "type": "String",

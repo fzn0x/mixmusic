@@ -15274,8 +15274,8 @@ func (msgs Messages) LyricsSourceEdited() string {
 // Under a source in the menu of the lyrics sources, and under a result of
 // lyricsSearchTitle: the lyrics it found. {shown} is yes for the lyrics
 // that show now; {timing} is words for lyrics timed word by word, lines for
-// lyrics timed line by line, plain for lyrics without times; {count} counts
-// the lines with words.
+// lyrics timed line by line, and anything else (plain, the other case) for
+// lyrics without times; {count} counts the lines with words.
 func LyricsSourceFound(shown string, timing string, count int) string {
 	return In(i18n.Locale()).LyricsSourceFound(shown, timing, count)
 }
@@ -15286,8 +15286,8 @@ func LyricsSourceFound(shown string, timing string, count int) string {
 // Under a source in the menu of the lyrics sources, and under a result of
 // lyricsSearchTitle: the lyrics it found. {shown} is yes for the lyrics
 // that show now; {timing} is words for lyrics timed word by word, lines for
-// lyrics timed line by line, plain for lyrics without times; {count} counts
-// the lines with words.
+// lyrics timed line by line, and anything else (plain, the other case) for
+// lyrics without times; {count} counts the lines with words.
 func (msgs Messages) LyricsSourceFound(shown string, timing string, count int) string {
 	return Catalog.Format(msgs.locale, "lyricsSourceFound", map[string]any{"shown": shown, "timing": timing, "count": count})
 }

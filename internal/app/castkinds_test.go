@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/fzn0x/mixmusic/builtin"
+	"github.com/fzn0x/mixmusic/internal/audio"
 	"github.com/fzn0x/mixmusic/internal/cast"
 	"github.com/fzn0x/mixmusic/internal/fcast"
 	"github.com/fzn0x/mixmusic/internal/fcast/fcasttest"
@@ -196,7 +197,7 @@ func TestCastingToRenderer(t *testing.T) {
 	}
 
 	// The next track goes ahead, as the player preloads it.
-	cur.out.Preload(streamURL("bbbbbbbbbbb"))
+	cur.out.Preload(streamURL("bbbbbbbbbbb"), audio.Cue{})
 	next := fake.Wait(t, "SetNextAVTransportURI", 1)
 	if !strings.HasSuffix(next.Args["NextURI"], "/yt/bbbbbbbbbbb/aac.m4a") ||
 		!strings.Contains(next.Args["NextURIMetaData"], "<dc:title>Song bbbbbbbbbbb</dc:title>") {

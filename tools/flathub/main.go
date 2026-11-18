@@ -2,7 +2,8 @@
 // (packaging/flathub) needs beside it: go-modules.json, the sources of the
 // Go modules MixMusic is built with, which flatpak-builder downloads from
 // the Go module proxy into vendor/ before the build, which runs without
-// the network, with vendor/modules.txt as go mod vendor writes it. It
+// the network, with a vendor/modules.txt of go mod vendor's modules that
+// lists every package of each, so that it changes only with go.sum. It
 // downloads each module once and checks it against go.sum.
 //
 //	go run ./tools/flathub          writes packaging/flathub/go-modules.json
@@ -105,9 +106,9 @@ func checkSources(root string) error {
 	return nil
 }
 
-// sources returns go-modules.json: modules.txt, as go mod vendor writes it,
-// then each module vendored, as an archive of the proxy, which fetch
-// downloads.
+// sources returns go-modules.json: modules.txt, of the modules go mod
+// vendor writes it with and every package of each, then each module
+// vendored, as an archive of the proxy, which fetch downloads.
 func sources(root string, fetch func(url string) ([]byte, error)) ([]byte, error) {
 	modulesTxt, err := vendorModules(root)
 	if err != nil {

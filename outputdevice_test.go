@@ -72,11 +72,15 @@ func TestOutputChoices(t *testing.T) {
 	}
 }
 
+// outputWide is a window wide enough for the device button beside the
+// player bar's other buttons, the sleep timer's among them.
+const outputWide = 1440
+
 // outputShell is a test shell of an app whose computer has the output
 // devices that devices returns. Spotify tracks play from YouTube Music, on
 // every system: on Linux, a new install's Spotify Connect shows its
 // devices button in the player bar too, which takes the room of the
-// device button at 1280.
+// device button in a window outputWide wide.
 func outputShell(t *testing.T, devices func() []app.OutputDevice) *shell {
 	t.Helper()
 	s := newTestShellOf(t, func(o *app.Options) {
@@ -170,7 +174,7 @@ func TestOutputButton(t *testing.T) {
 		defer mu.Unlock()
 		return slices.Clone(devices)
 	})
-	tt := tester(t, s)
+	tt := testerOf(t, s, outputWide, 820)
 	settleOutput(t, s, tt)
 	button, ok := tt.Find("Output device: System default")
 	if !ok {
@@ -243,10 +247,10 @@ func TestOutputButtonHidden(t *testing.T) {
 		}
 	}
 	// Widened, the window has room for it.
-	tt.SetSize(1280, 820)
+	tt.SetSize(outputWide, 820)
 	settleOutput(t, two, tt)
 	if _, ok := tt.Find("Output device: System default"); !ok {
-		t.Errorf("no device button at 1280: %q", tt.Texts())
+		t.Errorf("no device button at %d: %q", outputWide, tt.Texts())
 	}
 }
 
@@ -269,14 +273,14 @@ func TestOutputButtonNarrowed(t *testing.T) {
 	devices = append(devices, app.OutputDevice{ID: "hp", Name: "Headphones"})
 	mu.Unlock()
 	s.refetch(outputDevicesKey)
-	tt.SetSize(1280, 820)
+	tt.SetSize(outputWide, 820)
 	tt.Frame()
 	tt.SetSize(1150, 820)
 	settleOutput(t, s, tt)
 	if _, ok := tt.Find("Output device: System default"); ok {
 		t.Error("a device button where the player bar has no room for it")
 	}
-	tt.SetSize(1280, 820)
+	tt.SetSize(outputWide, 820)
 	outputFrames(s, tt)
 	if _, ok := tt.Find("Output device: System default"); !ok {
 		t.Errorf("no device button in a window wide again: %q", tt.Texts())
@@ -296,7 +300,7 @@ func TestOutputButtonKeepsTheVolume(t *testing.T) {
 	s.p.PlayTracks(testTracks, 0)
 	s.p.SetVolume(0.5)
 	s.settle(t, func(st player.State) bool { return st.Playing && st.Volume == 0.5 })
-	tt := tester(t, s)
+	tt := testerOf(t, s, outputWide, 820)
 	settleOutput(t, s, tt)
 	r, ok := tt.Find("Volume")
 	if !ok {

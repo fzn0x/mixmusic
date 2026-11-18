@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"iter"
-	"strings"
 )
 
 // The words of a track YouTube plays only to some signed-in viewers (#577):
@@ -88,11 +87,11 @@ var notAsked = map[string]string{
 
 // said tells how a try that took no stream went, for the details: why the
 // stream found as the account wasn't taken, or why it didn't ask.
-func (t accountTry) said() string {
+func (t accountTry) said() error {
 	if t.skip == "" {
-		return strings.TrimPrefix(t.err.Error(), "stream: ")
+		return trimmed(t.err, "stream: ")
 	}
-	return "not asked: " + notAsked[t.skip]
+	return errors.New("not asked: " + notAsked[t.skip])
 }
 
 // signedInOff are the words of a track YouTube plays only to signed-in
@@ -151,13 +150,13 @@ func (e *accountFailure) Unwrap() []error {
 
 // Steps tells how asking as the account went first, then the signed-out
 // ways, then the run once more as the account, when there was one.
-func (e *accountFailure) Steps() iter.Seq2[string, string] {
-	return func(yield func(string, string) bool) {
+func (e *accountFailure) Steps() iter.Seq2[string, error] {
+	return func(yield func(string, error) bool) {
 		if !yield("as your account", e.first.said()) {
 			return
 		}
 		var st interface {
-			Steps() iter.Seq2[string, string]
+			Steps() iter.Seq2[string, error]
 		}
 		if errors.As(e.err, &st) {
 			for what, why := range st.Steps() {
@@ -165,7 +164,7 @@ func (e *accountFailure) Steps() iter.Seq2[string, string] {
 					return
 				}
 			}
-		} else if !yield(e.route, strings.TrimPrefix(strings.TrimPrefix(e.err.Error(), "stream: "), "yt-dlp: ")) {
+		} else if !yield(e.route, trimmed(trimmed(e.err, "stream: "), "yt-dlp: ")) {
 			return
 		}
 		if e.again.skip == "" {

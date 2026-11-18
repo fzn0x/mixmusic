@@ -31,14 +31,14 @@ func signedInOnly(t *testing.T, asAccount func(context.Context) ([]byte, error),
 func stepsOf(t *testing.T, err error) [][2]string {
 	t.Helper()
 	var st interface {
-		Steps() iter.Seq2[string, string]
+		Steps() iter.Seq2[string, error]
 	}
 	if !errors.As(err, &st) {
 		t.Fatalf("%T tells no steps", err)
 	}
 	var steps [][2]string
 	for what, why := range st.Steps() {
-		steps = append(steps, [2]string{what, why})
+		steps = append(steps, [2]string{what, why.Error()})
 	}
 	return steps
 }
@@ -229,7 +229,7 @@ func TestAccountStepsInTheDetails(t *testing.T) {
 			continue
 		}
 		var st interface {
-			Steps() iter.Seq2[string, string]
+			Steps() iter.Seq2[string, error]
 		}
 		if told := errors.As(err, &st); told != on {
 			t.Errorf("not in the country, the switch on %v: tells steps %v", on, told)

@@ -83,8 +83,14 @@ MixMusic, from YouTube Music for them.
   chosen for it. MixMusic asks the device to play at the
   [speed](playing-music.md#speed) you set.
 
-When another app takes the device over, as someone casting to it from a
-phone, the cast ends, and MixMusic says so.
+A cast that ends by itself, on any kind of device, brings the track back to
+this computer, paused, and a note says why. "Casting to {device} stopped:
+the connection was lost" means the device stopped answering. "...it stopped
+playing from MixMusic" means the device ended the cast, or, on a DLNA
+renderer or an FCast receiver, that another app took it over, as someone
+casting to it from a phone. "...{app} plays on the device now" means
+another app took a Google Cast device over. The device's name stands where
+{device} is.
 
 ## DLNA and UPnP renderers
 
@@ -105,7 +111,8 @@ track doesn't play, and MixMusic names the format it would need, as
   only at their own speed: the speed button is dimmed then, and its tip
   says so.
 - **When it stops answering**, ten times in a row, the music comes back to
-  this computer, paused, as when a Google Cast device goes away.
+  this computer, paused, as when a Google Cast device goes away, and the
+  note says the connection was lost.
 
 ## FCast receivers
 
@@ -119,6 +126,11 @@ sender gives them. MixMusic finds them on your network by mDNS.
   version with such a receiver. An older receiver gets FCast's version 3.
 - **Formats.** A receiver that lists Opus in WebM gets that; others get
   the track's AAC audio, as renderers do.
+- **When it stops answering.** MixMusic asks a receiver that has said
+  nothing for 3 seconds whether it is there. One silent for 6 seconds, or a
+  broken connection, ends the cast, and the note says the connection was
+  lost. A receiver that loads other media ends the cast too, and the note
+  says it stopped playing from MixMusic.
 - **The volume.** FCast has no mute: muting sets the receiver's volume to
   nothing, and unmuting gives it back.
 

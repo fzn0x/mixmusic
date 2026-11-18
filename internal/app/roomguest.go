@@ -665,7 +665,7 @@ func roomProblem(name string, err error) string {
 		return locales.RoomProblemCodeShape()
 	}
 	if err != nil && !errors.Is(err, room.ErrLost) && !isNetErr(err) {
-		return err.Error()
+		return ErrorText(err)
 	}
 	return locales.RoomProblemUnreachable(name)
 }

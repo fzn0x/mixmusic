@@ -124,17 +124,22 @@ func (p *Player) PlayNext(tracks []media.Track) {
 // radio. A track added by itself is one the user chose, as for PlayNext.
 func (p *Player) Enqueue(tracks []media.Track) {
 	tracks = slices.Clone(tracks)
-	p.do(func() {
-		items := p.chosenItems(tracks)
-		if u := p.unshuffled; u != nil {
-			// In the queue's own order too.
-			cur, _ := p.s.Current()
-			p.unshuffled = slices.Insert(slices.Clone(u), enqueueAt(u, indexIn(u, cur.UID)), items...)
-		}
-		q := p.s.Queue
-		p.s.Queue = slices.Insert(slices.Clone(q), enqueueAt(q, p.s.Index), items...)
-		p.emit(QueueChange)
-	})
+	p.do(func() { p.enqueue(p.chosenItems(tracks)) })
+}
+
+// enqueue is Enqueue of items on the player's goroutine. It returns where
+// in the queue they went.
+func (p *Player) enqueue(items []Item) int {
+	if u := p.unshuffled; u != nil {
+		// In the queue's own order too.
+		cur, _ := p.s.Current()
+		p.unshuffled = slices.Insert(slices.Clone(u), enqueueAt(u, indexIn(u, cur.UID)), items...)
+	}
+	q := p.s.Queue
+	at := enqueueAt(q, p.s.Index)
+	p.s.Queue = slices.Insert(slices.Clone(q), at, items...)
+	p.emit(QueueChange)
+	return at
 }
 
 // enqueueAt is where tracks added to q go: at its end, before the entries

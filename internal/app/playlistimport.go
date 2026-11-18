@@ -544,9 +544,22 @@ func (i *Imports) Pick(picked []bool) {
 	a.importChanged()
 }
 
-// Stop stops looking, for the user to review what was found: the songs
-// not looked for yet count as not found, and TryAgain looks for them.
-func (i *Imports) Stop() { i.a.stopImportRun("stop") }
+// Stop stops looking, for the user to review what was found, as after a
+// halt too: the songs not looked for yet count as not found, and
+// TryAgain looks for them.
+func (i *Imports) Stop() {
+	a := i.a
+	a.stopImportRun("stop")
+	im := &a.imports
+	im.mu.Lock()
+	defer im.mu.Unlock()
+	a.importLoad()
+	if j := im.data.Job; j != nil && im.run == nil && (j.Step == ImportMatching || j.Step == ImportHalted) {
+		j.Step, j.Halt, j.Cause = ImportReview, "", ""
+		a.importSave()
+		a.importChanged()
+	}
+}
 
 // TryAgain looks again for the songs not looked for yet, as after a halt.
 func (i *Imports) TryAgain() {

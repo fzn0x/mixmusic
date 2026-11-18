@@ -19,6 +19,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -76,6 +77,9 @@ type Renderer struct {
 	broken  bool
 }
 
+// renderers counts the renderers made, which their UDNs tell apart.
+var renderers atomic.Int64
+
 // New starts a renderer, which stops as the test ends.
 func New(t *testing.T, opts Options) *Renderer {
 	t.Helper()
@@ -83,7 +87,7 @@ func New(t *testing.T, opts Options) *Renderer {
 		opts.Name = "Living Room TV"
 	}
 	if opts.UDN == "" {
-		opts.UDN = "uuid:5a6b7c8d-0000-1111-2222-" + strconv.FormatInt(time.Now().UnixNano()%1e12, 10)
+		opts.UDN = fmt.Sprintf("uuid:5a6b7c8d-0000-1111-2222-%012d", renderers.Add(1))
 	}
 	if opts.Sink == "" {
 		opts.Sink = "http-get:*:audio/mpeg:*,http-get:*:audio/mp4:*,http-get:*:audio/webm:*"

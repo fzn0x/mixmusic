@@ -37,10 +37,29 @@ func (s *shell) startSleep(t player.SleepTimer, open *bool) {
 // sleepButton is the moon button by the player, beside the speed button:
 // while the timer runs, it shows how long it has left, to the second, in
 // the accent. It opens sleepMenu.
-func (s *shell) sleepButton(c *ui.Context) {
+func (s *shell) sleepButton(c *ui.Context, room *outputSlot) {
 	k := &s.lk
 	now := time.Now()
 	left, on := s.st.SleepLeft(now)
+	// With no timer, the moon gives way to the device button, which a
+	// narrow window has room for alone: it shows once there is room for it
+	// and a little more, and while it showed, until none is left; never while
+	// the device button waits for room. A timer that runs always shows, as
+	// its time left. Its menu is also in the palette, the mini player and
+	// the tray.
+	if !on {
+		waits := s.outputChoice() && !room.shown
+		if room.moon {
+			room.moon = !waits && room.free >= 1
+		} else {
+			room.moon = !waits && room.free >= roomSleep+4
+		}
+		if !room.moon {
+			// Without the gap before it.
+			ui.Row(c.Key("sleep-slot")).Shrink(0).MarginEnd(-4)
+			return
+		}
+	}
 	label := locales.SleepTimerTitle()
 	if on {
 		label = locales.SleepTimerLeft(player.SleepClock(left))
@@ -404,3 +423,7 @@ func dayTimes(t string) []string {
 	}
 	return out
 }
+
+// roomSleep is the width the sleep timer's button needs beside the others
+// in the player bar, with no timer, with its gap.
+const roomSleep = 36

@@ -8,6 +8,7 @@ import (
 
 	"github.com/egoist/mygo/ui"
 
+	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/player"
 	"github.com/fzn0x/mixmusic/locales"
@@ -328,5 +329,28 @@ func TestSleepSettings(t *testing.T) {
 	got = s.svc.Preferences.Get().SleepTimer
 	if !got.ByDay || got.Days[time.Monday].On || !got.Days[time.Tuesday].On {
 		t.Errorf("the settings keep %+v", got)
+	}
+}
+
+// TestSleepGivesWay keeps the device button in a window 1280 wide, where
+// the player bar has room for it alone: the moon gives way while no timer
+// runs, and shows its time left once one does.
+func TestSleepGivesWay(t *testing.T) {
+	s := outputShell(t, func() []app.OutputDevice {
+		return []app.OutputDevice{{ID: "sp", Name: "Speakers"}, {ID: "hp", Name: "Headphones"}}
+	})
+	tt := testerOf(t, s, 1280, 820)
+	settleOutput(t, s, tt)
+	if _, ok := tt.Find("Output device: System default"); !ok {
+		t.Fatalf("no device button at 1280: %q", tt.Texts())
+	}
+	if got := sleepLabel(tt); got != "" {
+		t.Errorf("the moon %q took the device button's room", got)
+	}
+	s.p.StartSleep(player.SleepTimer{Mode: player.SleepMinutes, N: 30})
+	s.settle(t, func(st player.State) bool { return sleepMinutesLeft(st) > 0 })
+	outputFrames(s, tt)
+	if got := sleepLabel(tt); !strings.HasPrefix(got, "Sleep timer: ") {
+		t.Errorf("a timer that runs shows no moon: %q", tt.Texts())
 	}
 }

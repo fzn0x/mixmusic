@@ -3552,7 +3552,7 @@
   },
   "equalizerHeadphonesLineMissing": "the filter on line {line} has no {parameter}",
   "@equalizerHeadphonesLineMissing": {
-    "description": "Why a ParametricEQ.txt file didn't import, in the {error} of equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a filter lacks one of its parameters. {parameter} is Fc, its frequency, Gain or Q, as the file names them, which stay as they are. A lowercase fragment.",
+    "description": "Why a ParametricEQ.txt file didn't import, in the {error} of equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a filter lacks one of its parameters. {parameter} is Fc (the frequency), Gain or Q, as the file names them, which stay as they are. A lowercase fragment.",
     "placeholders": {
       "line": {
         "type": "int"
@@ -3716,7 +3716,7 @@
   "@equalizerHeadphonesTooBig": {
     "description": "Why a file didn't import, in the {error} of equalizerHeadphonesImportFailed: it is far bigger than a ParametricEQ.txt file is. A lowercase fragment."
   },
-  "equalizerHeadphonesTooMany": "the file holds {count} filters, and MixMusic plays up to {most}",
+  "equalizerHeadphonesTooMany": "the file holds {count, plural, one {# filter} other {# filters}}, and MixMusic plays up to {most}",
   "@equalizerHeadphonesTooMany": {
     "description": "Why a ParametricEQ.txt file didn't import, in the {error} of equalizerHeadphonesImportFailed: it holds more filters than a correction has. {most} is 20. A lowercase fragment.",
     "placeholders": {

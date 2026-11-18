@@ -11157,7 +11157,7 @@ func (msgs Messages) EqualizerHeadphonesLineLeft(line int, text string) string {
 //
 // Why a ParametricEQ.txt file didn't import, in the {error} of
 // equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a
-// filter lacks one of its parameters. {parameter} is Fc, its frequency,
+// filter lacks one of its parameters. {parameter} is Fc (the frequency),
 // Gain or Q, as the file names them, which stay as they are. A lowercase
 // fragment.
 func EqualizerHeadphonesLineMissing(line int, parameter string) string {
@@ -11169,7 +11169,7 @@ func EqualizerHeadphonesLineMissing(line int, parameter string) string {
 //
 // Why a ParametricEQ.txt file didn't import, in the {error} of
 // equalizerHeadphonesImportFailed or equalizerHeadphonesPickFailed: a
-// filter lacks one of its parameters. {parameter} is Fc, its frequency,
+// filter lacks one of its parameters. {parameter} is Fc (the frequency),
 // Gain or Q, as the file names them, which stay as they are. A lowercase
 // fragment.
 func (msgs Messages) EqualizerHeadphonesLineMissing(line int, parameter string) string {
@@ -11502,7 +11502,7 @@ func (msgs Messages) EqualizerHeadphonesTooBig() string {
 	return Catalog.Format(msgs.locale, "equalizerHeadphonesTooBig", nil)
 }
 
-// EqualizerHeadphonesTooMany says "the file holds {count} filters, and MixMusic plays up to {most}"
+// EqualizerHeadphonesTooMany says "the file holds {count, plural, one {# filter} other {# filters}}, and MixMusic plays up to {most}"
 // in the language the app shows.
 //
 // Why a ParametricEQ.txt file didn't import, in the {error} of
@@ -11512,7 +11512,7 @@ func EqualizerHeadphonesTooMany(count int, most int) string {
 	return In(i18n.Locale()).EqualizerHeadphonesTooMany(count, most)
 }
 
-// EqualizerHeadphonesTooMany says "the file holds {count} filters, and MixMusic plays up to {most}"
+// EqualizerHeadphonesTooMany says "the file holds {count, plural, one {# filter} other {# filters}}, and MixMusic plays up to {most}"
 // in the language of msgs.
 //
 // Why a ParametricEQ.txt file didn't import, in the {error} of

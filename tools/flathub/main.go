@@ -35,6 +35,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -152,13 +153,18 @@ type source struct {
 type module struct{ path, version string }
 
 // sourcesOf returns the sources of modulesTxt's modules, each checked
-// against its hash in sums, go.sum's lines.
+// against its hash in sums, go.sum's lines. The modules.txt it gives lists
+// every package of each module's archive, which vendor/ holds whole, not
+// only those MixMusic imports: a new import of a module it uses already
+// leaves go-modules.json as it is, so that pull requests that add imports
+// merge in any order (#843).
 func sourcesOf(modulesTxt, sums []byte, fetch func(url string) ([]byte, error)) ([]byte, error) {
 	mods, err := vendored(modulesTxt)
 	if err != nil {
 		return nil, err
 	}
-	list := []source{{Type: "inline", Dest: "vendor", DestFilename: "modules.txt", Contents: string(modulesTxt)}}
+	var list []source
+	pkgs := map[module][]string{}
 	for _, m := range mods {
 		want := goSum(sums, m)
 		if want == "" {
@@ -176,6 +182,9 @@ func sourcesOf(modulesTxt, sums []byte, fetch func(url string) ([]byte, error)) 
 		if got != want {
 			return nil, fmt.Errorf("%s is %s, go.sum says %s", url, got, want)
 		}
+		if pkgs[m], err = packagesOf(data, m); err != nil {
+			return nil, fmt.Errorf("%s: %w", url, err)
+		}
 		sum := sha256.Sum256(data)
 		list = append(list, source{
 			Type:            "archive",
@@ -185,6 +194,11 @@ func sourcesOf(modulesTxt, sums []byte, fetch func(url string) ([]byte, error)) 
 			Dest:            "vendor/" + m.path,
 		})
 	}
+	all, err := withPackages(modulesTxt, pkgs)
+	if err != nil {
+		return nil, err
+	}
+	list = append([]source{{Type: "inline", Dest: "vendor", DestFilename: "modules.txt", Contents: string(all)}}, list...)
 	var b bytes.Buffer
 	enc := json.NewEncoder(&b)
 	enc.SetEscapeHTML(false)
@@ -193,6 +207,79 @@ func sourcesOf(modulesTxt, sums []byte, fetch func(url string) ([]byte, error)) 
 		return nil, err
 	}
 	return b.Bytes(), nil
+}
+
+// packagesOf returns the packages of m's module zip, sorted: the folders
+// with Go files that aren't only tests, but those go build never reads,
+// testdata and those whose names start with "." or "_".
+func packagesOf(data []byte, m module) ([]string, error) {
+	z, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
+	if err != nil {
+		return nil, err
+	}
+	prefix := escape(m.path) + "@" + escape(m.version) + "/"
+	seen := map[string]bool{}
+	for _, f := range z.File {
+		name, ok := strings.CutPrefix(f.Name, prefix)
+		if !ok || !strings.HasSuffix(name, ".go") || strings.HasSuffix(name, "_test.go") {
+			continue
+		}
+		dir := path.Dir(name)
+		skip := false
+		for _, el := range strings.Split(dir, "/") {
+			if el == "testdata" || el == "vendor" || strings.HasPrefix(el, ".") && el != "." || strings.HasPrefix(el, "_") {
+				skip = true
+			}
+		}
+		if skip {
+			continue
+		}
+		pkg := m.path
+		if dir != "." {
+			pkg += "/" + dir
+		}
+		seen[pkg] = true
+	}
+	if len(seen) == 0 {
+		return nil, errors.New("the module has no packages")
+	}
+	pkgs := make([]string, 0, len(seen))
+	for p := range seen {
+		pkgs = append(pkgs, p)
+	}
+	slices.Sort(pkgs)
+	return pkgs, nil
+}
+
+// withPackages returns modulesTxt with the packages of each module in pkgs
+// in place of those it lists; a module pkgs doesn't have keeps none.
+func withPackages(modulesTxt []byte, pkgs map[module][]string) ([]byte, error) {
+	var b bytes.Buffer
+	var cur []string
+	flush := func() {
+		for _, p := range cur {
+			b.WriteString(p + "\n")
+		}
+		cur = nil
+	}
+	sc := bufio.NewScanner(bytes.NewReader(modulesTxt))
+	for sc.Scan() {
+		line := sc.Text()
+		switch {
+		case strings.HasPrefix(line, "## "):
+			b.WriteString(line + "\n")
+		case strings.HasPrefix(line, "# "):
+			flush()
+			b.WriteString(line + "\n")
+			if f := strings.Fields(line[2:]); len(f) == 2 {
+				cur = pkgs[module{f[0], f[1]}]
+			}
+		case strings.TrimSpace(line) == "":
+			b.WriteString(line + "\n")
+		}
+	}
+	flush()
+	return b.Bytes(), sc.Err()
 }
 
 // vendored returns the modules of modules.txt that have packages vendored,

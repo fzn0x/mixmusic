@@ -59,10 +59,23 @@ func fakeZip(t *testing.T, prefix string, files map[string]string) []byte {
 }
 
 // The sources vendor each module whose packages modules.txt lists, from
-// the proxy, as go.sum hashes it, after modules.txt itself.
+// the proxy, as go.sum hashes it, after modules.txt itself, which lists
+// every package the module's zip holds, imported or not (#843): not its
+// tests alone, testdata, nor folders starting with "." or "_".
 func TestSourcesOf(t *testing.T) {
-	const modulesTxt = "# example.com/Foo/bar v1.2.0\n## explicit; go 1.26\nexample.com/Foo/bar\nexample.com/Foo/bar/baz\n# example.com/unused v0.1.0\n## explicit; go 1.20\n"
-	zipFile := fakeZip(t, "example.com/!foo/bar@v1.2.0/", map[string]string{"go.mod": "module example.com/Foo/bar\n", "bar.go": "package bar\n"})
+	const modulesTxt = "# example.com/Foo/bar v1.2.0\n## explicit; go 1.26\nexample.com/Foo/bar/baz\n# example.com/unused v0.1.0\n## explicit; go 1.20\n"
+	const allPackages = "# example.com/Foo/bar v1.2.0\n## explicit; go 1.26\nexample.com/Foo/bar\nexample.com/Foo/bar/baz\nexample.com/Foo/bar/internal/qux\n# example.com/unused v0.1.0\n## explicit; go 1.20\n"
+	zipFile := fakeZip(t, "example.com/!foo/bar@v1.2.0/", map[string]string{
+		"go.mod":                  "module example.com/Foo/bar\n",
+		"bar.go":                  "package bar\n",
+		"baz/baz.go":              "package baz\n",
+		"internal/qux/qux.go":     "package qux\n",
+		"internal/qux/README.md":  "qux\n",
+		"tests/only_test.go":      "package tests\n",
+		"baz/testdata/fixture.go": "package fixture\n",
+		"_examples/main.go":       "package main\n",
+		".hidden/x.go":            "package x\n",
+	})
 	h1, err := hashZip(zipFile)
 	if err != nil {
 		t.Fatal(err)
@@ -87,7 +100,7 @@ func TestSourcesOf(t *testing.T) {
 	}
 	sum := sha256.Sum256(zipFile)
 	want := []source{
-		{Type: "inline", Dest: "vendor", DestFilename: "modules.txt", Contents: modulesTxt},
+		{Type: "inline", Dest: "vendor", DestFilename: "modules.txt", Contents: allPackages},
 		{Type: "archive", URL: url, SHA256: hex.EncodeToString(sum[:]), StripComponents: 3, Dest: "vendor/example.com/Foo/bar"},
 	}
 	if len(got) != len(want) {

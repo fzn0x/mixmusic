@@ -23,6 +23,19 @@ The search box at the top of the window, "Search Spotify and YouTube Music", sea
 
 The [command palette](settings.md#the-command-palette) (Ctrl+K) searches too: type anything, and its first item is "Search for" what you typed.
 
+### Open a link
+
+Paste a link of YouTube, YouTube Music or Spotify in the search box, and Enter opens what it names rather than search its text. The box suggests that item alone, with its cover; in the command palette, **Open link** takes the place of "Search for". A link is never kept among your recent searches. These links open:
+
+- **YouTube and YouTube Music,** on music.youtube.com, youtube.com, www.youtube.com, m.youtube.com and youtu.be:
+  - a song or a video: `watch?v=`, `youtu.be/` and `shorts/` links. It plays at once, as a suggested song does, with its radio after it when Autoplay is on.
+  - a playlist, or an album by its playlist: `list=` with an ID that starts with PL, OLAK5uy_ or RDCLAK5uy_, beside `v=` too. Its page opens, the album's for the playlist of an album's tracks. From a YouTube Music playlist's page, **Copy into a mix you can extend**, in its More menu, copies it, up to 20,000 tracks, signed in or not.
+  - a radio: `v=` beside any other `list=` that starts with RD. The song plays with that radio after it, as the radio's tracks in Up next.
+  - an album, `browse/MPREb_…`, and an artist, `channel/UC…`: their pages open.
+- **Spotify,** on open.spotify.com, with the page's language (`intl-de/`) or without, and as `spotify:` URIs, such as `spotify:track:…`: a track, which plays at once, an album, a playlist and an artist, whose pages open, and a show or an episode, which open the podcast's page. They need you [signed in to Spotify](spotify.md#sign-in): signed out, a toast says to sign in under Settings › Accounts. A playlist made by someone else opens the page that says Spotify hides its tracks from apps.
+
+What tracks who shared a link, as `si=`, `pp=` and `feature=`, is dropped. A link to any other site, or to another page of these, is searched as before. When what a link names can't be read, as a song YouTube doesn't have or a track Spotify won't tell apps of, a toast says why, and nothing is searched.
+
 ## Playing from anywhere
 
 - **A track's row:** double-click it, or click its cover, to play the list from that track: the album, the playlist or the search results. Doing so on the track that plays pauses it.

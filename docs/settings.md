@@ -237,7 +237,9 @@ keys.
   <kbd>Enter</kbd> runs the command chosen.
 - Once you type, the first item is **Search for** what you typed, which
   [searches](playing-music.md#search) YouTube Music and Spotify, and the
-  last is **Search the settings for** it.
+  last is **Search the settings for** it. For a link of YouTube, YouTube
+  Music or Spotify, the first is **Open link**, which
+  [opens what it names](playing-music.md#open-a-link).
 
 ![The command palette over the marketplace: "Type a command or a search", and the playback commands, Play or pause first, each with its group and its keys, as Space, Ctrl+→ and Ctrl+←](shots/palette.webp)
 

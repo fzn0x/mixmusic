@@ -15,6 +15,8 @@ import (
 // the Copy of a failure's details keep the errors' English.
 type errorWords struct {
 	words atomic.Pointer[func(error) string]
+	// settings tells the errors the playback settings change (#577).
+	settings atomic.Pointer[func(error) bool]
 }
 
 // errSpotifyNotHere is why a Spotify track plays from YouTube Music where
@@ -33,6 +35,14 @@ func (w *errorWords) say(err error) string {
 	return err.Error()
 }
 
+// inSettings reports whether the playback settings change err, as set.
+func (w *errorWords) inSettings(err error) bool {
+	if fn := w.settings.Load(); fn != nil && *fn != nil {
+		return (*fn)(err)
+	}
+	return false
+}
+
 // SetErrorWords has the player say the errors of its notices with words,
 // as the windows do in their language; nil says them as Go does.
 func (p *Player) SetErrorWords(words func(error) string) { p.errorWords.words.Store(&words) }
@@ -46,4 +56,13 @@ func sentenceStart(text string) string {
 	}
 	r, n := utf8.DecodeRuneInString(text)
 	return string(unicode.ToUpper(r)) + text[n:]
+}
+
+// SetSettingsErrors has the notice of a track that couldn't play for an
+// error inSettings reports offer the playback settings (Notice.Settings),
+// which change it, as for a track YouTube plays only to signed-in
+// viewers, whose words tell what to change there; nil offers them for
+// none.
+func (p *Player) SetSettingsErrors(inSettings func(error) bool) {
+	p.errorWords.settings.Store(&inSettings)
 }

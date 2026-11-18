@@ -3474,14 +3474,14 @@ func (msgs Messages) CastStoppedTaken(device string, why string) string {
 	return Catalog.Format(msgs.locale, "castStoppedTaken", map[string]any{"device": device, "why": why})
 }
 
-// CastTakenBy says "{app} plays on it now"
+// CastTakenBy says "{app} plays on the device now"
 // in the language the app shows.
 //
 // {why} of castStoppedTaken, a notice as another app took the cast device.
 // {app} names that app, as the device names it.
 func CastTakenBy(app string) string { return In(i18n.Locale()).CastTakenBy(app) }
 
-// CastTakenBy says "{app} plays on it now"
+// CastTakenBy says "{app} plays on the device now"
 // in the language of msgs.
 //
 // {why} of castStoppedTaken, a notice as another app took the cast device.

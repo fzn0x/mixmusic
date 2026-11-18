@@ -1001,7 +1001,7 @@
       }
     }
   },
-  "castTakenBy": "{app} plays on it now",
+  "castTakenBy": "{app} plays on the device now",
   "@castTakenBy": {
     "description": "{why} of castStoppedTaken, a notice as another app took the cast device. {app} names that app, as the device names it.",
     "placeholders": {

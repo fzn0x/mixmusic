@@ -122,7 +122,7 @@ func (a *App) useYouTubeAccount(authUser int, pageID string) error {
 	// The profile was the former account's, though the channel may be the
 	// same: each account's own.
 	a.mu.Lock()
-	a.youtubeMe, a.profileErrs.youtube = nil, ""
+	a.youtubeMe, a.profileErrs.youtube = nil, nil
 	a.mu.Unlock()
 	// The tracks whose audio found as the account YouTube refused are
 	// asked for as it again at once, as of a session of its own (#578).

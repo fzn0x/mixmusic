@@ -31,8 +31,10 @@ type SpotifyAccount struct {
 	Profile    *spotify.Profile `json:"profile"`
 	// RedirectURI is what the user registers in the developer dashboard.
 	RedirectURI string `json:"redirectUri"`
-	// Error tells why the profile could not be read, if it could not.
+	// Error tells why the profile could not be read, if it could not, and
+	// Fault is that error, which the windows say in their language.
 	Error string `json:"error,omitempty"`
+	Fault error  `json:"-"`
 	// Streaming is set when the sign-in lets Spotify play in MixMusic;
 	// sign-ins of MixMusic 0.4.0 and before do not.
 	Streaming bool `json:"streaming"`
@@ -61,14 +63,14 @@ const profileRetry = time.Minute
 // profileErrors is why the profiles read in the background could not be
 // read, and when they were.
 type profileErrors struct {
-	spotify, youtube string
+	spotify, youtube error
 	at               time.Time
 }
 
 // waits reports whether a profile that could not be read, for err, waits
 // before it is read again.
-func (e profileErrors) waits(err string) bool {
-	return err != "" && time.Since(e.at) < profileRetry
+func (e profileErrors) waits(err error) bool {
+	return err != nil && time.Since(e.at) < profileRetry
 }
 
 // Status returns the state of the user's accounts at once, without asking
@@ -97,11 +99,11 @@ func (a *App) knownAccountsStatus() AccountsStatus {
 	status.ListenBrainz = a.listenbrainzAccount()
 	read := false
 	if status.Spotify.SignedIn && spotifyMe == nil {
-		status.Spotify.Error = errs.spotify
+		status.Spotify.Error, status.Spotify.Fault = errorString(errs.spotify), errs.spotify
 		read = !errs.waits(errs.spotify)
 	}
 	if status.YouTube.SignedIn && youtubeMe == nil {
-		status.YouTube.Error = errs.youtube
+		status.YouTube.Error, status.YouTube.Fault = errorString(errs.youtube), errs.youtube
 		read = read || !errs.waits(errs.youtube)
 	}
 	if read {
@@ -122,7 +124,7 @@ func (a *App) readProfiles() {
 		// why of those it could not read.
 		status := a.accountsStatus(context.Background())
 		a.mu.Lock()
-		a.profileErrs = profileErrors{spotify: status.Spotify.Error, youtube: status.YouTube.Error, at: time.Now()}
+		a.profileErrs = profileErrors{spotify: status.Spotify.Fault, youtube: status.YouTube.Fault, at: time.Now()}
 		a.mu.Unlock()
 		notify()
 	}()
@@ -145,7 +147,7 @@ func (a *App) accountsStatus(ctx context.Context) AccountsStatus {
 	if sp.SignedIn {
 		me, err := a.spotifyProfile(ctx)
 		if err != nil {
-			sp.Error = err.Error()
+			sp.Error, sp.Fault = err.Error(), err
 		} else {
 			sp.Profile = &me
 		}
@@ -197,7 +199,7 @@ func (s *Accounts) SpotifyLogin(ctx context.Context) (AccountsStatus, error) {
 	}
 	s.a.spotify.SetToken(t)
 	s.a.mu.Lock()
-	s.a.spotifyMe, s.a.profileErrs.spotify = nil, ""
+	s.a.spotifyMe, s.a.profileErrs.spotify = nil, nil
 	s.a.mu.Unlock()
 	// MixMusic's own device connects again, with the new sign-in.
 	s.a.here.close()
@@ -219,10 +221,10 @@ func (a *App) spotifySignedIn(ctx context.Context) (AccountsStatus, error) {
 	status := a.accountsStatus(ctx)
 	var err error
 	if status.Spotify.Error != "" {
-		err = errors.New(status.Spotify.Error)
+		err = status.Spotify.Fault
 		// The accounts say so at once, rather than read the profile again.
 		a.mu.Lock()
-		a.profileErrs.spotify, a.profileErrs.at = status.Spotify.Error, time.Now()
+		a.profileErrs.spotify, a.profileErrs.at = status.Spotify.Fault, time.Now()
 		a.mu.Unlock()
 	}
 	notify()
@@ -238,9 +240,17 @@ func (a *App) signOutSpotify() error {
 	a.spotify.SetToken(spotify.Token{})
 	a.here.close()
 	a.mu.Lock()
-	a.spotifyMe, a.profileErrs.spotify = nil, ""
+	a.spotifyMe, a.profileErrs.spotify = nil, nil
 	a.mu.Unlock()
 	err := a.tokens.Clear()
 	notify()
 	return err
+}
+
+// errorString is err's text, or "" for no error.
+func errorString(err error) string {
+	if err == nil {
+		return ""
+	}
+	return err.Error()
 }

@@ -40,8 +40,9 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 			return
 		}
 		if sp.Error != "" {
-			s.found(c, locales.AccountSettingsSpotifyRefused(), sp.Error, func() {
-				s.alert(c, locales.AccountSettingsSpotifyRefused(), sp.Error, nil).Margin(12, 0)
+			why := faultText(sp.Fault, sp.Error)
+			s.found(c, locales.AccountSettingsSpotifyRefused(), why, func() {
+				s.alert(c, locales.AccountSettingsSpotifyRefused(), why, nil).Margin(12, 0)
 			})
 		}
 		// The form shows whole, as its button needs its field.
@@ -148,7 +149,7 @@ func (s *shell) youtubeAccount(c *ui.Context, yt app.YouTubeAccount) {
 			return
 		}
 		if yt.Error != "" {
-			again := locales.AccountSettingsYouTubeAgain(yt.Error)
+			again := locales.AccountSettingsYouTubeAgain(faultText(yt.Fault, yt.Error))
 			s.found(c, locales.AccountSettingsYouTubeRefused(), again, func() {
 				s.alert(c, locales.AccountSettingsYouTubeRefused(), again, nil).Margin(12, 0)
 			})
@@ -504,4 +505,14 @@ func (s *shell) account(kind, done string, do func(ctx context.Context) error) {
 			clear(s.loads)
 		})
 	}()
+}
+
+// faultText is fault, the error a state's text tells of, as the windows
+// show it, or text when the state has no fault, as one read from a
+// window's earlier state.
+func faultText(fault error, text string) string {
+	if fault != nil {
+		return errorText(fault)
+	}
+	return text
 }

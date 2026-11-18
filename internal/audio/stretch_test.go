@@ -122,8 +122,13 @@ func endStep(buf []float32) float64 { return maxStep(append(slices.Clone(buf), 0
 
 // lengthSlack is how far from the length of the input over the speed the
 // stretch of a track may end: its windows start within stretchSearch of
-// where the speed puts them, the last one too, and end on a hop.
-func lengthSlack(speed float64) float64 { return stretchSearch/speed + stretchHop }
+// where the speed puts them, the last one too, and end on a hop, after
+// which up to a window, a hop and the hops the speed adds to them play as
+// they are.
+func lengthSlack(speed float64) float64 {
+	asIs := stretchWindow + stretchHop*max(speed, 1)
+	return stretchSearch/speed + stretchHop + asIs*math.Abs(1-1/speed)
+}
 
 // TestStretchPassThrough plays at 1× the ring as it is, sample for sample.
 func TestStretchPassThrough(t *testing.T) {
@@ -343,6 +348,39 @@ func TestStretchEnd(t *testing.T) {
 		}
 		if p := s.position(r); p != int64(len(in)/2) {
 			t.Errorf("at %v×: it ends at frame %d of %d", speed, p, len(in)/2)
+		}
+	}
+}
+
+// TestStretchEndsOnItsLastSample plays a steady tone to its very last
+// sample at every speed, whatever its length: the stretch's last windows
+// stay in the track rather than run into the silence past it, so that the
+// level holds to the end, with no fade and no silence after, and the end
+// plays as it is. A track that follows on the next sample has no gap.
+func TestStretchEndsOnItsLastSample(t *testing.T) {
+	for _, hz := range []float64{97.3, 440, 2500} {
+		for _, secs := range []float64{2, 2.003, 2.007, 2.011} {
+			in := sine(hz, secs)
+			for _, speed := range speeds {
+				out := stretch(t, in, at(speed)).out
+				n, last := len(out)/2, len(in)/2
+				if out[2*n-2] != in[2*last-2] {
+					t.Errorf("%v Hz for %vs at %v×: it ends on %v, not on the track's last sample %v", hz, secs, speed, out[2*n-2], in[2*last-2])
+				}
+				// The level of each 20 ms of its last half second, a period
+				// of the lowest tone and more.
+				const span = 2 * stretchHop
+				for f := n - Rate/2; f+span <= n; f += span {
+					var sum float64
+					for i := f; i < f+span; i++ {
+						sum += float64(out[2*i]) * float64(out[2*i])
+					}
+					if r := math.Sqrt(sum/span) / (0.5 / math.Sqrt2); r < 0.94 || r > 1.06 {
+						t.Errorf("%v Hz for %vs at %v×: the level %.2f of the tone's %d frames from the end", hz, secs, speed, r, n-f)
+						break
+					}
+				}
+			}
 		}
 	}
 }

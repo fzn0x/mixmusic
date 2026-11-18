@@ -137,14 +137,17 @@ func (s *stretcher) start(r *ring, speed float64) {
 }
 
 // ready reports whether the stretch has the input its first windows need,
-// from the frame it plays next: what it holds and what the ring holds, or
-// the whole track.
+// from the frame it plays next: what it holds of the track and what the
+// ring holds. Less of a track's end than that plays as it is.
 func (s *stretcher) ready(r *ring) bool {
 	held := int64(0)
 	if s.mode == unwinding {
 		held = int64(s.have)
+		if s.end >= 0 {
+			held = min(held, max(s.end-s.lo, 0))
+		}
 	}
-	return held+r.readable() >= stretchHeld || r.done.Load()
+	return held+r.readable() >= stretchHeld
 }
 
 // read moves up to len(out)/r.channels frames of r, played at speed, into
@@ -224,6 +227,16 @@ func (s *stretcher) step(r *ring, speed float64) bool {
 	tpl := s.prev + stretchHop
 	if !s.fill(r, max(tpl, hi)+stretchWindow) {
 		return false
+	}
+	if s.end >= 0 {
+		// At the end of the track, the windows stay in it, rather than run
+		// into the silence past it: once a hop of them no longer fits, what
+		// is left plays as it is, to the last sample, so that a track that
+		// follows on the next one has no gap (follow.go).
+		hi = min(hi, s.end-stretchWindow)
+		if hi < lo+stretchHop || tpl+stretchHop > s.end {
+			return false
+		}
 	}
 	ch := s.ch
 	if s.fresh {
@@ -381,8 +394,7 @@ func (s *stretcher) position(r *ring) int64 {
 		// Each hop fades from the input at from to that at to.
 		p = s.from + (s.to-s.from)*int64(s.outAt)/stretchHop
 	}
-	// The last windows play into the silence past the end, which isn't
-	// the track's.
+	// Never past the frames the ring was given.
 	return min(p, r.write.Load())
 }
 

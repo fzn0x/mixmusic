@@ -13758,6 +13758,230 @@ func (msgs Messages) FirewallTitle() string {
 	return Catalog.Format(msgs.locale, "firewallTitle", nil)
 }
 
+// FoldersGone says "the folder is gone"
+// in the language the app shows.
+//
+// Why a mix or a playlist didn't go in a folder of the sidebar's Your
+// mixes, or a folder wasn't renamed or moved, as a toast: the folder went
+// away meanwhile.
+func FoldersGone() string { return In(i18n.Locale()).FoldersGone() }
+
+// FoldersGone says "the folder is gone"
+// in the language of msgs.
+//
+// Why a mix or a playlist didn't go in a folder of the sidebar's Your
+// mixes, or a folder wasn't renamed or moved, as a toast: the folder went
+// away meanwhile.
+func (msgs Messages) FoldersGone() string {
+	return Catalog.Format(msgs.locale, "foldersGone", nil)
+}
+
+// FoldersHeader says "{name}, folder, {count, plural, one {# playlist} other {# playlists}}"
+// in the language the app shows.
+//
+// What screen readers call the header of a folder of the sidebar's Your
+// mixes, which opens and closes it. {name} is the folder's name; {count}
+// counts the mixes and playlists in it.
+func FoldersHeader(name string, count int) string {
+	return In(i18n.Locale()).FoldersHeader(name, count)
+}
+
+// FoldersHeader says "{name}, folder, {count, plural, one {# playlist} other {# playlists}}"
+// in the language of msgs.
+//
+// What screen readers call the header of a folder of the sidebar's Your
+// mixes, which opens and closes it. {name} is the folder's name; {count}
+// counts the mixes and playlists in it.
+func (msgs Messages) FoldersHeader(name string, count int) string {
+	return Catalog.Format(msgs.locale, "foldersHeader", map[string]any{"name": name, "count": count})
+}
+
+// FoldersMoveTo says "Move to folder"
+// in the language the app shows.
+//
+// Menu item that opens the list of the folders of the sidebar's Your mixes,
+// to put a mix or a playlist in one: in the menu of its tile, of its page's
+// More button and of its entry in the sidebar.
+func FoldersMoveTo() string { return In(i18n.Locale()).FoldersMoveTo() }
+
+// FoldersMoveTo says "Move to folder"
+// in the language of msgs.
+//
+// Menu item that opens the list of the folders of the sidebar's Your mixes,
+// to put a mix or a playlist in one: in the menu of its tile, of its page's
+// More button and of its entry in the sidebar.
+func (msgs Messages) FoldersMoveTo() string {
+	return Catalog.Format(msgs.locale, "foldersMoveTo", nil)
+}
+
+// FoldersMoved says "Moved {title} to {folder}"
+// in the language the app shows.
+//
+// Toast after the user put a mix or a playlist in a folder of the sidebar's
+// Your mixes from its menu. {title} is its name; {folder} is the folder's.
+func FoldersMoved(title string, folder string) string {
+	return In(i18n.Locale()).FoldersMoved(title, folder)
+}
+
+// FoldersMoved says "Moved {title} to {folder}"
+// in the language of msgs.
+//
+// Toast after the user put a mix or a playlist in a folder of the sidebar's
+// Your mixes from its menu. {title} is its name; {folder} is the folder's.
+func (msgs Messages) FoldersMoved(title string, folder string) string {
+	return Catalog.Format(msgs.locale, "foldersMoved", map[string]any{"title": title, "folder": folder})
+}
+
+// FoldersNeedName says "a folder needs a name"
+// in the language the app shows.
+//
+// Why a folder of the sidebar's Your mixes wasn't made or renamed, as a
+// toast: its name had nothing to show.
+func FoldersNeedName() string { return In(i18n.Locale()).FoldersNeedName() }
+
+// FoldersNeedName says "a folder needs a name"
+// in the language of msgs.
+//
+// Why a folder of the sidebar's Your mixes wasn't made or renamed, as a
+// toast: its name had nothing to show.
+func (msgs Messages) FoldersNeedName() string {
+	return Catalog.Format(msgs.locale, "foldersNeedName", nil)
+}
+
+// FoldersNewItem says "New folder…"
+// in the language the app shows.
+//
+// The last item of Move to folder (foldersMoveTo): asks for the name of a
+// new folder of the sidebar's Your mixes, which the mix or playlist goes
+// in.
+func FoldersNewItem() string { return In(i18n.Locale()).FoldersNewItem() }
+
+// FoldersNewItem says "New folder…"
+// in the language of msgs.
+//
+// The last item of Move to folder (foldersMoveTo): asks for the name of a
+// new folder of the sidebar's Your mixes, which the mix or playlist goes
+// in.
+func (msgs Messages) FoldersNewItem() string {
+	return Catalog.Format(msgs.locale, "foldersNewItem", nil)
+}
+
+// FoldersNewTitle says "New folder"
+// in the language the app shows.
+//
+// Title of the dialog that asks for the name of a new folder of the
+// sidebar's Your mixes.
+func FoldersNewTitle() string { return In(i18n.Locale()).FoldersNewTitle() }
+
+// FoldersNewTitle says "New folder"
+// in the language of msgs.
+//
+// Title of the dialog that asks for the name of a new folder of the
+// sidebar's Your mixes.
+func (msgs Messages) FoldersNewTitle() string {
+	return Catalog.Format(msgs.locale, "foldersNewTitle", nil)
+}
+
+// FoldersPlay says "Play folder"
+// in the language the app shows.
+//
+// In the menu of a folder's header in the sidebar's Your mixes: plays all
+// its mixes and playlists, one after another.
+func FoldersPlay() string { return In(i18n.Locale()).FoldersPlay() }
+
+// FoldersPlay says "Play folder"
+// in the language of msgs.
+//
+// In the menu of a folder's header in the sidebar's Your mixes: plays all
+// its mixes and playlists, one after another.
+func (msgs Messages) FoldersPlay() string {
+	return Catalog.Format(msgs.locale, "foldersPlay", nil)
+}
+
+// FoldersRemoveFrom says "Remove from folder"
+// in the language the app shows.
+//
+// Menu item of a mix or a playlist in a folder of the sidebar's Your mixes:
+// takes it out of the folder, and it stays in the sidebar and the library.
+func FoldersRemoveFrom() string { return In(i18n.Locale()).FoldersRemoveFrom() }
+
+// FoldersRemoveFrom says "Remove from folder"
+// in the language of msgs.
+//
+// Menu item of a mix or a playlist in a folder of the sidebar's Your mixes:
+// takes it out of the folder, and it stays in the sidebar and the library.
+func (msgs Messages) FoldersRemoveFrom() string {
+	return Catalog.Format(msgs.locale, "foldersRemoveFrom", nil)
+}
+
+// FoldersRenameItem says "Rename folder…"
+// in the language the app shows.
+//
+// In the menu of a folder's header in the sidebar's Your mixes: asks for
+// the folder's new name.
+func FoldersRenameItem() string { return In(i18n.Locale()).FoldersRenameItem() }
+
+// FoldersRenameItem says "Rename folder…"
+// in the language of msgs.
+//
+// In the menu of a folder's header in the sidebar's Your mixes: asks for
+// the folder's new name.
+func (msgs Messages) FoldersRenameItem() string {
+	return Catalog.Format(msgs.locale, "foldersRenameItem", nil)
+}
+
+// FoldersRenameTitle says "Rename folder"
+// in the language the app shows.
+//
+// Title of the dialog that asks for a new name of a folder of the sidebar's
+// Your mixes.
+func FoldersRenameTitle() string { return In(i18n.Locale()).FoldersRenameTitle() }
+
+// FoldersRenameTitle says "Rename folder"
+// in the language of msgs.
+//
+// Title of the dialog that asks for a new name of a folder of the sidebar's
+// Your mixes.
+func (msgs Messages) FoldersRenameTitle() string {
+	return Catalog.Format(msgs.locale, "foldersRenameTitle", nil)
+}
+
+// FoldersSkipped says "Play folder skipped {playlist}, which didn't load: {error}"
+// in the language the app shows.
+//
+// Toast after Play folder (foldersPlay), for each mix or playlist of the
+// folder that didn't load, whose tracks don't play. {playlist} is its name;
+// {error} is why.
+func FoldersSkipped(playlist string, error string) string {
+	return In(i18n.Locale()).FoldersSkipped(playlist, error)
+}
+
+// FoldersSkipped says "Play folder skipped {playlist}, which didn't load: {error}"
+// in the language of msgs.
+//
+// Toast after Play folder (foldersPlay), for each mix or playlist of the
+// folder that didn't load, whose tracks don't play. {playlist} is its name;
+// {error} is why.
+func (msgs Messages) FoldersSkipped(playlist string, error string) string {
+	return Catalog.Format(msgs.locale, "foldersSkipped", map[string]any{"playlist": playlist, "error": error})
+}
+
+// FoldersUngroup says "Ungroup folder"
+// in the language the app shows.
+//
+// In the menu of a folder's header in the sidebar's Your mixes: takes the
+// folder away, and keeps its mixes and playlists in the sidebar.
+func FoldersUngroup() string { return In(i18n.Locale()).FoldersUngroup() }
+
+// FoldersUngroup says "Ungroup folder"
+// in the language of msgs.
+//
+// In the menu of a folder's header in the sidebar's Your mixes: takes the
+// folder away, and keeps its mixes and playlists in the sidebar.
+func (msgs Messages) FoldersUngroup() string {
+	return Catalog.Format(msgs.locale, "foldersUngroup", nil)
+}
+
 // FollowEmpty says "Follow an artist from their page or their menu, and they wait here."
 // in the language the app shows.
 func FollowEmpty() string { return In(i18n.Locale()).FollowEmpty() }

@@ -27,7 +27,12 @@ MixMusic plays on one.
 MixMusic looks for devices a few seconds after it starts, then every 45
 seconds, and again as you open the cast menu: Google Cast devices and FCast
 receivers by mDNS, DLNA renderers by SSDP. A device stays listed for three
-minutes after it was last seen. Groups of speakers aren't listed.
+minutes after it was last seen.
+
+A group of Google Cast speakers, made in the Google Home app, shows by its
+name with "Speaker group" in place of a model, as
+"Everywhere · Speaker group", and plays as one device: its speakers play
+together, and its volume is the group's.
 
 Below the devices, the menu lists the other computers with MixMusic's
 [remote control](remote-control.md) on, which you control from here
@@ -46,9 +51,16 @@ rather than play on, and the rooms of
   [offline cache](library.md#the-offline-cache)**: MixMusic sends the
   device what it holds before it asks YouTube.
 - **Songs on this computer**, from your [music folders](local-music.md),
-  on a DLNA renderer that tells it plays their format, as MP3, FLAC or AAC,
-  and on an FCast receiver: the device plays the file itself. Google Cast
-  devices don't play them yet.
+  with their cover: the device plays the file itself.
+  - **Google Cast devices** play every kind the library plays: MP3, FLAC,
+    Ogg Vorbis, Opus, AAC in M4A and MP4 files, and WAV. Their media
+    player plays FLAC up to 96 kHz and 24 bits, and WAV of whole-number
+    samples: a file beyond that doesn't play there, and MixMusic says
+    why, as "Living Room TV plays FLAC only up to 96 kHz and 24 bits,
+    which this file goes beyond".
+  - **A DLNA renderer** plays those of the formats it tells it plays, as
+    MP3, FLAC or AAC.
+  - **An FCast receiver** plays those of the formats it lists.
 
 Spotify tracks that Spotify plays, in MixMusic itself or on Spotify
 Connect, stay where they play. To cast your Spotify tracks, choose In
@@ -126,8 +138,9 @@ protocol on its own, and isn't affiliated with FUTO.
 
 While casting, the device fetches the audio from MixMusic, over your local
 network: MixMusic serves it only while it casts, only to that device, at
-an address no one else could guess, and to a DLNA renderer over at most 8
-connections at once
+an address no one else could guess, a song on this computer and its cover
+only while it plays there or comes next, and to a DLNA renderer over at
+most 8 connections at once
 ([how casting works inside](architecture/cast.md)). So the first time you
 cast, your system may ask about it:
 
@@ -170,6 +183,7 @@ the firewall".
   radio channels: MixMusic says "live streams don't play on cast devices
   yet".
 - Spotify tracks that Spotify plays (see above).
-- Gapless playback on Google Cast devices and FCast receivers, songs on this
-  computer on Google Cast devices, lyrics or the picture of music videos on
-  a TV's screen, and groups of speakers.
+- Gapless playback on Google Cast devices and FCast receivers, and lyrics
+  or the picture of music videos on a TV's screen.
+- Songs on this computer beyond what a Google Cast device plays, as FLAC
+  of 192 kHz: MixMusic doesn't convert them to fit.

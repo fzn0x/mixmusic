@@ -227,8 +227,11 @@ a service doesn't apply to them:
 - No YouTube Music match is looked for, and they don't go to Spotify or to
   YouTube Music playlists.
 - They don't download: they're on your computer already.
-- They don't play on [cast devices](casting.md), which can't reach your
-  files.
+- They play on [cast devices](casting.md#what-plays-on-the-device), with
+  their cover: MixMusic serves the device the file while it plays there
+  or comes next. A Google Cast device plays every kind the library plays,
+  but FLAC beyond 96 kHz and 24 bits and WAV of floating-point samples; a
+  DLNA renderer or an FCast receiver plays the formats it tells it plays.
 - Show in Explorer, in a track's menu (Show in Finder on macOS), opens the
   folder of its file.
 - [Track info](playing-music.md#track-info), in a track's menu, tells what

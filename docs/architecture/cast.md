@@ -14,8 +14,11 @@ on FCast receivers.
     MixMusic listens on no port of mDNS's. The few DNS records it reads,
     PTR, SRV, TXT and A, it reads by hand (`dns.go`); a device that
     answers the first question alone is asked for the rest. The TXT record
-    tells the device's ID, its name (`fn`) and its model (`md`); groups of
-    speakers are left out.
+    tells the device's ID, its name (`fn`) and its model (`md`). A group
+    of speakers, made in the Google Home app, answers as a device of its
+    own, with the model "Google Cast Group", on a port of its own at the
+    address of the speaker that leads it: it is a `Device` with `Group`
+    set, and plays as any device.
   - A `Session` connects over TLS to the device's port, 8009, with the
     protocol's frames: a 4-byte length, then a `CastMessage` protocol
     buffer, whose seven fields `message.go` writes and reads by hand. It
@@ -79,7 +82,11 @@ on FCast receivers.
   a `castOut`'s as a Google Cast session is (`castkinds.go`), and picks
   the format its device plays (`castformats.go`): Opus in WebM only where
   it lists it, else the stream's AAC (`stream.AACPath`), and a song on this
-  computer in its own format. The next track goes to a session that queues
+  computer in its own format. A Google Cast session takes a stream as it
+  comes, and a song on this computer in its own format
+  (`googleSource`): the default media receiver plays every kind the
+  library plays, but FLAC beyond 96 kHz and 24 bits and WAV of
+  floating-point samples, which are refused, with why (`googleBeyond`). The next track goes to a session that queues
   (`castQueue`, a renderer's `SetNextAVTransportURI`) as the player
   preloads it, and the next load takes in what the device moved on to.
 - **The audio** comes from MixMusic: the addresses the player plays are
@@ -88,12 +95,18 @@ on FCast receivers.
   serves downloads and the cache first. `castServer` serves the proxy's
   `/yt/` paths, only while casting, at a port of its own on the address
   that reaches the device, to that device's address alone, under a random
-  128-bit token. A renderer or a receiver fetches the addresses handed to
+  128-bit token. It serves the file of a song on this computer, and the
+  cover the index keeps of it, at the addresses handed to the device, only
+  while that track is the one cast or the one queued after it
+  (`castServer.keep`), and no other path. A request from another address
+  is turned away, and the log tells it once: which speaker of a group
+  fetches the audio is to be checked on a real group, where the one that
+  leads it is taken to. A renderer or a receiver fetches the addresses handed to
   it, with a file extension, served as the type it was told, a renderer with
   DLNA's `transferMode.dlna.org` and `contentFeatures.dlna.org` headers
   (`DLNA.ORG_OP=01`) over at most 8 connections at once. A load the device
   fails without fetching anything is told as a firewall's doing.
 
 Not yet: live streams, gapless playback through a Google Cast receiver's
-own queue, songs on this computer on Google Cast, lyrics on screens,
-groups of speakers, a receiver of MixMusic's own, AirPlay, and video.
+own queue, converting a song beyond a Google Cast device's bounds, lyrics
+on screens, a receiver of MixMusic's own, AirPlay, and video.

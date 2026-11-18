@@ -45,7 +45,8 @@ the time there shows above it.
 Drag the mini player anywhere but its buttons to move it, and drag its
 edges to resize it: the cover takes its height, and grows up to 180 px at
 100% zoom. It opens where you left it. A right click opens a menu of
-[speeds](playing-music.md#speed) for what plays. The mini player takes no
+[speeds](playing-music.md#speed) for what plays, and of the
+[sleep timer](playing-music.md#a-sleep-timer). The mini player takes no
 keyboard shortcuts but the zoom's, and <kbd>Escape</kbd>, which closes its
 panel. It [zooms](look-and-feel.md#density-text-size-and-zoom) with the
 main window, and its window grows and shrinks with it.
@@ -113,10 +114,11 @@ it's drawn.
 ## The tray
 
 MixMusic puts an icon in the tray (the menu bar on macOS). Its menu has
-**Play / Pause**, **Next**, **Previous**, **Show MixMusic**, **Mini player**,
-and the item that quits MixMusic. On Windows and macOS, a click on the icon
-shows the main window and a right click opens the menu; on Linux, a click
-opens the menu.
+**Play / Pause**, **Next**, **Previous**, the
+[**Sleep timer**](playing-music.md#a-sleep-timer)'s lengths and ends,
+**Show MixMusic**, **Mini player**, and the item that quits MixMusic. On
+Windows and macOS, a click on the icon shows the main window and a right
+click opens the menu; on Linux, a click opens the menu.
 
 ![The tray icon's menu on Windows: Play / Pause, Next and Previous, then Show MixMusic and Mini player, then Exit](shots/tray-menu.webp)
 
@@ -206,6 +208,8 @@ the **From any app** group at the top of
 - Next track and Previous track
 - Volume up, Volume down and Mute
 - Like what plays and Dislike what plays
+- [Sleep timer](playing-music.md#a-sleep-timer): last length, and Sleep
+  timer: cancel
 - Show MixMusic
 
 ![Settings › Shortcuts: the From any app group at the top, "These keys control MixMusic whichever window is in front", with Play or pause, Next track, Previous track and Volume up, each with none and a Set button](shots/shortcuts.webp)
@@ -305,6 +309,8 @@ portal, which may ask you first.
 
 MixMusic pauses as the computer goes to sleep, and stays paused when it
 wakes, ready where it was. A Spotify Connect device elsewhere plays on.
+The computer going to sleep ends the
+[sleep timer](playing-music.md#a-sleep-timer).
 
 ## Control from a key or a script
 

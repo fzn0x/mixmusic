@@ -51,6 +51,27 @@
   it a play (`sounds`), whatever it plays: a track lost there, one whose
   play failed after it took it, or one it went on to by itself past the
   queue's (#745). A device MixMusic sent nothing to is told nothing.
+- **The sleep timer** (`sleep.go`, #594): a timer of minutes runs on the
+  monotonic clock, and its fade starts so that half a second of silence
+  comes before the pause (`checkSleep`). A timer that ends with a track
+  counts the tracks that end where the queue moves on after one
+  (`advance`, `sleepEnded`), and as one fades into the next
+  (`fadingInto`); the last plays to its end, with no crossfade
+  (`sleepLast`), its fade in its last seconds (`sleepProgress`), and
+  Spotify devices get no tracks ahead meanwhile (`aheadOnDevice`). At
+  the end of the queue it stops before the radio's entries, unless the
+  radio plays already, and doesn't go round. It pauses as `Sleeping`
+  does, a Spotify Connect device elsewhere too; then the next entry waits
+  at its start, held paused. The engine fades (`Fader`); a Spotify device
+  or a cast output gets its volume stepped once a second instead, put
+  back a moment after the pause, or at the next play. Bedtime starts a
+  timer of the length the settings keep as playback starts, rather than
+  plays on, inside a window of `SleepTimer.Window`; a timer cancelled
+  inside one holds it off until it ends. `State.Sleep` and `SleepLeft`
+  tell the windows what runs; the app keeps the length the user chose
+  last (`KeepSleepMinutes`), and runs the tray's submenu, the global
+  shortcuts' commands and the assistants' `sleep_timer` tool
+  (`internal/app/sleeptimer.go`, `assistantsleep.go`).
 - **Lists that play while they're read** (`queue_list.go`, #543):
   `PlayList` plays the first part of a list as `PlayAll` does, and
   returns a `List`, whose `Add` adds each part after it as it comes: in

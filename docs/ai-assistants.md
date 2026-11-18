@@ -68,6 +68,7 @@ Other assistants take the same command and argument in their own words.
 | `previous_track` | Goes back, as the previous button does: a track past its first 3 seconds starts again. |
 | `seek` | Moves the track to a time, or forward or back by some seconds. |
 | `set_volume` | Sets the volume, or turns it up or down by some percent. |
+| `sleep_timer` | Sets the [sleep timer](playing-music.md#a-sleep-timer): after some minutes, at the end of the track, of a few tracks or of the queue; adds minutes to it, or cancels it; with nothing, tells what it does. It keeps no length as your last. |
 | `search` | Searches YouTube Music, and Spotify once you signed in, for songs, music videos, albums, artists and playlists. While explicit content is hidden, it finds none. |
 | `play_result` | Plays a song, an album, all of an artist's songs or a playlist that a search found, or puts it next, or at the end of the queue. An artist's songs are read first, which takes a moment for a long list. |
 | `list_playlists` | Lists your liked songs, your mixes, and your playlists on YouTube Music and Spotify. |

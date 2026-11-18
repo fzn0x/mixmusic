@@ -86,6 +86,7 @@ func (s *shell) commands() []command {
 		}},
 		{"settings.openFile", locales.CmdSettingsOpenFile(), "", locales.CmdGroupSettings(), s.openSettingsFile},
 		{"library.importPlaylist", locales.PlaylistImportCommand(), "", locales.RailLibrary(), s.openImport},
+		{"library.exportLibrary", locales.PlaylistExportLibrary(), "", locales.RailLibrary(), s.exportLibrary},
 	}
 	cmds = append(cmds, s.themeCommands...)
 	cmds = append(cmds, s.lyricStyleCommands()...)

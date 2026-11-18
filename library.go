@@ -132,6 +132,7 @@ func (s *shell) likedHead(c *ui.Context, liked []media.Track) {
 			h.shuffle()
 		}
 		s.downloadButton(c, d)
+		s.exportLikedButton(c, liked)
 	})
 }
 

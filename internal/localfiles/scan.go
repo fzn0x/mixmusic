@@ -315,13 +315,21 @@ func within(path, root string) bool {
 	return !settings.SamePath(filepath.Join(root, rel), root)
 }
 
+// The problems of a folder, as FolderStatus.Problem says them in English;
+// the windows word each in their language.
+const (
+	ProblemMissing    = "It isn't there: is its drive plugged in?"
+	ProblemDenied     = "MixMusic isn't allowed to read it"
+	ProblemUnreadable = "It can't be read"
+)
+
 // problemOf words why a folder can't be read.
 func problemOf(err error) string {
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
-		return "It isn't there: is its drive plugged in?"
+		return ProblemMissing
 	case errors.Is(err, fs.ErrPermission):
-		return "MixMusic isn't allowed to read it"
+		return ProblemDenied
 	}
-	return "It can't be read"
+	return ProblemUnreadable
 }

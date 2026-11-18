@@ -212,7 +212,7 @@ func (s *shell) computerSettings(c *ui.Context) {
 			s.rowWith(c, folder, func() {
 				switch {
 				case f.Problem != "":
-					ui.Text(c, locales.ComputerSettingsProblem(f.Problem)).TextColor(k.danger)
+					ui.Text(c, locales.ComputerSettingsProblem(folderProblem(f.Problem))).TextColor(k.danger)
 				case st.Scanning && f.Tracks == 0:
 					ui.Text(c, locales.ComputerSettingsReading())
 				default:
@@ -383,4 +383,17 @@ func (s *shell) localArt(url string) (string, bool) {
 		return s.svc.LocalFiles.ArtworkFile(url)
 	}
 	return s.svc.Downloads.ArtworkFile(url)
+}
+
+// folderProblem is why a music folder can't be read, as the window says it.
+func folderProblem(problem string) string {
+	switch problem {
+	case localfiles.ProblemMissing:
+		return locales.ComputerFolderMissing()
+	case localfiles.ProblemDenied:
+		return locales.ComputerFolderDenied()
+	case localfiles.ProblemUnreadable:
+		return locales.ComputerFolderUnreadable()
+	}
+	return problem
 }

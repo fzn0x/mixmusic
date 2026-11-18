@@ -1,6 +1,11 @@
 package app
 
-import "github.com/fzn0x/mixmusic/internal/localfiles"
+import (
+	"strings"
+
+	"github.com/fzn0x/mixmusic/internal/localfiles"
+	"github.com/fzn0x/mixmusic/locales"
+)
 
 // watchLocalFiles has the watch of the folders of music follow folders,
 // those scanned: once MixMusic started, so that what changes in them
@@ -46,5 +51,16 @@ func (l *LocalFiles) Unwatched(folder string) string {
 	if w == nil {
 		return ""
 	}
-	return w.Unwatched(folder)
+	why := w.Unwatched(folder)
+	// A known reason may have its detail after it, as the setting of
+	// Linux's limit.
+	for _, known := range []error{localfiles.ErrNetworkDrive, localfiles.ErrRemovableDrive, localfiles.ErrWatchLimit, localfiles.ErrCantWatch} {
+		if rest, ok := strings.CutPrefix(why, known.Error()); ok {
+			return ErrorText(known) + rest
+		}
+	}
+	if why == localfiles.WhyUnwatchable {
+		return locales.ErrorLocalFilesWatchFailed()
+	}
+	return why
 }

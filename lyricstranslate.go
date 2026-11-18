@@ -258,6 +258,7 @@ func (s *shell) lyricsSwitches(c *ui.Context, ly lyrics.Lyrics, lang, where stri
 				s.set.LyricsPlain = mode == 1
 				s.save()
 			}
+			s.songTiming(c, ly, where)
 		}
 		if canTranslate {
 			on := x.translate

@@ -543,7 +543,7 @@ func (n *notch) lyrics(c *ui.Context, t media.Track) {
 		return
 	}
 	lines := l.value.Lines
-	pos := s.st.Position + lyricsLead(s.st.Speed)
+	pos := s.lyricsAt(t, l.value)
 	at := sort.Search(len(lines), func(i int) bool { return ms(lines[i].TimeMs) > pos }) - 1
 	// In Latin letters, as the user shows the lyrics of their language
 	// (lyricsromanize.go).

@@ -329,9 +329,11 @@ func (s *shell) lyricsWith(c *ui.Context, o lyricsOptions) {
 			s.lyricsNote(c, ly.Note)
 		}
 	}
+	// The lyrics' time is the song's, moved by their timing (lyricsoffset.go).
+	shift := s.lyricsShift(t, ly)
 	active := -1
 	if synced {
-		pos := s.st.Position + lyricsLead(s.st.Speed)
+		pos := s.lyricsAt(t, ly)
 		for i, line := range ly.Lines {
 			if ms(line.TimeMs) <= pos {
 				active = i
@@ -405,19 +407,19 @@ func (s *shell) lyricsWith(c *ui.Context, o lyricsOptions) {
 				}
 			}
 			s.stageLine(c, stageLine{style: *o.stage, index: i, active: active, line: line, text: text, roman: roman, meaning: meaning,
-				words: words, synced: synced, reading: time.Since(view.userAt) <= lyricsPause, glide: glide, ball: ball, next: next})
+				words: words, synced: synced, reading: time.Since(view.userAt) <= lyricsPause, glide: glide, ball: ball, next: next, shift: shift})
 			return
 		}
 		var p ui.Element
 		if roman == "" && meaning == "" {
-			p = s.lyricsText(c, text, size, ink, words, 24, 4)
+			p = s.lyricsText(c, text, size, ink, words, shift, 24, 4)
 		} else {
 			// The line, then in Latin letters, then its translation, which
 			// screen readers read in this order too.
 			p = ui.Column(c).Padding(4, 24).Gap(2).Children(func() {
-				s.lyricsText(c, text, size, ink, words, 0, 0)
+				s.lyricsText(c, text, size, ink, words, shift, 0, 0)
 				if roman != "" {
-					s.lyricsRoman(c, roman, sub, romanWords)
+					s.lyricsRoman(c, roman, sub, romanWords, shift)
 				}
 				if meaning != "" {
 					ui.Text(c, meaning).FontSize(sub).TextColor(k.muted)
@@ -431,7 +433,7 @@ func (s *shell) lyricsWith(c *ui.Context, o lyricsOptions) {
 		} else if synced && !s.st.Loading {
 			p.Cursor(ui.CursorPointer)
 			if p.Clicked() {
-				s.p.Seek(ms(line.TimeMs))
+				s.seekLine(line, shift)
 			}
 		}
 	}).Grow(1).MinHeight(0)

@@ -31,8 +31,25 @@
   are kept.
 - **`ac3`** decodes AC-3 and E-AC-3, the 5.1 surround of YouTube's
   formats 380 and 328: a pure Go decoder written from ATSC A/52 and its
-  Annex E, of every audio coding mode and tool, spectral extension and
-  AHT among them, into six channels, with the stereo downmix the
-  stream's own mix levels ask for. It decodes streams of ffmpeg's encoders
+  Annex E, spectral extension and AHT among its tools, into six
+  channels, with the stereo downmix the
+  stream's own mix levels ask for. Of AC-3 it decodes every audio coding
+  mode, 1/0 to 3/2, with or without the LFE, at 48, 44.1 and 32 kHz, of
+  bsid 8 and below, and reads the Lo/Ro mix levels of Annex D's alternate
+  syntax (bsid 6) for the downmix. Of E-AC-3 (bsid 11 to 16) it decodes
+  frames of 1, 2, 3 or 6 blocks and independent substream 0, and skips the
+  frames of the others: of a stream of more than 5.1 channels, or of joint
+  object coding, it plays the 5.1. Enhanced coupling and the reduced
+  sample rates return `errors.ErrUnsupported`, and transient pre-noise
+  processing, optional for a decoder, is left out. The six channels are
+  float32, interleaved as Left, Right, Center, LFE, LeftSurround,
+  RightSurround, those the stream lacks silent. It applies the blocks'
+  dynamic range gains, leaves dialnorm to the player, checks each
+  syncframe's CRCs, and makes errors of malformed frames, never panics.
+  `ParseDAC3` and `ParseDEC3` read the payload of an MP4's `dac3` and
+  `dec3` box (header left out) into a `Config`: sample rate, `BSID`, mode,
+  LFE and bitrate, with `Channels()` giving 6 for 5.1; `ParseDEC3`
+  describes independent substream 0. A `Decoder` needs neither, as each
+  syncframe says it all again. It decodes streams of ffmpeg's encoders
   as ffmpeg's decoder does to about 110 dB, and its tests edit those
   streams, or write them again, to use the tools the encoders don't.

@@ -367,5 +367,5 @@ settings how it went. Public networks stay closed. Tests
 listen on 127.0.0.1 alone, and find the computers through
 `remotetest`'s fake.
 
-Not yet: seeing more than the other's 20 next tracks, and moving what
-plays there to this computer.
+Not yet: seeing more than the other's 40 next tracks (`MaxNext`). A
+computer with an older MixMusic still shows the first 20.

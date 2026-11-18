@@ -39,9 +39,11 @@ MixMusic's files, the resolver and the engine hold.
   tests give the dialog its answers through `trackInfoOf`. Show in
   Explorer, Finder or its folder shows the file of a track on this
   computer, or its download, through `showInFolder`.
-- **Copies.** `trackCopies` is the place a song's copies are to show,
-  side by side, the one that plays marked, once MixMusic links them
-  (#340). It shows nothing yet.
+- **Copies.** `trackCopies` (`copies.go`) shows, for a song on this
+  computer with two copies or more, a section "its copies": a row for each
+  copy, labelled "Plays" for the best copy, the one that plays, else
+  "Copy", with its format, its place and its path. It shows nothing for a
+  track that isn't a file on this computer, or a song with one copy.
 - **How a stream was found** (`trackinfostream.go`, #475). The stream the
   resolver holds tells its route (`Stream.Route`: the player API, yt-dlp's
   quick run, its full run, or the full run as the account), the

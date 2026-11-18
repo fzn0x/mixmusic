@@ -398,6 +398,24 @@ func (msgs Messages) AccountSettingsBrowserClosed(browser string) string {
 	return Catalog.Format(msgs.locale, "accountSettingsBrowserClosed", map[string]any{"browser": browser})
 }
 
+// AccountSettingsCantKeepSignIn says "Windows didn't let MixMusic keep your sign-in: {error}"
+// in the language the app shows.
+//
+// Why a sign-in wasn't kept, in Settings › Accounts, on Windows without
+// its Credential Manager. {error} is the system's own words.
+func AccountSettingsCantKeepSignIn(error string) string {
+	return In(i18n.Locale()).AccountSettingsCantKeepSignIn(error)
+}
+
+// AccountSettingsCantKeepSignIn says "Windows didn't let MixMusic keep your sign-in: {error}"
+// in the language of msgs.
+//
+// Why a sign-in wasn't kept, in Settings › Accounts, on Windows without
+// its Credential Manager. {error} is the system's own words.
+func (msgs Messages) AccountSettingsCantKeepSignIn(error string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsCantKeepSignIn", map[string]any{"error": error})
+}
+
 // AccountSettingsCharsPlaceholder says "32 letters and digits"
 // in the language the app shows.
 func AccountSettingsCharsPlaceholder() string {
@@ -442,6 +460,26 @@ func (msgs Messages) AccountSettingsConnectedLastfm() string {
 	return Catalog.Format(msgs.locale, "accountSettingsConnectedLastfm", nil)
 }
 
+// AccountSettingsCookiesBadHeader says "that isn't a signed-in YouTube Music cookie header: copy the Cookie header of a request to music.youtube.com, from a …"
+// in the language the app shows.
+//
+// Why the pasted cookie header didn't sign in to YouTube Music, in Settings
+// › Accounts. Cookie header is the name of an HTTP header: keep it as
+// browsers' developer tools show it.
+func AccountSettingsCookiesBadHeader() string {
+	return In(i18n.Locale()).AccountSettingsCookiesBadHeader()
+}
+
+// AccountSettingsCookiesBadHeader says "that isn't a signed-in YouTube Music cookie header: copy the Cookie header of a request to music.youtube.com, from a …"
+// in the language of msgs.
+//
+// Why the pasted cookie header didn't sign in to YouTube Music, in Settings
+// › Accounts. Cookie header is the name of an HTTP header: keep it as
+// browsers' developer tools show it.
+func (msgs Messages) AccountSettingsCookiesBadHeader() string {
+	return Catalog.Format(msgs.locale, "accountSettingsCookiesBadHeader", nil)
+}
+
 // AccountSettingsCookiesDenied says "the system keeps the cookies of {browser} from MixMusic"
 // in the language the app shows.
 //
@@ -458,6 +496,42 @@ func AccountSettingsCookiesDenied(browser string) string {
 // Settings › Accounts. {browser} is the browser's name.
 func (msgs Messages) AccountSettingsCookiesDenied(browser string) string {
 	return Catalog.Format(msgs.locale, "accountSettingsCookiesDenied", map[string]any{"browser": browser})
+}
+
+// AccountSettingsCookiesNoProfiles says "MixMusic didn't find the profiles of {browser}: give the folder of one"
+// in the language the app shows.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func AccountSettingsCookiesNoProfiles(browser string) string {
+	return In(i18n.Locale()).AccountSettingsCookiesNoProfiles(browser)
+}
+
+// AccountSettingsCookiesNoProfiles says "MixMusic didn't find the profiles of {browser}: give the folder of one"
+// in the language of msgs.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func (msgs Messages) AccountSettingsCookiesNoProfiles(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsCookiesNoProfiles", map[string]any{"browser": browser})
+}
+
+// AccountSettingsCookiesNoSession says "{browser} has no signed-in YouTube Music session: sign in to music.youtube.com in it, close it, then import again"
+// in the language the app shows.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func AccountSettingsCookiesNoSession(browser string) string {
+	return In(i18n.Locale()).AccountSettingsCookiesNoSession(browser)
+}
+
+// AccountSettingsCookiesNoSession says "{browser} has no signed-in YouTube Music session: sign in to music.youtube.com in it, close it, then import again"
+// in the language of msgs.
+//
+// Why importing the YouTube Music sign-in from a browser failed, in
+// Settings › Accounts. {browser} is the browser's name.
+func (msgs Messages) AccountSettingsCookiesNoSession(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsCookiesNoSession", map[string]any{"browser": browser})
 }
 
 // AccountSettingsCookiesNone says "MixMusic found no cookies of {browser}: is it installed? For a profile kept elsewhere, give its folder"
@@ -1216,6 +1290,26 @@ func (msgs Messages) AccountSettingsYouTubeAgain(error string) string {
 	return Catalog.Format(msgs.locale, "accountSettingsYouTubeAgain", map[string]any{"error": error})
 }
 
+// AccountSettingsYouTubeAnsweredAsAccount says "YouTube Music answered as the account {account}, not as its channel {channel}: MixMusic goes on as before"
+// in the language the app shows.
+//
+// Why switching to a YouTube channel failed, as a toast, in Settings ›
+// Accounts. {account} is the Google account's name; {channel} is the
+// channel's.
+func AccountSettingsYouTubeAnsweredAsAccount(account string, channel string) string {
+	return In(i18n.Locale()).AccountSettingsYouTubeAnsweredAsAccount(account, channel)
+}
+
+// AccountSettingsYouTubeAnsweredAsAccount says "YouTube Music answered as the account {account}, not as its channel {channel}: MixMusic goes on as before"
+// in the language of msgs.
+//
+// Why switching to a YouTube channel failed, as a toast, in Settings ›
+// Accounts. {account} is the Google account's name; {channel} is the
+// channel's.
+func (msgs Messages) AccountSettingsYouTubeAnsweredAsAccount(account string, channel string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsYouTubeAnsweredAsAccount", map[string]any{"account": account, "channel": channel})
+}
+
 // AccountSettingsYouTubeBrowser says "Browser"
 // in the language the app shows.
 func AccountSettingsYouTubeBrowser() string { return In(i18n.Locale()).AccountSettingsYouTubeBrowser() }
@@ -1456,6 +1550,42 @@ func AccountSettingsYouTubeNoAccount() string {
 // in the language of msgs.
 func (msgs Messages) AccountSettingsYouTubeNoAccount() string {
 	return Catalog.Format(msgs.locale, "accountSettingsYouTubeNoAccount", nil)
+}
+
+// AccountSettingsYouTubeNotAccepted says "YouTube Music didn't accept the sign-in: {error}"
+// in the language the app shows.
+//
+// Why signing in to YouTube Music failed, in Settings › Accounts. {error}
+// is why, often in YouTube's own words.
+func AccountSettingsYouTubeNotAccepted(error string) string {
+	return In(i18n.Locale()).AccountSettingsYouTubeNotAccepted(error)
+}
+
+// AccountSettingsYouTubeNotAccepted says "YouTube Music didn't accept the sign-in: {error}"
+// in the language of msgs.
+//
+// Why signing in to YouTube Music failed, in Settings › Accounts. {error}
+// is why, often in YouTube's own words.
+func (msgs Messages) AccountSettingsYouTubeNotAccepted(error string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsYouTubeNotAccepted", map[string]any{"error": error})
+}
+
+// AccountSettingsYouTubeNotChannel says "that isn't a channel of the account"
+// in the language the app shows.
+//
+// Why switching to a YouTube channel failed, as a toast, in Settings ›
+// Accounts.
+func AccountSettingsYouTubeNotChannel() string {
+	return In(i18n.Locale()).AccountSettingsYouTubeNotChannel()
+}
+
+// AccountSettingsYouTubeNotChannel says "that isn't a channel of the account"
+// in the language of msgs.
+//
+// Why switching to a YouTube channel failed, as a toast, in Settings ›
+// Accounts.
+func (msgs Messages) AccountSettingsYouTubeNotChannel() string {
+	return Catalog.Format(msgs.locale, "accountSettingsYouTubeNotChannel", nil)
 }
 
 // AccountSettingsYouTubePasteButton says "sign in with it"
@@ -2246,6 +2376,24 @@ func AppearanceUseTheme() string { return In(i18n.Locale()).AppearanceUseTheme()
 // in the language of msgs.
 func (msgs Messages) AppearanceUseTheme() string {
 	return Catalog.Format(msgs.locale, "appearanceUseTheme", nil)
+}
+
+// ArtistPlayCouldntOpen says "the artist couldn't be opened: {error}"
+// in the language the app shows.
+//
+// Why playing all of an artist's songs didn't start, as a toast. {error} is
+// why, often in the service's own words.
+func ArtistPlayCouldntOpen(error string) string {
+	return In(i18n.Locale()).ArtistPlayCouldntOpen(error)
+}
+
+// ArtistPlayCouldntOpen says "the artist couldn't be opened: {error}"
+// in the language of msgs.
+//
+// Why playing all of an artist's songs didn't start, as a toast. {error} is
+// why, often in the service's own words.
+func (msgs Messages) ArtistPlayCouldntOpen(error string) string {
+	return Catalog.Format(msgs.locale, "artistPlayCouldntOpen", map[string]any{"error": error})
 }
 
 // ArtistPlayFailed says "{artist}'s songs couldn't be loaded: {error}"
@@ -4014,6 +4162,22 @@ func (msgs Messages) CollabShelfTitle() string {
 	return Catalog.Format(msgs.locale, "collabShelfTitle", nil)
 }
 
+// CollabSignInFirst says "sign in to that service in Settings › Accounts to change its playlists"
+// in the language the app shows.
+//
+// Why a playlist's collaborators or sharing didn't change, in the {error}
+// of the collab messages: the user isn't signed in to its service.
+func CollabSignInFirst() string { return In(i18n.Locale()).CollabSignInFirst() }
+
+// CollabSignInFirst says "sign in to that service in Settings › Accounts to change its playlists"
+// in the language of msgs.
+//
+// Why a playlist's collaborators or sharing didn't change, in the {error}
+// of the collab messages: the user isn't signed in to its service.
+func (msgs Messages) CollabSignInFirst() string {
+	return Catalog.Format(msgs.locale, "collabSignInFirst", nil)
+}
+
 // CollabSpotifyBody says "Spotify keeps collaborative playlists off your profile: {title} leaves it. Those you send its link to can then add to…"
 // in the language the app shows.
 func CollabSpotifyBody(title string) string { return In(i18n.Locale()).CollabSpotifyBody(title) }
@@ -4104,6 +4268,22 @@ func CollabTracks(count int) string { return In(i18n.Locale()).CollabTracks(coun
 // in the language of msgs.
 func (msgs Messages) CollabTracks(count int) string {
 	return Catalog.Format(msgs.locale, "collabTracks", map[string]any{"count": count})
+}
+
+// CollabUnlistedNow says "{error}; the playlist is unlisted now"
+// in the language the app shows.
+//
+// Why inviting to a playlist failed, in the {error} of collabInviteFailed,
+// after it was unlisted. {error} is why, often in the service's own words.
+func CollabUnlistedNow(error string) string { return In(i18n.Locale()).CollabUnlistedNow(error) }
+
+// CollabUnlistedNow says "{error}; the playlist is unlisted now"
+// in the language of msgs.
+//
+// Why inviting to a playlist failed, in the {error} of collabInviteFailed,
+// after it was unlisted. {error} is why, often in the service's own words.
+func (msgs Messages) CollabUnlistedNow(error string) string {
+	return Catalog.Format(msgs.locale, "collabUnlistedNow", map[string]any{"error": error})
 }
 
 // CollabUnlisting says "Making {title} unlisted: YouTube Music takes up to half a minute before it lets collaborators in"
@@ -5632,6 +5812,24 @@ func (msgs Messages) CrossfadeTitle() string {
 	return Catalog.Format(msgs.locale, "crossfadeTitle", nil)
 }
 
+// DesktopSettingsAutostartAskFailed says "couldn't ask the desktop to start MixMusic at login: {error}"
+// in the language the app shows.
+//
+// Why Start at login (desktopSettingsLogin) didn't turn on, as a toast, for
+// MixMusic installed from Flathub. {error} is the system's own words.
+func DesktopSettingsAutostartAskFailed(error string) string {
+	return In(i18n.Locale()).DesktopSettingsAutostartAskFailed(error)
+}
+
+// DesktopSettingsAutostartAskFailed says "couldn't ask the desktop to start MixMusic at login: {error}"
+// in the language of msgs.
+//
+// Why Start at login (desktopSettingsLogin) didn't turn on, as a toast, for
+// MixMusic installed from Flathub. {error} is the system's own words.
+func (msgs Messages) DesktopSettingsAutostartAskFailed(error string) string {
+	return Catalog.Format(msgs.locale, "desktopSettingsAutostartAskFailed", map[string]any{"error": error})
+}
+
 // DesktopSettingsAutostartReason says "MixMusic starts when you log in, as you chose in its settings"
 // in the language the app shows.
 //
@@ -5826,6 +6024,22 @@ func DesktopSettingsNoBackgroundPortal() string {
 // desktops.
 func (msgs Messages) DesktopSettingsNoBackgroundPortal() string {
 	return Catalog.Format(msgs.locale, "desktopSettingsNoBackgroundPortal", nil)
+}
+
+// DesktopSettingsNoJsonApp says "no app on this computer opens .json files, so MixMusic showed settings.json in its folder"
+// in the language the app shows.
+//
+// Toast after Open settings.json, in Settings › Desktop, when no app
+// opens .json files. settings.json is the file's name.
+func DesktopSettingsNoJsonApp() string { return In(i18n.Locale()).DesktopSettingsNoJsonApp() }
+
+// DesktopSettingsNoJsonApp says "no app on this computer opens .json files, so MixMusic showed settings.json in its folder"
+// in the language of msgs.
+//
+// Toast after Open settings.json, in Settings › Desktop, when no app
+// opens .json files. settings.json is the file's name.
+func (msgs Messages) DesktopSettingsNoJsonApp() string {
+	return Catalog.Format(msgs.locale, "desktopSettingsNoJsonApp", nil)
 }
 
 // DesktopSettingsNotificationsAbout says "Tell what starts playing while MixMusic is in the background."
@@ -9494,6 +9708,24 @@ func (msgs Messages) ExploreNoPlaylists() string {
 	return Catalog.Format(msgs.locale, "exploreNoPlaylists", nil)
 }
 
+// ExploreNoneOnYouTube says "none of these tracks is on YouTube Music"
+// in the language the app shows.
+//
+// Why a playlist wasn't made or shared on YouTube Music, in the {error} of
+// exploreCouldntCreate and collabShareFailed: none of its tracks is there,
+// as songs on this computer.
+func ExploreNoneOnYouTube() string { return In(i18n.Locale()).ExploreNoneOnYouTube() }
+
+// ExploreNoneOnYouTube says "none of these tracks is on YouTube Music"
+// in the language of msgs.
+//
+// Why a playlist wasn't made or shared on YouTube Music, in the {error} of
+// exploreCouldntCreate and collabShareFailed: none of its tracks is there,
+// as songs on this computer.
+func (msgs Messages) ExploreNoneOnYouTube() string {
+	return Catalog.Format(msgs.locale, "exploreNoneOnYouTube", nil)
+}
+
 // ExploreNothingHere says "YouTube Music shows nothing here right now."
 // in the language the app shows.
 func ExploreNothingHere() string { return In(i18n.Locale()).ExploreNothingHere() }
@@ -11572,6 +11804,20 @@ func (msgs Messages) LibraryAddedToQueue(title string) string {
 	return Catalog.Format(msgs.locale, "libraryAddedToQueue", map[string]any{"title": title})
 }
 
+// LibraryAlbumNoPlaylist says "this album can't be saved: YouTube Music gave no playlist of its tracks"
+// in the language the app shows.
+//
+// Why a YouTube Music album wasn't saved to the library, as a toast.
+func LibraryAlbumNoPlaylist() string { return In(i18n.Locale()).LibraryAlbumNoPlaylist() }
+
+// LibraryAlbumNoPlaylist says "this album can't be saved: YouTube Music gave no playlist of its tracks"
+// in the language of msgs.
+//
+// Why a YouTube Music album wasn't saved to the library, as a toast.
+func (msgs Messages) LibraryAlbumNoPlaylist() string {
+	return Catalog.Format(msgs.locale, "libraryAlbumNoPlaylist", nil)
+}
+
 // LibraryAlbums says "Albums"
 // in the language the app shows.
 //
@@ -12166,6 +12412,22 @@ func (msgs Messages) LibraryShuffle() string {
 	return Catalog.Format(msgs.locale, "libraryShuffle", nil)
 }
 
+// LibrarySignInToKeep says "sign in to that service in Settings › Accounts to keep it in your library there"
+// in the language the app shows.
+//
+// Why an album, artist or playlist wasn't saved to the library of its
+// service, as a toast: the user isn't signed in to it.
+func LibrarySignInToKeep() string { return In(i18n.Locale()).LibrarySignInToKeep() }
+
+// LibrarySignInToKeep says "sign in to that service in Settings › Accounts to keep it in your library there"
+// in the language of msgs.
+//
+// Why an album, artist or playlist wasn't saved to the library of its
+// service, as a toast: the user isn't signed in to it.
+func (msgs Messages) LibrarySignInToKeep() string {
+	return Catalog.Format(msgs.locale, "librarySignInToKeep", nil)
+}
+
 // LibrarySongAdded says "Added {title} to your library on YouTube Music"
 // in the language the app shows.
 func LibrarySongAdded(title string) string { return In(i18n.Locale()).LibrarySongAdded(title) }
@@ -12270,6 +12532,24 @@ func ListenBrainzSettingsAboutServer(server string) string {
 // in the language of msgs.
 func (msgs Messages) ListenBrainzSettingsAboutServer(server string) string {
 	return Catalog.Format(msgs.locale, "listenBrainzSettingsAboutServer", map[string]any{"server": server})
+}
+
+// ListenBrainzSettingsCheckFailed says "MixMusic couldn't check the token with the server, so nothing was kept: check its address and your connection ({error})"
+// in the language the app shows.
+//
+// Why connecting to ListenBrainz or a server of its API failed, in Settings
+// › Accounts. {error} is the system's own words.
+func ListenBrainzSettingsCheckFailed(error string) string {
+	return In(i18n.Locale()).ListenBrainzSettingsCheckFailed(error)
+}
+
+// ListenBrainzSettingsCheckFailed says "MixMusic couldn't check the token with the server, so nothing was kept: check its address and your connection ({error})"
+// in the language of msgs.
+//
+// Why connecting to ListenBrainz or a server of its API failed, in Settings
+// › Accounts. {error} is the system's own words.
+func (msgs Messages) ListenBrainzSettingsCheckFailed(error string) string {
+	return Catalog.Format(msgs.locale, "listenBrainzSettingsCheckFailed", map[string]any{"error": error})
 }
 
 // ListenBrainzSettingsChecking says "checking the token…"
@@ -27864,6 +28144,26 @@ func (msgs Messages) YoutubeBrowserChoose() string {
 	return Catalog.Format(msgs.locale, "youtubeBrowserChoose", nil)
 }
 
+// YoutubeBrowserCouldntOpen says "MixMusic couldn't open {browser}: {error}"
+// in the language the app shows.
+//
+// Why signing in to YouTube Music in a browser failed, in Settings ›
+// Accounts. {browser} is the browser's name; {error} is the system's own
+// words.
+func YoutubeBrowserCouldntOpen(browser string, error string) string {
+	return In(i18n.Locale()).YoutubeBrowserCouldntOpen(browser, error)
+}
+
+// YoutubeBrowserCouldntOpen says "MixMusic couldn't open {browser}: {error}"
+// in the language of msgs.
+//
+// Why signing in to YouTube Music in a browser failed, in Settings ›
+// Accounts. {browser} is the browser's name; {error} is the system's own
+// words.
+func (msgs Messages) YoutubeBrowserCouldntOpen(browser string, error string) string {
+	return Catalog.Format(msgs.locale, "youtubeBrowserCouldntOpen", map[string]any{"browser": browser, "error": error})
+}
+
 // YoutubeBrowserDidntSignIn says "MixMusic didn't sign in to YouTube Music"
 // in the language the app shows.
 func YoutubeBrowserDidntSignIn() string { return In(i18n.Locale()).YoutubeBrowserDidntSignIn() }
@@ -27890,6 +28190,22 @@ func YoutubeBrowserForm() string { return In(i18n.Locale()).YoutubeBrowserForm()
 // it, and give the words and synonyms people search for in your language.
 func (msgs Messages) YoutubeBrowserForm() string {
 	return Catalog.Format(msgs.locale, "youtubeBrowserForm", nil)
+}
+
+// YoutubeBrowserGone says "MixMusic no longer finds {browser} on this computer"
+// in the language the app shows.
+//
+// Why signing in to YouTube Music in a browser failed, in Settings ›
+// Accounts. {browser} is the browser's name, as Firefox.
+func YoutubeBrowserGone(browser string) string { return In(i18n.Locale()).YoutubeBrowserGone(browser) }
+
+// YoutubeBrowserGone says "MixMusic no longer finds {browser} on this computer"
+// in the language of msgs.
+//
+// Why signing in to YouTube Music in a browser failed, in Settings ›
+// Accounts. {browser} is the browser's name, as Firefox.
+func (msgs Messages) YoutubeBrowserGone(browser string) string {
+	return Catalog.Format(msgs.locale, "youtubeBrowserGone", map[string]any{"browser": browser})
 }
 
 // YoutubeBrowserHint says "Closing the browser, or cancel, ends the sign-in, as do 10 minutes without one. MixMusic reads the new profile alone,…"

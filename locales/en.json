@@ -72,12 +72,43 @@
       }
     }
   },
+  "accountSettingsCantKeepSignIn": "Windows didn't let MixMusic keep your sign-in: {error}",
+  "@accountSettingsCantKeepSignIn": {
+    "description": "Why a sign-in wasn't kept, in Settings › Accounts, on Windows without its Credential Manager. {error} is the system's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "accountSettingsCharsPlaceholder": "32 letters and digits",
   "accountSettingsConnectButton": "connect to last.fm",
   "accountSettingsConnectLastfm": "Connect to Last.fm",
   "accountSettingsConnectedLastfm": "Connected to Last.fm",
+  "accountSettingsCookiesBadHeader": "that isn't a signed-in YouTube Music cookie header: copy the Cookie header of a request to music.youtube.com, from a tab signed in to it",
+  "@accountSettingsCookiesBadHeader": {
+    "description": "Why the pasted cookie header didn't sign in to YouTube Music, in Settings › Accounts. Cookie header is the name of an HTTP header: keep it as browsers' developer tools show it."
+  },
   "accountSettingsCookiesDenied": "the system keeps the cookies of {browser} from MixMusic",
   "@accountSettingsCookiesDenied": {
+    "description": "Why importing the YouTube Music sign-in from a browser failed, in Settings › Accounts. {browser} is the browser's name.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsCookiesNoProfiles": "MixMusic didn't find the profiles of {browser}: give the folder of one",
+  "@accountSettingsCookiesNoProfiles": {
+    "description": "Why importing the YouTube Music sign-in from a browser failed, in Settings › Accounts. {browser} is the browser's name.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsCookiesNoSession": "{browser} has no signed-in YouTube Music session: sign in to music.youtube.com in it, close it, then import again",
+  "@accountSettingsCookiesNoSession": {
     "description": "Why importing the YouTube Music sign-in from a browser failed, in Settings › Accounts. {browser} is the browser's name.",
     "placeholders": {
       "browser": {
@@ -310,6 +341,18 @@
       }
     }
   },
+  "accountSettingsYouTubeAnsweredAsAccount": "YouTube Music answered as the account {account}, not as its channel {channel}: MixMusic goes on as before",
+  "@accountSettingsYouTubeAnsweredAsAccount": {
+    "description": "Why switching to a YouTube channel failed, as a toast, in Settings › Accounts. {account} is the Google account's name; {channel} is the channel's.",
+    "placeholders": {
+      "account": {
+        "type": "String"
+      },
+      "channel": {
+        "type": "String"
+      }
+    }
+  },
   "accountSettingsYouTubeBrowser": "Browser",
   "accountSettingsYouTubeChannelAbout": "Brand channels of your account have their own home feed, library and likes.",
   "accountSettingsYouTubeChannelTitle": "Channel",
@@ -335,6 +378,19 @@
   "accountSettingsYouTubeImporting": "importing…",
   "accountSettingsYouTubeMultiple": "Your session reaches more than one account or channel. MixMusic uses the first account: choose another here.",
   "accountSettingsYouTubeNoAccount": "The account or channel MixMusic used is no longer one of this session: choose one.",
+  "accountSettingsYouTubeNotAccepted": "YouTube Music didn't accept the sign-in: {error}",
+  "@accountSettingsYouTubeNotAccepted": {
+    "description": "Why signing in to YouTube Music failed, in Settings › Accounts. {error} is why, often in YouTube's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsYouTubeNotChannel": "that isn't a channel of the account",
+  "@accountSettingsYouTubeNotChannel": {
+    "description": "Why switching to a YouTube channel failed, as a toast, in Settings › Accounts."
+  },
   "accountSettingsYouTubePasteButton": "sign in with it",
   "accountSettingsYouTubePasteDesc": "In a tab signed in to music.youtube.com, open the developer tools, and copy the Cookie header of a request to music.youtube.com from the Network panel. The text of a cookies.txt file will do too.",
   "accountSettingsYouTubePasteHint": "A cookie header is as good as your password: paste it here alone. YouTube may end a session that goes on in the browser; one from a private window you then close lasts longest.",
@@ -502,6 +558,15 @@
   "appearanceThemeTitle": "Theme",
   "appearanceUseFile": "use the file's",
   "appearanceUseTheme": "use the theme's",
+  "artistPlayCouldntOpen": "the artist couldn't be opened: {error}",
+  "@artistPlayCouldntOpen": {
+    "description": "Why playing all of an artist's songs didn't start, as a toast. {error} is why, often in the service's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "artistPlayFailed": "{artist}'s songs couldn't be loaded: {error}",
   "@artistPlayFailed": {
     "description": "Toast when an artist's songs didn't load to play. {error} is why, often in the service's own words.",
@@ -1103,6 +1168,10 @@
     }
   },
   "collabShelfTitle": "Playlists you collaborate on",
+  "collabSignInFirst": "sign in to that service in Settings › Accounts to change its playlists",
+  "@collabSignInFirst": {
+    "description": "Why a playlist's collaborators or sharing didn't change, in the {error} of the collab messages: the user isn't signed in to its service."
+  },
   "collabSpotifyBody": "Spotify keeps collaborative playlists off your profile: {title} leaves it. Those you send its link to can then add to it and put it in order.",
   "@collabSpotifyBody": {
     "placeholders": {
@@ -1147,6 +1216,15 @@
     "placeholders": {
       "count": {
         "type": "int"
+      }
+    }
+  },
+  "collabUnlistedNow": "{error}; the playlist is unlisted now",
+  "@collabUnlistedNow": {
+    "description": "Why inviting to a playlist failed, in the {error} of collabInviteFailed, after it was unlisted. {error} is why, often in the service's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
       }
     }
   },
@@ -1675,6 +1753,15 @@
     }
   },
   "crossfadeTitle": "Crossfade",
+  "desktopSettingsAutostartAskFailed": "couldn't ask the desktop to start MixMusic at login: {error}",
+  "@desktopSettingsAutostartAskFailed": {
+    "description": "Why Start at login (desktopSettingsLogin) didn't turn on, as a toast, for MixMusic installed from Flathub. {error} is the system's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "desktopSettingsAutostartReason": "MixMusic starts when you log in, as you chose in its settings",
   "@desktopSettingsAutostartReason": {
     "description": "Why MixMusic asks to start at login, which the Linux desktop shows as it asks the user."
@@ -1713,6 +1800,10 @@
   "desktopSettingsNoBackgroundPortal": "this desktop has no Background portal, which a Flatpak app needs to start at login: add MixMusic to the apps your desktop starts at login instead",
   "@desktopSettingsNoBackgroundPortal": {
     "description": "Why Start at login (desktopSettingsLogin) didn't turn on, as a toast, for MixMusic installed from Flathub. The Background portal is a part of Linux desktops."
+  },
+  "desktopSettingsNoJsonApp": "no app on this computer opens .json files, so MixMusic showed settings.json in its folder",
+  "@desktopSettingsNoJsonApp": {
+    "description": "Toast after Open settings.json, in Settings › Desktop, when no app opens .json files. settings.json is the file's name."
   },
   "desktopSettingsNotificationsAbout": "Tell what starts playing while MixMusic is in the background.",
   "desktopSettingsNotificationsTitle": "Notifications",
@@ -2841,6 +2932,10 @@
   "exploreNewPlaylist": "New playlist…",
   "exploreNewYouTubePlaylist": "New playlist on YouTube Music",
   "exploreNoPlaylists": "No playlists of yours",
+  "exploreNoneOnYouTube": "none of these tracks is on YouTube Music",
+  "@exploreNoneOnYouTube": {
+    "description": "Why a playlist wasn't made or shared on YouTube Music, in the {error} of exploreCouldntCreate and collabShareFailed: none of its tracks is there, as songs on this computer."
+  },
   "exploreNothingHere": "YouTube Music shows nothing here right now.",
   "exploreTabCharts": "Charts",
   "exploreTabMoods": "Moods & genres",
@@ -3568,6 +3663,10 @@
       }
     }
   },
+  "libraryAlbumNoPlaylist": "this album can't be saved: YouTube Music gave no playlist of its tracks",
+  "@libraryAlbumNoPlaylist": {
+    "description": "Why a YouTube Music album wasn't saved to the library, as a toast."
+  },
   "libraryAlbums": "Albums",
   "@libraryAlbums": {
     "description": "Shelf title."
@@ -3764,6 +3863,10 @@
   "@libraryShuffle": {
     "description": "A button that plays what the page shows shuffled. Lowercase."
   },
+  "librarySignInToKeep": "sign in to that service in Settings › Accounts to keep it in your library there",
+  "@librarySignInToKeep": {
+    "description": "Why an album, artist or playlist wasn't saved to the library of its service, as a toast: the user isn't signed in to it."
+  },
   "librarySongAdded": "Added {title} to your library on YouTube Music",
   "@librarySongAdded": {
     "placeholders": {
@@ -3809,6 +3912,15 @@
   "@listenBrainzSettingsAboutServer": {
     "placeholders": {
       "server": {
+        "type": "String"
+      }
+    }
+  },
+  "listenBrainzSettingsCheckFailed": "MixMusic couldn't check the token with the server, so nothing was kept: check its address and your connection ({error})",
+  "@listenBrainzSettingsCheckFailed": {
+    "description": "Why connecting to ListenBrainz or a server of its API failed, in Settings › Accounts. {error} is the system's own words.",
+    "placeholders": {
+      "error": {
         "type": "String"
       }
     }
@@ -8925,10 +9037,31 @@
   "widgetsTryAgain": "try again",
   "youtubeBrowserAbout": "MixMusic opens the browser with a new, empty profile of its own, at YouTube Music's sign-in. Sign in there as in any browser: MixMusic then takes the session, closes the browser and deletes the profile. Your own profiles stay as they are.",
   "youtubeBrowserChoose": "Browser to sign in with",
+  "youtubeBrowserCouldntOpen": "MixMusic couldn't open {browser}: {error}",
+  "@youtubeBrowserCouldntOpen": {
+    "description": "Why signing in to YouTube Music in a browser failed, in Settings › Accounts. {browser} is the browser's name; {error} is the system's own words.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "youtubeBrowserDidntSignIn": "MixMusic didn't sign in to YouTube Music",
   "youtubeBrowserForm": "MixMusic opens the browser with a new, empty profile of its own, at YouTube Music's sign-in. Sign in there as in any browser: MixMusic then takes the session, closes the browser and deletes the profile. Your own profiles stay as they are. MixMusic signs in through Firefox or Zen, and found neither. Google refuses a sign-in in Chrome, Edge and the others made from Chromium when MixMusic opens them. Closing the browser, or cancel, ends the sign-in, as do 10 minutes without one. MixMusic reads the new profile alone, never yours, and keeps the session encrypted on this computer. Sign in with. Log in. Temporary profile. Google refuses.",
   "@youtubeBrowserForm": {
     "description": "Never shown: what Settings' search finds the browser sign-in to YouTube Music by, its steps and labels, then words people search for. Translate it, and give the words and synonyms people search for in your language."
+  },
+  "youtubeBrowserGone": "MixMusic no longer finds {browser} on this computer",
+  "@youtubeBrowserGone": {
+    "description": "Why signing in to YouTube Music in a browser failed, in Settings › Accounts. {browser} is the browser's name, as Firefox.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
   },
   "youtubeBrowserHint": "Closing the browser, or cancel, ends the sign-in, as do 10 minutes without one. MixMusic reads the new profile alone, never yours, and keeps the session encrypted on this computer.",
   "youtubeBrowserNone": "MixMusic signs in through Firefox or Zen, and found neither. Google refuses a sign-in in Chrome, Edge and the others made from Chromium when MixMusic opens them.",

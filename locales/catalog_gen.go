@@ -17611,17 +17611,17 @@ func (msgs Messages) LibraryTagsChooseHint(name string) string {
 // LibraryTagsChooseItems says "Choose items…"
 // in the language the app shows.
 //
-// Button of a tag in Manage tags: lists every playlist and album of the
-// user's library with a check box, to put the tag on many or take it off at
-// once.
+// Button of a tag in Manage tags: lists every mix, playlist and album of
+// the user's library with a check box, to put the tag on many or take it
+// off at once.
 func LibraryTagsChooseItems() string { return In(i18n.Locale()).LibraryTagsChooseItems() }
 
 // LibraryTagsChooseItems says "Choose items…"
 // in the language of msgs.
 //
-// Button of a tag in Manage tags: lists every playlist and album of the
-// user's library with a check box, to put the tag on many or take it off at
-// once.
+// Button of a tag in Manage tags: lists every mix, playlist and album of
+// the user's library with a check box, to put the tag on many or take it
+// off at once.
 func (msgs Messages) LibraryTagsChooseItems() string {
 	return Catalog.Format(msgs.locale, "libraryTagsChooseItems", nil)
 }
@@ -17696,18 +17696,18 @@ func (msgs Messages) LibraryTagsDelete() string {
 	return Catalog.Format(msgs.locale, "libraryTagsDelete", nil)
 }
 
-// LibraryTagsDeleteBody says "{count, plural, =0 {It's on nothing.} one {It comes off the playlist or album it's on, which stays.} other {It comes …"
+// LibraryTagsDeleteBody says "{count, plural, =0 {It's on nothing.} one {It comes off the one item it's on. The item itself stays.} other {It comes…"
 // in the language the app shows.
 //
 // The question Delete tag asks (libraryTagsDeleteTitle). {count} counts the
-// playlists and albums the tag is on.
+// mixes, playlists and albums the tag is on, which an item names.
 func LibraryTagsDeleteBody(count int) string { return In(i18n.Locale()).LibraryTagsDeleteBody(count) }
 
-// LibraryTagsDeleteBody says "{count, plural, =0 {It's on nothing.} one {It comes off the playlist or album it's on, which stays.} other {It comes …"
+// LibraryTagsDeleteBody says "{count, plural, =0 {It's on nothing.} one {It comes off the one item it's on. The item itself stays.} other {It comes…"
 // in the language of msgs.
 //
 // The question Delete tag asks (libraryTagsDeleteTitle). {count} counts the
-// playlists and albums the tag is on.
+// mixes, playlists and albums the tag is on, which an item names.
 func (msgs Messages) LibraryTagsDeleteBody(count int) string {
 	return Catalog.Format(msgs.locale, "libraryTagsDeleteBody", map[string]any{"count": count})
 }
@@ -18028,34 +18028,34 @@ func (msgs Messages) LibraryTagsNewLabel() string {
 	return Catalog.Format(msgs.locale, "libraryTagsNewLabel", nil)
 }
 
-// LibraryTagsNoItemMatch says "No playlist or album has the tags chosen."
+// LibraryTagsNoItemMatch says "Nothing here has the tags chosen."
 // in the language the app shows.
 //
-// In Library › Tags, when the tags chosen in the row of chips show
-// nothing.
+// In Library › Tags, when the tags chosen in the row of chips show no
+// mix, playlist or album.
 func LibraryTagsNoItemMatch() string { return In(i18n.Locale()).LibraryTagsNoItemMatch() }
 
-// LibraryTagsNoItemMatch says "No playlist or album has the tags chosen."
+// LibraryTagsNoItemMatch says "Nothing here has the tags chosen."
 // in the language of msgs.
 //
-// In Library › Tags, when the tags chosen in the row of chips show
-// nothing.
+// In Library › Tags, when the tags chosen in the row of chips show no
+// mix, playlist or album.
 func (msgs Messages) LibraryTagsNoItemMatch() string {
 	return Catalog.Format(msgs.locale, "libraryTagsNoItemMatch", nil)
 }
 
-// LibraryTagsNoMatch says "No playlist or album matches “{query}”."
+// LibraryTagsNoMatch says "Nothing matches “{query}”."
 // in the language the app shows.
 //
-// In Choose items, when no name holds what the user searched. {query} is
-// the search.
+// In Choose items, when no mix, playlist or album's name holds what the
+// user searched. {query} is the search.
 func LibraryTagsNoMatch(query string) string { return In(i18n.Locale()).LibraryTagsNoMatch(query) }
 
-// LibraryTagsNoMatch says "No playlist or album matches “{query}”."
+// LibraryTagsNoMatch says "Nothing matches “{query}”."
 // in the language of msgs.
 //
-// In Choose items, when no name holds what the user searched. {query} is
-// the search.
+// In Choose items, when no mix, playlist or album's name holds what the
+// user searched. {query} is the search.
 func (msgs Messages) LibraryTagsNoMatch(query string) string {
 	return Catalog.Format(msgs.locale, "libraryTagsNoMatch", map[string]any{"query": query})
 }
@@ -18110,18 +18110,18 @@ func (msgs Messages) LibraryTagsNothingTagged() string {
 	return Catalog.Format(msgs.locale, "libraryTagsNothingTagged", nil)
 }
 
-// LibraryTagsOnCount says "{count, plural, =0 {On nothing yet.} one {On # playlist or album.} other {On # playlists and albums.}}"
+// LibraryTagsOnCount says "{count, plural, =0 {On nothing yet.} one {On # item.} other {On # items.}}"
 // in the language the app shows.
 //
-// In Manage tags, under a tag's name: how many playlists and albums the tag
-// is on.
+// In Manage tags, under a tag's name: how many mixes, playlists and albums
+// the tag is on, which an item names.
 func LibraryTagsOnCount(count int) string { return In(i18n.Locale()).LibraryTagsOnCount(count) }
 
-// LibraryTagsOnCount says "{count, plural, =0 {On nothing yet.} one {On # playlist or album.} other {On # playlists and albums.}}"
+// LibraryTagsOnCount says "{count, plural, =0 {On nothing yet.} one {On # item.} other {On # items.}}"
 // in the language of msgs.
 //
-// In Manage tags, under a tag's name: how many playlists and albums the tag
-// is on.
+// In Manage tags, under a tag's name: how many mixes, playlists and albums
+// the tag is on, which an item names.
 func (msgs Messages) LibraryTagsOnCount(count int) string {
 	return Catalog.Format(msgs.locale, "libraryTagsOnCount", map[string]any{"count": count})
 }
@@ -18130,8 +18130,8 @@ func (msgs Messages) LibraryTagsOnCount(count int) string {
 // in the language the app shows.
 //
 // What screen readers call a tag's row in Manage tags, which opens the tag
-// to edit. {name} is the tag's name; {count} counts the playlists and
-// albums it's on.
+// to edit. {name} is the tag's name; {count} counts the mixes, playlists
+// and albums it's on.
 func LibraryTagsRow(name string, count int) string {
 	return In(i18n.Locale()).LibraryTagsRow(name, count)
 }
@@ -18140,20 +18140,20 @@ func LibraryTagsRow(name string, count int) string {
 // in the language of msgs.
 //
 // What screen readers call a tag's row in Manage tags, which opens the tag
-// to edit. {name} is the tag's name; {count} counts the playlists and
-// albums it's on.
+// to edit. {name} is the tag's name; {count} counts the mixes, playlists
+// and albums it's on.
 func (msgs Messages) LibraryTagsRow(name string, count int) string {
 	return Catalog.Format(msgs.locale, "libraryTagsRow", map[string]any{"name": name, "count": count})
 }
 
-// LibraryTagsSearchLabel says "Search your playlists and albums"
+// LibraryTagsSearchLabel says "Search your mixes, playlists and albums"
 // in the language the app shows.
 //
 // What screen readers call the box of Choose items (libraryTagsChooseItems)
 // that filters the list by name.
 func LibraryTagsSearchLabel() string { return In(i18n.Locale()).LibraryTagsSearchLabel() }
 
-// LibraryTagsSearchLabel says "Search your playlists and albums"
+// LibraryTagsSearchLabel says "Search your mixes, playlists and albums"
 // in the language of msgs.
 //
 // What screen readers call the box of Choose items (libraryTagsChooseItems)
@@ -18162,14 +18162,14 @@ func (msgs Messages) LibraryTagsSearchLabel() string {
 	return Catalog.Format(msgs.locale, "libraryTagsSearchLabel", nil)
 }
 
-// LibraryTagsSearchPlaceholder says "search your playlists and albums"
+// LibraryTagsSearchPlaceholder says "search your mixes, playlists and albums"
 // in the language the app shows.
 //
 // Placeholder of the box of Choose items (libraryTagsChooseItems) that
 // filters the list by name.
 func LibraryTagsSearchPlaceholder() string { return In(i18n.Locale()).LibraryTagsSearchPlaceholder() }
 
-// LibraryTagsSearchPlaceholder says "search your playlists and albums"
+// LibraryTagsSearchPlaceholder says "search your mixes, playlists and albums"
 // in the language of msgs.
 //
 // Placeholder of the box of Choose items (libraryTagsChooseItems) that

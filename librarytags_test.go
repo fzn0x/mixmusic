@@ -279,7 +279,7 @@ func TestManageTags(t *testing.T) {
 	}
 
 	click(t, s, tt, "Work out, on 1 item")
-	if !tt.HasText("Edit tag") || !tt.HasText("On 1 playlist or album.") {
+	if !tt.HasText("Edit tag") || !tt.HasText("On 1 item.") {
 		t.Fatalf("the tag shows %q", tt.Texts())
 	}
 	click(t, s, tt, "Teal")
@@ -318,11 +318,11 @@ func TestManageTags(t *testing.T) {
 	if got, want := tagNames(s), []string{"calm: Run, Walk"}; !slices.Equal(got, want) {
 		t.Errorf("chosen, the tags are %q, want %q", got, want)
 	}
-	clickRole(t, s, tt, ui.RoleTextField, "Search your playlists and albums")
+	clickRole(t, s, tt, ui.RoleTextField, "Search your mixes, playlists and albums")
 	tt.Type("zzz")
 	s.drain()
 	tt.Frame()
-	if !tt.HasText("No playlist or album matches “zzz”.") {
+	if !tt.HasText("Nothing matches “zzz”.") {
 		t.Errorf("a search without matches says nothing: %q", tt.Texts())
 	}
 	press(s, tt, 0, ui.KeyEscape)
@@ -331,7 +331,7 @@ func TestManageTags(t *testing.T) {
 	}
 	press(s, tt, 0, ui.KeyEscape)
 	click(t, s, tt, "Delete tag")
-	if !tt.HasText("Delete calm?") || !tt.HasText("It comes off the 2 playlists and albums it's on, which stay.") {
+	if !tt.HasText("Delete calm?") || !tt.HasText("It comes off the 2 items it's on. The items themselves stay.") {
 		t.Fatalf("Delete tag asks %q", tt.Texts())
 	}
 	click(t, s, tt, "Delete")
@@ -466,7 +466,7 @@ func TestTagsTab(t *testing.T) {
 	}
 	clickRole(t, s, tt, ui.RoleToggleButton, "Fast")
 	click(t, s, tt, s.lk.words("Match all"))
-	if !tt.HasText("No playlist or album has the tags chosen.") {
+	if !tt.HasText("Nothing here has the tags chosen.") {
 		t.Errorf("by all of two, Library › Tags shows %q", tt.Texts())
 	}
 	if !slices.Equal(s.svc.Preferences.Get().TagFilter, []string{mood, fast}) {

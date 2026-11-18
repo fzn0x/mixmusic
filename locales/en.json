@@ -5647,7 +5647,7 @@
   },
   "libraryTagsChooseItems": "Choose items…",
   "@libraryTagsChooseItems": {
-    "description": "Button of a tag in Manage tags: lists every playlist and album of the user's library with a check box, to put the tag on many or take it off at once."
+    "description": "Button of a tag in Manage tags: lists every mix, playlist and album of the user's library with a check box, to put the tag on many or take it off at once."
   },
   "libraryTagsChooseTitle": "Choose items for {name}",
   "@libraryTagsChooseTitle": {
@@ -5675,9 +5675,9 @@
   "@libraryTagsDelete": {
     "description": "Button of a tag in Manage tags: asks before deleting it (libraryTagsDeleteTitle)."
   },
-  "libraryTagsDeleteBody": "{count, plural, =0 {It's on nothing.} one {It comes off the playlist or album it's on, which stays.} other {It comes off the # playlists and albums it's on, which stay.}}",
+  "libraryTagsDeleteBody": "{count, plural, =0 {It's on nothing.} one {It comes off the one item it's on. The item itself stays.} other {It comes off the # items it's on. The items themselves stay.}}",
   "@libraryTagsDeleteBody": {
-    "description": "The question Delete tag asks (libraryTagsDeleteTitle). {count} counts the playlists and albums the tag is on.",
+    "description": "The question Delete tag asks (libraryTagsDeleteTitle). {count} counts the mixes, playlists and albums the tag is on, which an item names.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -5783,13 +5783,13 @@
   "@libraryTagsNewLabel": {
     "description": "Label and placeholder of the field that names a new tag, in the Tags… dialog of an item and in Manage tags."
   },
-  "libraryTagsNoItemMatch": "No playlist or album has the tags chosen.",
+  "libraryTagsNoItemMatch": "Nothing here has the tags chosen.",
   "@libraryTagsNoItemMatch": {
-    "description": "In Library › Tags, when the tags chosen in the row of chips show nothing."
+    "description": "In Library › Tags, when the tags chosen in the row of chips show no mix, playlist or album."
   },
-  "libraryTagsNoMatch": "No playlist or album matches “{query}”.",
+  "libraryTagsNoMatch": "Nothing matches “{query}”.",
   "@libraryTagsNoMatch": {
-    "description": "In Choose items, when no name holds what the user searched. {query} is the search.",
+    "description": "In Choose items, when no mix, playlist or album's name holds what the user searched. {query} is the search.",
     "placeholders": {
       "query": {
         "type": "String"
@@ -5808,9 +5808,9 @@
   "@libraryTagsNothingTagged": {
     "description": "In Library › Tags while no tag is chosen and nothing has a tag. Tags… is libraryTagsItem, Choose items… libraryTagsChooseItems and Manage tags libraryTagsManage."
   },
-  "libraryTagsOnCount": "{count, plural, =0 {On nothing yet.} one {On # playlist or album.} other {On # playlists and albums.}}",
+  "libraryTagsOnCount": "{count, plural, =0 {On nothing yet.} one {On # item.} other {On # items.}}",
   "@libraryTagsOnCount": {
-    "description": "In Manage tags, under a tag's name: how many playlists and albums the tag is on.",
+    "description": "In Manage tags, under a tag's name: how many mixes, playlists and albums the tag is on, which an item names.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -5819,7 +5819,7 @@
   },
   "libraryTagsRow": "{name}, {count, plural, one {on # item} other {on # items}}",
   "@libraryTagsRow": {
-    "description": "What screen readers call a tag's row in Manage tags, which opens the tag to edit. {name} is the tag's name; {count} counts the playlists and albums it's on.",
+    "description": "What screen readers call a tag's row in Manage tags, which opens the tag to edit. {name} is the tag's name; {count} counts the mixes, playlists and albums it's on.",
     "placeholders": {
       "name": {
         "type": "String"
@@ -5829,11 +5829,11 @@
       }
     }
   },
-  "libraryTagsSearchLabel": "Search your playlists and albums",
+  "libraryTagsSearchLabel": "Search your mixes, playlists and albums",
   "@libraryTagsSearchLabel": {
     "description": "What screen readers call the box of Choose items (libraryTagsChooseItems) that filters the list by name."
   },
-  "libraryTagsSearchPlaceholder": "search your playlists and albums",
+  "libraryTagsSearchPlaceholder": "search your mixes, playlists and albums",
   "@libraryTagsSearchPlaceholder": {
     "description": "Placeholder of the box of Choose items (libraryTagsChooseItems) that filters the list by name."
   },

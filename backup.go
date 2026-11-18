@@ -473,9 +473,6 @@ func (s *shell) restoreDialog(c *ui.Context) {
 	k := &s.lk
 	m, n := r.Manifest, r.Counts
 	ticked := func(p backup.Part) bool { return b.rparts[p] && m.Has(p) }
-	if b.merge == 1 && ticked(backup.Library) {
-		s.countAdded(r)
-	}
 	s.dialog(c, &b.restoring, dialogOptions{key: "restore", title: locales.BackupRestoreDialogTitle(), width: 640}, func() {
 		ui.Text(c, locales.BackupRestoreFrom(m.Created.Local(), m.App, systemName(m.System))).FontSize(k.bodySize()).MaxWidth(580)
 		for _, p := range backup.Parts {
@@ -536,8 +533,12 @@ func (s *shell) restoreDialog(c *ui.Context) {
 			s.stageRestore()
 		}
 	})
-	if !b.restoring && !b.staging {
+	switch {
+	case !b.restoring && !b.staging:
 		s.closeRestore()
+	case b.merge == 1 && ticked(backup.Library):
+		// Once the frame that chose to add built, as it shows Counting….
+		s.countAdded(r)
 	}
 }
 

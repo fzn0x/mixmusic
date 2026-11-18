@@ -45,11 +45,15 @@ func (s *shell) setSpeed(v float64) {
 // speedLocked tells why the speed of what plays can't change, or "" when
 // it can: Spotify's players, in MixMusic or on Spotify Connect, play its
 // tracks and episodes at their own speed, as a live stream plays as it's
-// broadcast. A Spotify track not on its device yet, as it loads, goes
-// there, unless Spotify tracks play from YouTube Music.
+// broadcast, and as a renderer that turned another speed down plays. A
+// Spotify track not on its device yet, as it loads, goes there, unless
+// Spotify tracks play from YouTube Music.
 func (s *shell) speedLocked() string {
 	spotify := locales.SpeedMenuLockedSpotify()
 	src := s.st.Source
+	if d, own := s.svc.Player.CastOwnSpeed(); own && s.st.Remote {
+		return locales.SpeedMenuLockedCast(d.Name)
+	}
 	switch {
 	case src != nil && src.Mode != player.ModeStream:
 		return spotify

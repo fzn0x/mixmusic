@@ -616,7 +616,7 @@ func (s *shell) miniCastDevices(c *ui.Context) {
 			go s.svc.Player.StopCasting()
 		}
 		for _, d := range s.svc.Player.CastDevices() {
-			detail := d.Model
+			detail := app.ModelOf(d)
 			if connecting && starting.ID == d.ID {
 				detail = strings.TrimPrefix(detail+" · "+locales.CastConnecting(), " · ")
 			}

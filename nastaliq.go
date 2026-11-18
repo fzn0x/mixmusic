@@ -6,8 +6,8 @@ package main
 // letters come from the system's fonts. A card lays out its own lines, as
 // tall as their face, so a card in Urdu sets them in a Nastaliq face the
 // system has. The window keeps the system's choice for now: a Nastaliq
-// line is about 2.5 times as tall as Selawik's, which MyGo's rows and
-// fields don't make room for yet.
+// line is 2.5 em high, about twice Selawik's, which MyGo's rows and fields
+// don't make room for yet (#816, egoist/mygo#2016).
 
 import (
 	"slices"

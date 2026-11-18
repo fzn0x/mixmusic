@@ -39,10 +39,12 @@ What tracks who shared a link, as `si=`, `pp=` and `feature=`, is dropped. A lin
 ## Playing from anywhere
 
 - **A track's row:** double-click it, or click its cover, to play the list from that track: the album, the playlist or the search results. Doing so on the track that plays pauses it.
+- **A track's queue button:** with the pointer over a song's or an episode's row, a button in place of its length adds the track to the queue. With the keyboard's focus in the row, Shift+Enter adds it, and Alt+Enter (⌥Enter on macOS) plays it next: see [The queue and Up next](#the-queue-and-up-next).
 - **A track's menu,** from the … button of its row or a right click: Play, Play next, Add to queue, Start radio, Add to liked songs, Dislike, [Add to library](library.md#youtube-music-playlists-albums-and-artists) (YouTube Music, signed in), [Add to mix](library.md#mixes), [Add to YouTube Music playlist](library.md#youtube-music-playlists-albums-and-artists) (signed in), [Download](library.md#downloads), Go to the artist, Go to album, Open in Spotify or YouTube Music, [Copy](#sharing), and [Share](#sharing). A Spotify track that plays from YouTube Music also has Find another YouTube Music match, for when the recording found is the wrong one.
 - **An album's or a playlist's page:** Play and Shuffle, and the More menu: Play next, Add to queue, Start radio, Save as a new mix, Save as a YouTube Music playlist (signed in), Open on its service, Copy link and [Share](#sharing). The tiles of albums, playlists and mixes have Share in their menus too.
 - **An artist's page:** Play and Shuffle of all their songs (see [Play on a Spotify artist](spotify.md#play-on-an-artist)) or Play top songs, and [Follow](library.md#artists-you-follow), then Top songs, Albums, Singles & EPs, and Fans also like. Its More menu follows the artist or stops, and starts a radio of the artist.
 - **A tile,** on Home, Explore, the search or the library: its play button plays it, and clicking the tile opens its page. An artist's tile has a shuffle button, which shuffles all of their songs (see All of an artist's songs below), and Play and Shuffle in its menu.
+- **A song's tile,** on Home, Explore and the now playing page, also shows Add to queue and Play next beside its play button while the pointer is over it, or Tab reaches it. Neither opens the tile.
 - **Home's Jump back in** plays the track you played last again.
 - **[Synced lyrics](lyrics.md#synced-and-plain-lyrics):** click a line to play the song from there.
 
@@ -114,6 +116,8 @@ What counts as explicit is what marks it so. Spotify marks its tracks, and YouTu
 The Queue button by the player, or Ctrl+J (⌘J), shows Up next at the right of the window: the track playing, then what plays after it.
 
 - **Play next,** in a track's or a list's menu, puts it right after the track playing. **Add to queue** puts it after the tracks you added, and before those of the radio. During an album or a playlist, that is after the rest of the list too. To bring a track already in Up next forward, use **Play next** in its menu: it moves the track right after the one playing, and a radio track moved so counts as one you added.
+- **In one step:** a song's or an episode's row shows a queue button in place of its length while the pointer is over it, but in Up next and while tracks are selected, whose bar has Add to queue. A song's tile shows Add to queue and Play next beside its play button. With the keyboard's focus in a row, Shift+Enter adds the track to the queue and Alt+Enter (⌥Enter) plays it next. A track goes to the end even when Up next holds it already.
+- **While nothing plays,** Add to queue plays what it adds, as Play next does: from a row, a tile, a menu, the bar of the tracks selected and a list's More menu. Plugins and AI assistants only add to the queue.
 - **Drag** a track in Up next to move it, and use the × on its row to take it out. Clear takes out every track after the one playing. Double-click a track to play it.
 - **Marks** after the artists tell what a track is: "radio" for those a radio added, "skipped" for a song the queue passes over as you dislike it, and "made with AI" for one it passes over as YouTube labels it so. Clicking a skipped track's cover still plays it.
 - **In a wide window,** the player bar shows the track that plays next under the one playing, while Up next is closed.

@@ -598,8 +598,7 @@ func (s *shell) collectionMenu(title string, tracks []media.Track, rawURL string
 				s.notes = append(s.notes, player.Notice{Message: locales.LibraryPlaysNext(title)})
 			}
 			if m.Item(locales.LibraryAddToQueue()).Chosen() {
-				s.p.Enqueue(tracks)
-				s.notes = append(s.notes, player.Notice{Message: locales.LibraryAddedToQueue(title)})
+				s.addToQueue(tracks, locales.LibraryAddedToQueue(title), locales.QueueButtonPlaying(title))
 			}
 			if source != media.SourceFile && m.Item(locales.LibraryStartRadio()).Chosen() {
 				s.startRadio(tracks[0])

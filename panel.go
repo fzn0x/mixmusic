@@ -550,12 +550,10 @@ func (s *shell) trackMenuAt(m *ui.Menu, t media.Track, queued int) {
 			s.p.PlayTracks(one, 0)
 		}
 		if m.Item(locales.PanelPlayNext()).Chosen() {
-			s.p.PlayNext(one)
-			s.notes = append(s.notes, notice(locales.PanelPlaysNext(t.Title)))
+			s.playNextTrack(t)
 		}
 		if m.Item(locales.PanelAddToQueue()).Chosen() {
-			s.p.Enqueue(one)
-			s.notes = append(s.notes, notice(locales.PanelAddedToQueue(t.Title)))
+			s.queueTrack(t)
 		}
 		s.roomSongItem(m, t)
 	}

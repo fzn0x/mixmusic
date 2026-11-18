@@ -92,6 +92,7 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 		s.pickItem(m, key, t)
 	}
 	row.ContextMenu(menu)
+	s.queueKeys(row, t)
 	hovered := row.Hovered()
 	// A row of 60px or more shows larger artwork.
 	art := float32(40)
@@ -186,7 +187,13 @@ func (s *shell) trackRow(c *ui.Context, key string, i int, t media.Track, tracks
 		if t.DurationMs > 0 {
 			duration = clockLength(ms(t.DurationMs))
 		}
-		ui.Text(c, duration).FontSize(k.smallSize()).TextColor(sub).FontFeatures("tnum").Width(48).TextAlign(ui.End)
+		// Under the pointer, the queue's button takes the length's place
+		// (queuebutton.go).
+		if s.queueButtonShows(key, hovered) {
+			s.rowQueueButton(c, key+"-queue-"+count(i), t, 48, k.row)
+		} else {
+			ui.Text(c, duration).FontSize(k.smallSize()).TextColor(sub).FontFeatures("tnum").Width(48).TextAlign(ui.End)
+		}
 		// The menu, without a right click: shown on the row the pointer is
 		// on, or while its focus shows a ring, as Tab's does, and kept in
 		// its place on the others. The focus a click leaves on it shows

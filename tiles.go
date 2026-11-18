@@ -226,6 +226,7 @@ func (s *shell) artTileOf(c *ui.Context, key string, art []media.Image, title, s
 			if active {
 				ui.Box(c).Absolute().Top(0).Left(0).Size(size, size).InsetShadow(0, 0, 0, 3, k.accent).Radius(k.radiusSm)
 			}
+			s.songTileButtons(c, tile, key, rise)
 			if playable && rise > 0.01 {
 				p := s.buttonBase(c.Key(key+"-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().End(8).Bottom(8).
 					Label(circleLabel).Cursor(ui.CursorPointer)
@@ -435,7 +436,10 @@ func (s *shell) artistTile(c *ui.Context, key string, a media.Artist) {
 func (s *shell) trackTile(c *ui.Context, key string, t media.Track, queue []media.Track) {
 	cur, ok := s.st.Current()
 	active := ok && cur.Track.ID == t.ID
+	// Its play circle has the queue's buttons beside it (queuebutton.go).
+	s.songTile = &t
 	open, play := s.artTile(c, key, t.Artwork, t.Title, names(t.Artists), t.Source, false, active, true, func(m *ui.Menu) { s.trackMenu(m, t) })
+	s.songTile = nil
 	switch {
 	case play:
 		s.playFrom(queue, t)

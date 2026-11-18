@@ -29,6 +29,8 @@ A Spotify show's page says so when Spotify tracks play from YouTube Music: Spoti
 
 An episode's menu, from its … button or a right click, has Play, Play next and Add to queue, [Add to liked songs](library.md#liked-songs), [Dislike](playing-music.md#dislikes-and-skipping) and [Add to mix](library.md#mixes), Go to podcast, which opens its show, and Mark as played or Mark as unplayed. Open in its service and Copy link follow. Episodes don't start radios, and they don't download.
 
+With the pointer over an episode's row, a button in place of its length adds it to the queue, and plays it while nothing plays. With the keyboard's focus in the row, Shift+Enter adds it, and Alt+Enter (⌥Enter on macOS) plays it next.
+
 ## Following shows
 
 Follow a show with Follow on its page.

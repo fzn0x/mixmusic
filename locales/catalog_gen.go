@@ -24376,6 +24376,84 @@ func (msgs Messages) PullRefreshRelease() string {
 	return Catalog.Format(msgs.locale, "pullRefreshRelease", nil)
 }
 
+// QueueButtonAdd says "Add {title} to the queue"
+// in the language the app shows.
+//
+// The label and tooltip of the button that shows in place of a song's or an
+// episode's length while the pointer is over its row, and of one of the two
+// buttons beside the play circle of a song's tile on Home, Explore and the
+// now playing page. {title} is the song's or the episode's title.
+func QueueButtonAdd(title string) string { return In(i18n.Locale()).QueueButtonAdd(title) }
+
+// QueueButtonAdd says "Add {title} to the queue"
+// in the language of msgs.
+//
+// The label and tooltip of the button that shows in place of a song's or an
+// episode's length while the pointer is over its row, and of one of the two
+// buttons beside the play circle of a song's tile on Home, Explore and the
+// now playing page. {title} is the song's or the episode's title.
+func (msgs Messages) QueueButtonAdd(title string) string {
+	return Catalog.Format(msgs.locale, "queueButtonAdd", map[string]any{"title": title})
+}
+
+// QueueButtonPlayNext says "Play {title} next"
+// in the language the app shows.
+//
+// The label and tooltip of one of the two buttons beside the play circle of
+// a song's tile on Home, Explore and the now playing page: it puts the song
+// right after the one playing. {title} is the song's title.
+func QueueButtonPlayNext(title string) string { return In(i18n.Locale()).QueueButtonPlayNext(title) }
+
+// QueueButtonPlayNext says "Play {title} next"
+// in the language of msgs.
+//
+// The label and tooltip of one of the two buttons beside the play circle of
+// a song's tile on Home, Explore and the now playing page: it puts the song
+// right after the one playing. {title} is the song's title.
+func (msgs Messages) QueueButtonPlayNext(title string) string {
+	return Catalog.Format(msgs.locale, "queueButtonPlayNext", map[string]any{"title": title})
+}
+
+// QueueButtonPlaying says "Playing {title}"
+// in the language the app shows.
+//
+// The toast of Add to queue, from a song's row, menu, tile or keys, or from
+// an album's or a playlist's More menu, when no track was playing: what it
+// adds plays at once. {title} is the song's, the album's or the playlist's
+// title.
+func QueueButtonPlaying(title string) string { return In(i18n.Locale()).QueueButtonPlaying(title) }
+
+// QueueButtonPlaying says "Playing {title}"
+// in the language of msgs.
+//
+// The toast of Add to queue, from a song's row, menu, tile or keys, or from
+// an album's or a playlist's More menu, when no track was playing: what it
+// adds plays at once. {title} is the song's, the album's or the playlist's
+// title.
+func (msgs Messages) QueueButtonPlaying(title string) string {
+	return Catalog.Format(msgs.locale, "queueButtonPlaying", map[string]any{"title": title})
+}
+
+// QueueButtonPlayingTracks says "Playing {count, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+//
+// The toast of Add to queue in the bar of the tracks selected in a list,
+// when no track was playing: the tracks selected play at once. {count} is
+// how many tracks.
+func QueueButtonPlayingTracks(count int) string {
+	return In(i18n.Locale()).QueueButtonPlayingTracks(count)
+}
+
+// QueueButtonPlayingTracks says "Playing {count, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+//
+// The toast of Add to queue in the bar of the tracks selected in a list,
+// when no track was playing: the tracks selected play at once. {count} is
+// how many tracks.
+func (msgs Messages) QueueButtonPlayingTracks(count int) string {
+	return Catalog.Format(msgs.locale, "queueButtonPlayingTracks", map[string]any{"count": count})
+}
+
 // RailCollapse says "Collapse the sidebar"
 // in the language the app shows.
 func RailCollapse() string { return In(i18n.Locale()).RailCollapse() }

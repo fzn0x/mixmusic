@@ -226,6 +226,9 @@ type shell struct {
 	searchPivot  int
 	// shelfScroll is where the shelves scrolled, by page and shelf.
 	shelfScroll map[string]*ui.ScrollState
+	// songTile is the song whose tile is being built, whose play circle
+	// has the queue's buttons beside it (queuebutton.go).
+	songTile *media.Track
 	// versions are the versions of the albums the lists showed, and the
 	// version each album's page shows (versions.go).
 	versions albumVersions

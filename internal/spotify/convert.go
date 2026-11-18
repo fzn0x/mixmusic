@@ -46,6 +46,8 @@ type track struct {
 	DurationMs   int          `json:"duration_ms"`
 	Explicit     bool         `json:"explicit"`
 	IsLocal      bool         `json:"is_local"`
+	TrackNumber  int          `json:"track_number"`
+	DiscNumber   int          `json:"disc_number"`
 	Artists      []artist     `json:"artists"`
 	Album        *album       `json:"album"`
 	ExternalURLs externalURLs `json:"external_urls"`
@@ -153,6 +155,9 @@ func toTrack(t *track, from *album) (media.Track, bool) {
 		Artwork:    []media.Image{},
 		URL:        t.ExternalURLs.Spotify,
 		ISRC:       t.ExternalIDs.ISRC,
+		// Its place on its album, which every track object tells.
+		TrackNumber: t.TrackNumber,
+		DiscNumber:  t.DiscNumber,
 	}
 	if al != nil {
 		mt.Album = &media.Ref{ID: media.ID(media.SourceSpotify, al.ID), Name: al.Name}

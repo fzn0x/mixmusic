@@ -20062,6 +20062,38 @@ func (msgs Messages) RemoteControlled() string {
 	return Catalog.Format(msgs.locale, "remoteControlled", nil)
 }
 
+// RemoteErrorAnnounce says "Remote control can't announce this computer on the network: {error}"
+// in the language the app shows.
+//
+// Toast when remote control couldn't turn on. {error} is the system's own
+// words, often in English.
+func RemoteErrorAnnounce(error string) string { return In(i18n.Locale()).RemoteErrorAnnounce(error) }
+
+// RemoteErrorAnnounce says "Remote control can't announce this computer on the network: {error}"
+// in the language of msgs.
+//
+// Toast when remote control couldn't turn on. {error} is the system's own
+// words, often in English.
+func (msgs Messages) RemoteErrorAnnounce(error string) string {
+	return Catalog.Format(msgs.locale, "remoteErrorAnnounce", map[string]any{"error": error})
+}
+
+// RemoteErrorFile says "MixMusic couldn't open remote.json, where it keeps the computers paired: {error}"
+// in the language the app shows.
+//
+// Toast when remote control couldn't turn on or forget a computer.
+// remote.json is a file's name; {error} is the system's own words.
+func RemoteErrorFile(error string) string { return In(i18n.Locale()).RemoteErrorFile(error) }
+
+// RemoteErrorFile says "MixMusic couldn't open remote.json, where it keeps the computers paired: {error}"
+// in the language of msgs.
+//
+// Toast when remote control couldn't turn on or forget a computer.
+// remote.json is a file's name; {error} is the system's own words.
+func (msgs Messages) RemoteErrorFile(error string) string {
+	return Catalog.Format(msgs.locale, "remoteErrorFile", map[string]any{"error": error})
+}
+
 // RemoteErrorHandOverLate says "{name} didn't answer in time: what plays here plays on"
 // in the language the app shows.
 //
@@ -20094,6 +20126,42 @@ func RemoteErrorKeyBusy() string { return In(i18n.Locale()).RemoteErrorKeyBusy()
 // apart.
 func (msgs Messages) RemoteErrorKeyBusy() string {
 	return Catalog.Format(msgs.locale, "remoteErrorKeyBusy", nil)
+}
+
+// RemoteErrorKeyKeep says "Couldn't keep this computer's key: {error}"
+// in the language the app shows.
+//
+// Toast or problem when remote control or a room couldn't start: the key
+// that tells this computer apart couldn't be saved. {error} is the system's
+// own words.
+func RemoteErrorKeyKeep(error string) string { return In(i18n.Locale()).RemoteErrorKeyKeep(error) }
+
+// RemoteErrorKeyKeep says "Couldn't keep this computer's key: {error}"
+// in the language of msgs.
+//
+// Toast or problem when remote control or a room couldn't start: the key
+// that tells this computer apart couldn't be saved. {error} is the system's
+// own words.
+func (msgs Messages) RemoteErrorKeyKeep(error string) string {
+	return Catalog.Format(msgs.locale, "remoteErrorKeyKeep", map[string]any{"error": error})
+}
+
+// RemoteErrorKeyRead says "Couldn't read this computer's key: {error}"
+// in the language the app shows.
+//
+// Toast or problem when remote control or a room couldn't start: the key
+// that tells this computer apart couldn't be read. {error} is the system's
+// own words.
+func RemoteErrorKeyRead(error string) string { return In(i18n.Locale()).RemoteErrorKeyRead(error) }
+
+// RemoteErrorKeyRead says "Couldn't read this computer's key: {error}"
+// in the language of msgs.
+//
+// Toast or problem when remote control or a room couldn't start: the key
+// that tells this computer apart couldn't be read. {error} is the system's
+// own words.
+func (msgs Messages) RemoteErrorKeyRead(error string) string {
+	return Catalog.Format(msgs.locale, "remoteErrorKeyRead", map[string]any{"error": error})
 }
 
 // RemoteErrorListen says "Remote control can't listen on the network: {error}"

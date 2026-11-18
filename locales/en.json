@@ -6298,6 +6298,24 @@
     }
   },
   "remoteControlled": "You control it from here",
+  "remoteErrorAnnounce": "Remote control can't announce this computer on the network: {error}",
+  "@remoteErrorAnnounce": {
+    "description": "Toast when remote control couldn't turn on. {error} is the system's own words, often in English.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteErrorFile": "MixMusic couldn't open remote.json, where it keeps the computers paired: {error}",
+  "@remoteErrorFile": {
+    "description": "Toast when remote control couldn't turn on or forget a computer. remote.json is a file's name; {error} is the system's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "remoteErrorHandOverLate": "{name} didn't answer in time: what plays here plays on",
   "@remoteErrorHandOverLate": {
     "description": "Toast when what plays on this computer didn't move to the computer named {name}.",
@@ -6310,6 +6328,24 @@
   "remoteErrorKeyBusy": "This computer's key is being read: try again in a moment",
   "@remoteErrorKeyBusy": {
     "description": "Toast when remote control waits for the key that tells this computer apart."
+  },
+  "remoteErrorKeyKeep": "Couldn't keep this computer's key: {error}",
+  "@remoteErrorKeyKeep": {
+    "description": "Toast or problem when remote control or a room couldn't start: the key that tells this computer apart couldn't be saved. {error} is the system's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "remoteErrorKeyRead": "Couldn't read this computer's key: {error}",
+  "@remoteErrorKeyRead": {
+    "description": "Toast or problem when remote control or a room couldn't start: the key that tells this computer apart couldn't be read. {error} is the system's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "remoteErrorListen": "Remote control can't listen on the network: {error}",
   "@remoteErrorListen": {

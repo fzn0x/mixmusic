@@ -142,11 +142,23 @@ Settings › Playback › Equalizer shapes the sound of what MixMusic plays itse
 
 ![Settings › Playback scrolled to the Equalizer group: the Equalizer switch turned on, the Preset menu set to Custom, and the sliders of the preamp and the ten bands from 32 Hz to 16 kHz, each with its gain above it](shots/equalizer.webp)
 
-- **Equalizer** turns it on and off.
-- **Preset:** Flat, Bass boost, Treble boost, Vocal, Electronic, Rock, Acoustic, Late night or Lo-fi. Choosing one turns the equalizer on.
-- **Bands:** a preamp and ten bands, at 32, 64, 125, 250 and 500 Hz and 1, 2, 4, 8 and 16 kHz, each from -12 to +12 dB in half steps. Moving a band makes the preset Custom.
+- **Sound effects,** at the head of the group and on by default: off, the equalizer, crossfeed and stereo width stop at once and keep their settings, to hear a track as it is. Balance and mono still apply, as they serve how you hear.
+- **Equalizer** turns the equalizer on and off.
+- **Preset:** 23 built-in presets, each written for these bands: Flat, Bass boost, Bass reducer, Treble boost, Treble reducer, Vocal, Spoken word, Acoustic, Classical, Dance, Electronic, Hip-hop, Jazz, Metal, Piano, Pop, R&B, Rock, Live, Late night, Lo-fi, Small speakers and Warm. Choosing one turns the equalizer on. Your own presets follow them.
+- **Presets of your own:** **Save as…**, beside the menu, keeps the bands, the preamp and Auto headroom, with balance, mono, crossfeed and stereo width, under a name of up to 48 characters; a built-in preset's name is taken. Saving under the name of one of yours, ignoring case, asks before it replaces that preset. Keep as many as you like. While one of yours plays, **Rename…**, **Delete** and **Export…** under the menu rename it, delete it, the sound staying as it is, or save it as a JSON file. **Export all…** saves all of yours in one file, and **Import…** adds those of a file, asking before it replaces presets of the same names. They're kept in `settings.json`, under `equalizer.presets`, and an edit of it shows at once.
+- **Simple mode:** three sliders, **Bass**, **Mid** and **Treble**, each from -12 to +12 dB in half steps, in place of the ten bands, which they move. Bass doubles as a bass boost of the strength you choose. Turning it on sets the three from the bands, which stay as they are until one of the three moves.
+- **Auto headroom,** on by default: the preamp turns down as much as the bands boost at their peak, plus half a decibel, so that the equalizer makes no note louder than it came in, and a boost can't clip. The preamp's slider shows that cut, and moving it turns Auto headroom off. A preset never touches the preamp, so presets that boost play quieter than they did before Auto headroom.
+- **Bands:** a preamp, from -30 to +12 dB, and ten bands, at 32, 64, 125, 250 and 500 Hz and 1, 2, 4, 8 and 16 kHz, each from -12 to +12 dB in half steps. Moving a band makes the preset Custom.
 
-It works on YouTube Music, and on Spotify tracks played from their recording there. Spotify's own player takes no equalizer from apps: for Spotify tracks that Spotify plays, use your system's equalizer. [The audio engine](audio-engine.md#the-equalizer) tells how the bands are made.
+Settings › Playback › Sound has four more, under Play 5.1 surround:
+
+- **Balance,** from full left to full right, comes to rest at the centre as it passes. The side it leans to stays as it is, and the other plays quieter. With 5.1 surround, the left speakers weigh against the right ones, and the centre and the subwoofer stay.
+- **Mono** plays both sides mixed on each, for hearing on one side or with one earbud. With 5.1 surround, each left speaker plays mixed with its right one.
+- **Crossfeed,** for headphones, from 0%, off, to 100%: each ear hears a softened, slightly later copy of the other side, as from speakers, after Bauer's method. A sound in the middle stays as it is.
+- **Stereo width,** from 0%, mono, through 100%, as recorded, to 200%. A wider setting turns the middle down rather than the sides up, so that nothing plays past full scale.
+- Crossfeed and stereo width play on stereo. While 5.1 surround plays on six speakers, they're skipped, as a note under them says, and while Sound effects is off they wait, as another says.
+
+Each of these, like the equalizer, glides to a new setting without a click, and does nothing at all at its neutral setting. They work on YouTube Music, on Spotify tracks played from their recording there, and on the music on this computer. They don't reach a [cast device](casting.md), and Spotify's own player takes no equalizer from apps: for Spotify tracks that Spotify plays, use your system's equalizer. [The audio engine](audio-engine.md#the-equalizer) tells how the bands and the rest are made.
 
 ## Speed
 

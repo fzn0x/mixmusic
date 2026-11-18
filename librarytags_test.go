@@ -29,8 +29,8 @@ func focusOnRole(t *testing.T, tt *ui.Tester, role ui.Role, label string) {
 	t.Fatalf("Tab doesn't reach %q", label)
 }
 
-// press presses key, with mods, and lets the window take it in.
-func press(s *shell, tt *ui.Tester, mods ui.Modifiers, key ui.Key) {
+// pressKey presses key, with mods, and lets the window take it in.
+func pressKey(s *shell, tt *ui.Tester, mods ui.Modifiers, key ui.Key) {
 	tt.Key(mods, key)
 	s.drain()
 	tt.Frame()
@@ -169,7 +169,7 @@ func TestTagsFromMenus(t *testing.T) {
 	}
 	clickRole(t, s, tt, ui.RoleTextField, "New tag")
 	tt.Type("  Work   out ")
-	press(s, tt, 0, ui.KeyEnter)
+	pressKey(s, tt, 0, ui.KeyEnter)
 	tags := col.Tags()
 	if len(tags) != 1 || tags[0].Name != "Work out" || tags[0].Color != tagNext[0] {
 		t.Fatalf("library.json keeps %+v", tags)
@@ -201,7 +201,7 @@ func TestTagsFromMenus(t *testing.T) {
 	s.drain()
 	tt.Frame()
 	clickRole(t, s, tt, ui.RoleCheckBox, "Work out")
-	press(s, tt, 0, ui.KeyEscape)
+	pressKey(s, tt, 0, ui.KeyEscape)
 	if s.order.tags.item != nil {
 		t.Error("Escape left Tags… open")
 	}
@@ -218,7 +218,7 @@ func TestTagsFromMenus(t *testing.T) {
 	show(s, tt, "/library/youtube")
 	chooseIn(t, s, tt, "Chill", "Tags…")
 	clickRole(t, s, tt, ui.RoleCheckBox, "Work out")
-	press(s, tt, 0, ui.KeyEscape)
+	pressKey(s, tt, 0, ui.KeyEscape)
 	mood := makeTag(t, s, "Mood", "teal", library.Mark{ID: "yt:MPdeluxe", Kind: library.MarkAlbum, Title: "Kites (Deluxe)"})
 	chooseIn(t, s, tt, "Kites", "Tags…")
 	if info, _ := tt.AccessByRole(ui.RoleCheckBox, "Mood"); !info.Checked {
@@ -226,7 +226,7 @@ func TestTagsFromMenus(t *testing.T) {
 	}
 	clickRole(t, s, tt, ui.RoleCheckBox, "Work out")
 	clickRole(t, s, tt, ui.RoleCheckBox, "Mood")
-	press(s, tt, 0, ui.KeyEscape)
+	pressKey(s, tt, 0, ui.KeyEscape)
 	if got, want := tagNames(s), []string{"Work out: Run, Sleep, Chill, Kites", "Mood: "}; !slices.Equal(got, want) {
 		t.Errorf("tagged in YouTube Music's library, the tags are %q, want %q", got, want)
 	}
@@ -257,7 +257,7 @@ func TestManageTags(t *testing.T) {
 	}
 	clickRole(t, s, tt, ui.RoleTextField, "New tag")
 	tt.Type("Calm")
-	press(s, tt, 0, ui.KeyEnter)
+	pressKey(s, tt, 0, ui.KeyEnter)
 	if got, want := tagNames(s), []string{"Work out: Run", "Calm: "}; !slices.Equal(got, want) {
 		t.Fatalf("a new tag made %q, want %q", got, want)
 	}
@@ -269,7 +269,7 @@ func TestManageTags(t *testing.T) {
 		t.Errorf("dragged, the tags are %q, want %q", got, want)
 	}
 	focusOn(t, tt, "Calm, on 0 items")
-	press(s, tt, ui.Alt, ui.KeyDown)
+	pressKey(s, tt, ui.Alt, ui.KeyDown)
 	tt.Frame()
 	if got, want := tagNames(s), []string{"Work out: Run", "Calm: "}; !slices.Equal(got, want) {
 		t.Errorf("after Alt+Down, the tags are %q, want %q", got, want)
@@ -290,17 +290,17 @@ func TestManageTags(t *testing.T) {
 		t.Error("Teal isn't chosen")
 	}
 	clickRole(t, s, tt, ui.RoleTextField, "Name")
-	press(s, tt, ui.Cmd, ui.KeyA)
+	pressKey(s, tt, ui.Cmd, ui.KeyA)
 	tt.Type("Running")
-	press(s, tt, 0, ui.KeyEnter)
+	pressKey(s, tt, 0, ui.KeyEnter)
 	if got := col.Tags()[0].Name; got != "Running" {
 		t.Errorf("renamed, the tag is %q", got)
 	}
 	clickRole(t, s, tt, ui.RoleTextField, "Name")
-	press(s, tt, ui.Cmd, ui.KeyA)
+	pressKey(s, tt, ui.Cmd, ui.KeyA)
 	tt.Type(" calm ")
 	// Escape goes back a step, as Back does, and names the tag as typed.
-	press(s, tt, 0, ui.KeyEscape)
+	pressKey(s, tt, 0, ui.KeyEscape)
 	tags := col.Tags()
 	if got, want := tagNames(s), []string{"calm: Run"}; !slices.Equal(got, want) {
 		t.Fatalf("renamed as the other, the tags are %q, want %q", got, want)
@@ -325,11 +325,11 @@ func TestManageTags(t *testing.T) {
 	if !tt.HasText("Nothing matches “zzz”.") {
 		t.Errorf("a search without matches says nothing: %q", tt.Texts())
 	}
-	press(s, tt, 0, ui.KeyEscape)
+	pressKey(s, tt, 0, ui.KeyEscape)
 	if s.order.tags.query != "" || s.order.tags.choosing == "" {
 		t.Errorf("Escape in the search left %q, or left Choose items", s.order.tags.query)
 	}
-	press(s, tt, 0, ui.KeyEscape)
+	pressKey(s, tt, 0, ui.KeyEscape)
 	click(t, s, tt, "Delete tag")
 	if !tt.HasText("Delete calm?") || !tt.HasText("It comes off the 2 items it's on. The items themselves stay.") {
 		t.Fatalf("Delete tag asks %q", tt.Texts())
@@ -411,7 +411,7 @@ func TestTagFilterMixes(t *testing.T) {
 	clickRole(t, s, tt, ui.RoleToggleButton, "Work out")
 	show(s, tt, "/settings/appearance")
 	focusOnRole(t, tt, ui.RoleSwitch, "Show tag filters")
-	press(s, tt, 0, ui.KeySpace)
+	pressKey(s, tt, 0, ui.KeySpace)
 	if s.svc.Preferences.Get().TagFilters {
 		t.Fatal("the switch left the tag filters on")
 	}
@@ -449,7 +449,7 @@ func TestTagsTab(t *testing.T) {
 	tt.Frame()
 	chooseIn(t, s, tt, "Kites", "Tags…")
 	clickRole(t, s, tt, ui.RoleCheckBox, "Mood")
-	press(s, tt, 0, ui.KeyEscape)
+	pressKey(s, tt, 0, ui.KeyEscape)
 	kites := slices.IndexFunc(s.svc.LocalFiles.Albums(), func(a media.Album) bool { return a.Title == "Kites" })
 	if got := s.svc.Collection.TagsOf(s.svc.LocalFiles.Albums()[kites].ID); !slices.Equal(got, []string{mood}) {
 		t.Fatalf("the album on this computer has the tags %q", got)
@@ -484,14 +484,14 @@ func TestTagChipsKeys(t *testing.T) {
 	tt := tester(t, s)
 	show(s, tt, "/library/mixes")
 	focusOnRole(t, tt, ui.RoleToggleButton, "Work out")
-	press(s, tt, 0, ui.KeySpace)
+	pressKey(s, tt, 0, ui.KeySpace)
 	if got := s.svc.Preferences.Get().TagFilter; !slices.Equal(got, []string{work}) {
 		t.Errorf("Space chose %q", got)
 	}
 	if got, want := inReadingOrder(tt, "Calm", "Run"), []string{"Run"}; !slices.Equal(got, want) {
 		t.Errorf("by Work out, the mixes show %q, want %q", got, want)
 	}
-	press(s, tt, 0, ui.KeyEnter)
+	pressKey(s, tt, 0, ui.KeyEnter)
 	if got := s.svc.Preferences.Get().TagFilter; len(got) != 0 {
 		t.Errorf("Enter left %q chosen", got)
 	}
@@ -504,10 +504,10 @@ func TestTagChipsKeys(t *testing.T) {
 	s.drain()
 	tt.Frame()
 	focusOnRole(t, tt, ui.RoleCheckBox, "Work out")
-	press(s, tt, 0, ui.KeySpace)
+	pressKey(s, tt, 0, ui.KeySpace)
 	focusOnRole(t, tt, ui.RoleTextField, "New tag")
 	tt.Type("Evening")
-	press(s, tt, 0, ui.KeyEnter)
+	pressKey(s, tt, 0, ui.KeyEnter)
 	if got, want := tagNames(s), []string{"Work out: Run, Calm", "Evening: Calm"}; !slices.Equal(got, want) {
 		t.Errorf("by keys, the tags are %q, want %q", got, want)
 	}

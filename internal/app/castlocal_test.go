@@ -358,7 +358,7 @@ func TestCastOutServesCastAndQueued(t *testing.T) {
 	o.Load(a, audio.Cue{Autoplay: true})
 	q.wait(t, "load http://lan/yt/aaaaaaaaaaa 0s true")
 	ev.wait(t, "playing true")
-	o.Preload(b)
+	o.Preload(b, audio.Cue{})
 	q.wait(t, "next http://lan/yt/bbbbbbbbbbb")
 	if got := last(); !slices.Equal(got, []string{a, b}) {
 		t.Errorf("served %q, want the one cast and the one next", got)
@@ -366,7 +366,7 @@ func TestCastOutServesCastAndQueued(t *testing.T) {
 	q.mu.Lock()
 	q.nextErr = errors.New("no next")
 	q.mu.Unlock()
-	o.Preload(c)
+	o.Preload(c, audio.Cue{})
 	q.wait(t, "next http://lan/yt/ccccccccccc")
 	for deadline := time.Now().Add(5 * time.Second); !slices.Equal(last(), []string{a, ""}); time.Sleep(time.Millisecond) {
 		if time.Now().After(deadline) {

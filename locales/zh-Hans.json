@@ -643,6 +643,7 @@
   "downloadsProgressLabel": "下载",
   "downloadsReasonBadAudio": "获取到的音频无法播放",
   "downloadsReasonDiskFull": "磁盘已满",
+  "downloadsReasonExplicit": "含露骨内容，而你的设置会隐藏露骨内容",
   "downloadsReasonNeedsYTDLP": "需要 yt-dlp，可在“设置 › 播放”中安装",
   "downloadsReasonNetwork": "网络已断开",
   "downloadsReasonNoAudio": "YouTube 上没有 MixMusic 能播放的这首歌曲的音频",

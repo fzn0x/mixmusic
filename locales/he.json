@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "הורדות",
   "downloadsReasonBadAudio": "השמע שהתקבל לא ניתן להשמעה",
   "downloadsReasonDiskFull": "הדיסק מלא",
+  "downloadsReasonExplicit": "השיר מפורש, וההגדרות שלך מסתירות תוכן מפורש",
   "downloadsReasonNeedsYTDLP": "נדרש yt-dlp, שאפשר להתקין ב\"הגדרות › השמעה\"",
   "downloadsReasonNetwork": "החיבור לרשת נותק",
   "downloadsReasonNoAudio": "ב-YouTube אין שמע של הרצועה הזו ש-MixMusic יכולה להשמיע",

@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Shkarkimet",
   "downloadsReasonBadAudio": "audioja që erdhi nuk mund të luhet",
   "downloadsReasonDiskFull": "disku është plot",
+  "downloadsReasonExplicit": "kënga është e papërshtatshme, dhe cilësimet tuaja e fshehin përmbajtjen e papërshtatshme",
   "downloadsReasonNeedsYTDLP": "duhet yt-dlp, që instalohet te Cilësimet › Luajtja",
   "downloadsReasonNetwork": "rrjeti u ndërpre",
   "downloadsReasonNoAudio": "YouTube nuk ka audio të kësaj kënge që MixMusic mund të luajë",

@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Yuklab olinganlar",
   "downloadsReasonBadAudio": "kelgan audio ijro etilmaydi",
   "downloadsReasonDiskFull": "disk toʻla",
+  "downloadsReasonExplicit": "u eksplisit, sozlamalaringiz esa eksplisit kontentni yashiradi",
   "downloadsReasonNeedsYTDLP": "yt-dlp kerak, uni Sozlamalar › Ijro boʻlimida oʻrnatish mumkin",
   "downloadsReasonNetwork": "tarmoq uzildi",
   "downloadsReasonNoAudio": "YouTube-da bu trekning MixMusic ijro eta oladigan audiosi yoʻq",

@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Ներբեռնումներ",
   "downloadsReasonBadAudio": "ստացված ձայնը հնարավոր չէ նվագարկել",
   "downloadsReasonDiskFull": "սկավառակը լցված է",
+  "downloadsReasonExplicit": "երգը ոչ նորմատիվ է, իսկ Ձեր կարգավորումները թաքցնում են ոչ նորմատիվ բովանդակությունը",
   "downloadsReasonNeedsYTDLP": "պահանջվում է yt-dlp, որը տեղադրվում է «Կարգավորումներ › Նվագարկում» բաժնից",
   "downloadsReasonNetwork": "ցանցը կորավ",
   "downloadsReasonNoAudio": "YouTube-ը չունի այս երգի այնպիսի ձայն, որը MixMusic-ը նվագարկում է",

@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "डाउनलोडहरू",
   "downloadsReasonBadAudio": "आएको अडियो बज्न सक्दैन",
   "downloadsReasonDiskFull": "डिस्क भरिएको छ",
+  "downloadsReasonExplicit": "यो स्पष्ट सामग्रीको हो, र तपाईंका सेटिङहरूले स्पष्ट सामग्री लुकाउँछन्",
   "downloadsReasonNeedsYTDLP": "यसलाई yt-dlp चाहिन्छ, जुन सेटिङहरू › प्लेब्याकले स्थापना गर्छ",
   "downloadsReasonNetwork": "नेटवर्क विच्छेद भयो",
   "downloadsReasonNoAudio": "YouTube मा यो ट्र्याकको MixMusic ले बजाउने कुनै अडियो छैन",

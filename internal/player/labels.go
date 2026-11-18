@@ -166,8 +166,11 @@ func (p *Player) check(m *move, i int) {
 }
 
 // learned takes in the label a check told of t: the entries of a track
-// labeled are marked, and a pause of the checks is told once.
+// labeled are marked, and a pause of the checks is told once. The check
+// found the recording of a Spotify track, which the settings may hide as
+// explicit: its entries are marked then too.
 func (p *Player) learned(t media.Track, l Label) {
+	p.recordingFound(t)
 	switch l {
 	case LabelAI:
 		p.mark(t.ID)

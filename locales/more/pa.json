@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "ਡਾਊਨਲੋਡ",
   "downloadsReasonBadAudio": "ਜੋ ਆਡੀਓ ਆਇਆ ਉਹ ਚੱਲ ਨਹੀਂ ਸਕਦਾ",
   "downloadsReasonDiskFull": "ਡਿਸਕ ਭਰ ਗਈ ਹੈ",
+  "downloadsReasonExplicit": "ਇਹ ਅਸ਼ਲੀਲ ਹੈ, ਅਤੇ ਤੁਹਾਡੀਆਂ ਸੈਟਿੰਗਾਂ ਅਸ਼ਲੀਲ ਸਮੱਗਰੀ ਲੁਕਾਉਂਦੀਆਂ ਹਨ",
   "downloadsReasonNeedsYTDLP": "ਇਸਨੂੰ yt-dlp ਦੀ ਲੋੜ ਹੈ, ਜਿਸਨੂੰ ਸੈਟਿੰਗਾਂ › ਪਲੇਬੈਕ ਇੰਸਟਾਲ ਕਰਦਾ ਹੈ",
   "downloadsReasonNetwork": "ਨੈੱਟਵਰਕ ਟੁੱਟ ਗਿਆ",
   "downloadsReasonNoAudio": "YouTube ਕੋਲ ਇਸ ਗੀਤ ਦਾ ਕੋਈ ਅਜਿਹਾ ਆਡੀਓ ਨਹੀਂ ਜੋ MixMusic ਚਲਾਉਂਦਾ ਹੈ",

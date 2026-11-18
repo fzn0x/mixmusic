@@ -176,6 +176,21 @@ func (s playerServices) Skip(t media.Track) string {
 	return ""
 }
 
+var _ player.Recordings = playerServices{}
+
+// KnownRecording is the recording on YouTube Music that the Spotify track t
+// plays from, as found before, without searching: its download's, which
+// PrepareStream plays first, else its match.
+func (s playerServices) KnownRecording(t media.Track) (media.Track, bool) {
+	if k, ok := s.a.downloads.Lookup(t.ID); ok {
+		return k.Track, true
+	}
+	if s.a.matcher == nil {
+		return media.Track{}, false
+	}
+	return s.a.matcher.Matched(t)
+}
+
 var _ player.Network = playerServices{}
 
 // Online, WaitOnline and KickOnline are the network, as the player waits

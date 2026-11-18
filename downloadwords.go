@@ -64,6 +64,8 @@ func downloadReason(reason, why string) string {
 		return locales.DownloadsReasonNetwork()
 	case downloads.ReasonDiskFull:
 		return locales.DownloadsReasonDiskFull()
+	case downloads.ReasonExplicit:
+		return locales.DownloadsReasonExplicit()
 	}
 	return why
 }

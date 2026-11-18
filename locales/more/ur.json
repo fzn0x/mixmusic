@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "ڈاؤن لوڈز",
   "downloadsReasonBadAudio": "جو آڈیو آئی وہ چل نہیں سکتی",
   "downloadsReasonDiskFull": "ڈسک بھری ہوئی ہے",
+  "downloadsReasonExplicit": "یہ ایکسپلیسٹ ہے، اور آپ کی ترتیبات ایکسپلیسٹ مواد چھپاتی ہیں",
   "downloadsReasonNeedsYTDLP": "اسے yt-dlp چاہیے، جسے ترتیبات › پلے بیک انسٹال کرتی ہیں",
   "downloadsReasonNetwork": "نیٹ ورک چلا گیا",
   "downloadsReasonNoAudio": "YouTube پر اس ٹریک کی کوئی ایسی آڈیو نہیں جو MixMusic چلاتا ہو",

@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Vipakuliwa",
   "downloadsReasonBadAudio": "sauti iliyopokelewa haiwezi kuchezwa",
   "downloadsReasonDiskFull": "diski imejaa",
+  "downloadsReasonExplicit": "wimbo una maudhui ya watu wazima, na mipangilio yako huficha maudhui ya watu wazima",
   "downloadsReasonNeedsYTDLP": "inahitaji yt-dlp, ambayo Mipangilio › Uchezaji husakinisha",
   "downloadsReasonNetwork": "mtandao ulikatika",
   "downloadsReasonNoAudio": "YouTube haina sauti ya wimbo huu ambayo MixMusic inaweza kucheza",

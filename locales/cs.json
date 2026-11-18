@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Stažené",
   "downloadsReasonBadAudio": "stažený zvuk nelze přehrát",
   "downloadsReasonDiskFull": "disk je plný",
+  "downloadsReasonExplicit": "skladba je explicitní a vaše nastavení explicitní obsah skrývá",
   "downloadsReasonNeedsYTDLP": "je potřeba yt-dlp, který nainstalujete v Nastavení › Přehrávání",
   "downloadsReasonNetwork": "připojení k síti se přerušilo",
   "downloadsReasonNoAudio": "YouTube nemá zvuk této skladby, který MixMusic umí přehrát",

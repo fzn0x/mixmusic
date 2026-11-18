@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Preuzimanja",
   "downloadsReasonBadAudio": "primljeni zvuk ne može se reproducirati",
   "downloadsReasonDiskFull": "disk je pun",
+  "downloadsReasonExplicit": "pjesma je eksplicitna, a vaše postavke skrivaju eksplicitan sadržaj",
   "downloadsReasonNeedsYTDLP": "potreban je yt-dlp, koji instaliraju Postavke › Reprodukcija",
   "downloadsReasonNetwork": "veza s mrežom je prekinuta",
   "downloadsReasonNoAudio": "YouTube nema zvuk ove skladbe koji MixMusic reproducira",

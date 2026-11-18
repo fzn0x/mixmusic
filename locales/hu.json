@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Letöltések",
   "downloadsReasonBadAudio": "a kapott hang nem játszható le",
   "downloadsReasonDiskFull": "a lemez megtelt",
+  "downloadsReasonExplicit": "a szám explicit, és a beállítások elrejtik az explicit tartalmat",
   "downloadsReasonNeedsYTDLP": "ehhez yt-dlp kell, amelyet a Beállítások › Lejátszás telepít",
   "downloadsReasonNetwork": "megszakadt a hálózat",
   "downloadsReasonNoAudio": "a YouTube-on nincs olyan hangja ennek a számnak, amelyet a MixMusic lejátszik",

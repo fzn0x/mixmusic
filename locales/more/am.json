@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "ውርዶች",
   "downloadsReasonBadAudio": "የመጣው ድምፅ ሊጫወት አይችልም",
   "downloadsReasonDiskFull": "ዲስኩ ሞልቷል",
+  "downloadsReasonExplicit": "ጸያፍ ነው፣ ቅንብሮችዎ ደግሞ ጸያፍ ይዘትን ይደብቃሉ",
   "downloadsReasonNeedsYTDLP": "yt-dlp ያስፈልገዋል፣ እሱንም ቅንብሮች › መልሶ ማጫወት ይጭነዋል",
   "downloadsReasonNetwork": "አውታረ መረቡ ተቋረጠ",
   "downloadsReasonNoAudio": "YouTube MixMusic የሚያጫውተው የዚህ ትራክ ድምፅ የለውም",

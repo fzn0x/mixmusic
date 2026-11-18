@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Преузимања",
   "downloadsReasonBadAudio": "примљени звук не може да се пусти",
   "downloadsReasonDiskFull": "диск је пун",
+  "downloadsReasonExplicit": "песма је експлицитна, а ваша подешавања скривају експлицитан садржај",
   "downloadsReasonNeedsYTDLP": "потребан је yt-dlp, који се инсталира у Подешавања › Пуштање",
   "downloadsReasonNetwork": "веза је прекинута",
   "downloadsReasonNoAudio": "YouTube нема звук ове нумере који MixMusic може да пусти",

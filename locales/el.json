@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Λήψεις",
   "downloadsReasonBadAudio": "ο ήχος που ελήφθη δεν μπορεί να αναπαραχθεί",
   "downloadsReasonDiskFull": "ο δίσκος είναι πλήρης",
+  "downloadsReasonExplicit": "έχει ακατάλληλο περιεχόμενο και οι ρυθμίσεις σας κρύβουν το ακατάλληλο περιεχόμενο",
   "downloadsReasonNeedsYTDLP": "χρειάζεται το yt-dlp, που εγκαθίσταται από τις Ρυθμίσεις › Αναπαραγωγή",
   "downloadsReasonNetwork": "η σύνδεση δικτύου χάθηκε",
   "downloadsReasonNoAudio": "το YouTube δεν έχει ήχο αυτού του κομματιού που μπορεί να παίξει το MixMusic",

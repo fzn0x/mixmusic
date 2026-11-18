@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "බාගැනීම්",
   "downloadsReasonBadAudio": "ලැබුණු ශ්‍රව්‍යය වාදනය කළ නොහැක",
   "downloadsReasonDiskFull": "තැටිය පිරී ඇත",
+  "downloadsReasonExplicit": "එය වැඩිහිටි අන්තර්ගතයකි, ඔබේ සැකසීම් වැඩිහිටි අන්තර්ගතය සඟවයි",
   "downloadsReasonNeedsYTDLP": "එයට yt-dlp අවශ්‍ය වේ, එය සැකසීම් › වාදනය ස්ථාපනය කරයි",
   "downloadsReasonNetwork": "ජාලය විසන්ධි විය",
   "downloadsReasonNoAudio": "MixMusic වාදනය කරන මෙම ගීතයේ ශ්‍රව්‍යයක් YouTube හි නැත",

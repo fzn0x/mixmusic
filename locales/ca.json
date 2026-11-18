@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Baixades",
   "downloadsReasonBadAudio": "l’àudio rebut no es pot reproduir",
   "downloadsReasonDiskFull": "el disc és ple",
+  "downloadsReasonExplicit": "és explícita, i la teva configuració amaga el contingut explícit",
   "downloadsReasonNeedsYTDLP": "cal yt-dlp, que s’instal·la a Configuració › Reproducció",
   "downloadsReasonNetwork": "s’ha perdut la connexió",
   "downloadsReasonNoAudio": "YouTube no té cap àudio d’aquesta cançó que MixMusic pugui reproduir",

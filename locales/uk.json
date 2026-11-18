@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Завантаження",
   "downloadsReasonBadAudio": "отримане аудіо не відтворюється",
   "downloadsReasonDiskFull": "диск заповнений",
+  "downloadsReasonExplicit": "трек містить нецензурний вміст, а ваші налаштування його приховують",
   "downloadsReasonNeedsYTDLP": "потрібен yt-dlp, який установлюється в розділі Налаштування › Відтворення",
   "downloadsReasonNetwork": "зникла мережа",
   "downloadsReasonNoAudio": "YouTube не має аудіо цього треку, яке відтворює MixMusic",

@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Downloads",
   "downloadsReasonBadAudio": "de ontvangen audio kan niet worden afgespeeld",
   "downloadsReasonDiskFull": "de schijf is vol",
+  "downloadsReasonExplicit": "het nummer is expliciet, en je instellingen verbergen expliciete inhoud",
   "downloadsReasonNeedsYTDLP": "yt-dlp is nodig, dat je installeert via Instellingen › Afspelen",
   "downloadsReasonNetwork": "de netwerkverbinding viel weg",
   "downloadsReasonNoAudio": "YouTube heeft geen audio van dit nummer die MixMusic kan afspelen",

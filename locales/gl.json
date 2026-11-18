@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Descargas",
   "downloadsReasonBadAudio": "o audio recibido non se pode reproducir",
   "downloadsReasonDiskFull": "o disco está cheo",
+  "downloadsReasonExplicit": "é explícita, e a túa configuración oculta o contido explícito",
   "downloadsReasonNeedsYTDLP": "precisa yt-dlp, que se instala en Configuración › Reprodución",
   "downloadsReasonNetwork": "perdeuse a rede",
   "downloadsReasonNoAudio": "YouTube non ten ningún audio desta canción que MixMusic reproduza",

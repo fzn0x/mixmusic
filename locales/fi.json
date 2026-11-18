@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Lataukset",
   "downloadsReasonBadAudio": "saatua ääntä ei voi toistaa",
   "downloadsReasonDiskFull": "levy on täynnä",
+  "downloadsReasonExplicit": "kappale on eksplisiittinen, ja asetuksesi piilottavat eksplisiittisen sisällön",
   "downloadsReasonNeedsYTDLP": "tarvitaan yt-dlp, jonka voi asentaa kohdassa Asetukset › Toisto",
   "downloadsReasonNetwork": "verkkoyhteys katkesi",
   "downloadsReasonNoAudio": "YouTubessa ei ole tästä kappaleesta ääntä, jota MixMusic voi toistaa",

@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "ဒေါင်းလုဒ်များ",
   "downloadsReasonBadAudio": "ရလာသော အသံကို ဖွင့်၍ မရပါ",
   "downloadsReasonDiskFull": "ဒစ်ခ် ပြည့်နေသည်",
+  "downloadsReasonExplicit": "၎င်းသည် ပြင်းထန်ပြီး သင့်ဆက်တင်များက ပြင်းထန်သော အကြောင်းအရာကို ဖျောက်ထားသည်",
   "downloadsReasonNeedsYTDLP": "၎င်းအတွက် yt-dlp လိုအပ်ပြီး ဆက်တင်များ › ဖွင့်ခြင်း တွင် ထည့်သွင်းနိုင်သည်",
   "downloadsReasonNetwork": "ကွန်ရက် ပြတ်သွားသည်",
   "downloadsReasonNoAudio": "YouTube တွင် MixMusic ဖွင့်နိုင်သော ဤသီချင်း၏ အသံ မရှိပါ",

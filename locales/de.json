@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Downloads",
   "downloadsReasonBadAudio": "das empfangene Audio lässt sich nicht abspielen",
   "downloadsReasonDiskFull": "der Datenträger ist voll",
+  "downloadsReasonExplicit": "der Titel ist explizit, und deine Einstellungen blenden explizite Inhalte aus",
   "downloadsReasonNeedsYTDLP": "yt-dlp wird benötigt, das unter Einstellungen › Wiedergabe installiert wird",
   "downloadsReasonNetwork": "das Netzwerk ist weggefallen",
   "downloadsReasonNoAudio": "YouTube hat kein Audio dieses Titels, das MixMusic abspielt",

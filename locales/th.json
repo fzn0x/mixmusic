@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "การดาวน์โหลด",
   "downloadsReasonBadAudio": "เสียงที่ได้มาเล่นไม่ได้",
   "downloadsReasonDiskFull": "ดิสก์เต็ม",
+  "downloadsReasonExplicit": "เพลงนี้มีเนื้อหาไม่เหมาะสม และการตั้งค่าของคุณซ่อนเนื้อหาไม่เหมาะสม",
   "downloadsReasonNeedsYTDLP": "ต้องใช้ yt-dlp ซึ่งติดตั้งได้ในการตั้งค่า › การเล่น",
   "downloadsReasonNetwork": "เครือข่ายขาดการเชื่อมต่อ",
   "downloadsReasonNoAudio": "YouTube ไม่มีเสียงของเพลงนี้ในรูปแบบที่ MixMusic เล่นได้",

@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Muat turun",
   "downloadsReasonBadAudio": "audio yang diterima tidak dapat dimainkan",
   "downloadsReasonDiskFull": "cakera penuh",
+  "downloadsReasonExplicit": "ia eksplisit, dan tetapan anda menyembunyikan kandungan eksplisit",
   "downloadsReasonNeedsYTDLP": "ia memerlukan yt-dlp, yang dipasang oleh Tetapan › Main balik",
   "downloadsReasonNetwork": "rangkaian terputus",
   "downloadsReasonNoAudio": "YouTube tiada audio lagu ini yang dapat dimainkan oleh MixMusic",

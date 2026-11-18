@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Unduhan",
   "downloadsReasonBadAudio": "audio yang diterima tidak bisa diputar",
   "downloadsReasonDiskFull": "disk penuh",
+  "downloadsReasonExplicit": "lagu ini eksplisit, dan pengaturan Anda menyembunyikan konten eksplisit",
   "downloadsReasonNeedsYTDLP": "memerlukan yt-dlp, yang dipasang di Pengaturan › Pemutaran",
   "downloadsReasonNetwork": "jaringan terputus",
   "downloadsReasonNoAudio": "YouTube tidak punya audio lagu ini yang bisa diputar MixMusic",

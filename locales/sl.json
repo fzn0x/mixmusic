@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Prenosi",
   "downloadsReasonBadAudio": "prejetega zvoka ni mogoče predvajati",
   "downloadsReasonDiskFull": "disk je poln",
+  "downloadsReasonExplicit": "pesem je eksplicitna, vaše nastavitve pa skrivajo eksplicitno vsebino",
   "downloadsReasonNeedsYTDLP": "potreben je yt-dlp, ki ga namesti Nastavitve › Predvajanje",
   "downloadsReasonNetwork": "povezava z omrežjem je bila prekinjena",
   "downloadsReasonNoAudio": "YouTube nima zvoka te skladbe, ki bi ga MixMusic lahko predvajal",

@@ -8064,6 +8064,28 @@ func (msgs Messages) DownloadsReasonDiskFull() string {
 	return Catalog.Format(msgs.locale, "downloadsReasonDiskFull", nil)
 }
 
+// DownloadsReasonExplicit says "it's explicit, and your settings hide explicit content"
+// in the language the app shows.
+//
+// Why a track couldn't download: it is explicit, or, of a Spotify track,
+// its recording on YouTube Music that downloads in its place is, and Hide
+// explicit content in Settings › Playback is on. It goes in the {reason}
+// of downloadsMarkFailed and downloadsStatusFailed, so it starts in
+// lowercase where the language has cases.
+func DownloadsReasonExplicit() string { return In(i18n.Locale()).DownloadsReasonExplicit() }
+
+// DownloadsReasonExplicit says "it's explicit, and your settings hide explicit content"
+// in the language of msgs.
+//
+// Why a track couldn't download: it is explicit, or, of a Spotify track,
+// its recording on YouTube Music that downloads in its place is, and Hide
+// explicit content in Settings › Playback is on. It goes in the {reason}
+// of downloadsMarkFailed and downloadsStatusFailed, so it starts in
+// lowercase where the language has cases.
+func (msgs Messages) DownloadsReasonExplicit() string {
+	return Catalog.Format(msgs.locale, "downloadsReasonExplicit", nil)
+}
+
 // DownloadsReasonNeedsYTDLP says "it needs yt-dlp, which Settings › Playback installs"
 // in the language the app shows.
 //

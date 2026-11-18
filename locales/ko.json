@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "다운로드",
   "downloadsReasonBadAudio": "받은 오디오를 재생할 수 없습니다",
   "downloadsReasonDiskFull": "디스크가 가득 찼습니다",
+  "downloadsReasonExplicit": "19금 곡이며, 설정에서 19금 콘텐츠를 숨기고 있습니다",
   "downloadsReasonNeedsYTDLP": "yt-dlp가 필요합니다. 설정 › 재생에서 설치할 수 있습니다",
   "downloadsReasonNetwork": "네트워크 연결이 끊어졌습니다",
   "downloadsReasonNoAudio": "YouTube에 MixMusic이 재생할 수 있는 이 곡의 오디오가 없습니다",

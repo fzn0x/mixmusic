@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Изтеглени",
   "downloadsReasonBadAudio": "полученият звук не може да се възпроизведе",
   "downloadsReasonDiskFull": "дискът е пълен",
+  "downloadsReasonExplicit": "песента е с нецензурно съдържание, а настройките Ви го скриват",
   "downloadsReasonNeedsYTDLP": "нужен е yt-dlp, който се инсталира от Настройки › Възпроизвеждане",
   "downloadsReasonNetwork": "връзката прекъсна",
   "downloadsReasonNoAudio": "YouTube няма звук за тази песен, който MixMusic може да възпроизведе",

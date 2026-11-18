@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Atsisiuntimai",
   "downloadsReasonBadAudio": "gauto garso nepavyksta groti",
   "downloadsReasonDiskFull": "diskas pilnas",
+  "downloadsReasonExplicit": "daina yra necenzūrinė, o jūsų nustatymai slepia necenzūrinį turinį",
   "downloadsReasonNeedsYTDLP": "reikia yt-dlp, kurią galima įdiegti skiltyje Nustatymai › Atkūrimas",
   "downloadsReasonNetwork": "nutrūko tinklo ryšys",
   "downloadsReasonNoAudio": "YouTube neturi šio takelio garso, kurį MixMusic galėtų groti",

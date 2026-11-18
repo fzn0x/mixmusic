@@ -27,9 +27,17 @@ func (a *App) openDownloads(folder string) {
 		folder = a.defaultDownloads()
 	}
 	o := downloads.Options{Fetcher: a.proxy, Matcher: a.matcher, Cache: a.cache, Network: a.online, Art: a.artStore.Bytes,
-		Avoid: []string{filepath.Join(a.opts.CacheDir, "audio"), filepath.Join(a.opts.CacheDir, "artwork")}, Exists: chosen}
+		Avoid: []string{filepath.Join(a.opts.CacheDir, "audio"), filepath.Join(a.opts.CacheDir, "artwork")}, Exists: chosen,
+		Hides: a.hidesExplicit}
 	a.downloads = downloads.Open(folder, o)
 	a.proxy.Kept = a.downloads
+}
+
+// hidesExplicit reports whether the settings hide t, an explicit song or
+// video, while they hide explicit content: it doesn't download, nor a
+// Spotify track whose recording it is (#583).
+func (a *App) hidesExplicit(t media.Track) bool {
+	return a.settings.Get().HideExplicit && t.ExplicitSong()
 }
 
 // defaultDownloads is the folder the downloads are in unless the user

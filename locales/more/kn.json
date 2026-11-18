@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "ಡೌನ್‌ಲೋಡ್‌ಗಳು",
   "downloadsReasonBadAudio": "ಬಂದ ಆಡಿಯೊ ಪ್ಲೇ ಆಗುವುದಿಲ್ಲ",
   "downloadsReasonDiskFull": "ಡಿಸ್ಕ್ ತುಂಬಿದೆ",
+  "downloadsReasonExplicit": "ಇದು ಅಶ್ಲೀಲ, ಮತ್ತು ನಿಮ್ಮ ಸೆಟ್ಟಿಂಗ್‌ಗಳು ಅಶ್ಲೀಲ ವಿಷಯವನ್ನು ಮರೆಮಾಡುತ್ತವೆ",
   "downloadsReasonNeedsYTDLP": "ಇದಕ್ಕೆ yt-dlp ಬೇಕು, ಅದನ್ನು ಸೆಟ್ಟಿಂಗ್‌ಗಳು › ಪ್ಲೇಬ್ಯಾಕ್ ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡುತ್ತದೆ",
   "downloadsReasonNetwork": "ನೆಟ್‌ವರ್ಕ್ ಹೋಯಿತು",
   "downloadsReasonNoAudio": "MixMusic ಪ್ಲೇ ಮಾಡುವ ಈ ಹಾಡಿನ ಯಾವುದೇ ಆಡಿಯೊ YouTube ನಲ್ಲಿ ಇಲ್ಲ",

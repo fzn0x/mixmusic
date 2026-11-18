@@ -133,22 +133,34 @@ func (m *Matcher) known(id string) (media.Track, bool) {
 	return found, ok
 }
 
-// search looks for t among songs, then among videos.
+// search looks for t among songs, then among videos. A clean track whose
+// closest song is explicit looks among the videos too, for a clean one,
+// and takes the explicit song when there is none (#583).
 func (m *Matcher) search(ctx context.Context, t media.Track) (media.Track, error) {
 	query := t.Title
 	if len(t.Artists) > 0 {
 		query += " " + t.Artists[0].Name
 	}
 	var errs []error
+	var explicit media.Track
+	found := false
 	for _, filter := range []youtube.Filter{youtube.FilterSongs, youtube.FilterVideos} {
 		items, err := m.YouTube.Search(ctx, query, filter)
 		if err != nil {
 			errs = append(errs, err)
 			continue
 		}
-		if best, ok := Best(t, items); ok {
+		best, ok := Best(t, items)
+		switch {
+		case !ok:
+		case t.Explicit || !best.Explicit:
 			return best, nil
+		case !found:
+			explicit, found = best, true
 		}
+	}
+	if found {
+		return explicit, nil
 	}
 	if len(errs) == 2 {
 		return media.Track{}, errors.Join(errs...)
@@ -156,7 +168,8 @@ func (m *Matcher) search(ctx context.Context, t media.Track) (media.Track, error
 	return media.Track{}, ErrNoMatch
 }
 
-// Best returns the candidate closest to t, if one is close enough.
+// Best returns the candidate closest to t, if one is close enough: of two
+// alike, the one marked explicit, or clean, as t is (Score).
 func Best(t media.Track, candidates []media.Item) (media.Track, bool) {
 	var best media.Track
 	bestScore := 0.0
@@ -172,7 +185,8 @@ func Best(t media.Track, candidates []media.Item) (media.Track, bool) {
 }
 
 // Score rates how likely candidate is the recording of t, from 0 to 1, by
-// their titles, artists and durations.
+// their titles, artists and durations, whether candidate is a song, and
+// whether it is marked explicit as t is.
 func Score(t, candidate media.Track) float64 {
 	title := similarity(words(CleanTitle(t.Title)), words(CleanTitle(candidate.Title)))
 	artist := artistScore(t.Artists, candidate)
@@ -181,11 +195,20 @@ func Score(t, candidate media.Track) float64 {
 	if !candidate.Video {
 		score += 0.05 // audio tracks are the released recordings
 	}
+	score = min(score, 1)
+	if candidate.Explicit != t.Explicit {
+		score *= otherMark // the song's other version, explicit or clean
+	}
 	if title < 0.5 {
 		score *= 0.5 // another song, whoever sings it
 	}
-	return min(score, 1)
+	return score
 }
+
+// otherMark is what a recording marked explicit keeps of its score when
+// the track isn't, or the other way round: of two recordings alike, the
+// one marked as the track is goes first (#583).
+const otherMark = 0.95
 
 // artistScore rates whether the candidate is by one of the artists, by its
 // artists, or failing that its title, as "Artist - Song" videos have it.

@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "ការទាញយក",
   "downloadsReasonBadAudio": "សំឡេងដែលទទួលបានមិនអាចចាក់បានទេ",
   "downloadsReasonDiskFull": "ថាសពេញ",
+  "downloadsReasonExplicit": "វាមិនសមរម្យ ហើយការកំណត់របស់អ្នកលាក់ខ្លឹមសារមិនសមរម្យ",
   "downloadsReasonNeedsYTDLP": "វាត្រូវការ yt-dlp ដែល ការកំណត់ › ការចាក់ ដំឡើង",
   "downloadsReasonNetwork": "បណ្ដាញបានដាច់",
   "downloadsReasonNoAudio": "YouTube គ្មានសំឡេងនៃបទនេះដែល MixMusic អាចចាក់បានទេ",

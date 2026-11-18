@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "Deskargak",
   "downloadsReasonBadAudio": "iritsitako audioa ezin da erreproduzitu",
   "downloadsReasonDiskFull": "diskoa beteta dago",
+  "downloadsReasonExplicit": "esplizitua da, eta zure ezarpenek eduki esplizitua ezkutatzen dute",
   "downloadsReasonNeedsYTDLP": "yt-dlp behar du, Ezarpenak › Erreprodukzioa atalak instalatzen duena",
   "downloadsReasonNetwork": "sarea galdu da",
   "downloadsReasonNoAudio": "YouTube-k ez du pista honen audiorik MixMusic-ek erreproduzi dezakeenik",

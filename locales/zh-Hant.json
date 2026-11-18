@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "下載",
   "downloadsReasonBadAudio": "收到的音訊無法播放",
   "downloadsReasonDiskFull": "磁碟已滿",
+  "downloadsReasonExplicit": "這是限制級內容，而你的設定會隱藏限制級內容",
   "downloadsReasonNeedsYTDLP": "需要 yt-dlp，可在「設定 › 播放」中安裝",
   "downloadsReasonNetwork": "網路連線中斷",
   "downloadsReasonNoAudio": "YouTube 沒有這首曲目可供 MixMusic 播放的音訊",

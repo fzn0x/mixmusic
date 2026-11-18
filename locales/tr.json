@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "İndirmeler",
   "downloadsReasonBadAudio": "gelen ses çalınamıyor",
   "downloadsReasonDiskFull": "disk dolu",
+  "downloadsReasonExplicit": "parça müstehcen ve ayarlarınız müstehcen içeriği gizliyor",
   "downloadsReasonNeedsYTDLP": "yt-dlp gerekiyor; Ayarlar › Oynatma bölümünden kurulabilir",
   "downloadsReasonNetwork": "ağ bağlantısı koptu",
   "downloadsReasonNoAudio": "YouTube'da bu parçanın MixMusic'in çalabildiği bir sesi yok",

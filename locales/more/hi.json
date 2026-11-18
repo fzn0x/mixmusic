@@ -641,6 +641,7 @@
   "downloadsProgressLabel": "डाउनलोड",
   "downloadsReasonBadAudio": "मिला हुआ ऑडियो चल नहीं सकता",
   "downloadsReasonDiskFull": "डिस्क भर गई है",
+  "downloadsReasonExplicit": "यह एक्सप्लिसिट है, और आपकी सेटिंग एक्सप्लिसिट सामग्री छिपाती है",
   "downloadsReasonNeedsYTDLP": "इसके लिए yt-dlp चाहिए, जिसे सेटिंग › प्लेबैक इंस्टॉल करता है",
   "downloadsReasonNetwork": "नेटवर्क चला गया",
   "downloadsReasonNoAudio": "YouTube पर इस गाने का ऐसा कोई ऑडियो नहीं है जिसे MixMusic चला सके",

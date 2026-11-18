@@ -123,6 +123,11 @@ with it, and are made for the Expressive layout, though they work in any.
 To keep their colours from changing with each track, turn off Follow the
 artwork, and choose an Accent colour for them to start from.
 
+A cover without a colour of its own doesn't turn the window cyan or pink. A black, white or grey cover, which
+[the accent](#the-accent-and-the-artwork) makes a grey, gives a grey window: the primary, the secondary and the
+tertiary colours and the grounds all lose their colour. A cover that is nearly grey keeps its hue in a calm tint. Any
+other colour, even a dull one, still makes a colourful window.
+
 ## Colours from a file
 
 MixMusic can wear the colours that [pywal](https://github.com/dylanaraps/pywal)
@@ -193,6 +198,8 @@ or animations turned off on a Linux desktop), MixMusic moves less:
 - Aurora's lights, Anime's speed lines and Mochi's sparkles hold still.
 - The visualizer over the cover on the now playing page isn't drawn, and
   the cover shows whole.
+- The card of what plays, at the sidebar's foot, doesn't turn over to show
+  what plays next.
 - The [wavy progress bar](#density-text-size-and-zoom) holds still, and
   goes flat at once when you pause.
 - Lyrics timed [word by word](lyrics.md#word-by-word) light each word
@@ -226,3 +233,21 @@ Appearance › Theme), and run
 **[Reload add-ons](marketplace.md#reload-add-ons)** from the command
 palette. A theme that fails to load is listed under the theme cards, with
 the reason.
+
+## Language
+
+MixMusic is in English and in 66 other languages. Choose one in Settings › Appearance › Language: **System**, the default, takes the first of the computer's preferred languages MixMusic has, or else English, and each language follows, named in itself. A choice applies at once, with nothing to restart. Dates, times and numbers follow the computer's region format, as [Settings](settings.md#appearance) tells.
+
+- **English and Simplified Chinese** are the two languages a person wrote. Simplified Chinese names its translator in Settings › About.
+- **The other 65 were translated by a machine**, and no speaker has read them through yet, so some words may be wrong. Settings › About › Translation says so in the language, with **fix the translation**, which tells how to send fixes on GitHub. A speaker who fixes a language's file can add their name to it, and Settings › About then names the translators ([Settings › About](settings.md#about) tells more). A message a language doesn't have yet shows in English.
+- **Errors** MixMusic knows from the services and the system show in the language too, as [Settings](settings.md#appearance) tells. The logs keep every error in English.
+
+The languages, by the name they are written in here:
+
+- **Right to left:** Arabic, Hebrew, Persian and Urdu. The window is laid out mirrored: the sidebar on the right, rows from the right, the side panel on the left, and back arrows pointing right. The seek bars and their times, previous, play and next, the volume and the equalizer's bands, and the chart of Stats stay left to right in every language, as playback runs one way. Titles and lyrics read in the direction of their own text, so a Latin title keeps its order. [Right to left](architecture/right-to-left.md) tells how the views do it.
+- **Named in the installer and by the system:** Arabic, Bulgarian, Catalan, Chinese (Simplified), Chinese (Traditional), Croatian, Czech, Danish, Dutch, Estonian, Basque, Persian, Finnish, French, Galician, Georgian, German, Greek, Hebrew, Hungarian, Armenian, Indonesian, Italian, Japanese, Korean, Latvian, Lithuanian, Macedonian, Malay, Norwegian Bokmål, Polish, Portuguese (Brazil), Portuguese (Portugal), Romanian, Russian, Serbian (in Cyrillic), Slovak, Slovenian, Albanian, Spanish, Swedish, Thai, Turkish, Ukrainian, Uzbek (in Latin letters) and Vietnamese. On Windows the installer speaks these, on macOS the app's own language list and its permission prompts do, and on Linux the desktop entry names MixMusic in them. Japanese, Chinese (Simplified) and Chinese (Traditional) take the framework's own translations for its menus and controls.
+- **Named in English by the system:** Amharic, Azerbaijani, Bengali, Filipino, Gujarati, Hausa, Hindi, Kazakh, Khmer, Kannada, Malayalam, Marathi, Burmese, Nepali, Punjabi (in Gurmukhi), Sinhala, Swahili, Tamil, Telugu and Urdu. MixMusic itself shows in them, but the Windows installer, macOS's language list and the Linux desktop entry name MixMusic in English.
+
+MixMusic's own typefaces hold Latin letters, and Roboto Flex, the Material themes' face, Greek and Cyrillic too, so the other scripts are drawn with fonts your system has.
+
+To add a language, or to fix one, see [Contributing](https://github.com/fzn0x/mixmusic/blob/main/CONTRIBUTING.md#adding-or-fixing-a-language).

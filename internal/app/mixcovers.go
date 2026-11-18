@@ -23,6 +23,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 const (
@@ -45,15 +46,15 @@ func (a *App) mixCovers() string { return filepath.Join(a.opts.DataDir, "mix-cov
 func (c *Collection) SetMixCover(id, path string) error {
 	f, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf("couldn't read the image: %w", err)
+		return cantReadImage(err)
 	}
 	defer f.Close()
 	data, err := io.ReadAll(io.LimitReader(f, maxCoverBytes+1))
 	switch {
 	case err != nil:
-		return fmt.Errorf("couldn't read the image: %w", err)
+		return cantReadImage(err)
 	case len(data) > maxCoverBytes:
-		return errors.New("the image is too large for a cover: choose one under 40 MB")
+		return wordedLater("the image is too large for a cover: choose one under 40 MB", locales.MixCoverTooLarge, nil)
 	}
 	return c.a.keepMixCover(id, data)
 }
@@ -62,11 +63,12 @@ func (c *Collection) SetMixCover(id, path string) error {
 func (c *Collection) SetMixCoverOf(ctx context.Context, id string, track media.Track) error {
 	url := trackCover(track.Artwork)
 	if url == "" {
-		return errors.New(track.Title + " has no cover")
+		return wordedLater(track.Title+" has no cover", func() string { return locales.MixCoverTrackNone(track.Title) }, nil)
 	}
 	data, err := c.a.imageBytes(ctx, url)
 	if err != nil {
-		return fmt.Errorf("couldn't get the cover of %s: %w", track.Title, err)
+		return wordedLater(fmt.Sprintf("couldn't get the cover of %s: %v", track.Title, err),
+			func() string { return locales.MixCoverTrackFailed(track.Title, ErrorText(err)) }, err)
 	}
 	return c.a.keepMixCover(id, data)
 }
@@ -133,7 +135,7 @@ func (a *App) keepMixCover(id string, data []byte) error {
 	case err != nil || format != "png" && format != "jpeg" && format != "webp" && format != "gif":
 		return errNotCover
 	case cfg.Width*cfg.Height > maxCoverPixels:
-		return errors.New("the image is too large for a cover")
+		return wordedLater("the image is too large for a cover", locales.MixCoverTooManyPixels, nil)
 	}
 	var square, moving []byte
 	if format == "gif" {
@@ -183,7 +185,7 @@ func squareGIF(data []byte) (moving, still []byte, err error) {
 	case err != nil:
 		return nil, nil, errNotCover
 	case size.Pixels > maxCoverPixels:
-		return nil, nil, errors.New("the GIF is too large for a cover: choose one of fewer or smaller frames")
+		return nil, nil, wordedLater("the GIF is too large for a cover: choose one of fewer or smaller frames", locales.MixCoverGifTooLarge, nil)
 	}
 	moving, still, err = artwork.SquareGIF(data, mixCoverSize)
 	if err != nil {
@@ -234,4 +236,9 @@ func (a *App) imageBytes(ctx context.Context, url string) ([]byte, error) {
 		return os.ReadFile(path)
 	}
 	return a.artStore.Bytes(ctx, url)
+}
+
+// cantReadImage tells that the image of a cover couldn't be read, for err.
+func cantReadImage(err error) error {
+	return wordedLater("couldn't read the image: "+err.Error(), func() string { return locales.MixCoverCantRead(ErrorText(err)) }, err)
 }

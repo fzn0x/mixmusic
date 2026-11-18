@@ -5624,6 +5624,252 @@
   "@libraryStartRadio": {
     "description": "Menu item that starts a radio from the tracks."
   },
+  "libraryTagsAdd": "Add tag",
+  "@libraryTagsAdd": {
+    "description": "Button beside the field of a new tag (libraryTagsNewLabel): it makes the tag and, in the Tags… dialog of an item, puts it on the item. A tag of that name already is taken instead."
+  },
+  "libraryTagsAll": "All",
+  "@libraryTagsAll": {
+    "description": "The first chip of the row of tags, chosen while no tag is: above Library › Mixes it shows every mix, and in Library › Tags all that has a tag."
+  },
+  "libraryTagsBack": "Back",
+  "@libraryTagsBack": {
+    "description": "Button of Manage tags while it shows one tag, or its Choose items: goes back to the list of the tags, or to the tag."
+  },
+  "libraryTagsChooseHint": "Check the mixes, playlists and albums to tag with {name}. Each one you check or clear changes at once.",
+  "@libraryTagsChooseHint": {
+    "description": "Over the list of Choose items (libraryTagsChooseItems). {name} is the tag's name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryTagsChooseItems": "Choose items…",
+  "@libraryTagsChooseItems": {
+    "description": "Button of a tag in Manage tags: lists every playlist and album of the user's library with a check box, to put the tag on many or take it off at once."
+  },
+  "libraryTagsChooseTitle": "Choose items for {name}",
+  "@libraryTagsChooseTitle": {
+    "description": "Title of Manage tags while it lists the playlists and albums to tag (libraryTagsChooseItems). {name} is the tag's name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryTagsColour": "Colour",
+  "@libraryTagsColour": {
+    "description": "Heading of the colours of a tag in Manage tags, of which the user chooses one; also what screen readers call the group of them."
+  },
+  "libraryTagsColourName": "{color, select, red {Red} coral {Coral} orange {Orange} amber {Amber} gold {Gold} yellow {Yellow} lime {Lime} olive {Olive} green {Green} emerald {Emerald} mint {Mint} teal {Teal} cyan {Cyan} sky {Sky blue} blue {Blue} indigo {Indigo} violet {Violet} purple {Purple} plum {Plum} magenta {Magenta} pink {Pink} rose {Rose} brown {Brown} sand {Sand} slate {Slate} other {{color}}}",
+  "@libraryTagsColourName": {
+    "description": "The name of a colour a tag can have, which screen readers read for each colour of Manage tags. Each reads on every theme, so the shade shown changes a little between light and dark themes: name the hue.",
+    "placeholders": {
+      "color": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryTagsDelete": "Delete tag",
+  "@libraryTagsDelete": {
+    "description": "Button of a tag in Manage tags: asks before deleting it (libraryTagsDeleteTitle)."
+  },
+  "libraryTagsDeleteBody": "{count, plural, =0 {It's on nothing.} one {It comes off the playlist or album it's on, which stays.} other {It comes off the # playlists and albums it's on, which stay.}}",
+  "@libraryTagsDeleteBody": {
+    "description": "The question Delete tag asks (libraryTagsDeleteTitle). {count} counts the playlists and albums the tag is on.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryTagsDeleteButton": "Delete",
+  "@libraryTagsDeleteButton": {
+    "description": "The button that deletes a tag, in the question of libraryTagsDeleteTitle."
+  },
+  "libraryTagsDeleteTitle": "Delete {name}?",
+  "@libraryTagsDeleteTitle": {
+    "description": "Title of the question Delete tag (libraryTagsDelete) asks. {name} is the tag's name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryTagsDone": "Done",
+  "@libraryTagsDone": {
+    "description": "Button that closes the Tags… dialog of an item, and Manage tags."
+  },
+  "libraryTagsEditTitle": "Edit tag",
+  "@libraryTagsEditTitle": {
+    "description": "Title of Manage tags while it shows one tag: its name, its colour, Choose items… and Delete tag."
+  },
+  "libraryTagsFilter": "Filter by tags",
+  "@libraryTagsFilter": {
+    "description": "What screen readers call the row of the tags' chips, above Library › Mixes and in Library › Tags."
+  },
+  "libraryTagsFull": "{count, plural, one {You have # tag, the most there can be. Delete it to make another.} other {You have # tags, the most there can be. Delete one to make another.}}",
+  "@libraryTagsFull": {
+    "description": "Under the field of a new tag, in the Tags… dialog and in Manage tags, once the user has as many tags as MixMusic keeps. {count} is that number, 200.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryTagsGone": "the tag is gone",
+  "@libraryTagsGone": {
+    "description": "Why a tag wasn't put on an item, renamed, recoloured, moved or deleted, as a toast: it was deleted meanwhile. Lowercase: it may follow other words."
+  },
+  "libraryTagsItem": "Tags…",
+  "@libraryTagsItem": {
+    "description": "Menu item of a mix, of a playlist or an album of the user's library on Spotify or YouTube Music, and of an album on this computer: on its tile and in its page's More menu. It opens a dialog of the user's tags, to put them on it or take them off."
+  },
+  "libraryTagsItemTitle": "Tags for {title}",
+  "@libraryTagsItemTitle": {
+    "description": "Title of the dialog Tags… (libraryTagsItem) opens. {title} is the name of the mix, playlist or album.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryTagsKindOf": "{kind, select, mix {Mix} playlist {Playlist · {service}} album {Album · {service}} other {{service}}}",
+  "@libraryTagsKindOf": {
+    "description": "Under the name of an item in Choose items: what it is, and where it is. {kind} is mix, playlist or album; {service} is Spotify, YouTube Music, or, for an album of the music on this computer, On this computer (libraryOnThisComputer).",
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "service": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryTagsManage": "Manage tags",
+  "@libraryTagsManage": {
+    "description": "The last chip of the row of tags, above Library › Mixes and in Library › Tags, which opens a dialog of the same title: it makes, renames, recolours, orders and deletes the user's tags."
+  },
+  "libraryTagsManageHint": "Drag a tag onto another, or move it with Alt and the arrows, to change the order of the chips. Choose one to rename it, change its colour, tag many items at once or delete it.",
+  "@libraryTagsManageHint": {
+    "description": "Under the title of Manage tags (libraryTagsManage), over the list of the user's tags."
+  },
+  "libraryTagsManageItem": "Manage tags…",
+  "@libraryTagsManageItem": {
+    "description": "Button of the Tags… dialog of an item: it opens Manage tags (libraryTagsManage) in its place."
+  },
+  "libraryTagsMatchAll": "Match all",
+  "@libraryTagsMatchAll": {
+    "description": "Beside the row of tags: shows only what has every tag chosen."
+  },
+  "libraryTagsMatchAny": "Match any",
+  "@libraryTagsMatchAny": {
+    "description": "Beside the row of tags: shows what has any of the tags chosen. The default."
+  },
+  "libraryTagsMatchLabel": "How the tags chosen match",
+  "@libraryTagsMatchLabel": {
+    "description": "What screen readers call the choice of Match any (libraryTagsMatchAny) and Match all (libraryTagsMatchAll), beside the row of tags."
+  },
+  "libraryTagsName": "Name",
+  "@libraryTagsName": {
+    "description": "Label of the field of a tag's name in Manage tags: the tag takes the name once the user presses Enter, or goes Back or Done."
+  },
+  "libraryTagsNeedName": "a tag needs a name",
+  "@libraryTagsNeedName": {
+    "description": "Why a tag wasn't made or renamed, as a toast: its name had nothing to show. Lowercase: it may follow other words."
+  },
+  "libraryTagsNewLabel": "New tag",
+  "@libraryTagsNewLabel": {
+    "description": "Label and placeholder of the field that names a new tag, in the Tags… dialog of an item and in Manage tags."
+  },
+  "libraryTagsNoItemMatch": "No playlist or album has the tags chosen.",
+  "@libraryTagsNoItemMatch": {
+    "description": "In Library › Tags, when the tags chosen in the row of chips show nothing."
+  },
+  "libraryTagsNoMatch": "No playlist or album matches “{query}”.",
+  "@libraryTagsNoMatch": {
+    "description": "In Choose items, when no name holds what the user searched. {query} is the search.",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryTagsNoMixMatch": "No mix has the tags chosen.",
+  "@libraryTagsNoMixMatch": {
+    "description": "In Library › Mixes, when the tags chosen in the row of chips show none of the mixes."
+  },
+  "libraryTagsNone": "No tags yet. Name one below to make it.",
+  "@libraryTagsNone": {
+    "description": "In the Tags… dialog of an item and in Manage tags, while the user has no tags: the field under it (libraryTagsNewLabel) makes one."
+  },
+  "libraryTagsNothingTagged": "Nothing has a tag yet. Choose Tags… in the menu of a mix, a playlist or an album, or Choose items… for a tag in Manage tags.",
+  "@libraryTagsNothingTagged": {
+    "description": "In Library › Tags while no tag is chosen and nothing has a tag. Tags… is libraryTagsItem, Choose items… libraryTagsChooseItems and Manage tags libraryTagsManage."
+  },
+  "libraryTagsOnCount": "{count, plural, =0 {On nothing yet.} one {On # playlist or album.} other {On # playlists and albums.}}",
+  "@libraryTagsOnCount": {
+    "description": "In Manage tags, under a tag's name: how many playlists and albums the tag is on.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryTagsRow": "{name}, {count, plural, one {on # item} other {on # items}}",
+  "@libraryTagsRow": {
+    "description": "What screen readers call a tag's row in Manage tags, which opens the tag to edit. {name} is the tag's name; {count} counts the playlists and albums it's on.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryTagsSearchLabel": "Search your playlists and albums",
+  "@libraryTagsSearchLabel": {
+    "description": "What screen readers call the box of Choose items (libraryTagsChooseItems) that filters the list by name."
+  },
+  "libraryTagsSearchPlaceholder": "search your playlists and albums",
+  "@libraryTagsSearchPlaceholder": {
+    "description": "Placeholder of the box of Choose items (libraryTagsChooseItems) that filters the list by name."
+  },
+  "libraryTagsShowFilters": "Show tag filters",
+  "@libraryTagsShowFilters": {
+    "description": "Switch of Settings › Appearance › Colour and type, on by default: off, it hides the row of the tags' chips above Library › Mixes, which shows all the mixes."
+  },
+  "libraryTagsShowFiltersDescription": "The row of your tags above Library › Mixes, which shows the mixes of the tags you choose. Library › Tags keeps its row.",
+  "@libraryTagsShowFiltersDescription": {
+    "description": "Description of Show tag filters (libraryTagsShowFilters) in Settings › Appearance."
+  },
+  "libraryTagsSomeShown": "Showing {shown} of {total}. Search to find the others.",
+  "@libraryTagsSomeShown": {
+    "description": "Under the list of Choose items, when the library holds more playlists and albums than it lists at once. {shown} and {total} count them.",
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryTagsTab": "Tags",
+  "@libraryTagsTab": {
+    "description": "The Library's tab that shows the mixes, playlists and albums the user tagged, together in one grid, under the row of their tags' chips; also its name in Edit tabs."
+  },
+  "libraryTagsTooMany": "{count, plural, one {there is # tag already, the most there can be} other {there are # tags already, the most there can be}}",
+  "@libraryTagsTooMany": {
+    "description": "Why a new tag wasn't made, as a toast: the user has as many tags as MixMusic keeps. {count} is that number, 200. Lowercase: it may follow other words.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "libraryTrackCount": "{count, plural, one {# track} other {# tracks}}",
   "@libraryTrackCount": {
     "description": "How many tracks a list holds.",

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/egoist/mygo"
+	"github.com/egoist/mygo/i18n"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -163,7 +164,7 @@ var cardFaces = map[string][]struct {
 
 // cardFamily is the family a card is set in: the theme's face when
 // MixMusic carries it, else the interface's, and the system's fonts for
-// the letters it lacks.
+// the letters it lacks, after a Nastaliq face in Urdu (nastaliq.go).
 func (k *look) cardFamily() sharecard.Family {
 	files, ok := cardFaces[k.body]
 	if !ok {
@@ -181,7 +182,7 @@ func (k *look) cardFamily() sharecard.Family {
 		}
 		fam.Faces = append(fam.Faces, sharecard.Face{Weight: f.weight, Font: font})
 	}
-	fam.Fallback = sharecard.SystemFallback()
+	fam.Fallback = cardFallback(i18n.Locale(), sharecard.SystemFallback())
 	return fam
 }
 

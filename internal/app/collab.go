@@ -8,10 +8,10 @@ package app
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/spotify"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // errNotSpotify is a change of a Spotify playlist asked of another.
@@ -41,7 +41,8 @@ func (c *Collection) InviteYouTubeCollaborators(ctx context.Context, playlistID 
 	}
 	link, err := c.a.youtube.InviteCollaboratorsOnceUnlisted(ctx, list)
 	if err != nil {
-		err = fmt.Errorf("%w; the playlist is unlisted now", err)
+		inner := err
+		err = wordedLater(inner.Error()+"; the playlist is unlisted now", func() string { return locales.CollabUnlistedNow(ErrorText(inner)) }, inner)
 	}
 	return link, err
 }

@@ -27,6 +27,9 @@ type github struct {
 	// badSum publishes a checksum that isn't the program's.
 	badSum bool
 
+	// clock is the clock of the tries, whose waits pass at once.
+	clock *fakeClock
+
 	mu    sync.Mutex
 	asked []string
 }
@@ -66,6 +69,7 @@ func newGitHub(t *testing.T, g *github) *github {
 			http.NotFound(w, r)
 		}
 	}))
+	g.clock = fakeWaits(t)
 	saved := []string{releaseURL, tagURL, latestURL, apiURL}
 	savedOS, savedArch := goos, goarch
 	releaseURL, tagURL = srv.URL+"/latest/download/", srv.URL+"/download/"

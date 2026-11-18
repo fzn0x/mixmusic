@@ -60,6 +60,11 @@ type castOut struct {
 	served      func(path string) string
 	fetched     func() int64
 	contentType func(videoID string, surround bool) string
+	// source, when set, picks the path and type of a stream's audio in
+	// the formats the device plays, in contentType's place (castformats.go);
+	// upNext tells what plays next, which a device that queues shows.
+	source func(rawURL string) (path, contentType string, err error)
+	upNext func() *media.Track
 	// events is told what the device does: the player, while the output is
 	// its own.
 	events audio.Events
@@ -168,13 +173,13 @@ func videoOf(rawURL string) (videoID string, surround bool, err error) {
 }
 
 func (o *castOut) Load(rawURL string, cue audio.Cue) error {
-	videoID, surround, err := videoOf(rawURL)
+	path, contentType, err := o.pick(rawURL)
 	if err != nil {
 		go o.events.Error(err.Error())
 		return nil
 	}
 	u, _ := url.Parse(rawURL)
-	m := cast.Media{URL: o.served(u.Path) + query(u), ContentType: o.contentType(videoID, surround),
+	m := cast.Media{URL: o.served(path) + query(u), ContentType: contentType,
 		Start: cue.Start, Autoplay: cue.Autoplay}
 	if t := cue.Track; t != nil {
 		m.Title, m.Artist, m.Image = t.Title, t.ArtistNames(), coverOf(*t)
@@ -273,7 +278,7 @@ func (o *castOut) loadFailure(err error, fetched bool) string {
 	return "The cast device couldn't play the track: " + err.Error()
 }
 
-func (o *castOut) Preload(string) {}
+func (o *castOut) Preload(url string) { o.preload(url) }
 
 // Crossfade plays url at once: a cast device plays one stream at a time.
 // The player doesn't crossfade on one.

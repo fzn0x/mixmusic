@@ -3455,6 +3455,10 @@
       }
     }
   },
+  "equalizerHeadphonesChoose": "Choose…",
+  "@equalizerHeadphonesChoose": {
+    "description": "The button of Headphones (equalizerHeadphones), in Settings › Playback › Equalizer: it opens the dialog of AutoEq's profiles of headphones, to choose the one that corrects the sound, or None."
+  },
   "equalizerHeadphonesClose": "Close",
   "@equalizerHeadphonesClose": {
     "description": "The button that closes the dialog of Headphones (equalizerHeadphones)."

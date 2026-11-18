@@ -10872,6 +10872,24 @@ func (msgs Messages) EqualizerHeadphonesByOn(source string, rig string) string {
 	return Catalog.Format(msgs.locale, "equalizerHeadphonesByOn", map[string]any{"source": source, "rig": rig})
 }
 
+// EqualizerHeadphonesChoose says "Choose…"
+// in the language the app shows.
+//
+// The button of Headphones (equalizerHeadphones), in Settings › Playback
+// › Equalizer: it opens the dialog of AutoEq's profiles of headphones, to
+// choose the one that corrects the sound, or None.
+func EqualizerHeadphonesChoose() string { return In(i18n.Locale()).EqualizerHeadphonesChoose() }
+
+// EqualizerHeadphonesChoose says "Choose…"
+// in the language of msgs.
+//
+// The button of Headphones (equalizerHeadphones), in Settings › Playback
+// › Equalizer: it opens the dialog of AutoEq's profiles of headphones, to
+// choose the one that corrects the sound, or None.
+func (msgs Messages) EqualizerHeadphonesChoose() string {
+	return Catalog.Format(msgs.locale, "equalizerHeadphonesChoose", nil)
+}
+
 // EqualizerHeadphonesClose says "Close"
 // in the language the app shows.
 //

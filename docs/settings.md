@@ -361,6 +361,10 @@ Plugins' commands follow, with the keys their plugin gives them, if any.
 - In a mix, <kbd>Alt</kbd> <kbd>↑</kbd> and <kbd>Alt</kbd> <kbd>↓</kbd> move the
   track whose play button has the focus a place up or down: see
   [Mixes](library.md#mixes).
+- While the focus is in a song's or an episode's row, as on its play
+  button, <kbd>Shift</kbd> <kbd>Enter</kbd> adds it to the queue and
+  <kbd>Alt</kbd> <kbd>Enter</kbd> plays it next: see
+  [The queue and Up next](playing-music.md#the-queue-and-up-next).
 - After you click a button, a tile or a switch, <kbd>Space</kbd> still plays
   or pauses. A control you reach with <kbd>Tab</kbd> takes <kbd>Space</kbd>
   and <kbd>Enter</kbd> itself.

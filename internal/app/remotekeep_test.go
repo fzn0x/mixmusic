@@ -74,7 +74,7 @@ func TestRemoteKeptUnheard(t *testing.T) {
 		if got := desk.Remote().Paired(); !slices.EqualFunc(got, before, same) {
 			t.Errorf("%s: kept %+v, not %+v", c.name, got, before)
 		}
-		if !notes.has("Didn't pair with " + c.name + " again: the pairing didn't finish") {
+		if !notes.has("Didn't pair with " + c.name + " again: it stopped answering before the pairing finished") {
 			t.Errorf("%s: told %q", c.name, notes.told)
 		}
 	}

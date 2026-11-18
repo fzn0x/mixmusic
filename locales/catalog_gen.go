@@ -3304,6 +3304,122 @@ func (msgs Messages) CastPlayingOn(name string) string {
 	return Catalog.Format(msgs.locale, "castPlayingOn", map[string]any{"name": name})
 }
 
+// CastReceiverKey says "its key isn't the one it announced on the network"
+// in the language the app shows.
+//
+// A lowercase fragment, the {error} of castCouldntCast, as casting to an
+// FCast receiver starts: the security key the receiver shows isn't the one
+// it announced, so another device may stand in its place, and MixMusic
+// doesn't connect.
+func CastReceiverKey() string { return In(i18n.Locale()).CastReceiverKey() }
+
+// CastReceiverKey says "its key isn't the one it announced on the network"
+// in the language of msgs.
+//
+// A lowercase fragment, the {error} of castCouldntCast, as casting to an
+// FCast receiver starts: the security key the receiver shows isn't the one
+// it announced, so another device may stand in its place, and MixMusic
+// doesn't connect.
+func (msgs Messages) CastReceiverKey() string {
+	return Catalog.Format(msgs.locale, "castReceiverKey", nil)
+}
+
+// CastReceiverModel says "FCast receiver"
+// in the language the app shows.
+//
+// In the player bar's cast menu and the mini player's Cast section, beside
+// the name of an FCast receiver (a TV, TV stick or computer running an
+// FCast receiver app). FCast is a name, kept as it is.
+func CastReceiverModel() string { return In(i18n.Locale()).CastReceiverModel() }
+
+// CastReceiverModel says "FCast receiver"
+// in the language of msgs.
+//
+// In the player bar's cast menu and the mini player's Cast section, beside
+// the name of an FCast receiver (a TV, TV stick or computer running an
+// FCast receiver app). FCast is a name, kept as it is.
+func (msgs Messages) CastReceiverModel() string {
+	return Catalog.Format(msgs.locale, "castReceiverModel", nil)
+}
+
+// CastReceiverNoKey says "it announced a secure connection without its key"
+// in the language the app shows.
+//
+// A lowercase fragment, the {error} of castCouldntCast, as casting to an
+// FCast receiver starts: the receiver announced the secure version of FCast
+// but not the key MixMusic checks it by, so MixMusic doesn't connect.
+func CastReceiverNoKey() string { return In(i18n.Locale()).CastReceiverNoKey() }
+
+// CastReceiverNoKey says "it announced a secure connection without its key"
+// in the language of msgs.
+//
+// A lowercase fragment, the {error} of castCouldntCast, as casting to an
+// FCast receiver starts: the receiver announced the secure version of FCast
+// but not the key MixMusic checks it by, so MixMusic doesn't connect.
+func (msgs Messages) CastReceiverNoKey() string {
+	return Catalog.Format(msgs.locale, "castReceiverNoKey", nil)
+}
+
+// CastReceiverOlder says "it announced a secure connection, then answered without one"
+// in the language the app shows.
+//
+// A lowercase fragment, the {error} of castCouldntCast, as casting to an
+// FCast receiver starts: the receiver announced the secure version of
+// FCast, then answered as an older, unencrypted one, so MixMusic doesn't
+// connect.
+func CastReceiverOlder() string { return In(i18n.Locale()).CastReceiverOlder() }
+
+// CastReceiverOlder says "it announced a secure connection, then answered without one"
+// in the language of msgs.
+//
+// A lowercase fragment, the {error} of castCouldntCast, as casting to an
+// FCast receiver starts: the receiver announced the secure version of
+// FCast, then answered as an older, unencrypted one, so MixMusic doesn't
+// connect.
+func (msgs Messages) CastReceiverOlder() string {
+	return Catalog.Format(msgs.locale, "castReceiverOlder", nil)
+}
+
+// CastRendererFormat says "{device} doesn't play {format} audio"
+// in the language the app shows.
+//
+// Where a track couldn't play, as it plays on a DLNA renderer or an FCast
+// receiver that plays none of the formats MixMusic has the track in.
+// {format} names the format, as AAC, FLAC or Opus.
+func CastRendererFormat(device string, format string) string {
+	return In(i18n.Locale()).CastRendererFormat(device, format)
+}
+
+// CastRendererFormat says "{device} doesn't play {format} audio"
+// in the language of msgs.
+//
+// Where a track couldn't play, as it plays on a DLNA renderer or an FCast
+// receiver that plays none of the formats MixMusic has the track in.
+// {format} names the format, as AAC, FLAC or Opus.
+func (msgs Messages) CastRendererFormat(device string, format string) string {
+	return Catalog.Format(msgs.locale, "castRendererFormat", map[string]any{"device": device, "format": format})
+}
+
+// CastRendererModel says "DLNA renderer"
+// in the language the app shows.
+//
+// In the player bar's cast menu and the mini player's Cast section, beside
+// the name of a DLNA or UPnP renderer (a smart TV, an AV receiver or a
+// network speaker) that names no model of its own. DLNA is a name, kept as
+// it is.
+func CastRendererModel() string { return In(i18n.Locale()).CastRendererModel() }
+
+// CastRendererModel says "DLNA renderer"
+// in the language of msgs.
+//
+// In the player bar's cast menu and the mini player's Cast section, beside
+// the name of a DLNA or UPnP renderer (a smart TV, an AV receiver or a
+// network speaker) that names no model of its own. DLNA is a name, kept as
+// it is.
+func (msgs Messages) CastRendererModel() string {
+	return Catalog.Format(msgs.locale, "castRendererModel", nil)
+}
+
 // CastStoppedElsewhere says "Casting to {device} stopped: it stopped playing from MixMusic"
 // in the language the app shows.
 //
@@ -24720,6 +24836,24 @@ func SpeedMenuLabel(what string) string { return In(i18n.Locale()).SpeedMenuLabe
 // in the language of msgs.
 func (msgs Messages) SpeedMenuLabel(what string) string {
 	return Catalog.Format(msgs.locale, "speedMenuLabel", map[string]any{"what": what})
+}
+
+// SpeedMenuLockedCast says "{device} plays at its own speed"
+// in the language the app shows.
+//
+// A lowercase fragment, the {what} of speedMenuLabel, the speed button's
+// tip by the player, while the player plays on a DLNA renderer that turned
+// another speed down.
+func SpeedMenuLockedCast(device string) string { return In(i18n.Locale()).SpeedMenuLockedCast(device) }
+
+// SpeedMenuLockedCast says "{device} plays at its own speed"
+// in the language of msgs.
+//
+// A lowercase fragment, the {what} of speedMenuLabel, the speed button's
+// tip by the player, while the player plays on a DLNA renderer that turned
+// another speed down.
+func (msgs Messages) SpeedMenuLockedCast(device string) string {
+	return Catalog.Format(msgs.locale, "speedMenuLockedCast", map[string]any{"device": device})
 }
 
 // SpeedMenuLockedLive says "this live stream plays at its own speed"

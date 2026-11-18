@@ -934,6 +934,40 @@
       }
     }
   },
+  "castReceiverKey": "its key isn't the one it announced on the network",
+  "@castReceiverKey": {
+    "description": "A lowercase fragment, the {error} of castCouldntCast, as casting to an FCast receiver starts: the security key the receiver shows isn't the one it announced, so another device may stand in its place, and MixMusic doesn't connect."
+  },
+  "castReceiverModel": "FCast receiver",
+  "@castReceiverModel": {
+    "description": "In the player bar's cast menu and the mini player's Cast section, beside the name of an FCast receiver (a TV, TV stick or computer running an FCast receiver app). FCast is a name, kept as it is."
+  },
+  "castReceiverNoKey": "it announced a secure connection without its key",
+  "@castReceiverNoKey": {
+    "description": "A lowercase fragment, the {error} of castCouldntCast, as casting to an FCast receiver starts: the receiver announced the secure version of FCast but not the key MixMusic checks it by, so MixMusic doesn't connect."
+  },
+  "castReceiverOlder": "it announced a secure connection, then answered without one",
+  "@castReceiverOlder": {
+    "description": "A lowercase fragment, the {error} of castCouldntCast, as casting to an FCast receiver starts: the receiver announced the secure version of FCast, then answered as an older, unencrypted one, so MixMusic doesn't connect."
+  },
+  "castRendererFormat": "{device} doesn't play {format} audio",
+  "@castRendererFormat": {
+    "description": "Where a track couldn't play, as it plays on a DLNA renderer or an FCast receiver that plays none of the formats MixMusic has the track in. {format} names the format, as AAC, FLAC or Opus.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room TV"
+      },
+      "format": {
+        "type": "String",
+        "example": "AAC"
+      }
+    }
+  },
+  "castRendererModel": "DLNA renderer",
+  "@castRendererModel": {
+    "description": "In the player bar's cast menu and the mini player's Cast section, beside the name of a DLNA or UPnP renderer (a smart TV, an AV receiver or a network speaker) that names no model of its own. DLNA is a name, kept as it is."
+  },
   "castStoppedElsewhere": "Casting to {device} stopped: it stopped playing from MixMusic",
   "@castStoppedElsewhere": {
     "description": "A notice, as the device plays something else, or stops, by itself or from another app.",
@@ -8034,6 +8068,16 @@
     "placeholders": {
       "what": {
         "type": "String"
+      }
+    }
+  },
+  "speedMenuLockedCast": "{device} plays at its own speed",
+  "@speedMenuLockedCast": {
+    "description": "A lowercase fragment, the {what} of speedMenuLabel, the speed button's tip by the player, while the player plays on a DLNA renderer that turned another speed down.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room TV"
       }
     }
   },

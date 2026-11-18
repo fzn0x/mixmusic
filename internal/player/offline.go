@@ -220,6 +220,7 @@ func (p *Player) Woke() {
 // itself pauses, a track that loads stays paused once loaded, and a track
 // that waits for the network doesn't play once it's back: the computer
 // may wake somewhere quiet. A Spotify Connect device elsewhere plays on.
+// The sleep timer ends (sleep.go).
 func (p *Player) Sleeping() {
 	p.do(func() {
 		switch {
@@ -231,6 +232,7 @@ func (p *Player) Sleeping() {
 		case p.s.Playing && (p.s.Source == nil || p.s.Source.Mode != ModeConnect):
 			p.pause()
 		}
+		p.sleepAsleep()
 	})
 }
 

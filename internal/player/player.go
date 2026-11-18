@@ -141,6 +141,8 @@ type State struct {
 	// Remote is set while the streams play on a device away from the
 	// computer, as a cast device (SetOutput): Volume and Muted are its own.
 	Remote bool
+	// Sleep is the sleep timer that runs, or nil (sleep.go).
+	Sleep *Sleep
 }
 
 // Current returns the current entry.
@@ -561,6 +563,8 @@ type Player struct {
 	out    Output
 	home   homeVolume
 	engine Stream
+	// sleep is what the sleep timer keeps beside State.Sleep (sleep.go).
+	sleep sleepState
 }
 
 // New returns a player of the queue saved, which plays through stream and

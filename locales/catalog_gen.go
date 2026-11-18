@@ -12068,6 +12068,66 @@ func (msgs Messages) LibraryDisliked() string {
 	return Catalog.Format(msgs.locale, "libraryDisliked", nil)
 }
 
+// LibraryEditTabs says "Edit tabs"
+// in the language the app shows.
+//
+// Button at the end of the Library's tabs, and what screen readers call it:
+// it lists the tabs to move and hide.
+func LibraryEditTabs() string { return In(i18n.Locale()).LibraryEditTabs() }
+
+// LibraryEditTabs says "Edit tabs"
+// in the language of msgs.
+//
+// Button at the end of the Library's tabs, and what screen readers call it:
+// it lists the tabs to move and hide.
+func (msgs Messages) LibraryEditTabs() string {
+	return Catalog.Format(msgs.locale, "libraryEditTabs", nil)
+}
+
+// LibraryEditTabsHint says "Drag a tab onto another to move it there, or press Alt+Up or Alt+Down on it. A tab you hide waits under them, and sti…"
+// in the language the app shows.
+//
+// Under the buttons of Edit tabs, over the list of the Library's tabs.
+func LibraryEditTabsHint() string { return In(i18n.Locale()).LibraryEditTabsHint() }
+
+// LibraryEditTabsHint says "Drag a tab onto another to move it there, or press Alt+Up or Alt+Down on it. A tab you hide waits under them, and sti…"
+// in the language of msgs.
+//
+// Under the buttons of Edit tabs, over the list of the Library's tabs.
+func (msgs Messages) LibraryEditTabsHint() string {
+	return Catalog.Format(msgs.locale, "libraryEditTabsHint", nil)
+}
+
+// LibraryEditTabsReset says "reset tabs"
+// in the language the app shows.
+//
+// Button of Edit tabs, and the title of the question it asks: it puts the
+// Library's tabs back as they come.
+func LibraryEditTabsReset() string { return In(i18n.Locale()).LibraryEditTabsReset() }
+
+// LibraryEditTabsReset says "reset tabs"
+// in the language of msgs.
+//
+// Button of Edit tabs, and the title of the question it asks: it puts the
+// Library's tabs back as they come.
+func (msgs Messages) LibraryEditTabsReset() string {
+	return Catalog.Format(msgs.locale, "libraryEditTabsReset", nil)
+}
+
+// LibraryEditTabsResetBody says "Put the Library's tabs back in their own order, and show those you hid?"
+// in the language the app shows.
+//
+// The question reset tabs asks, before it does.
+func LibraryEditTabsResetBody() string { return In(i18n.Locale()).LibraryEditTabsResetBody() }
+
+// LibraryEditTabsResetBody says "Put the Library's tabs back in their own order, and show those you hid?"
+// in the language of msgs.
+//
+// The question reset tabs asks, before it does.
+func (msgs Messages) LibraryEditTabsResetBody() string {
+	return Catalog.Format(msgs.locale, "libraryEditTabsResetBody", nil)
+}
+
 // LibraryHiddenHint says "Hidden here only: they stay in your library on {service}."
 // in the language the app shows.
 //

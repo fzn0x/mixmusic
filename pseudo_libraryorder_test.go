@@ -55,3 +55,21 @@ func TestPseudoLocaleSidebarMixes(t *testing.T) {
 	}
 	checkPseudo(t, "Your mixes searched", tt.Texts(), "snow day")
 }
+
+// TestPseudoLocaleEditTabs shows Edit tabs with a tab hidden, in en-XA.
+func TestPseudoLocaleEditTabs(t *testing.T) {
+	usePseudoLocale(t)
+	s := libraryShell(t)
+	s.set.LibraryTabs = []settings.Arranged{{Key: "history", Hidden: true}}
+	s.save()
+	tt := tester(t, s)
+	tt.SetLocale("en-XA")
+	show(s, tt, "/library")
+	checkPseudo(t, "The Library", tt.Texts())
+	s.tabs.editing = true
+	tt.Frame()
+	if !tt.HasText(locales.In("en-XA").LibraryEditTabsHint()) {
+		t.Errorf("Edit tabs doesn't show: %q", tt.Texts())
+	}
+	checkPseudo(t, "Edit tabs", tt.Texts())
+}

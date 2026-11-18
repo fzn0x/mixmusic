@@ -3750,6 +3750,22 @@
   "@libraryDisliked": {
     "description": "Library pivot: the songs the user dislikes."
   },
+  "libraryEditTabs": "Edit tabs",
+  "@libraryEditTabs": {
+    "description": "Button at the end of the Library's tabs, and what screen readers call it: it lists the tabs to move and hide."
+  },
+  "libraryEditTabsHint": "Drag a tab onto another to move it there, or press Alt+Up or Alt+Down on it. A tab you hide waits under them, and still opens from its links, as Liked songs does from the sidebar.",
+  "@libraryEditTabsHint": {
+    "description": "Under the buttons of Edit tabs, over the list of the Library's tabs."
+  },
+  "libraryEditTabsReset": "reset tabs",
+  "@libraryEditTabsReset": {
+    "description": "Button of Edit tabs, and the title of the question it asks: it puts the Library's tabs back as they come."
+  },
+  "libraryEditTabsResetBody": "Put the Library's tabs back in their own order, and show those you hid?",
+  "@libraryEditTabsResetBody": {
+    "description": "The question reset tabs asks, before it does."
+  },
   "libraryHiddenHint": "Hidden here only: they stay in your library on {service}.",
   "@libraryHiddenHint": {
     "description": "Under libraryHiddenTitle. {service} is Spotify or YouTube Music.",

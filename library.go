@@ -13,11 +13,14 @@ import (
 	"github.com/fzn0x/mixmusic/locales"
 )
 
-// librarySections are the library's pivots, by their paths' last part.
-var librarySections = []struct {
+// librarySection is a pivot of the library, by its path's last part.
+type librarySection struct {
 	id    string
 	label func() string
-}{
+}
+
+// librarySections are the library's pivots, in their own order.
+var librarySections = []librarySection{
 	{"liked", locales.LibraryLiked}, {"mixes", locales.LibraryMixes}, {"podcasts", locales.LibraryPodcasts}, {"artists", locales.LibraryArtists}, {"downloads", locales.RailDownloads},
 	{"computer", locales.LibraryOnThisComputer}, {"history", locales.LibraryHistory},
 	{"disliked", locales.LibraryDisliked}, {"spotify", func() string { return "Spotify" }}, {"youtube", func() string { return "YouTube Music" }},
@@ -25,18 +28,32 @@ var librarySections = []struct {
 
 // libraryPage shows liked songs, the user's mixes, the history, the songs
 // they dislike once there are any, and the libraries of the services the
-// user signed in to.
+// user signed in to, in the tabs' order the user chose, without those
+// they hid but the one a link opened (librarytabs.go).
 func (s *shell) libraryPage(c *ui.Context, tab string) {
 	accounts := s.accounts()
 	disliked := s.svc.Collection.Disliked()
+	applies := func(id string) bool {
+		return (id != "spotify" || accounts.Spotify.SignedIn) && (id != "youtube" || accounts.YouTube.SignedIn) &&
+			(id != "disliked" || len(disliked) > 0)
+	}
+	if s.tabs.editing {
+		s.pageScroll(c, func() {
+			s.pageHeader(c, locales.RailLibrary(), nil, nil)
+			s.tabsEditor(c, applies)
+		})
+		return
+	}
 	var ids, labels []string
-	for _, sec := range librarySections {
-		if (sec.id == "spotify" && !accounts.Spotify.SignedIn) || (sec.id == "youtube" && !accounts.YouTube.SignedIn) ||
-			(sec.id == "disliked" && len(disliked) == 0) {
-			continue
+	for _, e := range s.libraryTabs() {
+		if applies(e.Key) && (!e.Hidden || e.Key == tab) && slices.ContainsFunc(librarySections, func(sec librarySection) bool { return sec.id == e.Key }) {
+			ids = append(ids, e.Key)
+			labels = append(labels, e.Title)
 		}
-		ids = append(ids, sec.id)
-		labels = append(labels, sec.label())
+	}
+	if len(ids) == 0 {
+		// Every tab that applies hidden: the first shows.
+		ids, labels = []string{"liked"}, []string{locales.LibraryLiked()}
 	}
 	selected := 0
 	for i, id := range ids {
@@ -67,7 +84,7 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 				counts[i] = -1
 			}
 		}
-		s.pageHeaderCounts(c, locales.RailLibrary(), labels, counts, &selected)
+		s.pageHeaderWith(c, locales.RailLibrary(), labels, counts, &selected, func() { s.editTabsButton(c) })
 		if selected != before {
 			s.router.Replace("/library/" + ids[selected])
 		}

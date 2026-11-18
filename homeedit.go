@@ -6,7 +6,8 @@ package main
 // tracks move (mixorder.go's way, for shelves); hides it, or removes one
 // they added; brings hidden ones back from the list under them; adds a
 // shelf; and Reset puts Home back as it comes. Each change is kept at once
-// in settings.json (homelayout.go).
+// in settings.json (homelayout.go). Edit tabs arranges the Library's tabs
+// with the same rows (librarytabs.go).
 
 import (
 	"github.com/egoist/mygo/ui"
@@ -26,8 +27,21 @@ type homeArrange struct {
 	memos              map[string]*homeMemo
 }
 
-// homeShelfDrag is a shelf of the list of Edit home dragged, by its key.
-type homeShelfDrag struct{ key string }
+// arrangeDrag is a row of a list the user arranges dragged: the list's
+// name, and the row's key.
+type arrangeDrag struct{ list, key string }
+
+// arrangement is a list the user arranges, as Edit home's shelves and
+// Edit tabs' tabs (librarytabs.go): its name, the arrangement it changes,
+// which set keeps, and the rows it shows; focus is the key of the row the
+// keys moved last, which takes the focus at its new place.
+type arrangement struct {
+	list  string
+	full  []settings.Arranged
+	shown []settings.Arranged
+	set   func(layout []settings.Arranged)
+	focus *string
+}
 
 // setHomeShelves keeps layout as Home's arrangement.
 func (s *shell) setHomeShelves(layout []settings.HomeShelf) {
@@ -121,9 +135,10 @@ func (s *shell) homeEditor(c *ui.Context) {
 	})
 	ui.Text(c, locales.HomeEditHint()).
 		FontSize(k.bodySize()).TextColor(k.muted).MaxWidth(640).Margin(0, 0, 24)
+	a := arrangement{list: "home", full: full, shown: shown, set: s.setHomeShelves, focus: &s.home.focus}
 	ui.Column(c.Key("home-shelves")).Gap(4).Margin(0, 0, k.sections()).Children(func() {
 		for i, e := range shown {
-			s.homeEditRow(c, i, e, shown, full)
+			s.homeEditRow(c, a, i, e)
 		}
 	})
 	for _, g := range groups {
@@ -136,7 +151,7 @@ func (s *shell) homeEditor(c *ui.Context) {
 		s.sectionTitle(c, locales.HomeEditHidden())
 		ui.Column(c.Key("home-hidden")).Gap(4).Children(func() {
 			for _, e := range hidden {
-				s.homeHiddenRow(c, e, full)
+				s.arrangeHiddenRow(c, a, e, homeSourceLabel(keySource(e.Key)))
 			}
 		})
 	}
@@ -146,72 +161,86 @@ func (s *shell) homeEditor(c *ui.Context) {
 	}
 }
 
-// homeEditRow is the row of the shelf e, at i of the shelves shown, which
-// drags onto another and moves with Alt+Up and Alt+Down while it has the
-// focus; full is the arrangement the edit changes.
-func (s *shell) homeEditRow(c *ui.Context, i int, e settings.HomeShelf, shown, full []settings.HomeShelf) {
-	k := &s.lk
+// homeEditRow is the row of the shelf e, at i of the shelves a shows,
+// which removes a shelf the user added, and hides the others.
+func (s *shell) homeEditRow(c *ui.Context, a arrangement, i int, e settings.HomeShelf) {
 	from := homeSourceLabel(keySource(e.Key))
-	row := ui.Row(c.Key("home-row-" + e.Key)).Height(56).PaddingStart(16).PaddingEnd(8).Gap(12).Radius(k.radiusSm).
-		Background(k.surface2).Label(locales.HomeEditRowLabel(e.Title, from)).Focusable().Cursor(ui.CursorGrab)
+	s.arrangeRow(c, a, i, e, locales.HomeEditRowLabel(e.Title, from), from, func() {
+		if addedKind(e.Key) {
+			if s.iconButton(c, "home-remove-"+e.Key, "trash", locales.HomeEditRemove(e.Title), false, 16).Clicked() {
+				a.set(withoutShelf(a.full, e.Key))
+			}
+		} else if s.iconButton(c, "home-hide-"+e.Key, "close", locales.HomeEditHide(e.Title), false, 16).Clicked() {
+			a.set(withHidden(a.full, e.Key, true))
+		}
+	})
+}
+
+// arrangeRow is the row of e, at i of the rows a shows, which drags onto
+// another and moves with Alt+Up and Alt+Down while it has the focus: label
+// is what screen readers call it, sub what shows under its title, if
+// anything, and end builds its buttons.
+func (s *shell) arrangeRow(c *ui.Context, a arrangement, i int, e settings.Arranged, label, sub string, end func()) {
+	k := &s.lk
+	row := ui.Row(c.Key(a.list + "-row-" + e.Key)).Height(56).PaddingStart(16).PaddingEnd(8).Gap(12).Radius(k.radiusSm).
+		Background(k.surface2).Label(label).Focusable().Cursor(ui.CursorGrab)
 	if row.Hovered() {
 		row.Background(k.surface2.Mix(k.text, 0.06))
 	}
-	row.Drag(homeShelfDrag{e.Key})
+	row.Drag(arrangeDrag{a.list, e.Key})
 	if row.Dragging() {
 		row.Opacity(0.4)
 	}
-	if d, over := ui.DragOver[homeShelfDrag](row); over && d.key != e.Key {
+	if d, over := ui.DragOver[arrangeDrag](row); over && d.list == a.list && d.key != e.Key {
 		// The accent's line shows where it goes: below, from above, and
 		// above, from below.
-		if shelfAt(shown, d.key) < i {
+		if shelfAt(a.shown, d.key) < i {
 			row.InsetShadow(0, -2, 0, 0, k.accent)
 		} else {
 			row.InsetShadow(0, 2, 0, 0, k.accent)
 		}
 	}
-	if d, ok := ui.Drop[homeShelfDrag](row); ok && d.key != e.Key {
-		s.setHomeShelves(movedOnto(full, d.key, e.Key))
+	if d, ok := ui.Drop[arrangeDrag](row); ok && d.list == a.list && d.key != e.Key {
+		a.set(movedOnto(a.full, d.key, e.Key))
 	}
 	step := func(to int) {
-		if to >= 0 && to < len(shown) {
-			s.setHomeShelves(movedOnto(full, e.Key, shown[to].Key))
-			s.home.focus = e.Key
+		if to >= 0 && to < len(a.shown) {
+			a.set(movedOnto(a.full, e.Key, a.shown[to].Key))
+			*a.focus = e.Key
 		}
 	}
 	row.OnShortcut(ui.Alt, ui.KeyUp, func() { step(i - 1) })
 	row.OnShortcut(ui.Alt, ui.KeyDown, func() { step(i + 1) })
-	if s.home.focus == e.Key {
-		s.home.focus = ""
+	if *a.focus == e.Key {
+		*a.focus = ""
 		row.Focus().ScrollIntoView()
 	}
 	row.Children(func() {
 		s.grip(c)
 		ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
 			ui.Text(c, e.Title).FontSize(k.bodySize()).SingleLine().MinWidth(0)
-			ui.Text(c, from).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
-		})
-		if addedKind(e.Key) {
-			if s.iconButton(c, "home-remove-"+e.Key, "trash", locales.HomeEditRemove(e.Title), false, 16).Clicked() {
-				s.setHomeShelves(withoutShelf(full, e.Key))
+			if sub != "" {
+				ui.Text(c, sub).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
 			}
-		} else if s.iconButton(c, "home-hide-"+e.Key, "close", locales.HomeEditHide(e.Title), false, 16).Clicked() {
-			s.setHomeShelves(withHidden(full, e.Key, true))
-		}
+		})
+		end()
 	})
 }
 
-// homeHiddenRow is the row of the shelf e the user hid, which Show brings
-// back where it was.
-func (s *shell) homeHiddenRow(c *ui.Context, e settings.HomeShelf, full []settings.HomeShelf) {
+// arrangeHiddenRow is the row of e, which the user hid of the list a, and
+// which Show brings back where it was; sub shows under its title, if
+// anything.
+func (s *shell) arrangeHiddenRow(c *ui.Context, a arrangement, e settings.Arranged, sub string) {
 	k := &s.lk
-	ui.Row(c.Key("home-hidden-" + e.Key)).Height(56).PaddingStart(16).PaddingEnd(8).Gap(12).Children(func() {
+	ui.Row(c.Key(a.list + "-hidden-" + e.Key)).Height(56).PaddingStart(16).PaddingEnd(8).Gap(12).Children(func() {
 		ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
 			ui.Text(c, e.Title).FontSize(k.bodySize()).TextColor(k.muted).SingleLine().MinWidth(0)
-			ui.Text(c, homeSourceLabel(keySource(e.Key))).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
+			if sub != "" {
+				ui.Text(c, sub).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
+			}
 		})
-		if s.button(c, "home-show-"+e.Key, locales.HomeEditShow(), false).Label(locales.HomeEditShowTitle(e.Title)).Clicked() {
-			s.setHomeShelves(withHidden(full, e.Key, false))
+		if s.button(c, a.list+"-show-"+e.Key, locales.HomeEditShow(), false).Label(locales.HomeEditShowTitle(e.Title)).Clicked() {
+			a.set(withHidden(a.full, e.Key, false))
 		}
 	})
 }

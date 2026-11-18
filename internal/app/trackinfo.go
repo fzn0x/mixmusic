@@ -155,7 +155,7 @@ func (p *Player) TrackInfo(ctx context.Context, t media.Track, now *player.Sourc
 	if t.Source == media.SourceFile {
 		path, ok := a.localFiles.FileOf(t.ID)
 		if !ok {
-			return TrackInfo{}, errors.New("not a file of this computer: " + t.ID)
+			return TrackInfo{}, wordedLater("not a file of this computer: "+t.ID, locales.TrackInfoFileNotFound, nil)
 		}
 		info.File = readTrackFile(FileMusic, path, true)
 		info.engine(a, now)

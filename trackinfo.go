@@ -98,7 +98,7 @@ func (s *shell) trackInfoDialog(c *ui.Context) {
 	s.dialog(c, &v.open, dialogOptions{key: "track-info", title: locales.TrackInfoTitle(), width: 560}, func() {
 		s.trackInfoBody(c, t, l)
 	}, func() {
-		if f := l.value.File; l.done && f != nil && f.Kind != app.FileCache && f.Problem != "File not found" {
+		if f := l.value.File; l.done && f != nil && f.Kind != app.FileCache && f.Problem != locales.TrackInfoFileNotFound() {
 			if s.dialogButton(c, "track-info-show", strings.ToLower(showInFolderLabel()), false).Clicked() {
 				showInFolder(f.Path)
 			}

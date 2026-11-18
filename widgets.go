@@ -591,23 +591,19 @@ func (s *shell) moved(c *ui.Context, key string, at float32) {
 	s.listTops[key] = at
 }
 
-// artPixels is how many pixels artwork of size DIPs takes, at the scale of
-// most displays and the window's zoom.
-func (s *shell) artPixels(size float32) int { return int(size * s.pixelsOf()) }
+// artPixels is how many pixels artwork of size DIPs takes at the window's
+// pixels: 0 before its first frame tells them (notePixels), when no
+// artwork loads yet, for one that loaded at a guessed size would load
+// again at the real one (#764).
+func (s *shell) artPixels(size float32) int { return int(size * s.pixelScale) }
 
 // artAt is the address of the image of images to show size DIPs across,
-// at the window's pixels.
+// at the window's pixels: none before its first frame.
 func (s *shell) artAt(images []media.Image, size float32) string {
-	return artworkURL(images, int(size*s.pixelsOf()))
-}
-
-// pixelsOf is how many device pixels a DIP of the window is: a Retina
-// display's 2 times the zoom. Before a frame painted, 1.5 times the zoom.
-func (s *shell) pixelsOf() float32 {
 	if s.pixelScale <= 0 {
-		return 1.5 * s.zoomOf()
+		return ""
 	}
-	return s.pixelScale
+	return artworkURL(images, s.artPixels(size))
 }
 
 // notePixels keeps the device pixels of a DIP the window paints at, for

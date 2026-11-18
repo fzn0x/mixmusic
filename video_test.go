@@ -369,6 +369,26 @@ func TestNowPlayingVideoRefresh(t *testing.T) {
 	}
 }
 
+// TestNowPlayingVideoOtherDisplay moves the window to a display of another
+// scale: the picture goes on playing while the stream for the new size is
+// asked for, rather than giving way to the cover until it comes (#764).
+func TestNowPlayingVideoOtherDisplay(t *testing.T) {
+	track := musicVideo()
+	s, tt, page, src := videoShell(t, track)
+	waitScript(t, s, page, "playing: true, active: true")
+	tt.SetScale(2)
+	for range 3 {
+		tt.Frame()
+		s.drain()
+	}
+	if _, ok := tt.Find("Music video: " + track.Title); !ok {
+		t.Fatal("the picture gave way to the cover")
+	}
+	if s.video.sent.src != src.Src || !s.video.sent.active {
+		t.Errorf("the page was told %+v", s.video.sent)
+	}
+}
+
 // TestNowPlayingVideoSettingsFile turns the picture off and on again from
 // settings.json, as an edit of it applies while MixMusic runs.
 func TestNowPlayingVideoSettingsFile(t *testing.T) {

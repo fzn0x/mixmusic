@@ -39,10 +39,11 @@ func clipKey(id string) string { return "clip:" + id }
 
 // clipSleeve builds the sleeve of t, size wide, as the clip of its album
 // that loops, and reports whether it did: not while the clip is looked
-// for, nor for an album of none.
+// for, nor before a frame told the window's pixels, nor for an album
+// of none.
 func (s *shell) clipSleeve(c *ui.Context, t media.Track, size float32) bool {
 	m := &s.moving.clips
-	if !s.set.MovingCovers || !s.svc.Player.HasClips() || m.broken[t.ID] || s.videoProblem() != "" || s.svc.System.MiniPlayerOpen() {
+	if !s.set.MovingCovers || !s.svc.Player.HasClips() || m.broken[t.ID] || s.pixelScale <= 0 || s.videoProblem() != "" || s.svc.System.MiniPlayerOpen() {
 		return false
 	}
 	res := s.clipSource(t)

@@ -420,11 +420,12 @@ func (s *shell) videoSleeve(c *ui.Context, t, rec media.Track, size float32) {
 }
 
 // videoSource returns the stream of the picture of rec for the page, once
-// the page told the codecs it plays: nil until then. It is chosen for the
-// largest frame, so that a window resized keeps it.
+// the page told the codecs it plays and a frame the window's pixels: nil
+// until then. It is chosen for the largest frame, so that a window
+// resized keeps it.
 func (s *shell) videoSource(rec media.Track) *loaded[app.VideoSource] {
 	v := &s.video
-	if v.view == nil || len(v.families) == 0 {
+	if v.view == nil || len(v.families) == 0 || s.pixelScale <= 0 {
 		return nil
 	}
 	w, h := videoShape(videoAspect(rec.Artwork, nil), videoFrame)
@@ -438,6 +439,11 @@ func (s *shell) videoSource(rec media.Track) *loaded[app.VideoSource] {
 	// page doesn't ask for its stream again, nor waits for it, nor tells
 	// that it failed.
 	delete(s.showing, key)
+	// On a display of another scale, the picture that plays goes on while
+	// the stream for the new size loads, and if it can't (#764).
+	if (!l.done || l.err != nil) && v.lastSrc != nil && v.lastTrack == rec.ID {
+		return &loaded[app.VideoSource]{done: true, value: *v.lastSrc}
+	}
 	return l
 }
 

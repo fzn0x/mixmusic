@@ -91,6 +91,9 @@ AppImage or archive copy's.
 - `librefm-queue.json`: the same for Libre.fm, or another GNU FM server.
   Disconnecting deletes it.
 - `updater.json`: your choices of updates.
+- `window-state.json`: the size and place of the window and of the mini
+  player, and whether the window was maximized or full screen, so that
+  they open as you left them.
 - `remote.json`: whether [remote control](remote-control.md) is on, and
   the computers paired with this one, by their names and their keys'
   fingerprints. The key of this computer is in the credential store.
@@ -100,6 +103,11 @@ AppImage or archive copy's.
 - `addons/`: the themes and plugins you installed, and what plugins keep
   in `addons/.storage`.
 - `bin/`: MixMusic's own yt-dlp.
+- `autoeq/`: for [Headphones](playing-music.md#headphones): `INDEX.md`,
+  AutoEq's list of profiles, `index.json`, its ETag and when it was last
+  checked, and `profiles/`, a file for each profile you picked. The list
+  may be 16 MB at most, a profile 64 kB. The correction you chose is in
+  `settings.json`, under `equalizer`, so that it plays offline.
 - `youtube-session.bin`: your YouTube Music session, encrypted with a key
   that the credential store keeps.
 - `matugen.json`, when you follow the colours that matugen writes there.
@@ -190,6 +198,7 @@ Where the credential store can't keep a secret:
 | Feature | Goes to | What it sends |
 |---|---|---|
 | Browsing YouTube Music: search, home, explore, pages | YouTube Music (`music.youtube.com`) | what you search and open, with a visitor ID YouTube gave; signed in, your session's cookies |
+| Searching YouTube itself, with the YouTube choice of search | YouTube (`www.youtube.com`) | what you search, as a visitor with no account: no cookies and no visitor ID |
 | Your YouTube Music library, once you sign in | YouTube Music | the likes, dislikes, saves, playlists and follows you make |
 | New releases of the artists you follow | YouTube Music, and Spotify once you sign in | the artists' IDs, to read their pages or lists of albums, at most every 12 hours each |
 | The audio of a track | YouTube's player API (`www.youtube.com`) and media servers; yt-dlp, which asks YouTube too | the video's ID, signed out |
@@ -220,7 +229,8 @@ Where the credential store can't keep a secret:
 | Listen with friends, while you host a room | each guest's MixMusic, on your network, or over the internet while you let friends outside it join, encrypted, once it proved the code or the link | your name in rooms, what plays, where it is and its volume, and up to 1,000 tracks of the queue, with the tags of your music files, never their paths or their audio; before a guest joins, who hosts, what plays and how many listen; the room's announcement tells your name in rooms to the whole network |
 | Listen with friends, while you're in a room | the host's MixMusic, on your network, or over the internet at the address its link names, encrypted | your name in rooms, and when each track is ready |
 | Listen with friends, while you let friends outside your network join | your router | a request to forward one TCP port, the room's, to your computer, by UPnP, NAT-PMP or PCP, and to let it in at your IPv6 address, renewed while the room lasts and removed as it ends; your invite link, which anyone it reaches can read, carries your router's internet address and the room's port, and your computer's IPv6 address, a temporary one, never one made of its hardware address, or the address you typed for invites in their place |
-| Checks for updates, unless you turn them off in Settings › About | GitHub | a request for the newest release, and its download when you install it |
+| Headphones, when Choose… first opens | GitHub (`raw.githubusercontent.com`, AutoEq's `results` folder) | a request for the list of profiles, checked again with its ETag once 7 days went by; and, as you pick one, a download of its `ParametricEQ.txt`, never fetched again. Nothing else is sent |
+| Checks for updates, unless you turn them off in Settings › About | GitHub | a request for the newest release, and its download when you install it; when GitHub's download address fails, a request to GitHub's API for the newest release and a download from the release's own address |
 | yt-dlp, when you install or update it | GitHub | a request for the version of yt-dlp's latest release, from its page or GitHub's API, and a download of it |
 | The marketplace, when you open it | GitHub | a download of the registry, and of the add-ons you install |
 | Knowing whether the network answers | YouTube and Spotify | a request over HTTPS for an empty answer |
@@ -255,7 +265,12 @@ Where the credential store can't keep a secret:
 - **Your history:** the library's history page clears what you played,
   and the plays the stats count.
 - **The cache:** Settings › Playback › Offline cache › Clear tracks and
-  Clear covers.
+  Clear covers. A downloaded song keeps its cover in the system's media
+  controls, the notification of a track that starts and Now playing for
+  overlays, even offline and after Clear covers: they read the cover from
+  the music on this computer first, then from the copy a download keeps in
+  the downloads folder, and only then from the covers in the cache. A
+  downloads folder on a drive that isn't plugged in falls back to those.
 - **A sign-in:** signing out of a service in Settings › Accounts deletes
   its sign-in.
 - **Your settings:** Settings › Desktop › Reset settings puts back the

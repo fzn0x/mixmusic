@@ -296,7 +296,7 @@ YouTube serves YouTube Music Premium's audio of a higher bitrate, near 256 kbit/
 
 ## A sleep timer
 
-The moon button by the player, beside the speed button, pauses the music for you later, fading it out first.
+The moon button by the player, beside the speed button, pauses the music for you later, fading it out first. In a narrow window it gives its room to the output device button while no timer runs; the timer is then in the command palette, the mini player's menu and the tray, and the moon shows again with the time left once one runs.
 
 - **After a time:** 5, 10, 15, 30, 45, 60 or 90 minutes, or any whole number of minutes from 1 to 9999, typed in its menu's field. Its last length stays from one start of MixMusic to the next.
 - **At an end:** **End of this track**, **End of the queue**, or **After 2 tracks** up to 20, with the buttons beside it. A track that ends counts, a song on Repeat: one or queued twice once each time, and the last plays to its real end, with no crossfade. At the end of the queue, Repeat: all doesn't go round, and the songs Autoplay adds don't start. A live stream, which never ends, offers minutes only.

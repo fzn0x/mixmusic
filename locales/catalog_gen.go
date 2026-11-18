@@ -8498,6 +8498,102 @@ func (msgs Messages) EpisodeTryAgain() string {
 	return Catalog.Format(msgs.locale, "episodeTryAgain", nil)
 }
 
+// EqualizerAutoHeadroom says "Auto headroom"
+// in the language the app shows.
+//
+// In Settings › Playback › Equalizer, a switch, and its name to screen
+// readers: the preamp turns down by itself as much as the bands boost.
+func EqualizerAutoHeadroom() string { return In(i18n.Locale()).EqualizerAutoHeadroom() }
+
+// EqualizerAutoHeadroom says "Auto headroom"
+// in the language of msgs.
+//
+// In Settings › Playback › Equalizer, a switch, and its name to screen
+// readers: the preamp turns down by itself as much as the bands boost.
+func (msgs Messages) EqualizerAutoHeadroom() string {
+	return Catalog.Format(msgs.locale, "equalizerAutoHeadroom", nil)
+}
+
+// EqualizerAutoHeadroomDesc says "The preamp turns down as much as the bands boost, so that no note comes out louder than it went in. Moving the preamp…"
+// in the language the app shows.
+//
+// Under the Auto headroom switch (equalizerAutoHeadroom), in Settings ›
+// Playback › Equalizer.
+func EqualizerAutoHeadroomDesc() string { return In(i18n.Locale()).EqualizerAutoHeadroomDesc() }
+
+// EqualizerAutoHeadroomDesc says "The preamp turns down as much as the bands boost, so that no note comes out louder than it went in. Moving the preamp…"
+// in the language of msgs.
+//
+// Under the Auto headroom switch (equalizerAutoHeadroom), in Settings ›
+// Playback › Equalizer.
+func (msgs Messages) EqualizerAutoHeadroomDesc() string {
+	return Catalog.Format(msgs.locale, "equalizerAutoHeadroomDesc", nil)
+}
+
+// EqualizerBalance says "Balance"
+// in the language the app shows.
+//
+// A row of Settings › Playback › Sound, and the name of its slider to
+// screen readers: it weighs the left side of the sound against the right.
+func EqualizerBalance() string { return In(i18n.Locale()).EqualizerBalance() }
+
+// EqualizerBalance says "Balance"
+// in the language of msgs.
+//
+// A row of Settings › Playback › Sound, and the name of its slider to
+// screen readers: it weighs the left side of the sound against the right.
+func (msgs Messages) EqualizerBalance() string {
+	return Catalog.Format(msgs.locale, "equalizerBalance", nil)
+}
+
+// EqualizerBalanceCentre says "Even on both sides."
+// in the language the app shows.
+//
+// Under Balance (equalizerBalance), while the slider is at its middle.
+func EqualizerBalanceCentre() string { return In(i18n.Locale()).EqualizerBalanceCentre() }
+
+// EqualizerBalanceCentre says "Even on both sides."
+// in the language of msgs.
+//
+// Under Balance (equalizerBalance), while the slider is at its middle.
+func (msgs Messages) EqualizerBalanceCentre() string {
+	return Catalog.Format(msgs.locale, "equalizerBalanceCentre", nil)
+}
+
+// EqualizerBalanceLeft says "{percent}% to the left: the right side plays quieter."
+// in the language the app shows.
+//
+// Under Balance (equalizerBalance), while the slider leans left. {percent}
+// is a whole number from 1 to 100.
+func EqualizerBalanceLeft(percent int) string { return In(i18n.Locale()).EqualizerBalanceLeft(percent) }
+
+// EqualizerBalanceLeft says "{percent}% to the left: the right side plays quieter."
+// in the language of msgs.
+//
+// Under Balance (equalizerBalance), while the slider leans left. {percent}
+// is a whole number from 1 to 100.
+func (msgs Messages) EqualizerBalanceLeft(percent int) string {
+	return Catalog.Format(msgs.locale, "equalizerBalanceLeft", map[string]any{"percent": percent})
+}
+
+// EqualizerBalanceRight says "{percent}% to the right: the left side plays quieter."
+// in the language the app shows.
+//
+// Under Balance (equalizerBalance), while the slider leans right. {percent}
+// is a whole number from 1 to 100.
+func EqualizerBalanceRight(percent int) string {
+	return In(i18n.Locale()).EqualizerBalanceRight(percent)
+}
+
+// EqualizerBalanceRight says "{percent}% to the right: the left side plays quieter."
+// in the language of msgs.
+//
+// Under Balance (equalizerBalance), while the slider leans right. {percent}
+// is a whole number from 1 to 100.
+func (msgs Messages) EqualizerBalanceRight(percent int) string {
+	return Catalog.Format(msgs.locale, "equalizerBalanceRight", map[string]any{"percent": percent})
+}
+
 // EqualizerBandDB says "{band} dB"
 // in the language the app shows.
 func EqualizerBandDB(band string) string { return In(i18n.Locale()).EqualizerBandDB(band) }
@@ -8528,6 +8624,70 @@ func (msgs Messages) EqualizerBandsDesc() string {
 	return Catalog.Format(msgs.locale, "equalizerBandsDesc", nil)
 }
 
+// EqualizerBass says "Bass"
+// in the language the app shows.
+//
+// In Settings › Playback › Equalizer, in simple mode, the short name
+// under the slider of the low notes, as under the bands' sliders their
+// frequencies. Keep it short.
+func EqualizerBass() string { return In(i18n.Locale()).EqualizerBass() }
+
+// EqualizerBass says "Bass"
+// in the language of msgs.
+//
+// In Settings › Playback › Equalizer, in simple mode, the short name
+// under the slider of the low notes, as under the bands' sliders their
+// frequencies. Keep it short.
+func (msgs Messages) EqualizerBass() string {
+	return Catalog.Format(msgs.locale, "equalizerBass", nil)
+}
+
+// EqualizerCrossfeed says "Crossfeed"
+// in the language the app shows.
+//
+// A row of Settings › Playback › Sound, for headphones, and the name of
+// its slider to screen readers: each ear hears a little of the other side.
+func EqualizerCrossfeed() string { return In(i18n.Locale()).EqualizerCrossfeed() }
+
+// EqualizerCrossfeed says "Crossfeed"
+// in the language of msgs.
+//
+// A row of Settings › Playback › Sound, for headphones, and the name of
+// its slider to screen readers: each ear hears a little of the other side.
+func (msgs Messages) EqualizerCrossfeed() string {
+	return Catalog.Format(msgs.locale, "equalizerCrossfeed", nil)
+}
+
+// EqualizerCrossfeedAt says "{percent}%: each ear hears a little of the other side, softened, as from speakers."
+// in the language the app shows.
+//
+// Under Crossfeed (equalizerCrossfeed), while it is on. {percent} is a
+// whole number from 5 to 100.
+func EqualizerCrossfeedAt(percent int) string { return In(i18n.Locale()).EqualizerCrossfeedAt(percent) }
+
+// EqualizerCrossfeedAt says "{percent}%: each ear hears a little of the other side, softened, as from speakers."
+// in the language of msgs.
+//
+// Under Crossfeed (equalizerCrossfeed), while it is on. {percent} is a
+// whole number from 5 to 100.
+func (msgs Messages) EqualizerCrossfeedAt(percent int) string {
+	return Catalog.Format(msgs.locale, "equalizerCrossfeedAt", map[string]any{"percent": percent})
+}
+
+// EqualizerCrossfeedOff says "Off. For headphones: each ear hears a little of the other side, softened, as from speakers."
+// in the language the app shows.
+//
+// Under Crossfeed (equalizerCrossfeed), while it is at 0%.
+func EqualizerCrossfeedOff() string { return In(i18n.Locale()).EqualizerCrossfeedOff() }
+
+// EqualizerCrossfeedOff says "Off. For headphones: each ear hears a little of the other side, softened, as from speakers."
+// in the language of msgs.
+//
+// Under Crossfeed (equalizerCrossfeed), while it is at 0%.
+func (msgs Messages) EqualizerCrossfeedOff() string {
+	return Catalog.Format(msgs.locale, "equalizerCrossfeedOff", nil)
+}
+
 // EqualizerCustom says "Custom"
 // in the language the app shows.
 func EqualizerCustom() string { return In(i18n.Locale()).EqualizerCustom() }
@@ -8538,6 +8698,54 @@ func (msgs Messages) EqualizerCustom() string {
 	return Catalog.Format(msgs.locale, "equalizerCustom", nil)
 }
 
+// EqualizerDelete says "Delete"
+// in the language the app shows.
+//
+// A link under Preset, in Settings › Playback › Equalizer, while a
+// preset of the user's plays, and the button of the question
+// equalizerDeleteTitle: it deletes the preset.
+func EqualizerDelete() string { return In(i18n.Locale()).EqualizerDelete() }
+
+// EqualizerDelete says "Delete"
+// in the language of msgs.
+//
+// A link under Preset, in Settings › Playback › Equalizer, while a
+// preset of the user's plays, and the button of the question
+// equalizerDeleteTitle: it deletes the preset.
+func (msgs Messages) EqualizerDelete() string {
+	return Catalog.Format(msgs.locale, "equalizerDelete", nil)
+}
+
+// EqualizerDeleteMessage says "The preset leaves the menu. The sound stays as it is."
+// in the language the app shows.
+//
+// Under the title of the question equalizerDeleteTitle.
+func EqualizerDeleteMessage() string { return In(i18n.Locale()).EqualizerDeleteMessage() }
+
+// EqualizerDeleteMessage says "The preset leaves the menu. The sound stays as it is."
+// in the language of msgs.
+//
+// Under the title of the question equalizerDeleteTitle.
+func (msgs Messages) EqualizerDeleteMessage() string {
+	return Catalog.Format(msgs.locale, "equalizerDeleteMessage", nil)
+}
+
+// EqualizerDeleteTitle says "Delete {name}?"
+// in the language the app shows.
+//
+// The title of the question asked before a preset of the user's is deleted.
+// {name} is the preset's name.
+func EqualizerDeleteTitle(name string) string { return In(i18n.Locale()).EqualizerDeleteTitle(name) }
+
+// EqualizerDeleteTitle says "Delete {name}?"
+// in the language of msgs.
+//
+// The title of the question asked before a preset of the user's is deleted.
+// {name} is the preset's name.
+func (msgs Messages) EqualizerDeleteTitle(name string) string {
+	return Catalog.Format(msgs.locale, "equalizerDeleteTitle", map[string]any{"name": name})
+}
+
 // EqualizerDesc says "Shape the sound of YouTube Music with ten bands and a preamp."
 // in the language the app shows.
 func EqualizerDesc() string { return In(i18n.Locale()).EqualizerDesc() }
@@ -8546,6 +8754,332 @@ func EqualizerDesc() string { return In(i18n.Locale()).EqualizerDesc() }
 // in the language of msgs.
 func (msgs Messages) EqualizerDesc() string {
 	return Catalog.Format(msgs.locale, "equalizerDesc", nil)
+}
+
+// EqualizerEffects says "Sound effects"
+// in the language the app shows.
+//
+// In Settings › Playback › Equalizer, the switch at the head of the
+// group, and its name to screen readers: it turns the equalizer, crossfeed
+// and stereo width on and off at once.
+func EqualizerEffects() string { return In(i18n.Locale()).EqualizerEffects() }
+
+// EqualizerEffects says "Sound effects"
+// in the language of msgs.
+//
+// In Settings › Playback › Equalizer, the switch at the head of the
+// group, and its name to screen readers: it turns the equalizer, crossfeed
+// and stereo width on and off at once.
+func (msgs Messages) EqualizerEffects() string {
+	return Catalog.Format(msgs.locale, "equalizerEffects", nil)
+}
+
+// EqualizerEffectsDesc says "Off, the equalizer, crossfeed and stereo width stop at once, and keep their settings. Balance and mono still apply."
+// in the language the app shows.
+//
+// Under the Sound effects switch (equalizerEffects), in Settings ›
+// Playback › Equalizer.
+func EqualizerEffectsDesc() string { return In(i18n.Locale()).EqualizerEffectsDesc() }
+
+// EqualizerEffectsDesc says "Off, the equalizer, crossfeed and stereo width stop at once, and keep their settings. Balance and mono still apply."
+// in the language of msgs.
+//
+// Under the Sound effects switch (equalizerEffects), in Settings ›
+// Playback › Equalizer.
+func (msgs Messages) EqualizerEffectsDesc() string {
+	return Catalog.Format(msgs.locale, "equalizerEffectsDesc", nil)
+}
+
+// EqualizerEffectsOff says "Sound effects are off: crossfeed and stereo width wait until they're on again, in Settings › Playback › Equalizer."
+// in the language the app shows.
+//
+// In Settings › Playback › Sound, under the Crossfeed and Stereo width
+// rows, while the Sound effects switch (equalizerEffects) is off.
+func EqualizerEffectsOff() string { return In(i18n.Locale()).EqualizerEffectsOff() }
+
+// EqualizerEffectsOff says "Sound effects are off: crossfeed and stereo width wait until they're on again, in Settings › Playback › Equalizer."
+// in the language of msgs.
+//
+// In Settings › Playback › Sound, under the Crossfeed and Stereo width
+// rows, while the Sound effects switch (equalizerEffects) is off.
+func (msgs Messages) EqualizerEffectsOff() string {
+	return Catalog.Format(msgs.locale, "equalizerEffectsOff", nil)
+}
+
+// EqualizerExport says "Export…"
+// in the language the app shows.
+//
+// A link under Preset, in Settings › Playback › Equalizer, while a
+// preset of the user's plays: it saves that preset as a JSON file.
+func EqualizerExport() string { return In(i18n.Locale()).EqualizerExport() }
+
+// EqualizerExport says "Export…"
+// in the language of msgs.
+//
+// A link under Preset, in Settings › Playback › Equalizer, while a
+// preset of the user's plays: it saves that preset as a JSON file.
+func (msgs Messages) EqualizerExport() string {
+	return Catalog.Format(msgs.locale, "equalizerExport", nil)
+}
+
+// EqualizerExportAll says "Export all…"
+// in the language the app shows.
+//
+// A link under Preset, in Settings › Playback › Equalizer, while the
+// user has presets of their own: it saves them all as a JSON file.
+func EqualizerExportAll() string { return In(i18n.Locale()).EqualizerExportAll() }
+
+// EqualizerExportAll says "Export all…"
+// in the language of msgs.
+//
+// A link under Preset, in Settings › Playback › Equalizer, while the
+// user has presets of their own: it saves them all as a JSON file.
+func (msgs Messages) EqualizerExportAll() string {
+	return Catalog.Format(msgs.locale, "equalizerExportAll", nil)
+}
+
+// EqualizerExportFailed says "Couldn't export the presets: {error}"
+// in the language the app shows.
+//
+// A toast, when the file of Export… or Export all… couldn't be saved.
+// {error} says why, from the system, as a lowercase fragment.
+func EqualizerExportFailed(error string) string {
+	return In(i18n.Locale()).EqualizerExportFailed(error)
+}
+
+// EqualizerExportFailed says "Couldn't export the presets: {error}"
+// in the language of msgs.
+//
+// A toast, when the file of Export… or Export all… couldn't be saved.
+// {error} says why, from the system, as a lowercase fragment.
+func (msgs Messages) EqualizerExportFailed(error string) string {
+	return Catalog.Format(msgs.locale, "equalizerExportFailed", map[string]any{"error": error})
+}
+
+// EqualizerExportTitle says "Export presets"
+// in the language the app shows.
+//
+// The title of the system's dialog that asks where to save the presets,
+// after Export… or Export all….
+func EqualizerExportTitle() string { return In(i18n.Locale()).EqualizerExportTitle() }
+
+// EqualizerExportTitle says "Export presets"
+// in the language of msgs.
+//
+// The title of the system's dialog that asks where to save the presets,
+// after Export… or Export all….
+func (msgs Messages) EqualizerExportTitle() string {
+	return Catalog.Format(msgs.locale, "equalizerExportTitle", nil)
+}
+
+// EqualizerExported says "{count, plural, one {Exported # preset as {file}} other {Exported # presets as {file}}}"
+// in the language the app shows.
+//
+// A toast, once Export… or Export all… saved the presets. {file} is the
+// file's name.
+func EqualizerExported(count int, file string) string {
+	return In(i18n.Locale()).EqualizerExported(count, file)
+}
+
+// EqualizerExported says "{count, plural, one {Exported # preset as {file}} other {Exported # presets as {file}}}"
+// in the language of msgs.
+//
+// A toast, once Export… or Export all… saved the presets. {file} is the
+// file's name.
+func (msgs Messages) EqualizerExported(count int, file string) string {
+	return Catalog.Format(msgs.locale, "equalizerExported", map[string]any{"count": count, "file": file})
+}
+
+// EqualizerImport says "Import…"
+// in the language the app shows.
+//
+// A link under Preset, in Settings › Playback › Equalizer: it adds the
+// presets of a JSON file to the user's.
+func EqualizerImport() string { return In(i18n.Locale()).EqualizerImport() }
+
+// EqualizerImport says "Import…"
+// in the language of msgs.
+//
+// A link under Preset, in Settings › Playback › Equalizer: it adds the
+// presets of a JSON file to the user's.
+func (msgs Messages) EqualizerImport() string {
+	return Catalog.Format(msgs.locale, "equalizerImport", nil)
+}
+
+// EqualizerImportFailed says "Couldn't import the presets: {error}"
+// in the language the app shows.
+//
+// A toast, when the file chosen after Import… couldn't be read. {error}
+// says why, as a lowercase fragment, as equalizerImportNoPresets.
+func EqualizerImportFailed(error string) string {
+	return In(i18n.Locale()).EqualizerImportFailed(error)
+}
+
+// EqualizerImportFailed says "Couldn't import the presets: {error}"
+// in the language of msgs.
+//
+// A toast, when the file chosen after Import… couldn't be read. {error}
+// says why, as a lowercase fragment, as equalizerImportNoPresets.
+func (msgs Messages) EqualizerImportFailed(error string) string {
+	return Catalog.Format(msgs.locale, "equalizerImportFailed", map[string]any{"error": error})
+}
+
+// EqualizerImportNoPresets says "the file holds no equalizer presets"
+// in the language the app shows.
+//
+// Why a file didn't import, in the {error} of equalizerImportFailed: it
+// isn't a file of presets, as Export… saves them.
+func EqualizerImportNoPresets() string { return In(i18n.Locale()).EqualizerImportNoPresets() }
+
+// EqualizerImportNoPresets says "the file holds no equalizer presets"
+// in the language of msgs.
+//
+// Why a file didn't import, in the {error} of equalizerImportFailed: it
+// isn't a file of presets, as Export… saves them.
+func (msgs Messages) EqualizerImportNoPresets() string {
+	return Catalog.Format(msgs.locale, "equalizerImportNoPresets", nil)
+}
+
+// EqualizerImportReplaceMessage says "{count, plural, one {One of your presets has the name of a preset in the file. Importing replaces it.} other {# of yo…"
+// in the language the app shows.
+//
+// Under the title of the question equalizerImportReplaceTitle.
+func EqualizerImportReplaceMessage(count int) string {
+	return In(i18n.Locale()).EqualizerImportReplaceMessage(count)
+}
+
+// EqualizerImportReplaceMessage says "{count, plural, one {One of your presets has the name of a preset in the file. Importing replaces it.} other {# of yo…"
+// in the language of msgs.
+//
+// Under the title of the question equalizerImportReplaceTitle.
+func (msgs Messages) EqualizerImportReplaceMessage(count int) string {
+	return Catalog.Format(msgs.locale, "equalizerImportReplaceMessage", map[string]any{"count": count})
+}
+
+// EqualizerImportReplaceTitle says "{count, plural, one {Replace # preset?} other {Replace # presets?}}"
+// in the language the app shows.
+//
+// The title of the question asked when presets of a file chosen after
+// Import… have the names of presets of the user's.
+func EqualizerImportReplaceTitle(count int) string {
+	return In(i18n.Locale()).EqualizerImportReplaceTitle(count)
+}
+
+// EqualizerImportReplaceTitle says "{count, plural, one {Replace # preset?} other {Replace # presets?}}"
+// in the language of msgs.
+//
+// The title of the question asked when presets of a file chosen after
+// Import… have the names of presets of the user's.
+func (msgs Messages) EqualizerImportReplaceTitle(count int) string {
+	return Catalog.Format(msgs.locale, "equalizerImportReplaceTitle", map[string]any{"count": count})
+}
+
+// EqualizerImportTitle says "Import presets"
+// in the language the app shows.
+//
+// The title of the system's dialog that asks for a file of presets, after
+// Import….
+func EqualizerImportTitle() string { return In(i18n.Locale()).EqualizerImportTitle() }
+
+// EqualizerImportTitle says "Import presets"
+// in the language of msgs.
+//
+// The title of the system's dialog that asks for a file of presets, after
+// Import….
+func (msgs Messages) EqualizerImportTitle() string {
+	return Catalog.Format(msgs.locale, "equalizerImportTitle", nil)
+}
+
+// EqualizerImported says "{count, plural, one {Imported # preset} other {Imported # presets}}"
+// in the language the app shows.
+//
+// A toast, once Import… added the presets of a file to the user's.
+func EqualizerImported(count int) string { return In(i18n.Locale()).EqualizerImported(count) }
+
+// EqualizerImported says "{count, plural, one {Imported # preset} other {Imported # presets}}"
+// in the language of msgs.
+//
+// A toast, once Import… added the presets of a file to the user's.
+func (msgs Messages) EqualizerImported(count int) string {
+	return Catalog.Format(msgs.locale, "equalizerImported", map[string]any{"count": count})
+}
+
+// EqualizerMid says "Mid"
+// in the language the app shows.
+//
+// In Settings › Playback › Equalizer, in simple mode, the short name
+// under the slider of the middle notes. Keep it short.
+func EqualizerMid() string { return In(i18n.Locale()).EqualizerMid() }
+
+// EqualizerMid says "Mid"
+// in the language of msgs.
+//
+// In Settings › Playback › Equalizer, in simple mode, the short name
+// under the slider of the middle notes. Keep it short.
+func (msgs Messages) EqualizerMid() string {
+	return Catalog.Format(msgs.locale, "equalizerMid", nil)
+}
+
+// EqualizerMono says "Mono"
+// in the language the app shows.
+//
+// A row of Settings › Playback › Sound, with a switch, and the switch's
+// name to screen readers.
+func EqualizerMono() string { return In(i18n.Locale()).EqualizerMono() }
+
+// EqualizerMono says "Mono"
+// in the language of msgs.
+//
+// A row of Settings › Playback › Sound, with a switch, and the switch's
+// name to screen readers.
+func (msgs Messages) EqualizerMono() string {
+	return Catalog.Format(msgs.locale, "equalizerMono", nil)
+}
+
+// EqualizerMonoDesc says "Both sides mixed on each, for hearing on one side or with one earbud."
+// in the language the app shows.
+//
+// Under Mono (equalizerMono), in Settings › Playback › Sound.
+func EqualizerMonoDesc() string { return In(i18n.Locale()).EqualizerMonoDesc() }
+
+// EqualizerMonoDesc says "Both sides mixed on each, for hearing on one side or with one earbud."
+// in the language of msgs.
+//
+// Under Mono (equalizerMono), in Settings › Playback › Sound.
+func (msgs Messages) EqualizerMonoDesc() string {
+	return Catalog.Format(msgs.locale, "equalizerMonoDesc", nil)
+}
+
+// EqualizerNameBuiltin says "A built-in preset is called {name}. Choose another name."
+// in the language the app shows.
+//
+// A toast, when the name given in the dialog of Save as… or Rename… is
+// a built-in preset's, as it shows in the menu; the dialog shows again.
+func EqualizerNameBuiltin(name string) string { return In(i18n.Locale()).EqualizerNameBuiltin(name) }
+
+// EqualizerNameBuiltin says "A built-in preset is called {name}. Choose another name."
+// in the language of msgs.
+//
+// A toast, when the name given in the dialog of Save as… or Rename… is
+// a built-in preset's, as it shows in the menu; the dialog shows again.
+func (msgs Messages) EqualizerNameBuiltin(name string) string {
+	return Catalog.Format(msgs.locale, "equalizerNameBuiltin", map[string]any{"name": name})
+}
+
+// EqualizerNameTooLong says "A preset's name can have up to {count} characters."
+// in the language the app shows.
+//
+// A toast, when the name given in the dialog of Save as… or Rename… is
+// longer; the dialog shows again.
+func EqualizerNameTooLong(count int) string { return In(i18n.Locale()).EqualizerNameTooLong(count) }
+
+// EqualizerNameTooLong says "A preset's name can have up to {count} characters."
+// in the language of msgs.
+//
+// A toast, when the name given in the dialog of Save as… or Rename… is
+// longer; the dialog shows again.
+func (msgs Messages) EqualizerNameTooLong(count int) string {
+	return Catalog.Format(msgs.locale, "equalizerNameTooLong", map[string]any{"count": count})
 }
 
 // EqualizerPreamp says "pre"
@@ -8588,6 +9122,70 @@ func (msgs Messages) EqualizerPresetBass() string {
 	return Catalog.Format(msgs.locale, "equalizerPresetBass", nil)
 }
 
+// EqualizerPresetBassCut says "Bass reducer"
+// in the language the app shows.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu: the
+// low notes turned down.
+func EqualizerPresetBassCut() string { return In(i18n.Locale()).EqualizerPresetBassCut() }
+
+// EqualizerPresetBassCut says "Bass reducer"
+// in the language of msgs.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu: the
+// low notes turned down.
+func (msgs Messages) EqualizerPresetBassCut() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetBassCut", nil)
+}
+
+// EqualizerPresetClassical says "Classical"
+// in the language the app shows.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// classical music.
+func EqualizerPresetClassical() string { return In(i18n.Locale()).EqualizerPresetClassical() }
+
+// EqualizerPresetClassical says "Classical"
+// in the language of msgs.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// classical music.
+func (msgs Messages) EqualizerPresetClassical() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetClassical", nil)
+}
+
+// EqualizerPresetDance says "Dance"
+// in the language the app shows.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// dance music.
+func EqualizerPresetDance() string { return In(i18n.Locale()).EqualizerPresetDance() }
+
+// EqualizerPresetDance says "Dance"
+// in the language of msgs.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// dance music.
+func (msgs Messages) EqualizerPresetDance() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetDance", nil)
+}
+
+// EqualizerPresetDesc says "The built-in presets, then yours. Yours keep the bands, the preamp, balance, mono, crossfeed and stereo width."
+// in the language the app shows.
+//
+// Under Preset, in Settings › Playback › Equalizer, over the links of
+// the user's presets.
+func EqualizerPresetDesc() string { return In(i18n.Locale()).EqualizerPresetDesc() }
+
+// EqualizerPresetDesc says "The built-in presets, then yours. Yours keep the bands, the preamp, balance, mono, crossfeed and stereo width."
+// in the language of msgs.
+//
+// Under Preset, in Settings › Playback › Equalizer, over the links of
+// the user's presets.
+func (msgs Messages) EqualizerPresetDesc() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetDesc", nil)
+}
+
 // EqualizerPresetElectronic says "Electronic"
 // in the language the app shows.
 func EqualizerPresetElectronic() string { return In(i18n.Locale()).EqualizerPresetElectronic() }
@@ -8608,6 +9206,38 @@ func (msgs Messages) EqualizerPresetFlat() string {
 	return Catalog.Format(msgs.locale, "equalizerPresetFlat", nil)
 }
 
+// EqualizerPresetHipHop says "Hip-hop"
+// in the language the app shows.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// hip-hop.
+func EqualizerPresetHipHop() string { return In(i18n.Locale()).EqualizerPresetHipHop() }
+
+// EqualizerPresetHipHop says "Hip-hop"
+// in the language of msgs.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// hip-hop.
+func (msgs Messages) EqualizerPresetHipHop() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetHipHop", nil)
+}
+
+// EqualizerPresetJazz says "Jazz"
+// in the language the app shows.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// jazz.
+func EqualizerPresetJazz() string { return In(i18n.Locale()).EqualizerPresetJazz() }
+
+// EqualizerPresetJazz says "Jazz"
+// in the language of msgs.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// jazz.
+func (msgs Messages) EqualizerPresetJazz() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetJazz", nil)
+}
+
 // EqualizerPresetLateNight says "Late night"
 // in the language the app shows.
 func EqualizerPresetLateNight() string { return In(i18n.Locale()).EqualizerPresetLateNight() }
@@ -8616,6 +9246,22 @@ func EqualizerPresetLateNight() string { return In(i18n.Locale()).EqualizerPrese
 // in the language of msgs.
 func (msgs Messages) EqualizerPresetLateNight() string {
 	return Catalog.Format(msgs.locale, "equalizerPresetLateNight", nil)
+}
+
+// EqualizerPresetLive says "Live"
+// in the language the app shows.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// live recordings of concerts.
+func EqualizerPresetLive() string { return In(i18n.Locale()).EqualizerPresetLive() }
+
+// EqualizerPresetLive says "Live"
+// in the language of msgs.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// live recordings of concerts.
+func (msgs Messages) EqualizerPresetLive() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetLive", nil)
 }
 
 // EqualizerPresetLoFi says "Lo-fi"
@@ -8628,6 +9274,86 @@ func (msgs Messages) EqualizerPresetLoFi() string {
 	return Catalog.Format(msgs.locale, "equalizerPresetLoFi", nil)
 }
 
+// EqualizerPresetMetal says "Metal"
+// in the language the app shows.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// heavy metal.
+func EqualizerPresetMetal() string { return In(i18n.Locale()).EqualizerPresetMetal() }
+
+// EqualizerPresetMetal says "Metal"
+// in the language of msgs.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// heavy metal.
+func (msgs Messages) EqualizerPresetMetal() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetMetal", nil)
+}
+
+// EqualizerPresetName says "Name"
+// in the language the app shows.
+//
+// The name to screen readers of the field of a preset's name, in the
+// dialogs of Save as… and Rename….
+func EqualizerPresetName() string { return In(i18n.Locale()).EqualizerPresetName() }
+
+// EqualizerPresetName says "Name"
+// in the language of msgs.
+//
+// The name to screen readers of the field of a preset's name, in the
+// dialogs of Save as… and Rename….
+func (msgs Messages) EqualizerPresetName() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetName", nil)
+}
+
+// EqualizerPresetPiano says "Piano"
+// in the language the app shows.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// piano music.
+func EqualizerPresetPiano() string { return In(i18n.Locale()).EqualizerPresetPiano() }
+
+// EqualizerPresetPiano says "Piano"
+// in the language of msgs.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// piano music.
+func (msgs Messages) EqualizerPresetPiano() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetPiano", nil)
+}
+
+// EqualizerPresetPop says "Pop"
+// in the language the app shows.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// pop music.
+func EqualizerPresetPop() string { return In(i18n.Locale()).EqualizerPresetPop() }
+
+// EqualizerPresetPop says "Pop"
+// in the language of msgs.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// pop music.
+func (msgs Messages) EqualizerPresetPop() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetPop", nil)
+}
+
+// EqualizerPresetRnB says "R&B"
+// in the language the app shows.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// rhythm and blues.
+func EqualizerPresetRnB() string { return In(i18n.Locale()).EqualizerPresetRnB() }
+
+// EqualizerPresetRnB says "R&B"
+// in the language of msgs.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu, for
+// rhythm and blues.
+func (msgs Messages) EqualizerPresetRnB() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetRnB", nil)
+}
+
 // EqualizerPresetRock says "Rock"
 // in the language the app shows.
 func EqualizerPresetRock() string { return In(i18n.Locale()).EqualizerPresetRock() }
@@ -8636,6 +9362,40 @@ func EqualizerPresetRock() string { return In(i18n.Locale()).EqualizerPresetRock
 // in the language of msgs.
 func (msgs Messages) EqualizerPresetRock() string {
 	return Catalog.Format(msgs.locale, "equalizerPresetRock", nil)
+}
+
+// EqualizerPresetSmallSpeakers says "Small speakers"
+// in the language the app shows.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu: for a
+// laptop's or a phone's speakers, the lowest notes they can't play turned
+// down.
+func EqualizerPresetSmallSpeakers() string { return In(i18n.Locale()).EqualizerPresetSmallSpeakers() }
+
+// EqualizerPresetSmallSpeakers says "Small speakers"
+// in the language of msgs.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu: for a
+// laptop's or a phone's speakers, the lowest notes they can't play turned
+// down.
+func (msgs Messages) EqualizerPresetSmallSpeakers() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetSmallSpeakers", nil)
+}
+
+// EqualizerPresetSpoken says "Spoken word"
+// in the language the app shows.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu: for
+// podcasts and audiobooks, voices clearer.
+func EqualizerPresetSpoken() string { return In(i18n.Locale()).EqualizerPresetSpoken() }
+
+// EqualizerPresetSpoken says "Spoken word"
+// in the language of msgs.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu: for
+// podcasts and audiobooks, voices clearer.
+func (msgs Messages) EqualizerPresetSpoken() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetSpoken", nil)
 }
 
 // EqualizerPresetTreble says "Treble boost"
@@ -8648,6 +9408,22 @@ func (msgs Messages) EqualizerPresetTreble() string {
 	return Catalog.Format(msgs.locale, "equalizerPresetTreble", nil)
 }
 
+// EqualizerPresetTrebleCut says "Treble reducer"
+// in the language the app shows.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu: the
+// high notes turned down.
+func EqualizerPresetTrebleCut() string { return In(i18n.Locale()).EqualizerPresetTrebleCut() }
+
+// EqualizerPresetTrebleCut says "Treble reducer"
+// in the language of msgs.
+//
+// The name of a built-in preset of the equalizer, in its Preset menu: the
+// high notes turned down.
+func (msgs Messages) EqualizerPresetTrebleCut() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetTrebleCut", nil)
+}
+
 // EqualizerPresetVocal says "Vocal"
 // in the language the app shows.
 func EqualizerPresetVocal() string { return In(i18n.Locale()).EqualizerPresetVocal() }
@@ -8658,18 +9434,220 @@ func (msgs Messages) EqualizerPresetVocal() string {
 	return Catalog.Format(msgs.locale, "equalizerPresetVocal", nil)
 }
 
-// EqualizerSpotifyNote says "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For S…"
+// EqualizerPresetWarm says "Warm"
 // in the language the app shows.
 //
-// Under the equalizer. {link} is equalizerSpotifyNotes, a link to Spotify's
-// page that says so.
-func EqualizerSpotifyNote(link string) string { return In(i18n.Locale()).EqualizerSpotifyNote(link) }
+// The name of a built-in preset of the equalizer, in its Preset menu: low
+// notes fuller, high ones softer.
+func EqualizerPresetWarm() string { return In(i18n.Locale()).EqualizerPresetWarm() }
 
-// EqualizerSpotifyNote says "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For S…"
+// EqualizerPresetWarm says "Warm"
 // in the language of msgs.
 //
-// Under the equalizer. {link} is equalizerSpotifyNotes, a link to Spotify's
-// page that says so.
+// The name of a built-in preset of the equalizer, in its Preset menu: low
+// notes fuller, high ones softer.
+func (msgs Messages) EqualizerPresetWarm() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetWarm", nil)
+}
+
+// EqualizerPresetsFilter says "Equalizer presets"
+// in the language the app shows.
+//
+// In the system's dialogs of Export… and Import…, the name of the kind
+// of file they save and open, JSON files.
+func EqualizerPresetsFilter() string { return In(i18n.Locale()).EqualizerPresetsFilter() }
+
+// EqualizerPresetsFilter says "Equalizer presets"
+// in the language of msgs.
+//
+// In the system's dialogs of Export… and Import…, the name of the kind
+// of file they save and open, JSON files.
+func (msgs Messages) EqualizerPresetsFilter() string {
+	return Catalog.Format(msgs.locale, "equalizerPresetsFilter", nil)
+}
+
+// EqualizerRename says "Rename…"
+// in the language the app shows.
+//
+// A link under Preset, in Settings › Playback › Equalizer, while a
+// preset of the user's plays: it opens a dialog to rename it.
+func EqualizerRename() string { return In(i18n.Locale()).EqualizerRename() }
+
+// EqualizerRename says "Rename…"
+// in the language of msgs.
+//
+// A link under Preset, in Settings › Playback › Equalizer, while a
+// preset of the user's plays: it opens a dialog to rename it.
+func (msgs Messages) EqualizerRename() string {
+	return Catalog.Format(msgs.locale, "equalizerRename", nil)
+}
+
+// EqualizerRenameButton says "Rename"
+// in the language the app shows.
+//
+// The button of the dialog equalizerRenameTitle that renames the preset.
+func EqualizerRenameButton() string { return In(i18n.Locale()).EqualizerRenameButton() }
+
+// EqualizerRenameButton says "Rename"
+// in the language of msgs.
+//
+// The button of the dialog equalizerRenameTitle that renames the preset.
+func (msgs Messages) EqualizerRenameButton() string {
+	return Catalog.Format(msgs.locale, "equalizerRenameButton", nil)
+}
+
+// EqualizerRenameTitle says "Rename preset"
+// in the language the app shows.
+//
+// The title of the dialog Rename… (equalizerRename) opens.
+func EqualizerRenameTitle() string { return In(i18n.Locale()).EqualizerRenameTitle() }
+
+// EqualizerRenameTitle says "Rename preset"
+// in the language of msgs.
+//
+// The title of the dialog Rename… (equalizerRename) opens.
+func (msgs Messages) EqualizerRenameTitle() string {
+	return Catalog.Format(msgs.locale, "equalizerRenameTitle", nil)
+}
+
+// EqualizerReplace says "Replace"
+// in the language the app shows.
+//
+// The button of the questions equalizerReplaceTitle and
+// equalizerImportReplaceTitle that replaces the presets of the same names.
+func EqualizerReplace() string { return In(i18n.Locale()).EqualizerReplace() }
+
+// EqualizerReplace says "Replace"
+// in the language of msgs.
+//
+// The button of the questions equalizerReplaceTitle and
+// equalizerImportReplaceTitle that replaces the presets of the same names.
+func (msgs Messages) EqualizerReplace() string {
+	return Catalog.Format(msgs.locale, "equalizerReplace", nil)
+}
+
+// EqualizerReplaceMessage says "One of your presets has this name already. Replacing it keeps this one in its place."
+// in the language the app shows.
+//
+// Under the title of the question equalizerReplaceTitle.
+func EqualizerReplaceMessage() string { return In(i18n.Locale()).EqualizerReplaceMessage() }
+
+// EqualizerReplaceMessage says "One of your presets has this name already. Replacing it keeps this one in its place."
+// in the language of msgs.
+//
+// Under the title of the question equalizerReplaceTitle.
+func (msgs Messages) EqualizerReplaceMessage() string {
+	return Catalog.Format(msgs.locale, "equalizerReplaceMessage", nil)
+}
+
+// EqualizerReplaceTitle says "Replace {name}?"
+// in the language the app shows.
+//
+// The title of the question asked when a preset is saved or renamed under
+// the name of one of the user's presets. {name} is that preset's name.
+func EqualizerReplaceTitle(name string) string { return In(i18n.Locale()).EqualizerReplaceTitle(name) }
+
+// EqualizerReplaceTitle says "Replace {name}?"
+// in the language of msgs.
+//
+// The title of the question asked when a preset is saved or renamed under
+// the name of one of the user's presets. {name} is that preset's name.
+func (msgs Messages) EqualizerReplaceTitle(name string) string {
+	return Catalog.Format(msgs.locale, "equalizerReplaceTitle", map[string]any{"name": name})
+}
+
+// EqualizerSave says "Save"
+// in the language the app shows.
+//
+// The button of the dialog of Save as… (equalizerSaveTitle) that saves
+// the preset.
+func EqualizerSave() string { return In(i18n.Locale()).EqualizerSave() }
+
+// EqualizerSave says "Save"
+// in the language of msgs.
+//
+// The button of the dialog of Save as… (equalizerSaveTitle) that saves
+// the preset.
+func (msgs Messages) EqualizerSave() string {
+	return Catalog.Format(msgs.locale, "equalizerSave", nil)
+}
+
+// EqualizerSaveAs says "Save as…"
+// in the language the app shows.
+//
+// A button beside the Preset menu, in Settings › Playback › Equalizer:
+// it saves the equalizer as a preset of the user's, under a name they give.
+func EqualizerSaveAs() string { return In(i18n.Locale()).EqualizerSaveAs() }
+
+// EqualizerSaveAs says "Save as…"
+// in the language of msgs.
+//
+// A button beside the Preset menu, in Settings › Playback › Equalizer:
+// it saves the equalizer as a preset of the user's, under a name they give.
+func (msgs Messages) EqualizerSaveAs() string {
+	return Catalog.Format(msgs.locale, "equalizerSaveAs", nil)
+}
+
+// EqualizerSaveTitle says "Save preset"
+// in the language the app shows.
+//
+// The title of the dialog Save as… (equalizerSaveAs) opens, which asks
+// for the preset's name.
+func EqualizerSaveTitle() string { return In(i18n.Locale()).EqualizerSaveTitle() }
+
+// EqualizerSaveTitle says "Save preset"
+// in the language of msgs.
+//
+// The title of the dialog Save as… (equalizerSaveAs) opens, which asks
+// for the preset's name.
+func (msgs Messages) EqualizerSaveTitle() string {
+	return Catalog.Format(msgs.locale, "equalizerSaveTitle", nil)
+}
+
+// EqualizerSimple says "Simple mode"
+// in the language the app shows.
+//
+// In Settings › Playback › Equalizer, a switch, and its name to screen
+// readers: three sliders, bass, mid and treble, in place of the ten bands.
+func EqualizerSimple() string { return In(i18n.Locale()).EqualizerSimple() }
+
+// EqualizerSimple says "Simple mode"
+// in the language of msgs.
+//
+// In Settings › Playback › Equalizer, a switch, and its name to screen
+// readers: three sliders, bass, mid and treble, in place of the ten bands.
+func (msgs Messages) EqualizerSimple() string {
+	return Catalog.Format(msgs.locale, "equalizerSimple", nil)
+}
+
+// EqualizerSimpleDesc says "Three sliders, bass, mid and treble, in place of the ten bands, which they move. Bass doubles as a bass boost."
+// in the language the app shows.
+//
+// Under the Simple mode switch (equalizerSimple), in Settings › Playback
+// › Equalizer.
+func EqualizerSimpleDesc() string { return In(i18n.Locale()).EqualizerSimpleDesc() }
+
+// EqualizerSimpleDesc says "Three sliders, bass, mid and treble, in place of the ten bands, which they move. Bass doubles as a bass boost."
+// in the language of msgs.
+//
+// Under the Simple mode switch (equalizerSimple), in Settings › Playback
+// › Equalizer.
+func (msgs Messages) EqualizerSimpleDesc() string {
+	return Catalog.Format(msgs.locale, "equalizerSimpleDesc", nil)
+}
+
+// EqualizerSpotifyNote says "The equalizer, its sound effects, balance and mono work only on what MixMusic plays itself: YouTube Music, Spotify tr…"
+// in the language the app shows.
+//
+// Under the equalizer, in Settings › Playback › Equalizer. {link} is
+// equalizerSpotifyNotes, a link to Spotify's page that says so.
+func EqualizerSpotifyNote(link string) string { return In(i18n.Locale()).EqualizerSpotifyNote(link) }
+
+// EqualizerSpotifyNote says "The equalizer, its sound effects, balance and mono work only on what MixMusic plays itself: YouTube Music, Spotify tr…"
+// in the language of msgs.
+//
+// Under the equalizer, in Settings › Playback › Equalizer. {link} is
+// equalizerSpotifyNotes, a link to Spotify's page that says so.
 func (msgs Messages) EqualizerSpotifyNote(link string) string {
 	return Catalog.Format(msgs.locale, "equalizerSpotifyNote", map[string]any{"link": link})
 }
@@ -8684,6 +9662,22 @@ func (msgs Messages) EqualizerSpotifyNotes() string {
 	return Catalog.Format(msgs.locale, "equalizerSpotifyNotes", nil)
 }
 
+// EqualizerSurroundNote says "While 5.1 surround plays on six speakers, crossfeed and stereo width are skipped."
+// in the language the app shows.
+//
+// In Settings › Playback › Sound, under the Crossfeed and Stereo width
+// rows, while Play 5.1 surround is on.
+func EqualizerSurroundNote() string { return In(i18n.Locale()).EqualizerSurroundNote() }
+
+// EqualizerSurroundNote says "While 5.1 surround plays on six speakers, crossfeed and stereo width are skipped."
+// in the language of msgs.
+//
+// In Settings › Playback › Sound, under the Crossfeed and Stereo width
+// rows, while Play 5.1 surround is on.
+func (msgs Messages) EqualizerSurroundNote() string {
+	return Catalog.Format(msgs.locale, "equalizerSurroundNote", nil)
+}
+
 // EqualizerTitle says "Equalizer"
 // in the language the app shows.
 func EqualizerTitle() string { return In(i18n.Locale()).EqualizerTitle() }
@@ -8692,6 +9686,54 @@ func EqualizerTitle() string { return In(i18n.Locale()).EqualizerTitle() }
 // in the language of msgs.
 func (msgs Messages) EqualizerTitle() string {
 	return Catalog.Format(msgs.locale, "equalizerTitle", nil)
+}
+
+// EqualizerTreble says "Treble"
+// in the language the app shows.
+//
+// In Settings › Playback › Equalizer, in simple mode, the short name
+// under the slider of the high notes. Keep it short.
+func EqualizerTreble() string { return In(i18n.Locale()).EqualizerTreble() }
+
+// EqualizerTreble says "Treble"
+// in the language of msgs.
+//
+// In Settings › Playback › Equalizer, in simple mode, the short name
+// under the slider of the high notes. Keep it short.
+func (msgs Messages) EqualizerTreble() string {
+	return Catalog.Format(msgs.locale, "equalizerTreble", nil)
+}
+
+// EqualizerWidth says "Stereo width"
+// in the language the app shows.
+//
+// A row of Settings › Playback › Sound, and the name of its slider to
+// screen readers: how far apart the left and right sides sound.
+func EqualizerWidth() string { return In(i18n.Locale()).EqualizerWidth() }
+
+// EqualizerWidth says "Stereo width"
+// in the language of msgs.
+//
+// A row of Settings › Playback › Sound, and the name of its slider to
+// screen readers: how far apart the left and right sides sound.
+func (msgs Messages) EqualizerWidth() string {
+	return Catalog.Format(msgs.locale, "equalizerWidth", nil)
+}
+
+// EqualizerWidthAt says "{percent}%: at 0% the sound is mono, at 100% as recorded, and wider above."
+// in the language the app shows.
+//
+// Under Stereo width (equalizerWidth). {percent} is a whole number from 0
+// to 200.
+func EqualizerWidthAt(percent int) string { return In(i18n.Locale()).EqualizerWidthAt(percent) }
+
+// EqualizerWidthAt says "{percent}%: at 0% the sound is mono, at 100% as recorded, and wider above."
+// in the language of msgs.
+//
+// Under Stereo width (equalizerWidth). {percent} is a whole number from 0
+// to 200.
+func (msgs Messages) EqualizerWidthAt(percent int) string {
+	return Catalog.Format(msgs.locale, "equalizerWidthAt", map[string]any{"percent": percent})
 }
 
 // ErrorAddonsBuiltin says "add-ons MixMusic ships with cannot be removed"

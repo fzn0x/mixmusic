@@ -2631,6 +2631,40 @@
   "episodeTranscriptSource": "From the episode's captions on YouTube.",
   "episodeTranscriptTitle": "Transcript",
   "episodeTryAgain": "try again",
+  "equalizerAutoHeadroom": "Auto headroom",
+  "@equalizerAutoHeadroom": {
+    "description": "In Settings › Playback › Equalizer, a switch, and its name to screen readers: the preamp turns down by itself as much as the bands boost."
+  },
+  "equalizerAutoHeadroomDesc": "The preamp turns down as much as the bands boost, so that no note comes out louder than it went in. Moving the preamp turns it off.",
+  "@equalizerAutoHeadroomDesc": {
+    "description": "Under the Auto headroom switch (equalizerAutoHeadroom), in Settings › Playback › Equalizer."
+  },
+  "equalizerBalance": "Balance",
+  "@equalizerBalance": {
+    "description": "A row of Settings › Playback › Sound, and the name of its slider to screen readers: it weighs the left side of the sound against the right."
+  },
+  "equalizerBalanceCentre": "Even on both sides.",
+  "@equalizerBalanceCentre": {
+    "description": "Under Balance (equalizerBalance), while the slider is at its middle."
+  },
+  "equalizerBalanceLeft": "{percent}% to the left: the right side plays quieter.",
+  "@equalizerBalanceLeft": {
+    "description": "Under Balance (equalizerBalance), while the slider leans left. {percent} is a whole number from 1 to 100.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "equalizerBalanceRight": "{percent}% to the right: the left side plays quieter.",
+  "@equalizerBalanceRight": {
+    "description": "Under Balance (equalizerBalance), while the slider leans right. {percent} is a whole number from 1 to 100.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
   "equalizerBandDB": "{band} dB",
   "@equalizerBandDB": {
     "placeholders": {
@@ -2641,22 +2675,304 @@
   },
   "equalizerBands": "Bands",
   "equalizerBandsDesc": "The ten bands of the equalizer and its preamp, in dB: pre 32 64 125 250 500 1k 2k 4k 8k 16k Hz.",
+  "equalizerBass": "Bass",
+  "@equalizerBass": {
+    "description": "In Settings › Playback › Equalizer, in simple mode, the short name under the slider of the low notes, as under the bands' sliders their frequencies. Keep it short."
+  },
+  "equalizerCrossfeed": "Crossfeed",
+  "@equalizerCrossfeed": {
+    "description": "A row of Settings › Playback › Sound, for headphones, and the name of its slider to screen readers: each ear hears a little of the other side."
+  },
+  "equalizerCrossfeedAt": "{percent}%: each ear hears a little of the other side, softened, as from speakers.",
+  "@equalizerCrossfeedAt": {
+    "description": "Under Crossfeed (equalizerCrossfeed), while it is on. {percent} is a whole number from 5 to 100.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "equalizerCrossfeedOff": "Off. For headphones: each ear hears a little of the other side, softened, as from speakers.",
+  "@equalizerCrossfeedOff": {
+    "description": "Under Crossfeed (equalizerCrossfeed), while it is at 0%."
+  },
   "equalizerCustom": "Custom",
+  "equalizerDelete": "Delete",
+  "@equalizerDelete": {
+    "description": "A link under Preset, in Settings › Playback › Equalizer, while a preset of the user's plays, and the button of the question equalizerDeleteTitle: it deletes the preset."
+  },
+  "equalizerDeleteMessage": "The preset leaves the menu. The sound stays as it is.",
+  "@equalizerDeleteMessage": {
+    "description": "Under the title of the question equalizerDeleteTitle."
+  },
+  "equalizerDeleteTitle": "Delete {name}?",
+  "@equalizerDeleteTitle": {
+    "description": "The title of the question asked before a preset of the user's is deleted. {name} is the preset's name.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Desk speakers"
+      }
+    }
+  },
   "equalizerDesc": "Shape the sound of YouTube Music with ten bands and a preamp.",
+  "equalizerEffects": "Sound effects",
+  "@equalizerEffects": {
+    "description": "In Settings › Playback › Equalizer, the switch at the head of the group, and its name to screen readers: it turns the equalizer, crossfeed and stereo width on and off at once."
+  },
+  "equalizerEffectsDesc": "Off, the equalizer, crossfeed and stereo width stop at once, and keep their settings. Balance and mono still apply.",
+  "@equalizerEffectsDesc": {
+    "description": "Under the Sound effects switch (equalizerEffects), in Settings › Playback › Equalizer."
+  },
+  "equalizerEffectsOff": "Sound effects are off: crossfeed and stereo width wait until they're on again, in Settings › Playback › Equalizer.",
+  "@equalizerEffectsOff": {
+    "description": "In Settings › Playback › Sound, under the Crossfeed and Stereo width rows, while the Sound effects switch (equalizerEffects) is off."
+  },
+  "equalizerExport": "Export…",
+  "@equalizerExport": {
+    "description": "A link under Preset, in Settings › Playback › Equalizer, while a preset of the user's plays: it saves that preset as a JSON file."
+  },
+  "equalizerExportAll": "Export all…",
+  "@equalizerExportAll": {
+    "description": "A link under Preset, in Settings › Playback › Equalizer, while the user has presets of their own: it saves them all as a JSON file."
+  },
+  "equalizerExportFailed": "Couldn't export the presets: {error}",
+  "@equalizerExportFailed": {
+    "description": "A toast, when the file of Export… or Export all… couldn't be saved. {error} says why, from the system, as a lowercase fragment.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "equalizerExportTitle": "Export presets",
+  "@equalizerExportTitle": {
+    "description": "The title of the system's dialog that asks where to save the presets, after Export… or Export all…."
+  },
+  "equalizerExported": "{count, plural, one {Exported # preset as {file}} other {Exported # presets as {file}}}",
+  "@equalizerExported": {
+    "description": "A toast, once Export… or Export all… saved the presets. {file} is the file's name.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "file": {
+        "type": "String",
+        "example": "Presets.json"
+      }
+    }
+  },
+  "equalizerImport": "Import…",
+  "@equalizerImport": {
+    "description": "A link under Preset, in Settings › Playback › Equalizer: it adds the presets of a JSON file to the user's."
+  },
+  "equalizerImportFailed": "Couldn't import the presets: {error}",
+  "@equalizerImportFailed": {
+    "description": "A toast, when the file chosen after Import… couldn't be read. {error} says why, as a lowercase fragment, as equalizerImportNoPresets.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "equalizerImportNoPresets": "the file holds no equalizer presets",
+  "@equalizerImportNoPresets": {
+    "description": "Why a file didn't import, in the {error} of equalizerImportFailed: it isn't a file of presets, as Export… saves them."
+  },
+  "equalizerImportReplaceMessage": "{count, plural, one {One of your presets has the name of a preset in the file. Importing replaces it.} other {# of your presets have the names of presets in the file. Importing replaces them.}}",
+  "@equalizerImportReplaceMessage": {
+    "description": "Under the title of the question equalizerImportReplaceTitle.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equalizerImportReplaceTitle": "{count, plural, one {Replace # preset?} other {Replace # presets?}}",
+  "@equalizerImportReplaceTitle": {
+    "description": "The title of the question asked when presets of a file chosen after Import… have the names of presets of the user's.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equalizerImportTitle": "Import presets",
+  "@equalizerImportTitle": {
+    "description": "The title of the system's dialog that asks for a file of presets, after Import…."
+  },
+  "equalizerImported": "{count, plural, one {Imported # preset} other {Imported # presets}}",
+  "@equalizerImported": {
+    "description": "A toast, once Import… added the presets of a file to the user's.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equalizerMid": "Mid",
+  "@equalizerMid": {
+    "description": "In Settings › Playback › Equalizer, in simple mode, the short name under the slider of the middle notes. Keep it short."
+  },
+  "equalizerMono": "Mono",
+  "@equalizerMono": {
+    "description": "A row of Settings › Playback › Sound, with a switch, and the switch's name to screen readers."
+  },
+  "equalizerMonoDesc": "Both sides mixed on each, for hearing on one side or with one earbud.",
+  "@equalizerMonoDesc": {
+    "description": "Under Mono (equalizerMono), in Settings › Playback › Sound."
+  },
+  "equalizerNameBuiltin": "A built-in preset is called {name}. Choose another name.",
+  "@equalizerNameBuiltin": {
+    "description": "A toast, when the name given in the dialog of Save as… or Rename… is a built-in preset's, as it shows in the menu; the dialog shows again.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Rock"
+      }
+    }
+  },
+  "equalizerNameTooLong": "A preset's name can have up to {count} characters.",
+  "@equalizerNameTooLong": {
+    "description": "A toast, when the name given in the dialog of Save as… or Rename… is longer; the dialog shows again.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "equalizerPreamp": "pre",
   "equalizerPreset": "Preset",
   "equalizerPresetAcoustic": "Acoustic",
   "equalizerPresetBass": "Bass boost",
+  "equalizerPresetBassCut": "Bass reducer",
+  "@equalizerPresetBassCut": {
+    "description": "The name of a built-in preset of the equalizer, in its Preset menu: the low notes turned down."
+  },
+  "equalizerPresetClassical": "Classical",
+  "@equalizerPresetClassical": {
+    "description": "The name of a built-in preset of the equalizer, in its Preset menu, for classical music."
+  },
+  "equalizerPresetDance": "Dance",
+  "@equalizerPresetDance": {
+    "description": "The name of a built-in preset of the equalizer, in its Preset menu, for dance music."
+  },
+  "equalizerPresetDesc": "The built-in presets, then yours. Yours keep the bands, the preamp, balance, mono, crossfeed and stereo width.",
+  "@equalizerPresetDesc": {
+    "description": "Under Preset, in Settings › Playback › Equalizer, over the links of the user's presets."
+  },
   "equalizerPresetElectronic": "Electronic",
   "equalizerPresetFlat": "Flat",
+  "equalizerPresetHipHop": "Hip-hop",
+  "@equalizerPresetHipHop": {
+    "description": "The name of a built-in preset of the equalizer, in its Preset menu, for hip-hop."
+  },
+  "equalizerPresetJazz": "Jazz",
+  "@equalizerPresetJazz": {
+    "description": "The name of a built-in preset of the equalizer, in its Preset menu, for jazz."
+  },
   "equalizerPresetLateNight": "Late night",
+  "equalizerPresetLive": "Live",
+  "@equalizerPresetLive": {
+    "description": "The name of a built-in preset of the equalizer, in its Preset menu, for live recordings of concerts."
+  },
   "equalizerPresetLoFi": "Lo-fi",
+  "equalizerPresetMetal": "Metal",
+  "@equalizerPresetMetal": {
+    "description": "The name of a built-in preset of the equalizer, in its Preset menu, for heavy metal."
+  },
+  "equalizerPresetName": "Name",
+  "@equalizerPresetName": {
+    "description": "The name to screen readers of the field of a preset's name, in the dialogs of Save as… and Rename…."
+  },
+  "equalizerPresetPiano": "Piano",
+  "@equalizerPresetPiano": {
+    "description": "The name of a built-in preset of the equalizer, in its Preset menu, for piano music."
+  },
+  "equalizerPresetPop": "Pop",
+  "@equalizerPresetPop": {
+    "description": "The name of a built-in preset of the equalizer, in its Preset menu, for pop music."
+  },
+  "equalizerPresetRnB": "R&B",
+  "@equalizerPresetRnB": {
+    "description": "The name of a built-in preset of the equalizer, in its Preset menu, for rhythm and blues."
+  },
   "equalizerPresetRock": "Rock",
+  "equalizerPresetSmallSpeakers": "Small speakers",
+  "@equalizerPresetSmallSpeakers": {
+    "description": "The name of a built-in preset of the equalizer, in its Preset menu: for a laptop's or a phone's speakers, the lowest notes they can't play turned down."
+  },
+  "equalizerPresetSpoken": "Spoken word",
+  "@equalizerPresetSpoken": {
+    "description": "The name of a built-in preset of the equalizer, in its Preset menu: for podcasts and audiobooks, voices clearer."
+  },
   "equalizerPresetTreble": "Treble boost",
+  "equalizerPresetTrebleCut": "Treble reducer",
+  "@equalizerPresetTrebleCut": {
+    "description": "The name of a built-in preset of the equalizer, in its Preset menu: the high notes turned down."
+  },
   "equalizerPresetVocal": "Vocal",
-  "equalizerSpotifyNote": "The equalizer works only on YouTube Music, which MixMusic plays itself, Spotify tracks played from it included. For Spotify, use a system-wide equalizer: {link} that its audio settings can't change while another device plays it.",
+  "equalizerPresetWarm": "Warm",
+  "@equalizerPresetWarm": {
+    "description": "The name of a built-in preset of the equalizer, in its Preset menu: low notes fuller, high ones softer."
+  },
+  "equalizerPresetsFilter": "Equalizer presets",
+  "@equalizerPresetsFilter": {
+    "description": "In the system's dialogs of Export… and Import…, the name of the kind of file they save and open, JSON files."
+  },
+  "equalizerRename": "Rename…",
+  "@equalizerRename": {
+    "description": "A link under Preset, in Settings › Playback › Equalizer, while a preset of the user's plays: it opens a dialog to rename it."
+  },
+  "equalizerRenameButton": "Rename",
+  "@equalizerRenameButton": {
+    "description": "The button of the dialog equalizerRenameTitle that renames the preset."
+  },
+  "equalizerRenameTitle": "Rename preset",
+  "@equalizerRenameTitle": {
+    "description": "The title of the dialog Rename… (equalizerRename) opens."
+  },
+  "equalizerReplace": "Replace",
+  "@equalizerReplace": {
+    "description": "The button of the questions equalizerReplaceTitle and equalizerImportReplaceTitle that replaces the presets of the same names."
+  },
+  "equalizerReplaceMessage": "One of your presets has this name already. Replacing it keeps this one in its place.",
+  "@equalizerReplaceMessage": {
+    "description": "Under the title of the question equalizerReplaceTitle."
+  },
+  "equalizerReplaceTitle": "Replace {name}?",
+  "@equalizerReplaceTitle": {
+    "description": "The title of the question asked when a preset is saved or renamed under the name of one of the user's presets. {name} is that preset's name.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Desk speakers"
+      }
+    }
+  },
+  "equalizerSave": "Save",
+  "@equalizerSave": {
+    "description": "The button of the dialog of Save as… (equalizerSaveTitle) that saves the preset."
+  },
+  "equalizerSaveAs": "Save as…",
+  "@equalizerSaveAs": {
+    "description": "A button beside the Preset menu, in Settings › Playback › Equalizer: it saves the equalizer as a preset of the user's, under a name they give."
+  },
+  "equalizerSaveTitle": "Save preset",
+  "@equalizerSaveTitle": {
+    "description": "The title of the dialog Save as… (equalizerSaveAs) opens, which asks for the preset's name."
+  },
+  "equalizerSimple": "Simple mode",
+  "@equalizerSimple": {
+    "description": "In Settings › Playback › Equalizer, a switch, and its name to screen readers: three sliders, bass, mid and treble, in place of the ten bands."
+  },
+  "equalizerSimpleDesc": "Three sliders, bass, mid and treble, in place of the ten bands, which they move. Bass doubles as a bass boost.",
+  "@equalizerSimpleDesc": {
+    "description": "Under the Simple mode switch (equalizerSimple), in Settings › Playback › Equalizer."
+  },
+  "equalizerSpotifyNote": "The equalizer, its sound effects, balance and mono work only on what MixMusic plays itself: YouTube Music, Spotify tracks played from it, and the music on this computer. They don't reach a cast device, or Spotify played by Spotify. For Spotify, use a system-wide equalizer: {link} that its audio settings can't change while another device plays it.",
   "@equalizerSpotifyNote": {
-    "description": "Under the equalizer. {link} is equalizerSpotifyNotes, a link to Spotify's page that says so.",
+    "description": "Under the equalizer, in Settings › Playback › Equalizer. {link} is equalizerSpotifyNotes, a link to Spotify's page that says so.",
     "placeholders": {
       "link": {
         "type": "String",
@@ -2665,7 +2981,28 @@
     }
   },
   "equalizerSpotifyNotes": "Spotify notes",
+  "equalizerSurroundNote": "While 5.1 surround plays on six speakers, crossfeed and stereo width are skipped.",
+  "@equalizerSurroundNote": {
+    "description": "In Settings › Playback › Sound, under the Crossfeed and Stereo width rows, while Play 5.1 surround is on."
+  },
   "equalizerTitle": "Equalizer",
+  "equalizerTreble": "Treble",
+  "@equalizerTreble": {
+    "description": "In Settings › Playback › Equalizer, in simple mode, the short name under the slider of the high notes. Keep it short."
+  },
+  "equalizerWidth": "Stereo width",
+  "@equalizerWidth": {
+    "description": "A row of Settings › Playback › Sound, and the name of its slider to screen readers: how far apart the left and right sides sound."
+  },
+  "equalizerWidthAt": "{percent}%: at 0% the sound is mono, at 100% as recorded, and wider above.",
+  "@equalizerWidthAt": {
+    "description": "Under Stereo width (equalizerWidth). {percent} is a whole number from 0 to 200.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
   "errorAddonsBuiltin": "add-ons MixMusic ships with cannot be removed",
   "@errorAddonsBuiltin": {
     "description": "Why a theme or plugin wasn't removed, as a toast."

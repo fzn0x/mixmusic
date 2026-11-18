@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 
+	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/remote/remotetest"
 	"github.com/fzn0x/mixmusic/locales"
 )
@@ -24,7 +25,12 @@ func TestPseudoLocaleRemote(t *testing.T) {
 	pc := found(t, lap, "Desktop")
 	show(lap, lt, remotePath(pc.ID))
 	lap.a.Remote().Pair(pc.ID)
-	untilBoth(t, desk, dt, lap, lt, "the code", func() bool { _, ok := desk.a.Remote().Code(); return ok })
+	// The laptop takes a code only once it asks for one, which may come
+	// after the desktop shows it.
+	untilBoth(t, desk, dt, lap, lt, "the code", func() bool {
+		_, ok := desk.a.Remote().Code()
+		return ok && lap.a.Remote().View(pc.ID).Step == app.RemoteCodeAsked
+	})
 	code, _ := desk.a.Remote().Code()
 	wrong := "000000"
 	if code.Code == wrong {

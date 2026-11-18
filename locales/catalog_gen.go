@@ -9170,14 +9170,14 @@ func (msgs Messages) EqualizerPresetDance() string {
 	return Catalog.Format(msgs.locale, "equalizerPresetDance", nil)
 }
 
-// EqualizerPresetDesc says "The built-in presets, then yours. Yours keep the bands, the preamp, balance, mono, crossfeed and stereo width."
+// EqualizerPresetDesc says "The built-in presets, then yours, which keep all of the equalizer, with balance, mono, crossfeed and stereo width."
 // in the language the app shows.
 //
 // Under Preset, in Settings › Playback › Equalizer, over the links of
 // the user's presets.
 func EqualizerPresetDesc() string { return In(i18n.Locale()).EqualizerPresetDesc() }
 
-// EqualizerPresetDesc says "The built-in presets, then yours. Yours keep the bands, the preamp, balance, mono, crossfeed and stereo width."
+// EqualizerPresetDesc says "The built-in presets, then yours, which keep all of the equalizer, with balance, mono, crossfeed and stereo width."
 // in the language of msgs.
 //
 // Under Preset, in Settings › Playback › Equalizer, over the links of

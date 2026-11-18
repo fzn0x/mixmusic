@@ -5,15 +5,17 @@ import (
 	"testing"
 
 	"github.com/fzn0x/mixmusic/internal/settings"
+	"github.com/fzn0x/mixmusic/locales"
 )
 
-// TestEqualizerNote says the equalizer works only on YouTube Music, and
-// sends Spotify to the system's equalizer, linking Spotify's own note.
+// TestEqualizerNote says the equalizer and the sound effects work only on
+// what MixMusic plays itself, not on a cast device, and sends Spotify to
+// the system's equalizer, linking Spotify's own note.
 func TestEqualizerNote(t *testing.T) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 2400)
 	show(s, tt, "/settings/playback")
-	for _, want := range []string{"works only on YouTube Music", "use a system-wide equalizer", "Spotify notes"} {
+	for _, want := range []string{"work only on what MixMusic plays itself", "don't reach a cast device", "use a system-wide equalizer", "Spotify notes"} {
 		if !tt.HasText(want) {
 			t.Errorf("the equalizer doesn't say %q", want)
 		}
@@ -50,6 +52,10 @@ func TestEqualizerSliders(t *testing.T) {
 	// under the groups of Playback before them.
 	tt := testerOf(t, s, 1280, 3600)
 	show(s, tt, "/settings/playback")
+	// The group comes into view, under the rows of Sound and the groups
+	// of Playback before it.
+	s.find.reveal = locales.EqualizerTitle()
+	tt.Frame()
 	img := tt.Image()
 	near := func(c color.Color, want color.NRGBA) bool {
 		r, g, b, _ := c.RGBA()

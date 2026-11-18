@@ -19,6 +19,7 @@ func TestEqGainLabel(t *testing.T) {
 func TestEqualizerHalfDecibels(t *testing.T) {
 	s := newTestShell(t)
 	s.set.Equalizer.Enabled = true
+	s.set.Equalizer.AutoHeadroom = false // the preamp shows its own
 	s.set.Equalizer.Preamp = 1.5
 	s.set.Equalizer.Gains = make([]float64, 10)
 	s.set.Equalizer.Gains[1], s.set.Equalizer.Gains[2] = -0.5, 3

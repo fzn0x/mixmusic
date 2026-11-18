@@ -2857,7 +2857,7 @@
   "@equalizerPresetDance": {
     "description": "The name of a built-in preset of the equalizer, in its Preset menu, for dance music."
   },
-  "equalizerPresetDesc": "The built-in presets, then yours. Yours keep the bands, the preamp, balance, mono, crossfeed and stereo width.",
+  "equalizerPresetDesc": "The built-in presets, then yours, which keep all of the equalizer, with balance, mono, crossfeed and stereo width.",
   "@equalizerPresetDesc": {
     "description": "Under Preset, in Settings › Playback › Equalizer, over the links of the user's presets."
   },

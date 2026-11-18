@@ -50,9 +50,9 @@ func (a *App) startGoPlayer() (*player.Player, error) {
 	return p, nil
 }
 
-// applyEngine gives the engine the sound of the settings: the equalizer,
-// the levelling, Even loudness, the output of 5.1 surround, and the device
-// it plays on.
+// applyEngine gives the engine the sound of the settings: the equalizer
+// and the stages after it, the levelling, Even loudness, the output of 5.1
+// surround, and the device it plays on.
 func (a *App) applyEngine(s settings.Settings) {
 	e := a.nativeEngine()
 	if e == nil {
@@ -61,9 +61,7 @@ func (a *App) applyEngine(s settings.Settings) {
 	// The volume's curve, on which Spotify in MixMusic plays too
 	// (hereDevice.gain).
 	e.SetVolumeCurve(s.VolumeCurve)
-	var gains [len(audio.Bands)]float64
-	copy(gains[:], s.Equalizer.Gains)
-	e.SetEqualizer(s.Equalizer.Enabled, gains, s.Equalizer.Preamp)
+	applySound(e, s.Equalizer)
 	e.SetNormalize(s.Normalize)
 	e.SetLoudness(s.Loudness)
 	e.SetSurround(s.Surround)

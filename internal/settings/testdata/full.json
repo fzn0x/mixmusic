@@ -184,7 +184,40 @@
       0,
       0
     ],
-    "preamp": -3
+    "preamp": -3,
+    "autoHeadroom": false,
+    "simple": true,
+    "bass": 6,
+    "mid": -1.5,
+    "treble": 2,
+    "effects": false,
+    "balance": -25,
+    "mono": true,
+    "crossfeed": 40,
+    "width": 150,
+    "presets": [
+      {
+        "name": "Desk speakers",
+        "gains": [
+          3,
+          2,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          2,
+          3
+        ],
+        "preamp": -3.6,
+        "autoHeadroom": true,
+        "balance": 10,
+        "mono": false,
+        "crossfeed": 0,
+        "width": 120
+      }
+    ]
   },
   "volumeCurve": "linear",
   "volume": 0.5,

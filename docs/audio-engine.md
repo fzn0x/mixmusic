@@ -81,13 +81,14 @@ In order:
 4. **The two decks are mixed**, which a crossfade moves from one to the
    other.
 5. **The preamp and the equalizer** shape the sound.
-6. **Volume levelling**, when it's on, squeezes loud and quiet moments
+6. **Stereo width and crossfeed**, on stereo, then **mono and balance**.
+7. **Volume levelling**, when it's on, squeezes loud and quiet moments
    closer together.
-7. **The volume** of the slider.
-8. **The analyser** reads what you hear, for the visualizer and plugins.
-9. **The output** plays it on your device.
+8. **The volume** of the slider.
+9. **The analyser** reads what you hear, for the visualizer and plugins.
+10. **The output** plays it on your device.
 
-Steps 5 to 8 are ports of Chromium's Web Audio, the biquad filters,
+Steps 5 and 7 to 9 are ports of Chromium's Web Audio, the biquad filters,
 DynamicsCompressor and AnalyserNode of Blink, which MixMusic used while it
 ran in a web view, before 0.5.0. They match Chromium sample for sample, so
 MixMusic sounds as it did. Pausing and playing fade over 5 ms, so that
@@ -178,29 +179,89 @@ on Natural, whatever the curve.
 
 ## The equalizer
 
-Settings › Playback › Equalizer has ten bands and a preamp, each from
--12 dB to +12 dB in steps of half a decibel. The lowest band, 32 Hz, is a
-low shelf, the highest, 16 kHz, a high shelf, and the eight between are
-peaking filters at 64, 125, 250, 500 Hz and 1, 2, 4 and 8 kHz, with a Q of
-1.1. Choosing a preset turns the equalizer on; moving a band makes it
-Custom.
+Settings › Playback › Equalizer has ten bands, each from -12 dB to +12 dB
+in steps of half a decibel, and a preamp, from -30 dB to +12 dB. The
+lowest band, 32 Hz, is a low shelf, the highest, 16 kHz, a high shelf,
+and the eight between are peaking filters at 64, 125, 250, 500 Hz and 1,
+2, 4 and 8 kHz, with a Q of 1.1. Choosing a preset turns the equalizer
+on; moving a band makes it Custom.
 
 | Preset | 32 | 64 | 125 | 250 | 500 | 1k | 2k | 4k | 8k | 16k |
 |---|---|---|---|---|---|---|---|---|---|---|
 | Flat | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | Bass boost | +6 | +5 | +4 | +2 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Bass reducer | -6 | -5 | -4 | -2 | -1 | 0 | 0 | 0 | 0 | 0 |
 | Treble boost | 0 | 0 | 0 | 0 | 0 | +1 | +2 | +4 | +5 | +6 |
+| Treble reducer | 0 | 0 | 0 | 0 | 0 | -1 | -2 | -4 | -5 | -6 |
 | Vocal | -2 | -1 | 0 | +2 | +4 | +4 | +3 | +1 | 0 | -1 |
-| Electronic | +5 | +4 | +1 | 0 | -1 | +1 | 0 | +1 | +4 | +5 |
-| Rock | +4 | +3 | +2 | 0 | -1 | 0 | +2 | +3 | +4 | +4 |
+| Spoken word | -6 | -4 | -1 | +1 | +3 | +4 | +4 | +2 | 0 | -3 |
 | Acoustic | +3 | +2 | +1 | +1 | +2 | +1 | +2 | +2 | +2 | +1 |
+| Classical | +3 | +2 | +1 | 0 | 0 | 0 | -1 | -1 | +1 | +3 |
+| Dance | +6 | +5 | +2 | 0 | -1 | -2 | -1 | +1 | +3 | +4 |
+| Electronic | +5 | +4 | +1 | 0 | -1 | +1 | 0 | +1 | +4 | +5 |
+| Hip-hop | +6 | +5 | +2 | +3 | -1 | -1 | +1 | -1 | +2 | +3 |
+| Jazz | +3 | +2 | +1 | +2 | -1 | -1 | 0 | +1 | +2 | +3 |
+| Metal | +4 | +3 | +1 | -1 | -2 | 0 | +2 | +4 | +4 | +3 |
+| Piano | +1 | +1 | 0 | +2 | +3 | +1 | +3 | +4 | +2 | +2 |
+| Pop | -1 | 0 | +2 | +3 | +3 | +1 | 0 | 0 | +1 | +1 |
+| R&B | +4 | +6 | +4 | +1 | -2 | -1 | +2 | +2 | +3 | +3 |
+| Rock | +4 | +3 | +2 | 0 | -1 | 0 | +2 | +3 | +4 | +4 |
+| Live | -2 | 0 | +2 | +3 | +3 | +3 | +2 | +1 | +1 | +1 |
 | Late night | +4 | +3 | +1 | 0 | 0 | 0 | 0 | +1 | +2 | +3 |
 | Lo-fi | -3 | 0 | +3 | +4 | +2 | 0 | -2 | -4 | -6 | -8 |
+| Small speakers | -8 | -4 | +3 | +3 | +1 | 0 | 0 | +1 | +2 | +2 |
+| Warm | +3 | +3 | +2 | +1 | 0 | 0 | -1 | -1 | -2 | -3 |
 
 The gains are in dB. The equalizer shapes only what the engine plays.
 Spotify's own player, in MixMusic or on Spotify Connect, can't be changed
 by any app, as [Spotify notes](https://support.spotify.com/us/article/equalizer/):
 use a system-wide equalizer for it.
+
+**Auto headroom**, on by default, sets the preamp to the peak of the
+bands' summed response, the gain of all ten filters together, plus 0.5
+dB, as a cut, rounded down to a tenth of a decibel: no frequency comes
+out louder than it went in. The peak is looked for at 0 Hz, 96 points to
+an octave from 5 Hz to 24 kHz, and each band's own frequency. Bass boost
+gets a preamp of -7.2 dB, all ten bands at +12 dB one of -21.8 dB,
+and bands that only cut get none.
+
+**Simple mode** sets the ten bands from three sliders. Each band takes a
+share of Bass, Mid and Treble, the three shares adding up to 1, so that
+the three at one gain make the bands flat at it:
+
+| | 32 | 64 | 125 | 250 | 500 | 1k | 2k | 4k | 8k | 16k |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Bass | 1 | 1 | 0.8 | 0.4 | 0.1 | 0 | 0 | 0 | 0 | 0 |
+| Mid | 0 | 0 | 0.2 | 0.6 | 0.9 | 1 | 0.8 | 0.4 | 0.1 | 0 |
+| Treble | 0 | 0 | 0 | 0 | 0 | 0 | 0.2 | 0.6 | 0.9 | 1 |
+
+Turning simple mode on finds the three whose bands come nearest the ones
+set, by least squares, to the half decibel.
+
+### Balance, mono, crossfeed and width
+
+After the equalizer, the engine runs four stages of its own:
+
+- **Stereo width** scales the side signal, (L − R) / 2, by the width, from
+  0 to 2. Above 1 it turns the mid signal, (L + R) / 2, down by as much
+  instead of turning the side up, so that no sample goes past the larger
+  of the two it came from.
+- **Crossfeed** mixes into each side the other's copy through a one-pole
+  low-pass at 700 Hz, 4 samples late, about 0.3 ms with the low-pass's
+  own delay, and takes the side's own copy, as late, out of it, by the
+  same share: at 100%, the copy plays 4.5 dB below the side at the low
+  notes. What plays alike on both sides comes out as it went in. This is
+  Bauer's crossfeed for headphones, as bs2b's default makes it.
+- **Mono** moves each side to their mix.
+- **Balance** turns the side away from where it leans down, linearly: at
+  -40, the right plays at 60%.
+
+On 5.1, mono and balance take the front and the surround pairs, and leave
+the centre and the subwoofer; width and crossfeed are skipped. Sound
+effects off has the equalizer glide flat, and width and crossfeed to
+neutral, keeping their settings. Each stage glides to a new setting with
+the volume's time constant, 20 ms, and is skipped once it rests at
+neutral, so that the samples come out as they went in.
 
 ## Crossfade and the next track
 

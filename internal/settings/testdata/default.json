@@ -133,7 +133,18 @@
       0,
       0
     ],
-    "preamp": 0
+    "preamp": 0,
+    "autoHeadroom": true,
+    "simple": false,
+    "bass": 0,
+    "mid": 0,
+    "treble": 0,
+    "effects": true,
+    "balance": 0,
+    "mono": false,
+    "crossfeed": 0,
+    "width": 100,
+    "presets": []
   },
   "volumeCurve": "natural",
   "volume": 0.8,

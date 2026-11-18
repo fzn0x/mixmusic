@@ -52,6 +52,14 @@
   less its LAME tag's delay and padding, else its first frame's bitrate
   and its size. With ffmpeg on the PATH, the tests play a file of each
   kind it makes against its decode.
+  After the equalizer, `sound.go` runs the stages of #615: stereo width
+  and crossfeed, on stereo alone, then mono and balance (`SetSound`),
+  each gliding as the volume does and skipped while it rests at neutral;
+  `headroom.go` sums the bands' response for Auto headroom's preamp
+  (`Headroom`). `internal/app/sound.go` gives the engine what the
+  settings say, Sound effects off making the equalizer flat and width
+  and crossfeed neutral, and `internal/settings` keeps the user's
+  presets (`Equalizer.Save`, `EncodePresets`).
   `internal/audio/output` plays it on the system's output, without cgo:
   through WASAPI on Windows, an Audio Queue on macOS, and PulseAudio,
   which PipeWire serves too, or ALSA on Linux. `Devices` lists the

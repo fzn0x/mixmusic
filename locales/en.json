@@ -1483,9 +1483,9 @@
   "@computerFolderDenied": {
     "description": "Why a music folder can't be read, in the {problem} of computerSettingsProblem, in Settings › This computer: the system doesn't let MixMusic read it."
   },
-  "computerFolderMissing": "It isn't there: is its drive plugged in?",
+  "computerFolderMissing": "It isn't there: its drive may be unplugged",
   "@computerFolderMissing": {
-    "description": "Why a music folder can't be read, in the {problem} of computerSettingsProblem, in Settings › This computer."
+    "description": "Why a music folder can't be read, in the {problem} of computerSettingsProblem, in Settings › This computer: it isn't where it was, as on a drive unplugged. computerSettingsProblem puts a full stop after it, so it ends without one, and without a question mark."
   },
   "computerFolderUnreadable": "It can't be read",
   "@computerFolderUnreadable": {

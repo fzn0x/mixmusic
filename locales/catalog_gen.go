@@ -5074,18 +5074,22 @@ func (msgs Messages) ComputerFolderDenied() string {
 	return Catalog.Format(msgs.locale, "computerFolderDenied", nil)
 }
 
-// ComputerFolderMissing says "It isn't there: is its drive plugged in?"
+// ComputerFolderMissing says "It isn't there: its drive may be unplugged"
 // in the language the app shows.
 //
 // Why a music folder can't be read, in the {problem} of
-// computerSettingsProblem, in Settings › This computer.
+// computerSettingsProblem, in Settings › This computer: it isn't where it
+// was, as on a drive unplugged. computerSettingsProblem puts a full stop
+// after it, so it ends without one, and without a question mark.
 func ComputerFolderMissing() string { return In(i18n.Locale()).ComputerFolderMissing() }
 
-// ComputerFolderMissing says "It isn't there: is its drive plugged in?"
+// ComputerFolderMissing says "It isn't there: its drive may be unplugged"
 // in the language of msgs.
 //
 // Why a music folder can't be read, in the {problem} of
-// computerSettingsProblem, in Settings › This computer.
+// computerSettingsProblem, in Settings › This computer: it isn't where it
+// was, as on a drive unplugged. computerSettingsProblem puts a full stop
+// after it, so it ends without one, and without a question mark.
 func (msgs Messages) ComputerFolderMissing() string {
 	return Catalog.Format(msgs.locale, "computerFolderMissing", nil)
 }

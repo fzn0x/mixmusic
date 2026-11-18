@@ -54,8 +54,8 @@ func (p *Player) askRadioAhead() {
 }
 
 // waitRadioAhead has then, of a move past the end of the queue, wait for
-// the radio of seed asked for ahead, and tells whether it does: no such
-// radio is on its way, and the move asks for its own.
+// the radio of seed asked for ahead, and tells whether it does. Without
+// such a radio on its way, the move asks for its own.
 func (p *Player) waitRadioAhead(seed Item, then func(added bool, err error)) bool {
 	a := p.radioAhead
 	if a == nil || !a.asking || a.seed != seed.UID {

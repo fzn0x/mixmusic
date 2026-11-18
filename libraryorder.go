@@ -33,9 +33,23 @@ type libraryOrder struct {
 	mixes string
 	side  string
 	// playlists are the searches of the services' playlists, by their
-	// keys.
+	// keys, and views the views made last of them.
 	playlists map[string]*string
+	views     map[string]*playlistsMemo
 	focus     string
+}
+
+// playlistsMemo is the view made last of a service's playlists: of the
+// list of, searched for query, in the sort of sort and descending, with
+// the pins and the hidden of the library at version. A library of
+// thousands sorts once, not in every frame.
+type playlistsMemo struct {
+	of         []media.Playlist
+	query      string
+	sort       string
+	descending bool
+	version    uint64
+	view       []media.Playlist
 }
 
 // playlistsQuery is the search of the playlists of the service of key.
@@ -339,9 +353,30 @@ func playlistSortLabels(service string) []string {
 }
 
 // playlistsView returns the playlists of a service's library, of list,
-// that the library shows: those the user didn't hide, whose titles hold
-// the words of query, as the user sorted them, the pinned ones first.
-func (s *shell) playlistsView(list []media.Playlist, query string) []media.Playlist {
+// that the library of key shows: those the user didn't hide, whose titles
+// hold the words of query, as the user sorted them, the pinned ones
+// first. It makes them again only when one of those changed (the lists
+// of a service are replaced as they change, not changed in place).
+func (s *shell) playlistsView(key string, list []media.Playlist, query string) []media.Playlist {
+	if s.order.views == nil {
+		s.order.views = map[string]*playlistsMemo{}
+	}
+	m := s.order.views[key]
+	if m == nil {
+		m = &playlistsMemo{}
+		s.order.views[key] = m
+	}
+	same := len(m.of) == len(list) && (len(list) == 0 || &m.of[0] == &list[0])
+	version := s.svc.Collection.Version()
+	if !same || m.view == nil || m.query != query || m.sort != s.set.PlaylistsSort || m.descending != s.set.PlaylistsDescending || m.version != version {
+		m.view = s.playlistsSorted(list, query)
+		m.of, m.query, m.sort, m.descending, m.version = list, query, s.set.PlaylistsSort, s.set.PlaylistsDescending, version
+	}
+	return m.view
+}
+
+// playlistsSorted is playlistsView, made anew.
+func (s *shell) playlistsSorted(list []media.Playlist, query string) []media.Playlist {
 	col := s.svc.Collection
 	out := make([]media.Playlist, 0, len(list))
 	for _, p := range list {

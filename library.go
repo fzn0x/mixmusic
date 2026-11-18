@@ -250,7 +250,7 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 	// ones first.
 	playlistList, albumList, artistList := playlists.shown(), albums.shown(), artists.shown()
 	query := s.order.playlistsQuery(key)
-	view := s.playlistsView(playlistList, strings.TrimSpace(*query))
+	view := s.playlistsView(key, playlistList, strings.TrimSpace(*query))
 	if len(playlistList) > 0 {
 		s.sortTools(c, key+"-playlists", locales.LibraryPlaylistsSearchPlaceholder(), locales.LibraryPlaylistsSearchLabel(), query,
 			settings.PlaylistsSorts, playlistSortLabels(sourceName(source)), &s.set.PlaylistsSort, &s.set.PlaylistsDescending, len(view), len(playlistList))

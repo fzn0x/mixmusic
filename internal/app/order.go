@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"slices"
+	"sync"
 
 	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/media"
@@ -15,11 +17,29 @@ import (
 // of a service go once its whole library, listed under the account they
 // were seen under, lacks them.
 
+// mixMemo is the mixes as they were sorted last: of the library at
+// version, by sort, the other way when descending. The window lists them
+// in every frame, which sorts them once.
+type mixMemo struct {
+	mu         sync.Mutex
+	version    uint64
+	sort       string
+	descending bool
+	list       []media.Playlist
+}
+
 // sortedMixes returns the mixes, without their tracks, as the user sorted
-// them, the pinned ones first.
+// them, the pinned ones first, in a slice of the caller's own.
 func (a *App) sortedMixes() []media.Playlist {
 	set := a.settings.Get()
-	return a.library.SortedPlaylists(set.MixesSort, set.MixesDescending)
+	m := &a.mixes
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if v := a.library.Version(); m.list == nil || m.version != v || m.sort != set.MixesSort || m.descending != set.MixesDescending {
+		m.list = a.library.SortedPlaylists(set.MixesSort, set.MixesDescending)
+		m.version, m.sort, m.descending = v, set.MixesSort, set.MixesDescending
+	}
+	return slices.Clone(m.list)
 }
 
 // MovePlaylist moves the mix id onto the mix onto, in the user's own

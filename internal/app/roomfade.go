@@ -32,7 +32,7 @@ func (s roomStream) Crossfade(url string, d time.Duration, cue audio.Cue) error 
 	if cue.Track == nil || h == nil || h.server.Listeners() == 0 {
 		return s.Stream.Crossfade(url, d, cue)
 	}
-	s.Stream.Preload(url)
+	s.Stream.Preload(url, audio.Cue{Speed: cue.Speed})
 	entry := a.roomEntry(cue.Track.ID)
 	asked := time.Now()
 	seq := held.hold(func() error { return s.Stream.Crossfade(url, max(d-time.Since(asked), d/4), cue) })

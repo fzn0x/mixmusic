@@ -154,7 +154,9 @@ tracks down to one level, so that none jumps out.
   level and a quiet recording turned up could clip. Loud masters are
   common, so many tracks play 4 to 7 dB quieter than with it off.
 - **When.** A track takes its level with its first sample, so it never
-  starts loud; a later change glides.
+  starts loud; a later change glides. The next song of the same album,
+  following on without a crossfade, starts at the level of the one before
+  and glides to its own over a few seconds.
 - **Offline.** MixMusic keeps the measures of the tracks you played in
   `loudness.json` in its cache folder, so cached and downloaded tracks
   keep their level without the network.
@@ -351,11 +353,37 @@ seconds; at 0, the default, it is off.
   behind it. Played again, it fades while there's time, or the next one
   starts as it ends.
 
-**Without a crossfade**, the next track is ready before its turn: a second
-into a track, MixMusic finds the next one's stream, and ten seconds in, it
-fetches its audio and decodes its start on the other deck. When the track
-ends, the decks swap and the next track starts at once, without loading.
-Live streams and episodes are not fetched ahead.
+**Without a crossfade**, the next track starts on the sample right after
+the last one of the track before, with no silence and no fade-in, at any
+speed and in every format the engine plays: there is nothing to set.
+That holds with Crossfade off, between the songs of an album that Keep
+albums gapless plays straight on, and wherever a track ends without a
+crossfade, so music that runs on, as a live album does, never stops at a
+track change.
+
+- **Ready before its turn.** A second into a track, MixMusic finds the
+  next one's stream, and ten seconds in, it fetches its audio and decodes
+  its start on the other deck, armed to follow the one playing. As that
+  one has played all it holds, its speed's stretch too, the engine fills
+  the rest of what it renders from the other deck, at full level, and
+  makes it the one that plays. The app, the media controls and Discord
+  see one track change, as after a crossfade.
+- **What disarms it.** A change to the queue, Shuffle or Repeat, a next
+  track newly passed over, or a move to a cast device: the next track
+  that plays then starts as below. A speed changed meanwhile reaches the
+  next track too.
+- **Songs of one album** under Even loudness: the next one starts at the
+  level of the one before and glides to its own over a few seconds, so
+  that the album doesn't step in level.
+- **As before**, a next track whose audio wasn't fetched in time loads as
+  the one before ends, and starts once it has, and so do live streams and
+  podcast episodes, which are never fetched ahead, tracks on a cast device
+  and tracks Spotify plays. While friends listen to a room you host, the
+  next track waits for them, as it always has.
+- **The ends of tracks.** The decoders drop the samples an encoder adds
+  at both ends of a track, as its file tells them, and YouTube's Opus
+  files tell their ends to the sample. A few of YouTube's files start
+  with up to 20 ms of near silence of their own, which plays.
 
 ## Speed, at the track's own pitch
 
@@ -370,7 +398,9 @@ Each window is taken from about where the speed puts it, within 15 ms
 either way, at the place that best continues the window before it, so
 that their overlap adds up in phase rather than smearing. At 1× the track
 plays as it is, with nothing in between. The six channels of 5.1 are cut
-at the same places, so they stay together.
+at the same places, so they stay together. The windows stay within the
+track: its last 50 ms at most play as they are, so that it ends on its own
+last sample, rather than fade into silence, and the next one follows on.
 
 The clock, the seek bar and synced lyrics keep the track's own time.
 Spotify's players and live streams keep their own speed, and the speed

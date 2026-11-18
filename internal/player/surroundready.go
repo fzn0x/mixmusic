@@ -70,7 +70,9 @@ func (p *Player) playsSurround() bool {
 
 // loadAudio has the engine load the audio of src, the current entry's
 // stream, that audioOf gives, as cue asks, and keeps which it is. A try
-// again asks for it anew.
+// again asks for it anew. The engine lets go of the next entry's audio it
+// held, which loads again as the track plays on, armed to follow it, but
+// after a try again, once the stream holds (retryStream).
 func (p *Player) loadAudio(src Source, cue audio.Cue, again bool) {
 	url := p.audioOf(src)
 	p.inSurround = src.SurroundURL != "" && url == src.SurroundURL
@@ -78,6 +80,10 @@ func (p *Player) loadAudio(src Source, cue audio.Cue, again bool) {
 		url += "?retry=" + strconv.FormatInt(time.Now().UnixMilli(), 10)
 	}
 	p.currentParts(url, src)
+	p.ahead = aheadState{}
+	if !again {
+		p.prefetched = ""
+	}
 	_ = p.stream.Load(url, cue)
 }
 

@@ -283,7 +283,10 @@ func (s engineStream) Stop() {
 // track.
 func (s engineStream) Unload() { s.e.Unload() }
 
-func (s engineStream) Preload(url string)     { s.e.Preload(url) }
+// Preload loads the next track on the engine's other deck, armed as cue
+// asks to follow the one that plays.
+func (s engineStream) Preload(url string, cue audio.Cue) { s.e.Preload(url, cue) }
+
 func (s engineStream) Play() error            { return s.e.Play() }
 func (s engineStream) Pause()                 { s.e.Pause() }
 func (s engineStream) Seek(t time.Duration)   { s.e.Seek(t) }

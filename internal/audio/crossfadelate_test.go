@@ -245,7 +245,7 @@ func TestEngineCrossfadePausedPastItsEnd(t *testing.T) {
 	buffered(t, e, 0, ringFrames/2)
 	e.Play()
 	dev.play(t, 188*quantum)
-	e.Preload(speech)
+	e.Preload(speech, Cue{})
 	buffered(t, e, 1, ringFrames/2)
 	const fade = 300 * time.Millisecond
 	if err := e.Crossfade(speech, fade, Cue{}); err != nil {

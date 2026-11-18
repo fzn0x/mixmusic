@@ -489,7 +489,7 @@ func TestEngineCrossfadesIntoAAC(t *testing.T) {
 	e.Play()
 	at := 188 * quantum
 	dev.play(t, at)
-	e.Preload(aacFragments + "#-11")
+	e.Preload(aacFragments+"#-11", Cue{})
 	buffered(t, e, 1, ringFrames/2)
 	const fade = 300 * time.Millisecond
 	if err := e.Crossfade(aacFragments+"#-11", fade, Cue{}); err != nil {

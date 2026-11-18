@@ -6177,6 +6177,15 @@
   "@playlistImportSure": {
     "description": "On a song of an import, before the track found: MixMusic is sure it's the song. Also a segment above the songs to review, which shows those found."
   },
+  "playlistImportTextFailed": "Couldn't import the text: {error}",
+  "@playlistImportTextFailed": {
+    "description": "A toast, when the text the user pasted to import holds no songs MixMusic reads. {error} is why, as playlistImportErrNoSongs.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "playlistImportTick": "Import {title}",
   "@playlistImportTick": {
     "description": "What screen readers say of the check box of a song of an import, on the page that imports playlists.",

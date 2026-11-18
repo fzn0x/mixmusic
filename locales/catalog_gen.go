@@ -20106,6 +20106,24 @@ func (msgs Messages) PlaylistImportSure() string {
 	return Catalog.Format(msgs.locale, "playlistImportSure", nil)
 }
 
+// PlaylistImportTextFailed says "Couldn't import the text: {error}"
+// in the language the app shows.
+//
+// A toast, when the text the user pasted to import holds no songs MixMusic
+// reads. {error} is why, as playlistImportErrNoSongs.
+func PlaylistImportTextFailed(error string) string {
+	return In(i18n.Locale()).PlaylistImportTextFailed(error)
+}
+
+// PlaylistImportTextFailed says "Couldn't import the text: {error}"
+// in the language of msgs.
+//
+// A toast, when the text the user pasted to import holds no songs MixMusic
+// reads. {error} is why, as playlistImportErrNoSongs.
+func (msgs Messages) PlaylistImportTextFailed(error string) string {
+	return Catalog.Format(msgs.locale, "playlistImportTextFailed", map[string]any{"error": error})
+}
+
 // PlaylistImportTick says "Import {title}"
 // in the language the app shows.
 //

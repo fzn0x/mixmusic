@@ -190,6 +190,20 @@ belongs to its main thread: what finishes elsewhere comes back through
   fill in frames that only paint again; Reduce Motion lights each word
   whole as it starts. Lines shown in Latin letters in their place light
   whole.
+- **The lyrics' time** (`lyricsoffset.go`, #610) is the song's, moved by
+  the timing of the track's lyrics (`Catalog.LyricsOffset`, kept by
+  `internal/app`'s `lyricsoffset.go` in `lyrics-offsets/`, for the lyrics
+  of one source) and by Settings' `LyricsOffset`, a delay of the output
+  that grows with the speed: `lyricsShift`. Every view of the line sung
+  now (the panel, the page, the stage, the mini player and the notch)
+  takes it from `lyricsAt`, which adds `lyricsLead`, and the words lit
+  from `sungOptions.shift`, which moves the song's clock and not the
+  lines, so that the romanization's and translation's keys stay. A line
+  clicked seeks to its time less the shift (`seekLine`). The timing
+  above the lyrics (`songTiming`) sits in `lyricsSwitches`, beside synced
+  and plain text, without a label, so that the choices above the lyrics
+  keep to one line on the now playing page; its field shows words
+  without the focus and milliseconds with it (`timingField`).
 - **The full-screen lyrics** (`lyricsstage.go`) are a `DialogBase` whose
   panel fills the window, so that no click falls on its backdrop, and
   that shows the lyrics of the panel and of the now playing page, which

@@ -70,6 +70,9 @@ AppImage or archive copy's.
 - `local-copies.json`: the [copies of one song](local-music.md#copies-of-one-song)
   among those files, the ones you linked or unlinked by hand, and what
   each copy's audio is.
+- `lyrics-offsets/`: how far you moved the lyrics of a track earlier or
+  later, with [their timing](lyrics.md#timing), and their source, a file
+  each, for 10,000 tracks at most.
 - `queue.json`: up to 500 tracks of the queue, around the one playing,
   and where it was; while you're in a room of
   [Listen with friends](listen-with-friends.md), yours as it was as you

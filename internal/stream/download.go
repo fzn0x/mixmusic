@@ -107,6 +107,19 @@ func (s Stream) Container() string {
 	return ""
 }
 
+// resolveStereo is resolve for a download, which keeps the stereo audio
+// alone: no 5.1 audio is looked for behind it (Resolver.resolveStereo).
+func (p *Proxy) resolveStereo(ctx context.Context, videoID string) (Stream, error) {
+	s, err := p.Resolver.resolveStereo(ctx, videoID)
+	if err != nil {
+		return s, err
+	}
+	if err := p.served(ctx, videoID, s); err != nil {
+		return Stream{}, err
+	}
+	return s, nil
+}
+
 // Download fetches the whole audio of a video into w, to keep on disk: in
 // chunks, as the proxy serves it, once YouTube serves a stream yt-dlp just
 // found. It finds the stream again when YouTube refuses its URL, and
@@ -122,7 +135,7 @@ func (s Stream) Container() string {
 // address. A writer that fails ends it with the writer's error, as of a
 // full disk.
 func (p *Proxy) Download(ctx context.Context, videoID string, resume func(s Stream) (int64, error), w io.Writer, progress func(done, size int64)) (Stream, error) {
-	s, err := p.resolve(ctx, videoID)
+	s, err := p.resolveStereo(ctx, videoID)
 	if err != nil {
 		return s, err
 	}
@@ -186,7 +199,7 @@ func (p *Proxy) Download(ctx context.Context, videoID string, resume func(s Stre
 			// each chunk, and must be of the same version to go on.
 			again = true
 			p.Resolver.Forget(videoID)
-			found, err := p.resolve(ctx, videoID)
+			found, err := p.resolveStereo(ctx, videoID)
 			if err != nil {
 				return s, err
 			}

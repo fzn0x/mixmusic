@@ -171,7 +171,8 @@ func (a *App) listenbrainzCheck(ctx context.Context, token, server string) (list
 	case errors.Is(err, listenbrainz.ErrTokenRefused):
 		return listenbrainzCredentials{}, errListenBrainzToken
 	case err != nil:
-		return listenbrainzCredentials{}, fmt.Errorf("MixMusic couldn't check the token with the server, so nothing was kept: check its address and your connection (%v)", err)
+		return listenbrainzCredentials{}, wordedLater(fmt.Sprintf("MixMusic couldn't check the token with the server, so nothing was kept: check its address and your connection (%v)", err),
+			func() string { return locales.ListenBrainzSettingsCheckFailed(ErrorText(err)) }, nil)
 	}
 	c := listenbrainzCredentials{Token: token, Name: name}
 	if addr != listenbrainz.DefaultServer {

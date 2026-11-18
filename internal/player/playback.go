@@ -519,6 +519,7 @@ func (p *Player) setLive(live bool) {
 func (p *Player) stopStream() {
 	p.loaded = false
 	p.unsounded = false
+	p.ahead = aheadState{} // the engine lets go of it
 	p.stream.Stop()
 }
 
@@ -783,8 +784,9 @@ func (p *Player) preload(next Item) {
 		// behind its live edge by then. Nor is an episode, which the
 		// engine would hold whole beside the track that plays.
 		if err == nil && src.Mode == ModeStream && src.URL != "" && !src.Live && !spoken(next.Track) {
-			p.partsFor(src.audio(p.surround), src)
-			p.stream.Preload(src.audio(p.surround))
+			url := src.audio(p.surround)
+			p.partsFor(url, src)
+			p.holdAhead(next.UID, src, url)
 		}
 		if errors.Is(err, ErrOffline) {
 			p.prefetchOnline(next.UID)
@@ -840,37 +842,52 @@ func (p *Player) crossfadeTo(next Item, fade time.Duration) {
 		if i < 0 || p.s.Queue[i].Skip != "" {
 			return // gone, labeled or found explicit meanwhile: it's passed over in turn
 		}
-		p.fadingInto(next)
-		p.loadToken++
-		p.retry = retryState{}
-		p.stereoOnly = false
-		p.stopReadying()
-		p.readyURL = ""
-		p.endWait()
-		p.markPlayed(next.UID)
-		p.askedAt = time.Time{}
-		p.unsounded = false // it fades in under the track that ends
-		p.s.Index = i
-		p.s.Position = 0
-		p.s.Duration = ms(next.Track.DurationMs)
-		p.s.Source = &src
-		p.setLive(src.Live)
-		p.s.Error = ""
-		// The track fading out keeps its speed, and next plays at its own.
-		p.s.Speed = speedOf(p.svc.Settings(), next.Track, p.s.Live)
-		p.emit(TrackChange)
-		p.report()
-		p.loaded = true
+		p.becomeCurrent(i, next, src)
 		p.paused = false
-		// Its 5.1 audio, while it isn't ready, plays once it is and the fade
-		// ended.
-		p.knowReady(src)
 		url := p.audioOf(src)
-		p.inSurround = src.SurroundURL != "" && url == src.SurroundURL
-		p.currentParts(url, src)
+		p.playsAudio(url, src)
 		_ = p.stream.Crossfade(url, fade, p.cue(0, false))
 		p.readySurround()
 	})
+}
+
+// becomeCurrent takes in next, of src, at i in the queue, becoming the
+// current entry as it starts under the track before, which the engine
+// fades out, or which ended on the sample before (follow.go): the engine
+// tells no start of it, and plays the next entry's audio it held.
+func (p *Player) becomeCurrent(i int, next Item, src Source) {
+	p.fadingInto(next)
+	p.loadToken++
+	p.retry = retryState{}
+	p.stereoOnly = false
+	p.stopReadying()
+	p.readyURL = ""
+	p.endWait()
+	p.markPlayed(next.UID)
+	p.askedAt = time.Time{}
+	p.unsounded = false // it fades in under the track that ends
+	p.s.Index = i
+	p.s.Position = 0
+	p.s.Duration = ms(next.Track.DurationMs)
+	p.s.Source = &src
+	p.setLive(src.Live)
+	p.s.Error = ""
+	// The track fading out keeps its speed, and next plays at its own.
+	p.s.Speed = speedOf(p.svc.Settings(), next.Track, p.s.Live)
+	p.emit(TrackChange)
+	p.report()
+	p.loaded = true
+	p.ahead = aheadState{}
+	// Its 5.1 audio, while it isn't ready, plays once it is and the fade
+	// ended.
+	p.knowReady(src)
+}
+
+// playsAudio keeps that the engine plays url, the 5.1 audio or the stereo
+// audio of src, the current entry's stream, whose parts it passes over.
+func (p *Player) playsAudio(url string, src Source) {
+	p.inSurround = src.SurroundURL != "" && url == src.SurroundURL
+	p.currentParts(url, src)
 }
 
 func (p *Player) play() {

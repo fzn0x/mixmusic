@@ -281,7 +281,10 @@ func (o *castOut) loadFailure(err error, fetched bool) error {
 	return worded("The cast device couldn't play the track: "+err.Error(), locales.CastCouldntPlay(err.Error()), nil)
 }
 
-func (o *castOut) Preload(rawURL string) { o.preload(rawURL) }
+// Preload hands a device that queues the next track ahead (castnext.go).
+// The cue's follow is the engine's alone: the player arms none on a cast
+// device, which plays one stream at a time.
+func (o *castOut) Preload(rawURL string, _ audio.Cue) { o.preload(rawURL) }
 
 // Crossfade plays url at once: a cast device plays one stream at a time.
 // The player doesn't crossfade on one.

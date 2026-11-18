@@ -178,6 +178,9 @@ type fakeStream struct {
 	from   time.Duration
 	fresh  bool
 	silent map[string]bool
+	// ahead is the URL the engine's other deck holds, as Preload loaded it,
+	// until Load, Crossfade or Stop let go of it.
+	ahead string
 }
 
 func (s *fakeStream) record(format string, args ...any) {
@@ -198,7 +201,7 @@ func atSpeed(speed float64) string {
 func (s *fakeStream) Load(url string, cue audio.Cue) error {
 	s.record("load %s %v %v%s", url, cue.Start, cue.Autoplay, atSpeed(cue.Speed))
 	s.mu.Lock()
-	s.url, s.paused = url, true
+	s.url, s.paused, s.ahead = url, true, ""
 	s.from, s.fresh = cue.Start, cue.Autoplay
 	s.mu.Unlock()
 	if cue.Autoplay {
@@ -207,10 +210,34 @@ func (s *fakeStream) Load(url string, cue audio.Cue) error {
 	return nil
 }
 
-func (s *fakeStream) Preload(url string) { s.record("preload %s", url) }
+// Preload records a preload of a track the engine's other deck doesn't
+// hold, as the engine loads one, and how the deck is armed to follow the
+// track that plays, while it is.
+func (s *fakeStream) Preload(url string, cue audio.Cue) {
+	s.mu.Lock()
+	held := s.ahead == url
+	s.ahead = url
+	s.mu.Unlock()
+	if !held {
+		s.record("preload %s", url)
+	}
+	if held || cue.Follow {
+		speed, glide := cue.Speed, ""
+		if speed == 0 {
+			speed = 1 // the track's own, as the engine takes it
+		}
+		if cue.Glide {
+			glide = " glide"
+		}
+		s.record("arm %s %v%s%s", url, cue.Follow, atSpeed(speed), glide)
+	}
+}
 
 func (s *fakeStream) Crossfade(url string, d time.Duration, cue audio.Cue) error {
 	s.record("crossfade %s %v%s", url, d, atSpeed(cue.Speed))
+	s.mu.Lock()
+	s.ahead = ""
+	s.mu.Unlock()
 	return nil
 }
 
@@ -269,7 +296,7 @@ func (s *fakeStream) Stop() {
 	s.record("stop")
 	s.mu.Lock()
 	was := s.paused
-	s.paused, s.url = true, ""
+	s.paused, s.url, s.ahead = true, "", ""
 	s.mu.Unlock()
 	if !was {
 		s.p.Playing(false)

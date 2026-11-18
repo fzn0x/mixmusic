@@ -319,7 +319,10 @@ type Services interface {
 type Stream interface {
 	// Load and Crossfade start a track as cue asks, as the engine's do.
 	Load(url string, cue audio.Cue) error
-	Preload(url string)
+	// Preload loads the next track on the engine's other deck, armed to
+	// follow the one that plays on its next sample as cue asks: Preload
+	// of the track it holds takes cue alone, as the engine's does.
+	Preload(url string, cue audio.Cue)
 	Crossfade(url string, d time.Duration, cue audio.Cue) error
 	// Fading reports whether the crossfade Crossfade started plays on, as
 	// the engine's does: a next track whose audio is late, or a pause,
@@ -501,6 +504,9 @@ type Player struct {
 	// albums is how the next entry plays, as it was prepared, which tells
 	// whether a Spotify album plays straight on into it (gapless.go).
 	albums gaplessState
+	// ahead is the next entry's audio the engine holds on its other deck,
+	// which follows the current track on its next sample (follow.go).
+	ahead aheadState
 	// stopWait stops the wait for the network under way, if any; radioWaits
 	// is set when the radio waits, at the end of the queue, rather than the
 	// current track. toldOffline is set once the user was told that the
@@ -750,6 +756,9 @@ func (p *Player) run() {
 		for _, fn := range tasks {
 			p.saveAsked = false
 			fn()
+			// The next track follows the current one as the state now lets
+			// it (follow.go).
+			p.arm()
 			if !p.saveAsked && slices.Contains(p.events, QueueChange) {
 				// An edit of the queue is kept, also while nothing plays to
 				// report it.

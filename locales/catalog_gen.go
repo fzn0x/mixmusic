@@ -14062,6 +14062,70 @@ func (msgs Messages) LyricsCreditFromBy(source string, by string) string {
 	return Catalog.Format(msgs.locale, "lyricsCreditFromBy", map[string]any{"source": source, "by": by})
 }
 
+// LyricsEditAbout says "Correct a word or a line. A time in brackets, as [01:02.50], is when the line after it is sung, and one in angle brac…"
+// in the language the app shows.
+//
+// At the top of lyricsEditTitle. Keep the times as they are written:
+// [01:02.50] and <01:02.50>. "Automatic" is lyricsSourceAutomatic.
+func LyricsEditAbout() string { return In(i18n.Locale()).LyricsEditAbout() }
+
+// LyricsEditAbout says "Correct a word or a line. A time in brackets, as [01:02.50], is when the line after it is sung, and one in angle brac…"
+// in the language of msgs.
+//
+// At the top of lyricsEditTitle. Keep the times as they are written:
+// [01:02.50] and <01:02.50>. "Automatic" is lyricsSourceAutomatic.
+func (msgs Messages) LyricsEditAbout() string {
+	return Catalog.Format(msgs.locale, "lyricsEditAbout", nil)
+}
+
+// LyricsEditEmpty says "These lyrics have no words to keep."
+// in the language the app shows.
+//
+// In lyricsEditTitle, under the text box, when the listener saves it with
+// no words in it.
+func LyricsEditEmpty() string { return In(i18n.Locale()).LyricsEditEmpty() }
+
+// LyricsEditEmpty says "These lyrics have no words to keep."
+// in the language of msgs.
+//
+// In lyricsEditTitle, under the text box, when the listener saves it with
+// no words in it.
+func (msgs Messages) LyricsEditEmpty() string {
+	return Catalog.Format(msgs.locale, "lyricsEditEmpty", nil)
+}
+
+// LyricsEditLabel says "Lyrics"
+// in the language the app shows.
+//
+// For screen readers: the text box of lyricsEditTitle, which holds the
+// lyrics to correct.
+func LyricsEditLabel() string { return In(i18n.Locale()).LyricsEditLabel() }
+
+// LyricsEditLabel says "Lyrics"
+// in the language of msgs.
+//
+// For screen readers: the text box of lyricsEditTitle, which holds the
+// lyrics to correct.
+func (msgs Messages) LyricsEditLabel() string {
+	return Catalog.Format(msgs.locale, "lyricsEditLabel", nil)
+}
+
+// LyricsEditTitle says "Edit lyrics"
+// in the language the app shows.
+//
+// The title of the dialog lyricsSourceEdit opens: the lyrics shown, as text
+// to correct.
+func LyricsEditTitle() string { return In(i18n.Locale()).LyricsEditTitle() }
+
+// LyricsEditTitle says "Edit lyrics"
+// in the language of msgs.
+//
+// The title of the dialog lyricsSourceEdit opens: the lyrics shown, as text
+// to correct.
+func (msgs Messages) LyricsEditTitle() string {
+	return Catalog.Format(msgs.locale, "lyricsEditTitle", nil)
+}
+
 // LyricsFullScreen says "Full-screen lyrics"
 // in the language the app shows.
 func LyricsFullScreen() string { return In(i18n.Locale()).LyricsFullScreen() }
@@ -14806,6 +14870,134 @@ func (msgs Messages) LyricsRomanizeUnder() string {
 	return Catalog.Format(msgs.locale, "lyricsRomanizeUnder", nil)
 }
 
+// LyricsSearchAbout says "Every lyrics source that is on gets this title and artist. YouTube Music and YouTube captions look up the track that …"
+// in the language the app shows.
+//
+// At the top of lyricsSearchTitle: what the sources are sent. YouTube Music
+// and YouTube captions are names.
+func LyricsSearchAbout() string { return In(i18n.Locale()).LyricsSearchAbout() }
+
+// LyricsSearchAbout says "Every lyrics source that is on gets this title and artist. YouTube Music and YouTube captions look up the track that …"
+// in the language of msgs.
+//
+// At the top of lyricsSearchTitle: what the sources are sent. YouTube Music
+// and YouTube captions are names.
+func (msgs Messages) LyricsSearchAbout() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchAbout", nil)
+}
+
+// LyricsSearchArtist says "Artist"
+// in the language the app shows.
+//
+// In lyricsSearchTitle: the label of the field of the artist to search for.
+func LyricsSearchArtist() string { return In(i18n.Locale()).LyricsSearchArtist() }
+
+// LyricsSearchArtist says "Artist"
+// in the language of msgs.
+//
+// In lyricsSearchTitle: the label of the field of the artist to search for.
+func (msgs Messages) LyricsSearchArtist() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchArtist", nil)
+}
+
+// LyricsSearchGo says "search"
+// in the language the app shows.
+//
+// In lyricsSearchTitle: the button that asks the sources for the title and
+// artist in the fields. Lowercase, as the labels of buttons are.
+func LyricsSearchGo() string { return In(i18n.Locale()).LyricsSearchGo() }
+
+// LyricsSearchGo says "search"
+// in the language of msgs.
+//
+// In lyricsSearchTitle: the button that asks the sources for the title and
+// artist in the fields. Lowercase, as the labels of buttons are.
+func (msgs Messages) LyricsSearchGo() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchGo", nil)
+}
+
+// LyricsSearchLooking says "Asking the lyrics sources…"
+// in the language the app shows.
+//
+// In lyricsSearchTitle, while the sources are asked for the title and
+// artist.
+func LyricsSearchLooking() string { return In(i18n.Locale()).LyricsSearchLooking() }
+
+// LyricsSearchLooking says "Asking the lyrics sources…"
+// in the language of msgs.
+//
+// In lyricsSearchTitle, while the sources are asked for the title and
+// artist.
+func (msgs Messages) LyricsSearchLooking() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchLooking", nil)
+}
+
+// LyricsSearchSongTitle says "Title"
+// in the language the app shows.
+//
+// In lyricsSearchTitle: the label of the field of the song's title to
+// search for.
+func LyricsSearchSongTitle() string { return In(i18n.Locale()).LyricsSearchSongTitle() }
+
+// LyricsSearchSongTitle says "Title"
+// in the language of msgs.
+//
+// In lyricsSearchTitle: the label of the field of the song's title to
+// search for.
+func (msgs Messages) LyricsSearchSongTitle() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchSongTitle", nil)
+}
+
+// LyricsSearchTitle says "Search lyrics by title and artist"
+// in the language the app shows.
+//
+// The title of the dialog lyricsSourceSearch opens: a title and an artist
+// to change, and what each lyrics source found for them.
+func LyricsSearchTitle() string { return In(i18n.Locale()).LyricsSearchTitle() }
+
+// LyricsSearchTitle says "Search lyrics by title and artist"
+// in the language of msgs.
+//
+// The title of the dialog lyricsSourceSearch opens: a title and an artist
+// to change, and what each lyrics source found for them.
+func (msgs Messages) LyricsSearchTitle() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchTitle", nil)
+}
+
+// LyricsSearchUse says "show these"
+// in the language the app shows.
+//
+// In lyricsSearchTitle, the button on a result: shows these lyrics for the
+// track that plays, and keeps the source, title and artist for it.
+// Lowercase, as the labels of buttons are.
+func LyricsSearchUse() string { return In(i18n.Locale()).LyricsSearchUse() }
+
+// LyricsSearchUse says "show these"
+// in the language of msgs.
+//
+// In lyricsSearchTitle, the button on a result: shows these lyrics for the
+// track that plays, and keeps the source, title and artist for it.
+// Lowercase, as the labels of buttons are.
+func (msgs Messages) LyricsSearchUse() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchUse", nil)
+}
+
+// LyricsSearchUseFrom says "Show the lyrics from {source}"
+// in the language the app shows.
+//
+// For screen readers: the lyricsSearchUse button on a result of
+// lyricsSearchTitle. {source} is the source's name.
+func LyricsSearchUseFrom(source string) string { return In(i18n.Locale()).LyricsSearchUseFrom(source) }
+
+// LyricsSearchUseFrom says "Show the lyrics from {source}"
+// in the language of msgs.
+//
+// For screen readers: the lyricsSearchUse button on a result of
+// lyricsSearchTitle. {source} is the source's name.
+func (msgs Messages) LyricsSearchUseFrom(source string) string {
+	return Catalog.Format(msgs.locale, "lyricsSearchUseFrom", map[string]any{"source": source})
+}
+
 // LyricsSettingsDesc says "The translate switch beside the lyrics shows them in this language. While it's on, the lyrics of the track playing an…"
 // in the language the app shows.
 func LyricsSettingsDesc() string { return In(i18n.Locale()).LyricsSettingsDesc() }
@@ -14950,6 +15142,46 @@ func (msgs Messages) LyricsShowInLatin() string {
 	return Catalog.Format(msgs.locale, "lyricsShowInLatin", nil)
 }
 
+// LyricsSource says "source"
+// in the language the app shows.
+//
+// Above the lyrics, in the lyrics panel and on the now playing page, beside
+// "synced" and "plain text", and under "No lyrics found for this track.":
+// the label before the button that names where the lyrics come from and
+// opens the menu of the lyrics sources. Lowercase, as the other labels
+// there.
+func LyricsSource() string { return In(i18n.Locale()).LyricsSource() }
+
+// LyricsSource says "source"
+// in the language of msgs.
+//
+// Above the lyrics, in the lyrics panel and on the now playing page, beside
+// "synced" and "plain text", and under "No lyrics found for this track.":
+// the label before the button that names where the lyrics come from and
+// opens the menu of the lyrics sources. Lowercase, as the other labels
+// there.
+func (msgs Messages) LyricsSource() string {
+	return Catalog.Format(msgs.locale, "lyricsSource", nil)
+}
+
+// LyricsSourceAutomatic says "Automatic"
+// in the language the app shows.
+//
+// First in the menu of the lyrics sources, and on its button while it is
+// chosen: the lyrics MixMusic finds by itself, asking the sources in the
+// order of Settings › Playback › Lyrics sources.
+func LyricsSourceAutomatic() string { return In(i18n.Locale()).LyricsSourceAutomatic() }
+
+// LyricsSourceAutomatic says "Automatic"
+// in the language of msgs.
+//
+// First in the menu of the lyrics sources, and on its button while it is
+// chosen: the lyrics MixMusic finds by itself, asking the sources in the
+// order of Settings › Playback › Lyrics sources.
+func (msgs Messages) LyricsSourceAutomatic() string {
+	return Catalog.Format(msgs.locale, "lyricsSourceAutomatic", nil)
+}
+
 // LyricsSourceBetterLyricsSent says "Lyrics timed word by word. Gets the title, first artist, album and length of tracks that have an album."
 // in the language the app shows.
 func LyricsSourceBetterLyricsSent() string { return In(i18n.Locale()).LyricsSourceBetterLyricsSent() }
@@ -14958,6 +15190,28 @@ func LyricsSourceBetterLyricsSent() string { return In(i18n.Locale()).LyricsSour
 // in the language of msgs.
 func (msgs Messages) LyricsSourceBetterLyricsSent() string {
 	return Catalog.Format(msgs.locale, "lyricsSourceBetterLyricsSent", nil)
+}
+
+// LyricsSourceCaptionTrack says "{source} ({language})"
+// in the language the app shows.
+//
+// In the menu of the lyrics sources, and on its button: a caption track the
+// uploader of the video wrote, by its language. {source} is
+// lyricsSourceCaptionsName, {language} the name of the language, as
+// lyricsLangGerman.
+func LyricsSourceCaptionTrack(source string, language string) string {
+	return In(i18n.Locale()).LyricsSourceCaptionTrack(source, language)
+}
+
+// LyricsSourceCaptionTrack says "{source} ({language})"
+// in the language of msgs.
+//
+// In the menu of the lyrics sources, and on its button: a caption track the
+// uploader of the video wrote, by its language. {source} is
+// lyricsSourceCaptionsName, {language} the name of the language, as
+// lyricsLangGerman.
+func (msgs Messages) LyricsSourceCaptionTrack(source string, language string) string {
+	return Catalog.Format(msgs.locale, "lyricsSourceCaptionTrack", map[string]any{"source": source, "language": language})
 }
 
 // LyricsSourceCaptionsName says "YouTube captions"
@@ -14980,6 +15234,82 @@ func (msgs Messages) LyricsSourceCaptionsSent() string {
 	return Catalog.Format(msgs.locale, "lyricsSourceCaptionsSent", nil)
 }
 
+// LyricsSourceEdit says "Edit lyrics…"
+// in the language the app shows.
+//
+// In the menu of the lyrics sources: opens lyricsEditTitle, a dialog with
+// the lyrics shown as text, to correct them.
+func LyricsSourceEdit() string { return In(i18n.Locale()).LyricsSourceEdit() }
+
+// LyricsSourceEdit says "Edit lyrics…"
+// in the language of msgs.
+//
+// In the menu of the lyrics sources: opens lyricsEditTitle, a dialog with
+// the lyrics shown as text, to correct them.
+func (msgs Messages) LyricsSourceEdit() string {
+	return Catalog.Format(msgs.locale, "lyricsSourceEdit", nil)
+}
+
+// LyricsSourceEdited says "Your edit"
+// in the language the app shows.
+//
+// In the menu of the lyrics sources, and on its button: the lyrics the
+// listener edited with lyricsSourceEdit, which show for the track until
+// another choice replaces them.
+func LyricsSourceEdited() string { return In(i18n.Locale()).LyricsSourceEdited() }
+
+// LyricsSourceEdited says "Your edit"
+// in the language of msgs.
+//
+// In the menu of the lyrics sources, and on its button: the lyrics the
+// listener edited with lyricsSourceEdit, which show for the track until
+// another choice replaces them.
+func (msgs Messages) LyricsSourceEdited() string {
+	return Catalog.Format(msgs.locale, "lyricsSourceEdited", nil)
+}
+
+// LyricsSourceFound says "{shown, select, yes {Showing} other {Found}}, {timing, select, words {timed word by word} lines {timed by line} other…"
+// in the language the app shows.
+//
+// Under a source in the menu of the lyrics sources, and under a result of
+// lyricsSearchTitle: the lyrics it found. {shown} is yes for the lyrics
+// that show now; {timing} is words for lyrics timed word by word, lines for
+// lyrics timed line by line, plain for lyrics without times; {count} counts
+// the lines with words.
+func LyricsSourceFound(shown string, timing string, count int) string {
+	return In(i18n.Locale()).LyricsSourceFound(shown, timing, count)
+}
+
+// LyricsSourceFound says "{shown, select, yes {Showing} other {Found}}, {timing, select, words {timed word by word} lines {timed by line} other…"
+// in the language of msgs.
+//
+// Under a source in the menu of the lyrics sources, and under a result of
+// lyricsSearchTitle: the lyrics it found. {shown} is yes for the lyrics
+// that show now; {timing} is words for lyrics timed word by word, lines for
+// lyrics timed line by line, plain for lyrics without times; {count} counts
+// the lines with words.
+func (msgs Messages) LyricsSourceFound(shown string, timing string, count int) string {
+	return Catalog.Format(msgs.locale, "lyricsSourceFound", map[string]any{"shown": shown, "timing": timing, "count": count})
+}
+
+// LyricsSourceInstrumental says "Says the track is instrumental"
+// in the language the app shows.
+//
+// Under a source in the menu of the lyrics sources, and under a result of
+// lyricsSearchTitle: the source has the track as an instrumental, without
+// words.
+func LyricsSourceInstrumental() string { return In(i18n.Locale()).LyricsSourceInstrumental() }
+
+// LyricsSourceInstrumental says "Says the track is instrumental"
+// in the language of msgs.
+//
+// Under a source in the menu of the lyrics sources, and under a result of
+// lyricsSearchTitle: the source has the track as an instrumental, without
+// words.
+func (msgs Messages) LyricsSourceInstrumental() string {
+	return Catalog.Format(msgs.locale, "lyricsSourceInstrumental", nil)
+}
+
 // LyricsSourceLRCLIBSent says "Gets the title, artists, album and length; for a music video, its song's."
 // in the language the app shows.
 func LyricsSourceLRCLIBSent() string { return In(i18n.Locale()).LyricsSourceLRCLIBSent() }
@@ -14990,6 +15320,24 @@ func (msgs Messages) LyricsSourceLRCLIBSent() string {
 	return Catalog.Format(msgs.locale, "lyricsSourceLRCLIBSent", nil)
 }
 
+// LyricsSourceLabel says "Lyrics source: {name}"
+// in the language the app shows.
+//
+// For screen readers: the button after lyricsSource, which opens the menu
+// of the lyrics sources. {name} is what the button shows: a source's name,
+// lyricsSourceAutomatic or lyricsSourceEdited.
+func LyricsSourceLabel(name string) string { return In(i18n.Locale()).LyricsSourceLabel(name) }
+
+// LyricsSourceLabel says "Lyrics source: {name}"
+// in the language of msgs.
+//
+// For screen readers: the button after lyricsSource, which opens the menu
+// of the lyrics sources. {name} is what the button shows: a source's name,
+// lyricsSourceAutomatic or lyricsSourceEdited.
+func (msgs Messages) LyricsSourceLabel(name string) string {
+	return Catalog.Format(msgs.locale, "lyricsSourceLabel", map[string]any{"name": name})
+}
+
 // LyricsSourceLastOn says "{name}, the last source on"
 // in the language the app shows.
 func LyricsSourceLastOn(name string) string { return In(i18n.Locale()).LyricsSourceLastOn(name) }
@@ -14998,6 +15346,40 @@ func LyricsSourceLastOn(name string) string { return In(i18n.Locale()).LyricsSou
 // in the language of msgs.
 func (msgs Messages) LyricsSourceLastOn(name string) string {
 	return Catalog.Format(msgs.locale, "lyricsSourceLastOn", map[string]any{"name": name})
+}
+
+// LyricsSourceNotAsked says "Not asked yet"
+// in the language the app shows.
+//
+// Under a source in the menu of the lyrics sources: MixMusic didn't send it
+// the track, as an earlier source had lyrics. Picking it asks it then.
+func LyricsSourceNotAsked() string { return In(i18n.Locale()).LyricsSourceNotAsked() }
+
+// LyricsSourceNotAsked says "Not asked yet"
+// in the language of msgs.
+//
+// Under a source in the menu of the lyrics sources: MixMusic didn't send it
+// the track, as an earlier source had lyrics. Picking it asks it then.
+func (msgs Messages) LyricsSourceNotAsked() string {
+	return Catalog.Format(msgs.locale, "lyricsSourceNotAsked", nil)
+}
+
+// LyricsSourceNotFound says "Not found"
+// in the language the app shows.
+//
+// Under a source in the menu of the lyrics sources, and under a result of
+// lyricsSearchTitle: the source has no lyrics of the track, or can't look
+// it up.
+func LyricsSourceNotFound() string { return In(i18n.Locale()).LyricsSourceNotFound() }
+
+// LyricsSourceNotFound says "Not found"
+// in the language of msgs.
+//
+// Under a source in the menu of the lyrics sources, and under a result of
+// lyricsSearchTitle: the source has no lyrics of the track, or can't look
+// it up.
+func (msgs Messages) LyricsSourceNotFound() string {
+	return Catalog.Format(msgs.locale, "lyricsSourceNotFound", nil)
 }
 
 // LyricsSourceOff says "off"
@@ -15032,6 +15414,42 @@ func (msgs Messages) LyricsSourceRowLabel(name string, state string) string {
 	return Catalog.Format(msgs.locale, "lyricsSourceRowLabel", map[string]any{"name": name, "state": state})
 }
 
+// LyricsSourceSearch says "Search by title and artist…"
+// in the language the app shows.
+//
+// In the menu of the lyrics sources: opens lyricsSearchTitle, a dialog that
+// asks every source for another title and artist.
+func LyricsSourceSearch() string { return In(i18n.Locale()).LyricsSourceSearch() }
+
+// LyricsSourceSearch says "Search by title and artist…"
+// in the language of msgs.
+//
+// In the menu of the lyrics sources: opens lyricsSearchTitle, a dialog that
+// asks every source for another title and artist.
+func (msgs Messages) LyricsSourceSearch() string {
+	return Catalog.Format(msgs.locale, "lyricsSourceSearch", nil)
+}
+
+// LyricsSourceSearched says "{source}: {title} by {artist}"
+// in the language the app shows.
+//
+// In the menu of the lyrics sources: the result of lyricsSourceSearch the
+// listener picked, asked again each time the track plays. {source} is the
+// source's name, {title} and {artist} what the listener searched for.
+func LyricsSourceSearched(source string, title string, artist string) string {
+	return In(i18n.Locale()).LyricsSourceSearched(source, title, artist)
+}
+
+// LyricsSourceSearched says "{source}: {title} by {artist}"
+// in the language of msgs.
+//
+// In the menu of the lyrics sources: the result of lyricsSourceSearch the
+// listener picked, asked again each time the track plays. {source} is the
+// source's name, {title} and {artist} what the listener searched for.
+func (msgs Messages) LyricsSourceSearched(source string, title string, artist string) string {
+	return Catalog.Format(msgs.locale, "lyricsSourceSearched", map[string]any{"source": source, "title": title, "artist": artist})
+}
+
 // LyricsSourceUnisonSent says "Gets the video ID, or the title, artists, album and length."
 // in the language the app shows.
 func LyricsSourceUnisonSent() string { return In(i18n.Locale()).LyricsSourceUnisonSent() }
@@ -15040,6 +15458,24 @@ func LyricsSourceUnisonSent() string { return In(i18n.Locale()).LyricsSourceUnis
 // in the language of msgs.
 func (msgs Messages) LyricsSourceUnisonSent() string {
 	return Catalog.Format(msgs.locale, "lyricsSourceUnisonSent", nil)
+}
+
+// LyricsSourceUnreachable says "Can't be reached"
+// in the language the app shows.
+//
+// Under a source in the menu of the lyrics sources, and under a result of
+// lyricsSearchTitle: the source couldn't be reached, or answered with an
+// error. Picking it asks it again.
+func LyricsSourceUnreachable() string { return In(i18n.Locale()).LyricsSourceUnreachable() }
+
+// LyricsSourceUnreachable says "Can't be reached"
+// in the language of msgs.
+//
+// Under a source in the menu of the lyrics sources, and under a result of
+// lyricsSearchTitle: the source couldn't be reached, or answered with an
+// error. Picking it asks it again.
+func (msgs Messages) LyricsSourceUnreachable() string {
+	return Catalog.Format(msgs.locale, "lyricsSourceUnreachable", nil)
 }
 
 // LyricsSourceYouTubeMusicSent says "Gets the video ID of the track, or of its recording there."

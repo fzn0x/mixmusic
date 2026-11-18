@@ -233,7 +233,7 @@ func (p *Player) StreamFailure(track media.Track) error {
 	if err != nil {
 		return nil
 	}
-	return p.a.proxy.Fault(videoID)
+	return engineWords(p.a.proxy.Fault(videoID))
 }
 
 // ForgetMatch drops the YouTube Music recording found for a Spotify track,

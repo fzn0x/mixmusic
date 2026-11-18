@@ -39,6 +39,7 @@ How MixMusic plays; [Playing music](playing-music.md) tells all of it.
 | [Spotify tracks](playing-music.md#how-spotify-tracks-play) | How Spotify tracks play: **In MixMusic, from Spotify** (Premium, on Windows and macOS), **On Spotify Connect**, with the **Device** that plays them, or **In MixMusic, from YouTube Music**. Under them, how to hear Spotify in [lossless](spotify-playback.md#lossless), which On Spotify Connect alone plays. See [Spotify](spotify.md). |
 | Sound | **[Output device](playing-music.md#the-output-device)** (System default, or a device by name), **[Quality](playing-music.md#data-saver)** (best, or data saver), **[Play audio as your account](playing-music.md#play-audio-as-your-account)** (off at first, for YouTube Music Premium's higher bitrate), **[Crossfade](playing-music.md#crossfade-and-gapless-playback)** (off, or 1 to 12 seconds), with **Keep albums gapless** (on at first) under it while it's on, **[Even loudness](playing-music.md#even-loudness-volume-levelling-and-the-volume)**, **Volume levelling**, **Play 5.1 surround when a track has it**, **[Autoplay](playing-music.md#autoplay-and-radios)**, **[Skip songs made with AI](playing-music.md#skipping-songs-made-with-ai)** and **[Skip songs you dislike](playing-music.md#dislikes-and-skipping)**. |
 | [Speed](playing-music.md#speed) | **Songs** and **Podcasts**, each from 0.5× to 3×, at the tracks' own pitch, with **normal** to go back to 1×. |
+| [Sleep timer](playing-music.md#a-sleep-timer) | **Fade out**: off, 10, 30, 60 or 120 seconds, 30 at first. **Let the track finish**. **Start the sleep timer by itself**, off at first; once on, its **Window**, the same **Every day**, 22:00 to 06:00 at first, or **By day of the week**, each day with its switch. |
 | [Music videos](playing-music.md#the-picture-of-music-videos) | **Show the video of music videos**, on the now playing page. |
 | [Moving covers](playing-music.md#moving-covers) | **Show moving covers**: GIF covers move on the now playing page and a mix's page. Off at first. |
 | [Explicit content](playing-music.md#hiding-explicit-content) | **[Prefer clean versions](playing-music.md#versions-of-an-album)**: an album that comes explicit and clean shows its clean version, and opens on it. **[Hide explicit content](playing-music.md#hiding-explicit-content)**: the songs, albums and videos marked explicit don't show where the services list music, and never play or download; Prefer clean versions stays on meanwhile. |
@@ -304,6 +305,11 @@ while you're not typing in a text field. The ID is the command's name in
 | Slow down | none | none | `player.slower` |
 | Normal speed | none | none | `player.normalSpeed` |
 | Start a radio of what plays | none | none | `player.radio` |
+| [Sleep timer](playing-music.md#a-sleep-timer): 5, 10, 15, 30, 45, 60 or 90 minutes | none | none | `player.sleep5` to `player.sleep90` |
+| Sleep timer: end of this track | none | none | `player.sleepTrack` |
+| Sleep timer: end of the queue | none | none | `player.sleepQueue` |
+| Sleep timer: last length | none | none | `player.sleepLast` |
+| Sleep timer: cancel | none | none | `player.sleepCancel` |
 | [Open music files…](local-music.md#open-files-without-a-folder) | <kbd>Ctrl</kbd> <kbd>O</kbd> | <kbd>⌘</kbd> <kbd>O</kbd> | `player.openFiles` |
 
 ### Go to

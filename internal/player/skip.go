@@ -323,12 +323,16 @@ func (p *Player) sounded() {
 	}
 	p.passing.radios = 0
 	p.tellSkipped()
+	// Playback that starts at bedtime starts the sleep timer (sleep.go).
+	p.sleepSounded()
 }
 
 // fadingInto takes in next, after the current entry, becoming current by
 // a crossfade, which the engine tells no start of: it sounds, past the
 // entries the queue passed over to reach it.
 func (p *Player) fadingInto(next Item) {
+	// The track fading out ended, for the sleep timer (sleep.go).
+	p.sleepPassed()
 	q := p.s.Queue
 	m := &move{dir: 1}
 	for k := 1; k < len(q) && p.s.Index >= 0; k++ {

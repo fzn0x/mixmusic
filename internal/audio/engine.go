@@ -94,6 +94,8 @@ type Engine struct {
 	// plays on, whose gain at vol is what master glides to.
 	vol   float64
 	curve volume.Curve
+	// away is the sleep timer's fade, after the volume (fadeaway.go).
+	away fadeAway
 	// The audio thread's buffers: a quantum, the rest of the last one, and
 	// each deck's frames. bus is the channels of the quantum, as the output
 	// asked for them last.
@@ -707,7 +709,7 @@ func (e *Engine) renderQuantum() {
 		e.comp.process(buf, ch, levelThreshold, levelKnee, levelRatio, levelAttack, levelRelease)
 	}
 	for i := 0; i < len(buf); i += ch {
-		g := float32(e.master.next())
+		g := float32(e.master.next() * e.away.gain())
 		for c := range ch {
 			buf[i+c] *= g
 		}

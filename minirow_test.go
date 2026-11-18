@@ -78,7 +78,8 @@ func TestMiniRowOf(t *testing.T) {
 }
 
 // TestMiniMenuHolds puts the buttons a row too narrow has no room for in
-// the mini player's menu, above the speed, which works them.
+// the mini player's menu, above the speed and the sleep timer, which works
+// them.
 func TestMiniMenuHolds(t *testing.T) {
 	s := playing(t)
 	// Narrower than the window takes, which leaves the artwork no room.
@@ -90,7 +91,7 @@ func TestMiniMenuHolds(t *testing.T) {
 	if err := tt.RightClick(testTracks[0].Title); err != nil {
 		t.Fatal(err)
 	}
-	if menu := tt.Menu(); len(menu) != 3 || menu[0] != "Repeat: off" || menu[2] != "Speed of songs" {
+	if menu := tt.Menu(); len(menu) != 4 || menu[0] != "Repeat: off" || menu[2] != "Speed of songs" || menu[3] != "Sleep timer" {
 		t.Fatalf("the mini player's menu holds %q", menu)
 	}
 	if err := tt.ChooseMenuItem("Repeat: off"); err != nil {

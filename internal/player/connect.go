@@ -613,9 +613,10 @@ func (c *connectEngine) follows(track media.Track, f *following) {
 // the current one, up to maxAhead, that a device which plays them by itself
 // gets: the Spotify tracks right after it, up to the first that isn't one,
 // that the queue passes over, or whose label a move would check first.
-// Repeating one has none.
+// Repeating one has none, nor has a sleep timer that stops the music at
+// the end of a track: the device can't go on past it by itself.
 func (p *Player) aheadOnDevice() []Item {
-	if p.s.Repeat == RepeatOne || p.s.Index < 0 {
+	if p.s.Repeat == RepeatOne || p.s.Index < 0 || p.s.Sleep.Ending() {
 		return nil
 	}
 	var ahead []Item

@@ -138,7 +138,12 @@ func TestStageShortcutCanBeChanged(t *testing.T) {
 	if !tt.HasText("Show or hide the full-screen lyrics") {
 		t.Fatalf("Settings › Shortcuts doesn't list the full-screen lyrics: %q", tt.Texts())
 	}
-	if err := tt.Click("change the shortcut of Show or hide the full-screen lyrics"); err != nil {
+	change := "change the shortcut of Show or hide the full-screen lyrics"
+	err := tt.Click(change)
+	if err != nil && reveal(tt, change) {
+		err = tt.Click(change)
+	}
+	if err != nil {
 		t.Fatalf("the full-screen lyrics have no shortcut to change: %v", err)
 	}
 	tt.Key(ui.Cmd|ui.Alt, ui.KeyF)

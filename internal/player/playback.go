@@ -760,6 +760,9 @@ func (p *Player) onProgress() {
 		!spoken(entry.Track) && !spoken(next.Track) && !p.gapless(entry, next) {
 		p.crossfadeTo(next, fade)
 	}
+	// The sleep timer's fade, in the last seconds of the last track it lets
+	// play (sleep.go).
+	p.sleepProgress()
 	p.reporting.call(p, func() {
 		p.svc.Report(p.now())
 		p.save()
@@ -808,9 +811,10 @@ func (p *Player) fadeEnded() {
 
 // crossfadeTo plays next while the current track fades out, over fade. A
 // remote output plays one stream at a time: next starts there as the
-// current track ends.
+// current track ends. The last track the sleep timer lets play plays to
+// its end.
 func (p *Player) crossfadeTo(next Item, fade time.Duration) {
-	if p.out.Stream != nil {
+	if p.out.Stream != nil || p.sleepLast() {
 		return
 	}
 	p.crossfading = true
@@ -974,6 +978,11 @@ func (p *Player) seek(t time.Duration) {
 // radio with autoplay, past the entries the queue passes over.
 func (p *Player) advance(ended bool) {
 	if len(p.s.Queue) == 0 {
+		return
+	}
+	// The sleep timer may stop the music at the end of this track, which a
+	// track that repeats ends too (sleep.go).
+	if ended && p.sleepEnded() {
 		return
 	}
 	if ended && p.s.Repeat == RepeatOne {

@@ -260,7 +260,7 @@ func TestSpeedButtonOnSpotify(t *testing.T) {
 	if err := mini.RightClick(testTracks[1].Title); err != nil {
 		t.Fatal(err)
 	}
-	if got := mini.Menu(); !slices.Equal(got, []string{label}) {
+	if got := mini.Menu(); !slices.Equal(got, []string{label, "Sleep timer"}) {
 		t.Errorf("the mini player's menu holds %q", got)
 	}
 	if err := mini.ChooseMenuItem(label); err == nil {

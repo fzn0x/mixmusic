@@ -35,6 +35,10 @@
   as is one under a second, and those that overlap or touch are joined
   (`Spans`). Each is passed over once a play, so that seeking back into
   one plays it, and the events hear of each (`SkipEvents`).
+  The sleep timer's fade (`fadeaway.go`, #594) is a gain of its own,
+  after the volume: `FadeAway` takes it to silence on an equal-power
+  curve, cos(πt/2), and holds it there, tracks that start meanwhile too,
+  until `FadeBack`, so that the volume the user set never moves.
   `MIXMUSIC_STRETCH_WAV=<dir> go test ./internal/audio -run StretchListen`
   writes the test files at each speed, to listen to. `Stretches`
   decodes stretches of a file as a deck plays them, from the frame a seek

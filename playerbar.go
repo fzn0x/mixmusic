@@ -329,6 +329,7 @@ func (s *shell) playerSide(c *ui.Context) {
 		s.devicesButton(c)
 	}
 	s.speedButton(c)
+	s.sleepButton(c, room)
 	s.outputButton(c, room)
 	s.volumeControl(c)
 	if s.iconButton(c, "mini", "mini", locales.PlayerMiniPlayer(), false, 18).Clicked() {

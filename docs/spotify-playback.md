@@ -151,7 +151,10 @@ Spotify open.
 - **The visualizer** hears the Spotify app on this computer, on Windows;
   other devices it can't hear, and it draws nothing then.
 - **Sleep.** As the computer goes to sleep, MixMusic pauses its own
-  player, and a device elsewhere plays on.
+  player, and a device elsewhere plays on. The
+  [sleep timer](playing-music.md#a-sleep-timer) pauses that device too,
+  after stepping its volume down once a second, which it puts back once
+  paused, and hands it no tracks ahead while it ends with a track.
 
 ## Lossless
 

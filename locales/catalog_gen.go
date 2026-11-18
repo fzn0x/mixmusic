@@ -2912,6 +2912,38 @@ func (msgs Messages) AssistantsToastSkippedTo(what string) string {
 	return Catalog.Format(msgs.locale, "assistantsToastSkippedTo", map[string]any{"what": what})
 }
 
+// AssistantsToastSleep says "An AI assistant set the sleep timer: {what}"
+// in the language the app shows.
+//
+// Toast when an AI assistant started the sleep timer, or added minutes to
+// it. {what} is sleepInMinutes, sleepAtTrackEnd, sleepAfterTracks or
+// sleepAtQueueEnd.
+func AssistantsToastSleep(what string) string { return In(i18n.Locale()).AssistantsToastSleep(what) }
+
+// AssistantsToastSleep says "An AI assistant set the sleep timer: {what}"
+// in the language of msgs.
+//
+// Toast when an AI assistant started the sleep timer, or added minutes to
+// it. {what} is sleepInMinutes, sleepAtTrackEnd, sleepAfterTracks or
+// sleepAtQueueEnd.
+func (msgs Messages) AssistantsToastSleep(what string) string {
+	return Catalog.Format(msgs.locale, "assistantsToastSleep", map[string]any{"what": what})
+}
+
+// AssistantsToastSleepOff says "An AI assistant turned the sleep timer off"
+// in the language the app shows.
+//
+// Toast when an AI assistant cancelled the sleep timer.
+func AssistantsToastSleepOff() string { return In(i18n.Locale()).AssistantsToastSleepOff() }
+
+// AssistantsToastSleepOff says "An AI assistant turned the sleep timer off"
+// in the language of msgs.
+//
+// Toast when an AI assistant cancelled the sleep timer.
+func (msgs Messages) AssistantsToastSleepOff() string {
+	return Catalog.Format(msgs.locale, "assistantsToastSleepOff", nil)
+}
+
 // AssistantsToastVolume says "An AI assistant set the volume to {percent}%"
 // in the language the app shows.
 //
@@ -3946,6 +3978,90 @@ func CmdSettingsOpenFile() string { return In(i18n.Locale()).CmdSettingsOpenFile
 // in the language of msgs.
 func (msgs Messages) CmdSettingsOpenFile() string {
 	return Catalog.Format(msgs.locale, "cmdSettingsOpenFile", nil)
+}
+
+// CmdSleepCancel says "Sleep timer: cancel"
+// in the language the app shows.
+//
+// A command of the command palette, which takes a shortcut in Settings ›
+// Shortcuts, and a global one: the sleep timer ends, and the music plays
+// on.
+func CmdSleepCancel() string { return In(i18n.Locale()).CmdSleepCancel() }
+
+// CmdSleepCancel says "Sleep timer: cancel"
+// in the language of msgs.
+//
+// A command of the command palette, which takes a shortcut in Settings ›
+// Shortcuts, and a global one: the sleep timer ends, and the music plays
+// on.
+func (msgs Messages) CmdSleepCancel() string {
+	return Catalog.Format(msgs.locale, "cmdSleepCancel", nil)
+}
+
+// CmdSleepLast says "Sleep timer: last length"
+// in the language the app shows.
+//
+// A command of the command palette, which takes a shortcut in Settings ›
+// Shortcuts, and a global one: it starts the sleep timer for the length
+// chosen last.
+func CmdSleepLast() string { return In(i18n.Locale()).CmdSleepLast() }
+
+// CmdSleepLast says "Sleep timer: last length"
+// in the language of msgs.
+//
+// A command of the command palette, which takes a shortcut in Settings ›
+// Shortcuts, and a global one: it starts the sleep timer for the length
+// chosen last.
+func (msgs Messages) CmdSleepLast() string {
+	return Catalog.Format(msgs.locale, "cmdSleepLast", nil)
+}
+
+// CmdSleepMinutes says "Sleep timer: {minutes, plural, one {# minute} other {# minutes}}"
+// in the language the app shows.
+//
+// A command of the command palette, which takes a shortcut in Settings ›
+// Shortcuts: it starts the sleep timer for that long.
+func CmdSleepMinutes(minutes int) string { return In(i18n.Locale()).CmdSleepMinutes(minutes) }
+
+// CmdSleepMinutes says "Sleep timer: {minutes, plural, one {# minute} other {# minutes}}"
+// in the language of msgs.
+//
+// A command of the command palette, which takes a shortcut in Settings ›
+// Shortcuts: it starts the sleep timer for that long.
+func (msgs Messages) CmdSleepMinutes(minutes int) string {
+	return Catalog.Format(msgs.locale, "cmdSleepMinutes", map[string]any{"minutes": minutes})
+}
+
+// CmdSleepQueue says "Sleep timer: end of the queue"
+// in the language the app shows.
+//
+// A command of the command palette, which takes a shortcut in Settings ›
+// Shortcuts: the music stops at the end of the queue.
+func CmdSleepQueue() string { return In(i18n.Locale()).CmdSleepQueue() }
+
+// CmdSleepQueue says "Sleep timer: end of the queue"
+// in the language of msgs.
+//
+// A command of the command palette, which takes a shortcut in Settings ›
+// Shortcuts: the music stops at the end of the queue.
+func (msgs Messages) CmdSleepQueue() string {
+	return Catalog.Format(msgs.locale, "cmdSleepQueue", nil)
+}
+
+// CmdSleepTrack says "Sleep timer: end of this track"
+// in the language the app shows.
+//
+// A command of the command palette, which takes a shortcut in Settings ›
+// Shortcuts: the music stops at the end of the track that plays.
+func CmdSleepTrack() string { return In(i18n.Locale()).CmdSleepTrack() }
+
+// CmdSleepTrack says "Sleep timer: end of this track"
+// in the language of msgs.
+//
+// A command of the command palette, which takes a shortcut in Settings ›
+// Shortcuts: the music stops at the end of the track that plays.
+func (msgs Messages) CmdSleepTrack() string {
+	return Catalog.Format(msgs.locale, "cmdSleepTrack", nil)
 }
 
 // CmdSpeedAt says "{kind, select, podcasts {Podcasts} other {Songs}} play at {speed}"
@@ -26084,6 +26200,752 @@ func SkipPartsTitle() string { return In(i18n.Locale()).SkipPartsTitle() }
 // in the language of msgs.
 func (msgs Messages) SkipPartsTitle() string {
 	return Catalog.Format(msgs.locale, "skipPartsTitle", nil)
+}
+
+// SleepAdd says "+{minutes} min"
+// in the language the app shows.
+//
+// A button of the sleep timer's menu while the timer runs, and an item of
+// its submenus: the music stops that many minutes later. Keep it short.
+func SleepAdd(minutes int) string { return In(i18n.Locale()).SleepAdd(minutes) }
+
+// SleepAdd says "+{minutes} min"
+// in the language of msgs.
+//
+// A button of the sleep timer's menu while the timer runs, and an item of
+// its submenus: the music stops that many minutes later. Keep it short.
+func (msgs Messages) SleepAdd(minutes int) string {
+	return Catalog.Format(msgs.locale, "sleepAdd", map[string]any{"minutes": minutes})
+}
+
+// SleepAfterTracks says "the music stops after {count, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+//
+// A piece of the sleep timer's toasts (sleepTimerOn, assistantsToastSleep),
+// for a timer that stops at the end of a few tracks, the one that plays
+// first: from 2 to 20.
+func SleepAfterTracks(count int) string { return In(i18n.Locale()).SleepAfterTracks(count) }
+
+// SleepAfterTracks says "the music stops after {count, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+//
+// A piece of the sleep timer's toasts (sleepTimerOn, assistantsToastSleep),
+// for a timer that stops at the end of a few tracks, the one that plays
+// first: from 2 to 20.
+func (msgs Messages) SleepAfterTracks(count int) string {
+	return Catalog.Format(msgs.locale, "sleepAfterTracks", map[string]any{"count": count})
+}
+
+// SleepAfterTracksItem says "After {count, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+//
+// An item of the sleep timer's menu: the music stops at the end of a few
+// tracks, the one that plays first, from 2 to 20, which the buttons beside
+// it (sleepFewerTracks, sleepMoreTracks) change.
+func SleepAfterTracksItem(count int) string { return In(i18n.Locale()).SleepAfterTracksItem(count) }
+
+// SleepAfterTracksItem says "After {count, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+//
+// An item of the sleep timer's menu: the music stops at the end of a few
+// tracks, the one that plays first, from 2 to 20, which the buttons beside
+// it (sleepFewerTracks, sleepMoreTracks) change.
+func (msgs Messages) SleepAfterTracksItem(count int) string {
+	return Catalog.Format(msgs.locale, "sleepAfterTracksItem", map[string]any{"count": count})
+}
+
+// SleepAtQueueEnd says "the music stops at the end of the queue"
+// in the language the app shows.
+//
+// A piece of the sleep timer's toasts (sleepTimerOn, assistantsToastSleep),
+// for a timer that stops at the end of the queue, before the songs autoplay
+// adds.
+func SleepAtQueueEnd() string { return In(i18n.Locale()).SleepAtQueueEnd() }
+
+// SleepAtQueueEnd says "the music stops at the end of the queue"
+// in the language of msgs.
+//
+// A piece of the sleep timer's toasts (sleepTimerOn, assistantsToastSleep),
+// for a timer that stops at the end of the queue, before the songs autoplay
+// adds.
+func (msgs Messages) SleepAtQueueEnd() string {
+	return Catalog.Format(msgs.locale, "sleepAtQueueEnd", nil)
+}
+
+// SleepAtTrackEnd says "the music stops at the end of this track"
+// in the language the app shows.
+//
+// A piece of the sleep timer's toasts (sleepTimerOn, assistantsToastSleep),
+// for a timer that stops at the end of the track that plays.
+func SleepAtTrackEnd() string { return In(i18n.Locale()).SleepAtTrackEnd() }
+
+// SleepAtTrackEnd says "the music stops at the end of this track"
+// in the language of msgs.
+//
+// A piece of the sleep timer's toasts (sleepTimerOn, assistantsToastSleep),
+// for a timer that stops at the end of the track that plays.
+func (msgs Messages) SleepAtTrackEnd() string {
+	return Catalog.Format(msgs.locale, "sleepAtTrackEnd", nil)
+}
+
+// SleepBedtimeByDay says "By day of the week"
+// in the language the app shows.
+//
+// A choice of Window (sleepBedtimeWhen), in Settings › Playback › Sleep
+// timer: a window for each day, each with its own switch.
+func SleepBedtimeByDay() string { return In(i18n.Locale()).SleepBedtimeByDay() }
+
+// SleepBedtimeByDay says "By day of the week"
+// in the language of msgs.
+//
+// A choice of Window (sleepBedtimeWhen), in Settings › Playback › Sleep
+// timer: a window for each day, each with its own switch.
+func (msgs Messages) SleepBedtimeByDay() string {
+	return Catalog.Format(msgs.locale, "sleepBedtimeByDay", nil)
+}
+
+// SleepBedtimeDayLabel says "Window of {day}"
+// in the language the app shows.
+//
+// The label, for screen readers, of the switch of a day's window of the
+// night, in Settings › Playback › Sleep timer. {day} is a day of the
+// week.
+func SleepBedtimeDayLabel(day string) string { return In(i18n.Locale()).SleepBedtimeDayLabel(day) }
+
+// SleepBedtimeDayLabel says "Window of {day}"
+// in the language of msgs.
+//
+// The label, for screen readers, of the switch of a day's window of the
+// night, in Settings › Playback › Sleep timer. {day} is a day of the
+// week.
+func (msgs Messages) SleepBedtimeDayLabel(day string) string {
+	return Catalog.Format(msgs.locale, "sleepBedtimeDayLabel", map[string]any{"day": day})
+}
+
+// SleepBedtimeDesc says "Music that starts playing inside the window below starts the timer, at the length you chose last: {minutes, plural, o…"
+// in the language the app shows.
+//
+// The description of Start the sleep timer by itself (sleepBedtimeTitle),
+// in Settings › Playback › Sleep timer.
+func SleepBedtimeDesc(minutes int) string { return In(i18n.Locale()).SleepBedtimeDesc(minutes) }
+
+// SleepBedtimeDesc says "Music that starts playing inside the window below starts the timer, at the length you chose last: {minutes, plural, o…"
+// in the language of msgs.
+//
+// The description of Start the sleep timer by itself (sleepBedtimeTitle),
+// in Settings › Playback › Sleep timer.
+func (msgs Messages) SleepBedtimeDesc(minutes int) string {
+	return Catalog.Format(msgs.locale, "sleepBedtimeDesc", map[string]any{"minutes": minutes})
+}
+
+// SleepBedtimeEndLabel says "End of the window of {day}"
+// in the language the app shows.
+//
+// The label, for screen readers, of the menu of the time a window of the
+// night ends, in Settings › Playback › Sleep timer. {day} is a day of
+// the week, or Every day (sleepBedtimeEveryDay).
+func SleepBedtimeEndLabel(day string) string { return In(i18n.Locale()).SleepBedtimeEndLabel(day) }
+
+// SleepBedtimeEndLabel says "End of the window of {day}"
+// in the language of msgs.
+//
+// The label, for screen readers, of the menu of the time a window of the
+// night ends, in Settings › Playback › Sleep timer. {day} is a day of
+// the week, or Every day (sleepBedtimeEveryDay).
+func (msgs Messages) SleepBedtimeEndLabel(day string) string {
+	return Catalog.Format(msgs.locale, "sleepBedtimeEndLabel", map[string]any{"day": day})
+}
+
+// SleepBedtimeEveryDay says "Every day"
+// in the language the app shows.
+//
+// A choice of Window (sleepBedtimeWhen), in Settings › Playback › Sleep
+// timer, and the title of the row of that window's times.
+func SleepBedtimeEveryDay() string { return In(i18n.Locale()).SleepBedtimeEveryDay() }
+
+// SleepBedtimeEveryDay says "Every day"
+// in the language of msgs.
+//
+// A choice of Window (sleepBedtimeWhen), in Settings › Playback › Sleep
+// timer, and the title of the row of that window's times.
+func (msgs Messages) SleepBedtimeEveryDay() string {
+	return Catalog.Format(msgs.locale, "sleepBedtimeEveryDay", nil)
+}
+
+// SleepBedtimeHint says "A window that ends before it starts ends the next morning. Cancel the timer inside a window, and it stays off until t…"
+// in the language the app shows.
+//
+// A hint under the windows of the night in Settings › Playback › Sleep
+// timer.
+func SleepBedtimeHint() string { return In(i18n.Locale()).SleepBedtimeHint() }
+
+// SleepBedtimeHint says "A window that ends before it starts ends the next morning. Cancel the timer inside a window, and it stays off until t…"
+// in the language of msgs.
+//
+// A hint under the windows of the night in Settings › Playback › Sleep
+// timer.
+func (msgs Messages) SleepBedtimeHint() string {
+	return Catalog.Format(msgs.locale, "sleepBedtimeHint", nil)
+}
+
+// SleepBedtimeStartLabel says "Start of the window of {day}"
+// in the language the app shows.
+//
+// The label, for screen readers, of the menu of the time a window of the
+// night starts, in Settings › Playback › Sleep timer. {day} is a day of
+// the week, or Every day (sleepBedtimeEveryDay).
+func SleepBedtimeStartLabel(day string) string { return In(i18n.Locale()).SleepBedtimeStartLabel(day) }
+
+// SleepBedtimeStartLabel says "Start of the window of {day}"
+// in the language of msgs.
+//
+// The label, for screen readers, of the menu of the time a window of the
+// night starts, in Settings › Playback › Sleep timer. {day} is a day of
+// the week, or Every day (sleepBedtimeEveryDay).
+func (msgs Messages) SleepBedtimeStartLabel(day string) string {
+	return Catalog.Format(msgs.locale, "sleepBedtimeStartLabel", map[string]any{"day": day})
+}
+
+// SleepBedtimeTitle says "Start the sleep timer by itself"
+// in the language the app shows.
+//
+// A switch of Settings › Playback › Sleep timer: the timer starts by
+// itself as music starts playing inside the window of the night set below
+// it.
+func SleepBedtimeTitle() string { return In(i18n.Locale()).SleepBedtimeTitle() }
+
+// SleepBedtimeTitle says "Start the sleep timer by itself"
+// in the language of msgs.
+//
+// A switch of Settings › Playback › Sleep timer: the timer starts by
+// itself as music starts playing inside the window of the night set below
+// it.
+func (msgs Messages) SleepBedtimeTitle() string {
+	return Catalog.Format(msgs.locale, "sleepBedtimeTitle", nil)
+}
+
+// SleepBedtimeTo says "to"
+// in the language the app shows.
+//
+// Between the start and the end of a window of the night, in Settings ›
+// Playback › Sleep timer, as in 22:00 to 06:00. Only this word shows,
+// between two menus of times.
+func SleepBedtimeTo() string { return In(i18n.Locale()).SleepBedtimeTo() }
+
+// SleepBedtimeTo says "to"
+// in the language of msgs.
+//
+// Between the start and the end of a window of the night, in Settings ›
+// Playback › Sleep timer, as in 22:00 to 06:00. Only this word shows,
+// between two menus of times.
+func (msgs Messages) SleepBedtimeTo() string {
+	return Catalog.Format(msgs.locale, "sleepBedtimeTo", nil)
+}
+
+// SleepBedtimeWhen says "Window"
+// in the language the app shows.
+//
+// A setting of Settings › Playback › Sleep timer, under Start the sleep
+// timer by itself: whether the window of the night is the same every day
+// (sleepBedtimeEveryDay) or one for each day of the week
+// (sleepBedtimeByDay).
+func SleepBedtimeWhen() string { return In(i18n.Locale()).SleepBedtimeWhen() }
+
+// SleepBedtimeWhen says "Window"
+// in the language of msgs.
+//
+// A setting of Settings › Playback › Sleep timer, under Start the sleep
+// timer by itself: whether the window of the night is the same every day
+// (sleepBedtimeEveryDay) or one for each day of the week
+// (sleepBedtimeByDay).
+func (msgs Messages) SleepBedtimeWhen() string {
+	return Catalog.Format(msgs.locale, "sleepBedtimeWhen", nil)
+}
+
+// SleepCancel says "Cancel"
+// in the language the app shows.
+//
+// A button of the sleep timer's menu while the timer runs, and an item of
+// its submenus: the timer ends, and the music plays on.
+func SleepCancel() string { return In(i18n.Locale()).SleepCancel() }
+
+// SleepCancel says "Cancel"
+// in the language of msgs.
+//
+// A button of the sleep timer's menu while the timer runs, and an item of
+// its submenus: the timer ends, and the music plays on.
+func (msgs Messages) SleepCancel() string {
+	return Catalog.Format(msgs.locale, "sleepCancel", nil)
+}
+
+// SleepEndOfQueue says "End of the queue"
+// in the language the app shows.
+//
+// An item of the sleep timer's menu, and of its submenus: the music stops
+// at the end of the queue, before the songs autoplay adds.
+func SleepEndOfQueue() string { return In(i18n.Locale()).SleepEndOfQueue() }
+
+// SleepEndOfQueue says "End of the queue"
+// in the language of msgs.
+//
+// An item of the sleep timer's menu, and of its submenus: the music stops
+// at the end of the queue, before the songs autoplay adds.
+func (msgs Messages) SleepEndOfQueue() string {
+	return Catalog.Format(msgs.locale, "sleepEndOfQueue", nil)
+}
+
+// SleepEndOfTrack says "End of this track"
+// in the language the app shows.
+//
+// An item of the sleep timer's menu, and of its submenus: the music stops
+// at the end of the track that plays.
+func SleepEndOfTrack() string { return In(i18n.Locale()).SleepEndOfTrack() }
+
+// SleepEndOfTrack says "End of this track"
+// in the language of msgs.
+//
+// An item of the sleep timer's menu, and of its submenus: the music stops
+// at the end of the track that plays.
+func (msgs Messages) SleepEndOfTrack() string {
+	return Catalog.Format(msgs.locale, "sleepEndOfTrack", nil)
+}
+
+// SleepFadeDesc says "Before the sleep timer stops the music, it fades out over this time. Your volume stays where it is."
+// in the language the app shows.
+//
+// The description of Fade out (sleepFadeTitle), in Settings › Playback
+// › Sleep timer.
+func SleepFadeDesc() string { return In(i18n.Locale()).SleepFadeDesc() }
+
+// SleepFadeDesc says "Before the sleep timer stops the music, it fades out over this time. Your volume stays where it is."
+// in the language of msgs.
+//
+// The description of Fade out (sleepFadeTitle), in Settings › Playback
+// › Sleep timer.
+func (msgs Messages) SleepFadeDesc() string {
+	return Catalog.Format(msgs.locale, "sleepFadeDesc", nil)
+}
+
+// SleepFadeOff says "Off"
+// in the language the app shows.
+//
+// A choice of Fade out (sleepFadeTitle), in Settings › Playback › Sleep
+// timer: no fade.
+func SleepFadeOff() string { return In(i18n.Locale()).SleepFadeOff() }
+
+// SleepFadeOff says "Off"
+// in the language of msgs.
+//
+// A choice of Fade out (sleepFadeTitle), in Settings › Playback › Sleep
+// timer: no fade.
+func (msgs Messages) SleepFadeOff() string {
+	return Catalog.Format(msgs.locale, "sleepFadeOff", nil)
+}
+
+// SleepFadeSeconds says "{seconds} s"
+// in the language the app shows.
+//
+// A choice of Fade out (sleepFadeTitle), in Settings › Playback › Sleep
+// timer: a number of seconds, abbreviated.
+func SleepFadeSeconds(seconds int) string { return In(i18n.Locale()).SleepFadeSeconds(seconds) }
+
+// SleepFadeSeconds says "{seconds} s"
+// in the language of msgs.
+//
+// A choice of Fade out (sleepFadeTitle), in Settings › Playback › Sleep
+// timer: a number of seconds, abbreviated.
+func (msgs Messages) SleepFadeSeconds(seconds int) string {
+	return Catalog.Format(msgs.locale, "sleepFadeSeconds", map[string]any{"seconds": seconds})
+}
+
+// SleepFadeTitle says "Fade out"
+// in the language the app shows.
+//
+// A setting of Settings › Playback › Sleep timer: how long the music
+// fades out before the timer stops it.
+func SleepFadeTitle() string { return In(i18n.Locale()).SleepFadeTitle() }
+
+// SleepFadeTitle says "Fade out"
+// in the language of msgs.
+//
+// A setting of Settings › Playback › Sleep timer: how long the music
+// fades out before the timer stops it.
+func (msgs Messages) SleepFadeTitle() string {
+	return Catalog.Format(msgs.locale, "sleepFadeTitle", nil)
+}
+
+// SleepFewerTracks says "Fewer tracks"
+// in the language the app shows.
+//
+// The label of the minus button beside After N tracks
+// (sleepAfterTracksItem) in the sleep timer's menu.
+func SleepFewerTracks() string { return In(i18n.Locale()).SleepFewerTracks() }
+
+// SleepFewerTracks says "Fewer tracks"
+// in the language of msgs.
+//
+// The label of the minus button beside After N tracks
+// (sleepAfterTracksItem) in the sleep timer's menu.
+func (msgs Messages) SleepFewerTracks() string {
+	return Catalog.Format(msgs.locale, "sleepFewerTracks", nil)
+}
+
+// SleepFinish says "Let the track finish"
+// in the language the app shows.
+//
+// A switch of the sleep timer's menu, and a setting of Settings ›
+// Playback › Sleep timer: when the time runs out, the music stops at the
+// end of the track that plays.
+func SleepFinish() string { return In(i18n.Locale()).SleepFinish() }
+
+// SleepFinish says "Let the track finish"
+// in the language of msgs.
+//
+// A switch of the sleep timer's menu, and a setting of Settings ›
+// Playback › Sleep timer: when the time runs out, the music stops at the
+// end of the track that plays.
+func (msgs Messages) SleepFinish() string {
+	return Catalog.Format(msgs.locale, "sleepFinish", nil)
+}
+
+// SleepFinishDesc says "When the time runs out, the music stops at the end of the track that plays, and fades out in its last seconds."
+// in the language the app shows.
+//
+// The description of Let the track finish (sleepFinish), in Settings ›
+// Playback › Sleep timer.
+func SleepFinishDesc() string { return In(i18n.Locale()).SleepFinishDesc() }
+
+// SleepFinishDesc says "When the time runs out, the music stops at the end of the track that plays, and fades out in its last seconds."
+// in the language of msgs.
+//
+// The description of Let the track finish (sleepFinish), in Settings ›
+// Playback › Sleep timer.
+func (msgs Messages) SleepFinishDesc() string {
+	return Catalog.Format(msgs.locale, "sleepFinishDesc", nil)
+}
+
+// SleepInMinutes says "the music stops in {minutes, plural, one {# minute} other {# minutes}}"
+// in the language the app shows.
+//
+// A piece of the sleep timer's toasts (sleepTimerOn, sleepTimerBedtime,
+// assistantsToastSleep): how long the timer runs, in whole minutes.
+func SleepInMinutes(minutes int) string { return In(i18n.Locale()).SleepInMinutes(minutes) }
+
+// SleepInMinutes says "the music stops in {minutes, plural, one {# minute} other {# minutes}}"
+// in the language of msgs.
+//
+// A piece of the sleep timer's toasts (sleepTimerOn, sleepTimerBedtime,
+// assistantsToastSleep): how long the timer runs, in whole minutes.
+func (msgs Messages) SleepInMinutes(minutes int) string {
+	return Catalog.Format(msgs.locale, "sleepInMinutes", map[string]any{"minutes": minutes})
+}
+
+// SleepMinutes says "{minutes, plural, one {# minute} other {# minutes}}"
+// in the language the app shows.
+//
+// An item of the sleep timer's menu, and of its submenu in the mini
+// player's and the tray icon's menus: a length of the timer.
+func SleepMinutes(minutes int) string { return In(i18n.Locale()).SleepMinutes(minutes) }
+
+// SleepMinutes says "{minutes, plural, one {# minute} other {# minutes}}"
+// in the language of msgs.
+//
+// An item of the sleep timer's menu, and of its submenu in the mini
+// player's and the tray icon's menus: a length of the timer.
+func (msgs Messages) SleepMinutes(minutes int) string {
+	return Catalog.Format(msgs.locale, "sleepMinutes", map[string]any{"minutes": minutes})
+}
+
+// SleepMinutesField says "Minutes"
+// in the language the app shows.
+//
+// The placeholder of the field of the sleep timer's menu where the user
+// types a length of the timer, in minutes.
+func SleepMinutesField() string { return In(i18n.Locale()).SleepMinutesField() }
+
+// SleepMinutesField says "Minutes"
+// in the language of msgs.
+//
+// The placeholder of the field of the sleep timer's menu where the user
+// types a length of the timer, in minutes.
+func (msgs Messages) SleepMinutesField() string {
+	return Catalog.Format(msgs.locale, "sleepMinutesField", nil)
+}
+
+// SleepMinutesFieldLabel says "Length of the sleep timer, in minutes"
+// in the language the app shows.
+//
+// The label, for screen readers, of the field of the sleep timer's menu
+// where the user types a length of the timer.
+func SleepMinutesFieldLabel() string { return In(i18n.Locale()).SleepMinutesFieldLabel() }
+
+// SleepMinutesFieldLabel says "Length of the sleep timer, in minutes"
+// in the language of msgs.
+//
+// The label, for screen readers, of the field of the sleep timer's menu
+// where the user types a length of the timer.
+func (msgs Messages) SleepMinutesFieldLabel() string {
+	return Catalog.Format(msgs.locale, "sleepMinutesFieldLabel", nil)
+}
+
+// SleepMinutesInvalid says "A whole number of minutes, from 1 to {max}"
+// in the language the app shows.
+//
+// Under the field of minutes of the sleep timer's menu, when what the user
+// typed isn't a length the timer takes.
+func SleepMinutesInvalid(max int) string { return In(i18n.Locale()).SleepMinutesInvalid(max) }
+
+// SleepMinutesInvalid says "A whole number of minutes, from 1 to {max}"
+// in the language of msgs.
+//
+// Under the field of minutes of the sleep timer's menu, when what the user
+// typed isn't a length the timer takes.
+func (msgs Messages) SleepMinutesInvalid(max int) string {
+	return Catalog.Format(msgs.locale, "sleepMinutesInvalid", map[string]any{"max": max})
+}
+
+// SleepMoreTracks says "More tracks"
+// in the language the app shows.
+//
+// The label of the plus button beside After N tracks (sleepAfterTracksItem)
+// in the sleep timer's menu.
+func SleepMoreTracks() string { return In(i18n.Locale()).SleepMoreTracks() }
+
+// SleepMoreTracks says "More tracks"
+// in the language of msgs.
+//
+// The label of the plus button beside After N tracks (sleepAfterTracksItem)
+// in the sleep timer's menu.
+func (msgs Messages) SleepMoreTracks() string {
+	return Catalog.Format(msgs.locale, "sleepMoreTracks", nil)
+}
+
+// SleepStart says "Start"
+// in the language the app shows.
+//
+// The button beside the field of minutes in the sleep timer's menu, which
+// starts the timer.
+func SleepStart() string { return In(i18n.Locale()).SleepStart() }
+
+// SleepStart says "Start"
+// in the language of msgs.
+//
+// The button beside the field of minutes in the sleep timer's menu, which
+// starts the timer.
+func (msgs Messages) SleepStart() string {
+	return Catalog.Format(msgs.locale, "sleepStart", nil)
+}
+
+// SleepStopsAfterTracks says "Stops after {count, plural, one {# track} other {# tracks}}"
+// in the language the app shows.
+//
+// The first line of the sleep timer's menu while the timer stops the music
+// at the end of a few tracks: how many are left to end, the one that plays
+// first, 2 or more.
+func SleepStopsAfterTracks(count int) string { return In(i18n.Locale()).SleepStopsAfterTracks(count) }
+
+// SleepStopsAfterTracks says "Stops after {count, plural, one {# track} other {# tracks}}"
+// in the language of msgs.
+//
+// The first line of the sleep timer's menu while the timer stops the music
+// at the end of a few tracks: how many are left to end, the one that plays
+// first, 2 or more.
+func (msgs Messages) SleepStopsAfterTracks(count int) string {
+	return Catalog.Format(msgs.locale, "sleepStopsAfterTracks", map[string]any{"count": count})
+}
+
+// SleepStopsAtQueue says "Stops at the end of the queue"
+// in the language the app shows.
+//
+// The first line of the sleep timer's menu while the timer stops the music
+// at the end of the queue.
+func SleepStopsAtQueue() string { return In(i18n.Locale()).SleepStopsAtQueue() }
+
+// SleepStopsAtQueue says "Stops at the end of the queue"
+// in the language of msgs.
+//
+// The first line of the sleep timer's menu while the timer stops the music
+// at the end of the queue.
+func (msgs Messages) SleepStopsAtQueue() string {
+	return Catalog.Format(msgs.locale, "sleepStopsAtQueue", nil)
+}
+
+// SleepStopsAtTrack says "Stops at the end of this track"
+// in the language the app shows.
+//
+// The first line of the sleep timer's menu while the timer stops the music
+// at the end of the track that plays.
+func SleepStopsAtTrack() string { return In(i18n.Locale()).SleepStopsAtTrack() }
+
+// SleepStopsAtTrack says "Stops at the end of this track"
+// in the language of msgs.
+//
+// The first line of the sleep timer's menu while the timer stops the music
+// at the end of the track that plays.
+func (msgs Messages) SleepStopsAtTrack() string {
+	return Catalog.Format(msgs.locale, "sleepStopsAtTrack", nil)
+}
+
+// SleepStopsIn says "Stops in {time}"
+// in the language the app shows.
+//
+// The first line of the sleep timer's menu while a timer of minutes runs.
+// {time} is how long it runs on, as 12:34.
+func SleepStopsIn(time_ string) string { return In(i18n.Locale()).SleepStopsIn(time_) }
+
+// SleepStopsIn says "Stops in {time}"
+// in the language of msgs.
+//
+// The first line of the sleep timer's menu while a timer of minutes runs.
+// {time} is how long it runs on, as 12:34.
+func (msgs Messages) SleepStopsIn(time_ string) string {
+	return Catalog.Format(msgs.locale, "sleepStopsIn", map[string]any{"time": time_})
+}
+
+// SleepTimerBedtime says "It's bedtime, so the sleep timer is on: {what}"
+// in the language the app shows.
+//
+// Toast as the sleep timer starts by itself, as music starts playing inside
+// the bedtime window the user set in Settings › Playback › Sleep timer.
+// {what} is sleepInMinutes.
+func SleepTimerBedtime(what string) string { return In(i18n.Locale()).SleepTimerBedtime(what) }
+
+// SleepTimerBedtime says "It's bedtime, so the sleep timer is on: {what}"
+// in the language of msgs.
+//
+// Toast as the sleep timer starts by itself, as music starts playing inside
+// the bedtime window the user set in Settings › Playback › Sleep timer.
+// {what} is sleepInMinutes.
+func (msgs Messages) SleepTimerBedtime(what string) string {
+	return Catalog.Format(msgs.locale, "sleepTimerBedtime", map[string]any{"what": what})
+}
+
+// SleepTimerEnded says "The sleep timer ran out with nothing playing"
+// in the language the app shows.
+//
+// Toast when the sleep timer's time ran out while the music was paused
+// already: it ends.
+func SleepTimerEnded() string { return In(i18n.Locale()).SleepTimerEnded() }
+
+// SleepTimerEnded says "The sleep timer ran out with nothing playing"
+// in the language of msgs.
+//
+// Toast when the sleep timer's time ran out while the music was paused
+// already: it ends.
+func (msgs Messages) SleepTimerEnded() string {
+	return Catalog.Format(msgs.locale, "sleepTimerEnded", nil)
+}
+
+// SleepTimerFinishing says "Time's up: the music stops at the end of this track"
+// in the language the app shows.
+//
+// Toast when the sleep timer's time ran out while Let the track finish
+// (sleepFinish) is on: the track that plays plays to its end.
+func SleepTimerFinishing() string { return In(i18n.Locale()).SleepTimerFinishing() }
+
+// SleepTimerFinishing says "Time's up: the music stops at the end of this track"
+// in the language of msgs.
+//
+// Toast when the sleep timer's time ran out while Let the track finish
+// (sleepFinish) is on: the track that plays plays to its end.
+func (msgs Messages) SleepTimerFinishing() string {
+	return Catalog.Format(msgs.locale, "sleepTimerFinishing", nil)
+}
+
+// SleepTimerLeft says "Sleep timer: {time} left"
+// in the language the app shows.
+//
+// The label and tip of the moon button by the player while the sleep timer
+// runs. {time} is how long it runs on, as 12:34 or 1:02:03.
+func SleepTimerLeft(time_ string) string { return In(i18n.Locale()).SleepTimerLeft(time_) }
+
+// SleepTimerLeft says "Sleep timer: {time} left"
+// in the language of msgs.
+//
+// The label and tip of the moon button by the player while the sleep timer
+// runs. {time} is how long it runs on, as 12:34 or 1:02:03.
+func (msgs Messages) SleepTimerLeft(time_ string) string {
+	return Catalog.Format(msgs.locale, "sleepTimerLeft", map[string]any{"time": time_})
+}
+
+// SleepTimerOff says "Sleep timer off"
+// in the language the app shows.
+//
+// Toast as the user cancels the sleep timer: the music plays on.
+func SleepTimerOff() string { return In(i18n.Locale()).SleepTimerOff() }
+
+// SleepTimerOff says "Sleep timer off"
+// in the language of msgs.
+//
+// Toast as the user cancels the sleep timer: the music plays on.
+func (msgs Messages) SleepTimerOff() string {
+	return Catalog.Format(msgs.locale, "sleepTimerOff", nil)
+}
+
+// SleepTimerOffAsleep says "Sleep timer off, as the computer went to sleep"
+// in the language the app shows.
+//
+// Toast, seen once the computer wakes, when the computer going to sleep
+// ended the sleep timer.
+func SleepTimerOffAsleep() string { return In(i18n.Locale()).SleepTimerOffAsleep() }
+
+// SleepTimerOffAsleep says "Sleep timer off, as the computer went to sleep"
+// in the language of msgs.
+//
+// Toast, seen once the computer wakes, when the computer going to sleep
+// ended the sleep timer.
+func (msgs Messages) SleepTimerOffAsleep() string {
+	return Catalog.Format(msgs.locale, "sleepTimerOffAsleep", nil)
+}
+
+// SleepTimerOn says "Sleep timer on: {what}"
+// in the language the app shows.
+//
+// Toast as the user starts the sleep timer, or adds minutes to it. {what}
+// is sleepInMinutes, sleepAtTrackEnd, sleepAfterTracks or sleepAtQueueEnd.
+func SleepTimerOn(what string) string { return In(i18n.Locale()).SleepTimerOn(what) }
+
+// SleepTimerOn says "Sleep timer on: {what}"
+// in the language of msgs.
+//
+// Toast as the user starts the sleep timer, or adds minutes to it. {what}
+// is sleepInMinutes, sleepAtTrackEnd, sleepAfterTracks or sleepAtQueueEnd.
+func (msgs Messages) SleepTimerOn(what string) string {
+	return Catalog.Format(msgs.locale, "sleepTimerOn", map[string]any{"what": what})
+}
+
+// SleepTimerPaused says "The sleep timer paused the music"
+// in the language the app shows.
+//
+// Toast when the sleep timer stopped the music, after its time or at the
+// end of a track or of the queue.
+func SleepTimerPaused() string { return In(i18n.Locale()).SleepTimerPaused() }
+
+// SleepTimerPaused says "The sleep timer paused the music"
+// in the language of msgs.
+//
+// Toast when the sleep timer stopped the music, after its time or at the
+// end of a track or of the queue.
+func (msgs Messages) SleepTimerPaused() string {
+	return Catalog.Format(msgs.locale, "sleepTimerPaused", nil)
+}
+
+// SleepTimerTitle says "Sleep timer"
+// in the language the app shows.
+//
+// The moon button by the player, the title of its menu, of a submenu of the
+// mini player's and the tray icon's menus, and of a group of Settings ›
+// Playback.
+func SleepTimerTitle() string { return In(i18n.Locale()).SleepTimerTitle() }
+
+// SleepTimerTitle says "Sleep timer"
+// in the language of msgs.
+//
+// The moon button by the player, the title of its menu, of a submenu of the
+// mini player's and the tray icon's menus, and of a group of Settings ›
+// Playback.
+func (msgs Messages) SleepTimerTitle() string {
+	return Catalog.Format(msgs.locale, "sleepTimerTitle", nil)
 }
 
 // SpeedAt says "{speed}, at their own pitch."

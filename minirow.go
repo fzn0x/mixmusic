@@ -117,8 +117,10 @@ func (s *shell) miniHiddenItems(m *ui.Menu) {
 }
 
 // miniMenu is the mini player's menu, on a right click: the buttons its
-// window has no room for, then the speed of what plays.
+// window has no room for, then the speed of what plays, and the sleep
+// timer.
 func (s *shell) miniMenu(m *ui.Menu) {
 	s.miniHiddenItems(m)
 	s.speedItems(m)
+	s.sleepItems(m)
 }

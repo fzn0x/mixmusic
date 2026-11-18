@@ -170,6 +170,9 @@ func (s *shell) outputRoom(c *ui.Context) *outputSlot {
 type outputSlot struct {
 	free  float32
 	shown bool
+	// moon tells that the sleep timer's button showed with no timer: it
+	// gives way to the device button (sleeptimer.go).
+	moon bool
 }
 
 // fits reports whether the device button fits beside the others: once

@@ -612,11 +612,10 @@ MixMusic dibangun di atas proyek-proyek berikut:
   dipakai di jendela aplikasi.
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**,
   yang ilmu warna HCT-nya diportkan menjadi warna-warna tema Material.
-- **[FCast](https://docs.fcast.org)**,
-  protokol terbuka yang dipakai MixMusic untuk
-  memutar lagu di penerima FCast. MixMusic adalah implementasi independennya,
-  dan tidak berafiliasi dengan FUTO; FCast adalah merek dagang terdaftar
-  milik FUTO.
+- **[FCast](https://docs.fcast.org)**, protokol terbuka yang dipakai MixMusic
+  untuk memutar lagu di penerima FCast. MixMusic adalah implementasi
+  independennya, dan tidak berafiliasi dengan FUTO; FCast adalah merek dagang
+  terdaftar milik FUTO.
 - **[Kevin MacLeod](https://incompetech.com)**, yang musiknya, di bawah
   lisensi [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/),
   diputar di situs web.

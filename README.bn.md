@@ -574,10 +574,9 @@ MixMusic এই প্রজেক্টগুলোর ওপর দাঁড�
   টাইপফেস।
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities),**
   যার HCT কালার সায়েন্সের পোর্ট হলো Material থিমগুলোর রং।
-- **[FCast](https://docs.fcast.org),**
-  যে উন্মুক্ত প্রোটোকল দিয়ে MixMusic FCast রিসিভারে
-  বাজায়। MixMusic তার একটি স্বাধীন বাস্তবায়ন, এবং FUTO-র সঙ্গে যুক্ত নয়;
-  FCast FUTO-র নিবন্ধিত ট্রেডমার্ক।
+- **[FCast](https://docs.fcast.org),** যে উন্মুক্ত প্রোটোকল দিয়ে MixMusic FCast
+  রিসিভারে বাজায়। MixMusic তার একটি স্বাধীন বাস্তবায়ন, এবং FUTO-র সঙ্গে যুক্ত
+  নয়; FCast FUTO-র নিবন্ধিত ট্রেডমার্ক।
 - **[Kevin MacLeod](https://incompetech.com),** যার সংগীত,
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)-এর অধীনে,
   ওয়েবসাইটে বাজে।

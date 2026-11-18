@@ -595,11 +595,10 @@ An gina MixMusic a kan waɗannan ayyuka:
   **[Archivo](https://github.com/Omnibus-Type/Archivo)**, haruffan tagogi.
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**,
   wanda launukan jigogin Material fassarar kimiyyar launi ta HCT ɗinsa ne.
-- **[FCast](https://docs.fcast.org)**,
-  buɗaɗɗiyar yarjejeniyar sadarwa wadda MixMusic yake
-  amfani da ita wajen kunna waƙa a kan masu karɓar FCast. MixMusic aiwatarwa
-  ce mai zaman kanta ta ita, kuma ba shi da alaƙa da FUTO; FCast alamar
-  kasuwanci ce mai rijista ta FUTO.
+- **[FCast](https://docs.fcast.org)**, buɗaɗɗiyar yarjejeniyar sadarwa wadda
+  MixMusic yake amfani da ita wajen kunna waƙa a kan masu karɓar FCast. MixMusic
+  aiwatarwa ce mai zaman kanta ta ita, kuma ba shi da alaƙa da FUTO; FCast
+  alamar kasuwanci ce mai rijista ta FUTO.
 - **[Kevin MacLeod](https://incompetech.com)**, wanda kiɗansa, a ƙarƙashin
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), yake kunnawa a
   shafin yanar gizo.

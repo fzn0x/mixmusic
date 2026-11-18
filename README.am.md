@@ -563,10 +563,9 @@ MixMusic የተገነባው በእነዚህ ፕሮጀክቶች ላይ ነው፦
   **[Archivo](https://github.com/Omnibus-Type/Archivo)**፣ የመስኮቶቹ ፊደል ቅርጾች።
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**፣
   የMaterial ገጽታዎች ቀለሞች ፖርት የሆኑበት የHCT የቀለም ሳይንስ ባለቤት።
-- **[FCast](https://docs.fcast.org)**፣
-  MixMusic በFCast ተቀባዮች ላይ የሚጫወትበት ክፍት ፕሮቶኮል።
-  MixMusic የራሱ ገለልተኛ አተገባበር ነው፣ ከFUTO ጋር ግንኙነት የለውም፤ FCast የFUTO
-  የተመዘገበ የንግድ ምልክት ነው።
+- **[FCast](https://docs.fcast.org)**፣ MixMusic በFCast ተቀባዮች ላይ የሚጫወትበት ክፍት
+  ፕሮቶኮል። MixMusic የራሱ ገለልተኛ አተገባበር ነው፣ ከFUTO ጋር ግንኙነት የለውም፤ FCast የFUTO የተመዘገበ
+  የንግድ ምልክት ነው።
 - **[Kevin MacLeod](https://incompetech.com)**፣ በ
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) ስር ያለው ሙዚቃው
   በድረ-ገጹ ላይ የሚጫወት።

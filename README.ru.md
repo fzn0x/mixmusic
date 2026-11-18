@@ -594,10 +594,9 @@ MixMusic построен на этих проектах:
   **[Archivo](https://github.com/Omnibus-Type/Archivo)**, шрифты окон.
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**,
   портом чьей цветовой науки HCT являются цвета тем Material.
-- **[FCast](https://docs.fcast.org)**,
-  открытый протокол, по которому MixMusic играет на
-  приёмниках FCast. MixMusic его независимая реализация и не связан с FUTO;
-  FCast является зарегистрированным товарным знаком FUTO.
+- **[FCast](https://docs.fcast.org)**, открытый протокол, по которому MixMusic
+  играет на приёмниках FCast. MixMusic является его независимой реализацией и не
+  связан с FUTO; FCast является зарегистрированным товарным знаком FUTO.
 - **[Kevin MacLeod](https://incompetech.com)**, чья музыка под лицензией
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) играет на
   сайте.

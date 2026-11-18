@@ -562,10 +562,9 @@ MixMusic इन प्रोजेक्ट पर बना है:
   **[Archivo](https://github.com/Omnibus-Type/Archivo)**, विंडो के फ़ॉन्ट।
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**,
   जिसके HCT कलर साइंस का पोर्ट Material थीम के रंग हैं।
-- **[FCast](https://docs.fcast.org)**,
-  वह खुला प्रोटोकॉल जिससे MixMusic FCast रिसीवर पर
-  चलाता है। MixMusic उसका एक स्वतंत्र कार्यान्वयन है, और FUTO से जुड़ा नहीं है;
-  FCast FUTO का पंजीकृत ट्रेडमार्क है।
+- **[FCast](https://docs.fcast.org)**, वह खुला प्रोटोकॉल जिससे MixMusic FCast
+  रिसीवर पर चलाता है। MixMusic उसका एक स्वतंत्र कार्यान्वयन है, और FUTO से जुड़ा
+  नहीं है; FCast FUTO का पंजीकृत ट्रेडमार्क है।
 - **[Kevin MacLeod](https://incompetech.com)**, जिनका संगीत,
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) के तहत, वेबसाइट पर
   बजता है।

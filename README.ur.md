@@ -628,10 +628,9 @@ MixMusic ان پروجیکٹس پر بنا ہے:
   **[Archivo](https://github.com/Omnibus-Type/Archivo)،** ونڈوز کے ٹائپ فیسز۔
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)،**
   جس کی HCT رنگ سائنس کا Material تھیمز کے رنگ پورٹ ہیں۔
-- **[FCast](https://docs.fcast.org)،**
-  وہ کھلا پروٹوکول جس سے MixMusic FCast ریسیورز پر
-  چلاتا ہے۔ MixMusic اس کا ایک آزاد نفاذ ہے، اور FUTO سے وابستہ نہیں؛ FCast
-  FUTO کا رجسٹرڈ ٹریڈ مارک ہے۔
+- **[FCast](https://docs.fcast.org)،** وہ کھلا پروٹوکول جس سے MixMusic FCast
+  ریسیورز پر چلاتا ہے۔ MixMusic اس کا ایک آزاد نفاذ ہے، اور FUTO سے وابستہ نہیں؛
+  FCast FUTO کا رجسٹرڈ ٹریڈ مارک ہے۔
 - **[Kevin MacLeod](https://incompetech.com)،** جن کی موسیقی،
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) کے تحت، ویب سائٹ
   پر چلتی ہے۔

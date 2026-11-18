@@ -2,7 +2,10 @@ package audio
 
 // The shelving and peaking filters of BiquadFilterNode, as Blink computes
 // and runs them (third_party/blink/renderer/platform/audio/biquad.cc, under
-// the BSD license of LICENSE.blink), for stereo and 5.1.
+// the BSD license of LICENSE.blink), for stereo and 5.1. The corrections of
+// headphones (#616) add shelves of a Q of their own, and low-pass and
+// high-pass filters, as Robert Bristow-Johnson's Audio EQ Cookbook makes
+// them.
 
 import "math"
 
@@ -12,7 +15,19 @@ const (
 	lowShelf filterKind = iota
 	highShelf
 	peaking
+	// lowShelfQ and highShelfQ are shelves of a Q of their own: Blink's
+	// have a slope of 1, which is a Q of 1/√2.
+	lowShelfQ
+	highShelfQ
+	// lowPass and highPass are of a Q as the cookbook has it, not as
+	// Blink's, whose Q is a resonance in dB.
+	lowPass
+	highPass
 )
+
+// leastQ is the least Q a filter computes with: a Q of 0 would divide by
+// zero.
+const leastQ = 1e-3
 
 // biquad is a second-order filter of up to maxChannels channels.
 type biquad struct {
@@ -22,14 +37,17 @@ type biquad struct {
 }
 
 // set computes the coefficients of a filter at frequency hz, of quality q
-// (for peaking) and gain in dB, as Blink's SetLowShelfParams,
-// SetHighShelfParams and SetPeakingParams do.
+// (for peaking, the shelves of a Q and the low-pass and high-pass) and gain
+// in dB (for peaking and the shelves), as Blink's SetLowShelfParams,
+// SetHighShelfParams and SetPeakingParams do, and the cookbook's LPF and
+// HPF.
 func (f *biquad) set(kind filterKind, hz, q, gain float64) {
 	frequency := min(max(hz/(Rate/2), 0), 1)
 	a := pow10(gain / 40)
 	switch kind {
-	case lowShelf, highShelf:
-		if frequency == 1 && kind == lowShelf || frequency == 0 && kind == highShelf {
+	case lowShelf, highShelf, lowShelfQ, highShelfQ:
+		low := kind == lowShelf || kind == lowShelfQ
+		if frequency == 1 && low || frequency == 0 && !low {
 			f.normalize(a*a, 0, 0, 1, 0, 0)
 			return
 		}
@@ -40,10 +58,13 @@ func (f *biquad) set(kind filterKind, hz, q, gain float64) {
 		w0 := math.Pi * frequency
 		const s = 1 // the slope: 1 is the most
 		alpha := 0.5 * math.Sin(w0) * math.Sqrt((a+1/a)*(1/s-1)+2)
+		if kind == lowShelfQ || kind == highShelfQ {
+			alpha = math.Sin(w0) / (2 * max(q, leastQ))
+		}
 		k := math.Cos(w0)
 		k2 := 2 * math.Sqrt(a) * alpha
 		ap1, am1 := a+1, a-1
-		if kind == lowShelf {
+		if low {
 			f.normalize(a*(ap1-am1*k+k2), 2*a*(am1-ap1*k), a*(ap1-am1*k-k2),
 				ap1+am1*k+k2, -2*(am1+ap1*k), ap1+am1*k-k2)
 		} else {
@@ -62,6 +83,22 @@ func (f *biquad) set(kind filterKind, hz, q, gain float64) {
 			alpha := math.Sin(w0) / (2 * q)
 			k := math.Cos(w0)
 			f.normalize(1+alpha*a, -2*k, 1-alpha*a, 1+alpha/a, -2*k, 1-alpha/a)
+		}
+	case lowPass, highPass:
+		switch {
+		case frequency == 1 && kind == lowPass || frequency == 0 && kind == highPass:
+			f.normalize(1, 0, 0, 1, 0, 0) // all of it passes
+		case frequency == 1 || frequency == 0:
+			f.normalize(0, 0, 0, 1, 0, 0) // none of it does
+		default:
+			w0 := math.Pi * frequency
+			alpha := math.Sin(w0) / (2 * max(q, leastQ))
+			k := math.Cos(w0)
+			if kind == lowPass {
+				f.normalize((1-k)/2, 1-k, (1-k)/2, 1+alpha, -2*k, 1-alpha)
+			} else {
+				f.normalize((1+k)/2, -(1 + k), (1+k)/2, 1+alpha, -2*k, 1-alpha)
+			}
 		}
 	}
 }

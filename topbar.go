@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/egoist/mygo/ui"
+	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/locales"
 )
@@ -58,7 +59,8 @@ const suggestPause = 180 * time.Millisecond
 // YouTube Music's suggestions for it, or the recent searches while it is
 // empty. Below the searches come the songs, albums, artists and playlists
 // YouTube Music suggests: a song plays at once, with its radio after it,
-// and the others open their page.
+// and the others open their page. A link to what a service has opens it
+// instead, with what it names as the only suggestion (links.go).
 func (s *shell) searchField(c *ui.Context) {
 	k := &s.lk
 	box := ui.Row(c).Height(36).MaxWidth(520).Grow(1).Shrink(1).MinWidth(160).Gap(8).PaddingX(12).
@@ -84,6 +86,12 @@ func (s *shell) searchField(c *ui.Context) {
 		box.Background(k.surface2)
 	}
 	search := func(q string) {
+		// A link opens what it names, as one of the recent searches kept
+		// before links weren't.
+		if l, ok := media.ParseLink(q); ok {
+			s.openLink(l)
+			return
+		}
 		if q = strings.TrimSpace(q); q != "" {
 			s.query = q
 			s.forget("suggest:")
@@ -105,8 +113,14 @@ func (s *shell) searchField(c *ui.Context) {
 		var (
 			options []string
 			items   []media.Item
+			linked  *app.Linked
 		)
-		if cb.Open() {
+		link, isLink := media.ParseLink(s.query)
+		switch {
+		case !cb.Open():
+		case isLink:
+			linked = s.linkSuggestion(c, link)
+		default:
 			options, items = s.suggestions(c)
 		}
 		cb.Popup(func(panel ui.Element) {
@@ -120,6 +134,9 @@ func (s *shell) searchField(c *ui.Context) {
 			// one the arrows reach comes into view.
 			_, h := c.Size()
 			ui.Scroll(c.Key("search-suggestions")).MaxHeight(max(h-b.Y-b.H-6-8-12, 120)).Children(func() {
+				if linked != nil {
+					s.linkedItem(c, cb, link, *linked)
+				}
 				for _, q := range options {
 					item := cb.Item(q).Height(36).PaddingX(12).Gap(12).AlignItems(ui.Center).Radius(k.radiusSm).Cursor(ui.CursorPointer)
 					ink, mark := k.text, k.muted
@@ -144,10 +161,17 @@ func (s *shell) searchField(c *ui.Context) {
 			// The choice comes as the popup closes, which then built no rows.
 			if it, ok := suggestedOf(s.suggested.Items, v); ok {
 				s.openSuggested(it)
+			} else if v == linkValue && isLink {
+				s.openLink(link)
 			} else {
 				search(v)
 			}
 		} else if in.Submitted() {
+			// A link opens with the suggestions closed, as a choice closes
+			// them: open, they would read again one that failed.
+			if isLink {
+				cb.SetOpen(false)
+			}
 			search(s.query)
 		}
 	})
@@ -219,10 +243,16 @@ func suggestedOf(items []media.Item, value string) (media.Item, bool) {
 // box suggests: its artwork, round for an artist, then its title over
 // what it is and by whom.
 func (s *shell) suggestedItem(c *ui.Context, cb ui.ComboboxParts, it media.Item) {
+	title, line, art := s.suggestedLine(it)
+	s.suggestedRow(c, cb, suggestedKey(it), it, title, line, art)
+}
+
+// suggestedRow is the row of it, of value, whose words are title over
+// line, and whose artwork is art.
+func (s *shell) suggestedRow(c *ui.Context, cb ui.ComboboxParts, value string, it media.Item, title, line string, art []media.Image) {
 	k := &s.lk
 	key := suggestedKey(it)
-	title, line, art := s.suggestedLine(it)
-	item := cb.Item(key).Height(48).PaddingX(8).Gap(12).AlignItems(ui.Center).Radius(k.radiusSm).Cursor(ui.CursorPointer).
+	item := cb.Item(value).Height(48).PaddingX(8).Gap(12).AlignItems(ui.Center).Radius(k.radiusSm).Cursor(ui.CursorPointer).
 		Label(locales.TopbarSuggestedLabel(title, line))
 	ink, mark := k.text, k.muted
 	if item.Highlighted() {

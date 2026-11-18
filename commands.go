@@ -7,6 +7,7 @@ import (
 
 	"github.com/egoist/mygo/ui"
 
+	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/locales"
 )
 
@@ -366,8 +367,12 @@ func (s *shell) palette(c *ui.Context) {
 		}
 	}
 	if query := strings.TrimSpace(s.paletteQuery); query != "" {
-		// Enter searches what was typed; the arrows reach the commands.
+		// Enter searches what was typed, or opens it, a link (links.go);
+		// the arrows reach the commands.
 		search := command{"search", locales.CmdSearchFor(query), "", locales.CmdGroupSearch(), func() { s.navigate(searchPath(query)) }}
+		if l, ok := media.ParseLink(query); ok {
+			search = command{"link", locales.CmdOpenLink(), "", locales.CmdGroupSearch(), func() { s.openLink(l) }}
+		}
 		// Last, the search of the settings: with no command found, Down
 		// reaches it.
 		settings := command{"settings.find", locales.CmdSearchSettingsFor(query), "", locales.CmdGroupSettings(), func() {

@@ -989,6 +989,10 @@
   "cmdGroupSearch": "search",
   "cmdGroupSettings": "settings",
   "cmdGroupView": "view",
+  "cmdOpenLink": "Open link",
+  "@cmdOpenLink": {
+    "description": "First item of the command palette, in place of cmdSearchFor, when what was typed is a link to a song, album, playlist, artist or podcast of YouTube, YouTube Music or Spotify: it plays the song or opens the page."
+  },
   "cmdPalettePlaceholder": "type a command or a search",
   "cmdPlayFirst": "Play something first",
   "cmdPlayerBack": "Back 10 seconds",
@@ -8414,9 +8418,22 @@
   "topbarKindEpisode": "Episode",
   "topbarKindPlaylist": "Playlist",
   "topbarKindPodcast": "Podcast",
+  "topbarKindRadio": "Radio",
+  "@topbarKindRadio": {
+    "description": "In the search box's suggestions, what the row of a pasted link to a YouTube radio is, before its song's artists, as \"Radio · Daft Punk\": the song plays with that radio after it. Shown as topbarKindSong is."
+  },
   "topbarKindSingle": "Single",
   "topbarKindSong": "Song",
   "topbarKindVideo": "Video",
+  "topbarLinkCantOpen": "Couldn't open the link: {error}",
+  "@topbarLinkCantOpen": {
+    "description": "Toast when a link pasted in the search box or the command palette names a song, album, playlist, artist or podcast that couldn't be read. {error} is why, often in the service's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "topbarLinkSpotifySignIn": "Sign in to Spotify in Settings › Accounts to open its links.",
   "@topbarLinkSpotifySignIn": {
     "description": "Toast when a Spotify link is pasted in the search box or the command palette while the user isn't signed in to Spotify. Its button opens Settings › Accounts."

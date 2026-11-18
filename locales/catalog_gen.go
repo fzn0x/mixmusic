@@ -3548,6 +3548,24 @@ func (msgs Messages) CmdGroupView() string {
 	return Catalog.Format(msgs.locale, "cmdGroupView", nil)
 }
 
+// CmdOpenLink says "Open link"
+// in the language the app shows.
+//
+// First item of the command palette, in place of cmdSearchFor, when what
+// was typed is a link to a song, album, playlist, artist or podcast of
+// YouTube, YouTube Music or Spotify: it plays the song or opens the page.
+func CmdOpenLink() string { return In(i18n.Locale()).CmdOpenLink() }
+
+// CmdOpenLink says "Open link"
+// in the language of msgs.
+//
+// First item of the command palette, in place of cmdSearchFor, when what
+// was typed is a link to a song, album, playlist, artist or podcast of
+// YouTube, YouTube Music or Spotify: it plays the song or opens the page.
+func (msgs Messages) CmdOpenLink() string {
+	return Catalog.Format(msgs.locale, "cmdOpenLink", nil)
+}
+
 // CmdPalettePlaceholder says "type a command or a search"
 // in the language the app shows.
 func CmdPalettePlaceholder() string { return In(i18n.Locale()).CmdPalettePlaceholder() }
@@ -25972,6 +25990,24 @@ func (msgs Messages) TopbarKindPodcast() string {
 	return Catalog.Format(msgs.locale, "topbarKindPodcast", nil)
 }
 
+// TopbarKindRadio says "Radio"
+// in the language the app shows.
+//
+// In the search box's suggestions, what the row of a pasted link to a
+// YouTube radio is, before its song's artists, as "Radio · Daft Punk": the
+// song plays with that radio after it. Shown as topbarKindSong is.
+func TopbarKindRadio() string { return In(i18n.Locale()).TopbarKindRadio() }
+
+// TopbarKindRadio says "Radio"
+// in the language of msgs.
+//
+// In the search box's suggestions, what the row of a pasted link to a
+// YouTube radio is, before its song's artists, as "Radio · Daft Punk": the
+// song plays with that radio after it. Shown as topbarKindSong is.
+func (msgs Messages) TopbarKindRadio() string {
+	return Catalog.Format(msgs.locale, "topbarKindRadio", nil)
+}
+
 // TopbarKindSingle says "Single"
 // in the language the app shows.
 func TopbarKindSingle() string { return In(i18n.Locale()).TopbarKindSingle() }
@@ -26000,6 +26036,24 @@ func TopbarKindVideo() string { return In(i18n.Locale()).TopbarKindVideo() }
 // in the language of msgs.
 func (msgs Messages) TopbarKindVideo() string {
 	return Catalog.Format(msgs.locale, "topbarKindVideo", nil)
+}
+
+// TopbarLinkCantOpen says "Couldn't open the link: {error}"
+// in the language the app shows.
+//
+// Toast when a link pasted in the search box or the command palette names a
+// song, album, playlist, artist or podcast that couldn't be read. {error}
+// is why, often in the service's own words.
+func TopbarLinkCantOpen(error string) string { return In(i18n.Locale()).TopbarLinkCantOpen(error) }
+
+// TopbarLinkCantOpen says "Couldn't open the link: {error}"
+// in the language of msgs.
+//
+// Toast when a link pasted in the search box or the command palette names a
+// song, album, playlist, artist or podcast that couldn't be read. {error}
+// is why, often in the service's own words.
+func (msgs Messages) TopbarLinkCantOpen(error string) string {
+	return Catalog.Format(msgs.locale, "topbarLinkCantOpen", map[string]any{"error": error})
 }
 
 // TopbarLinkSpotifySignIn says "Sign in to Spotify in Settings › Accounts to open its links."

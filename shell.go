@@ -27,6 +27,9 @@ func (s *shell) view(c *ui.Context) {
 	s.keepSpotifyPlaylists()
 	s.keepYouTubeSongs()
 	c.SetTheme(&s.lk.theme)
+	// A link read since the last frame opens, and says why it can't
+	// with this frame's toasts.
+	s.followLink()
 	s.toasts(c)
 	s.fileToast(c)
 	s.runShortcuts(c)

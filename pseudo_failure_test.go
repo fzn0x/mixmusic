@@ -40,7 +40,7 @@ func TestFailureWays(t *testing.T) {
 	usePseudoLocale(t)
 	for _, way := range []string{"the file", "finding it on YouTube Music", "finding its stream", "Spotify in MixMusic",
 		"the live stream", "the download, or the offline cache", "the stream", "the stream, tried again",
-		"its 5.1 surround audio", "YouTube's player API"} {
+		"its 5.1 surround audio", "YouTube's player API", "as your account", "as your account, tried again"} {
 		if got := failureWay(way); got == "" || got[0] != '[' {
 			t.Errorf("%q says %q, which no catalog translates", way, got)
 		}

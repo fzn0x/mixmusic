@@ -9442,18 +9442,228 @@ func (msgs Messages) ErrorSpotifyTooMany() string {
 	return Catalog.Format(msgs.locale, "errorSpotifyTooMany", nil)
 }
 
-// ErrorStreamAdults says "YouTube plays this track only to signed-in adults, on its own website"
+// ErrorStreamAccountEnded says "{why}; sign in to YouTube Music again, in Settings › Accounts, for your account to be asked"
 // in the language the app shows.
 //
 // Why a track's audio wasn't found, as a toast or inside a message that
-// leads it.
-func ErrorStreamAdults() string { return In(i18n.Locale()).ErrorStreamAdults() }
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, Play audio as your account is on, and YouTube ended the YouTube
+// Music session, or it lacks what asking as the account needs, so the
+// user's account wasn't asked for the audio. {why} is
+// errorStreamSignedInOnly, errorStreamAdults, errorStreamMembers or
+// errorStreamPremium.
+func ErrorStreamAccountEnded(why string) string {
+	return In(i18n.Locale()).ErrorStreamAccountEnded(why)
+}
 
-// ErrorStreamAdults says "YouTube plays this track only to signed-in adults, on its own website"
+// ErrorStreamAccountEnded says "{why}; sign in to YouTube Music again, in Settings › Accounts, for your account to be asked"
 // in the language of msgs.
 //
 // Why a track's audio wasn't found, as a toast or inside a message that
-// leads it.
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, Play audio as your account is on, and YouTube ended the YouTube
+// Music session, or it lacks what asking as the account needs, so the
+// user's account wasn't asked for the audio. {why} is
+// errorStreamSignedInOnly, errorStreamAdults, errorStreamMembers or
+// errorStreamPremium.
+func (msgs Messages) ErrorStreamAccountEnded(why string) string {
+	return Catalog.Format(msgs.locale, "errorStreamAccountEnded", map[string]any{"why": why})
+}
+
+// ErrorStreamAccountNoTools says "{why}; asking as your account takes yt-dlp and a JavaScript runtime, in Settings › Playback › Tools"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, Play audio as your account is on, and yt-dlp or a JavaScript
+// runtime is missing, which asking for the audio as the user's account
+// takes. Tools is the group toolSettingsGroup. yt-dlp is a program's name:
+// keep it. {why} is errorStreamSignedInOnly, errorStreamAdults,
+// errorStreamMembers or errorStreamPremium.
+func ErrorStreamAccountNoTools(why string) string {
+	return In(i18n.Locale()).ErrorStreamAccountNoTools(why)
+}
+
+// ErrorStreamAccountNoTools says "{why}; asking as your account takes yt-dlp and a JavaScript runtime, in Settings › Playback › Tools"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, Play audio as your account is on, and yt-dlp or a JavaScript
+// runtime is missing, which asking for the audio as the user's account
+// takes. Tools is the group toolSettingsGroup. yt-dlp is a program's name:
+// keep it. {why} is errorStreamSignedInOnly, errorStreamAdults,
+// errorStreamMembers or errorStreamPremium.
+func (msgs Messages) ErrorStreamAccountNoTools(why string) string {
+	return Catalog.Format(msgs.locale, "errorStreamAccountNoTools", map[string]any{"why": why})
+}
+
+// ErrorStreamAccountNotFirst says "{why}; your account is asked only while MixMusic uses the first Google account of your session, in Settings › Accounts"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, Play audio as your account is on, and MixMusic uses another
+// Google account of the YouTube Music session than its first, which alone
+// the audio is asked for as. {why} is errorStreamSignedInOnly,
+// errorStreamAdults, errorStreamMembers or errorStreamPremium.
+func ErrorStreamAccountNotFirst(why string) string {
+	return In(i18n.Locale()).ErrorStreamAccountNotFirst(why)
+}
+
+// ErrorStreamAccountNotFirst says "{why}; your account is asked only while MixMusic uses the first Google account of your session, in Settings › Accounts"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, Play audio as your account is on, and MixMusic uses another
+// Google account of the YouTube Music session than its first, which alone
+// the audio is asked for as. {why} is errorStreamSignedInOnly,
+// errorStreamAdults, errorStreamMembers or errorStreamPremium.
+func (msgs Messages) ErrorStreamAccountNotFirst(why string) string {
+	return Catalog.Format(msgs.locale, "errorStreamAccountNotFirst", map[string]any{"why": why})
+}
+
+// ErrorStreamAccountOff says "{why}; your account wasn't asked, as Play audio as your account is off, in Settings › Playback"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, and the switch Play audio as your account (audioAsAccountTitle)
+// is off. {why} is errorStreamAdults, errorStreamMembers or
+// errorStreamPremium. Name the switch as audioAsAccountTitle does.
+func ErrorStreamAccountOff(why string) string { return In(i18n.Locale()).ErrorStreamAccountOff(why) }
+
+// ErrorStreamAccountOff says "{why}; your account wasn't asked, as Play audio as your account is off, in Settings › Playback"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, and the switch Play audio as your account (audioAsAccountTitle)
+// is off. {why} is errorStreamAdults, errorStreamMembers or
+// errorStreamPremium. Name the switch as audioAsAccountTitle does.
+func (msgs Messages) ErrorStreamAccountOff(why string) string {
+	return Catalog.Format(msgs.locale, "errorStreamAccountOff", map[string]any{"why": why})
+}
+
+// ErrorStreamAccountRefused says "{why}; YouTube didn't give it to your account either"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, and the audio was asked for as the user's account too, which
+// YouTube didn't give either. {why} is errorStreamSignedInOnly,
+// errorStreamAdults, errorStreamMembers or errorStreamPremium.
+func ErrorStreamAccountRefused(why string) string {
+	return In(i18n.Locale()).ErrorStreamAccountRefused(why)
+}
+
+// ErrorStreamAccountRefused says "{why}; YouTube didn't give it to your account either"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, and the audio was asked for as the user's account too, which
+// YouTube didn't give either. {why} is errorStreamSignedInOnly,
+// errorStreamAdults, errorStreamMembers or errorStreamPremium.
+func (msgs Messages) ErrorStreamAccountRefused(why string) string {
+	return Catalog.Format(msgs.locale, "errorStreamAccountRefused", map[string]any{"why": why})
+}
+
+// ErrorStreamAccountSaver says "{why}; your account is asked only at the best Quality, in Settings › Playback"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, Play audio as your account is on, and Quality is data saver,
+// which never asks for the audio as the user's account. Quality is the
+// setting playbackQuality, and best its value playbackQualityBest: name
+// them as those do. {why} is errorStreamSignedInOnly, errorStreamAdults,
+// errorStreamMembers or errorStreamPremium.
+func ErrorStreamAccountSaver(why string) string {
+	return In(i18n.Locale()).ErrorStreamAccountSaver(why)
+}
+
+// ErrorStreamAccountSaver says "{why}; your account is asked only at the best Quality, in Settings › Playback"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, Play audio as your account is on, and Quality is data saver,
+// which never asks for the audio as the user's account. Quality is the
+// setting playbackQuality, and best its value playbackQualityBest: name
+// them as those do. {why} is errorStreamSignedInOnly, errorStreamAdults,
+// errorStreamMembers or errorStreamPremium.
+func (msgs Messages) ErrorStreamAccountSaver(why string) string {
+	return Catalog.Format(msgs.locale, "errorStreamAccountSaver", map[string]any{"why": why})
+}
+
+// ErrorStreamAccountSignIn says "{why}; sign in to YouTube Music in Settings › Accounts, then turn on Play audio as your account in Settings › Pla…"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, MixMusic isn't signed in to YouTube Music, and the switch Play
+// audio as your account (audioAsAccountTitle) is off. {why} is
+// errorStreamSignedInOnly, errorStreamAdults, errorStreamMembers or
+// errorStreamPremium. Name the switch as audioAsAccountTitle does.
+func ErrorStreamAccountSignIn(why string) string {
+	return In(i18n.Locale()).ErrorStreamAccountSignIn(why)
+}
+
+// ErrorStreamAccountSignIn says "{why}; sign in to YouTube Music in Settings › Accounts, then turn on Play audio as your account in Settings › Pla…"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, MixMusic isn't signed in to YouTube Music, and the switch Play
+// audio as your account (audioAsAccountTitle) is off. {why} is
+// errorStreamSignedInOnly, errorStreamAdults, errorStreamMembers or
+// errorStreamPremium. Name the switch as audioAsAccountTitle does.
+func (msgs Messages) ErrorStreamAccountSignIn(why string) string {
+	return Catalog.Format(msgs.locale, "errorStreamAccountSignIn", map[string]any{"why": why})
+}
+
+// ErrorStreamAccountSignedOut says "{why}; sign in to YouTube Music in Settings › Accounts for your account to be asked"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, Play audio as your account is on, and MixMusic isn't signed in
+// to YouTube Music, so the user's account wasn't asked for the audio. {why}
+// is errorStreamSignedInOnly, errorStreamAdults, errorStreamMembers or
+// errorStreamPremium.
+func ErrorStreamAccountSignedOut(why string) string {
+	return In(i18n.Locale()).ErrorStreamAccountSignedOut(why)
+}
+
+// ErrorStreamAccountSignedOut says "{why}; sign in to YouTube Music in Settings › Accounts for your account to be asked"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay: YouTube plays it only to some signed-in
+// viewers, Play audio as your account is on, and MixMusic isn't signed in
+// to YouTube Music, so the user's account wasn't asked for the audio. {why}
+// is errorStreamSignedInOnly, errorStreamAdults, errorStreamMembers or
+// errorStreamPremium.
+func (msgs Messages) ErrorStreamAccountSignedOut(why string) string {
+	return Catalog.Format(msgs.locale, "errorStreamAccountSignedOut", map[string]any{"why": why})
+}
+
+// ErrorStreamAdults says "YouTube plays this track only to signed-in adults"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay, and as {why} of the errorStreamAccount
+// messages.
+func ErrorStreamAdults() string { return In(i18n.Locale()).ErrorStreamAdults() }
+
+// ErrorStreamAdults says "YouTube plays this track only to signed-in adults"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay, and as {why} of the errorStreamAccount
+// messages.
 func (msgs Messages) ErrorStreamAdults() string {
 	return Catalog.Format(msgs.locale, "errorStreamAdults", nil)
 }
@@ -9542,14 +9752,16 @@ func (msgs Messages) ErrorStreamLive() string {
 // in the language the app shows.
 //
 // Why a track's audio wasn't found, as a toast or inside a message that
-// leads it.
+// leads it, as playerCouldntPlay, and as {why} of the errorStreamAccount
+// messages.
 func ErrorStreamMembers() string { return In(i18n.Locale()).ErrorStreamMembers() }
 
 // ErrorStreamMembers says "only the members of its channel can play this track"
 // in the language of msgs.
 //
 // Why a track's audio wasn't found, as a toast or inside a message that
-// leads it.
+// leads it, as playerCouldntPlay, and as {why} of the errorStreamAccount
+// messages.
 func (msgs Messages) ErrorStreamMembers() string {
 	return Catalog.Format(msgs.locale, "errorStreamMembers", nil)
 }
@@ -9622,14 +9834,16 @@ func (msgs Messages) ErrorStreamNoFormat() string {
 // in the language the app shows.
 //
 // Why a track's audio wasn't found, as a toast or inside a message that
-// leads it.
+// leads it, as playerCouldntPlay, and as {why} of the errorStreamAccount
+// messages.
 func ErrorStreamPremium() string { return In(i18n.Locale()).ErrorStreamPremium() }
 
 // ErrorStreamPremium says "only YouTube Music Premium members can play this track"
 // in the language of msgs.
 //
 // Why a track's audio wasn't found, as a toast or inside a message that
-// leads it.
+// leads it, as playerCouldntPlay, and as {why} of the errorStreamAccount
+// messages.
 func (msgs Messages) ErrorStreamPremium() string {
 	return Catalog.Format(msgs.locale, "errorStreamPremium", nil)
 }
@@ -9668,16 +9882,38 @@ func (msgs Messages) ErrorStreamRefused() string {
 // in the language the app shows.
 //
 // Why a track's audio wasn't found, as a toast or inside a message that
-// leads it.
+// leads it, as playerCouldntPlay, while Play audio as your account
+// (audioAsAccountTitle) is off and the user is signed in to YouTube Music.
+// Name the switch as audioAsAccountTitle does.
 func ErrorStreamSignedIn() string { return In(i18n.Locale()).ErrorStreamSignedIn() }
 
 // ErrorStreamSignedIn says "YouTube plays this track only to signed-in viewers; Play audio as your account, in Settings › Playback, can play it"
 // in the language of msgs.
 //
 // Why a track's audio wasn't found, as a toast or inside a message that
-// leads it.
+// leads it, as playerCouldntPlay, while Play audio as your account
+// (audioAsAccountTitle) is off and the user is signed in to YouTube Music.
+// Name the switch as audioAsAccountTitle does.
 func (msgs Messages) ErrorStreamSignedIn() string {
 	return Catalog.Format(msgs.locale, "errorStreamSignedIn", nil)
+}
+
+// ErrorStreamSignedInOnly says "YouTube plays this track only to signed-in viewers"
+// in the language the app shows.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay, and as {why} of the errorStreamAccount
+// messages.
+func ErrorStreamSignedInOnly() string { return In(i18n.Locale()).ErrorStreamSignedInOnly() }
+
+// ErrorStreamSignedInOnly says "YouTube plays this track only to signed-in viewers"
+// in the language of msgs.
+//
+// Why a track's audio wasn't found, as a toast or inside a message that
+// leads it, as playerCouldntPlay, and as {why} of the errorStreamAccount
+// messages.
+func (msgs Messages) ErrorStreamSignedInOnly() string {
+	return Catalog.Format(msgs.locale, "errorStreamSignedInOnly", nil)
 }
 
 // ErrorStreamStalled says "YouTube stopped sending the audio, as happens when the connection drops; check the connection and play the track again"
@@ -10700,6 +10936,26 @@ func FailureWayAgain(way string) string { return In(i18n.Locale()).FailureWayAga
 // {way} is one of the failureWay messages.
 func (msgs Messages) FailureWayAgain(way string) string {
 	return Catalog.Format(msgs.locale, "failureWayAgain", map[string]any{"way": way})
+}
+
+// FailureWayAsAccount says "As your account"
+// in the language the app shows.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: asking YouTube for its audio as the user's YouTube Music
+// account, as Play audio as your account (audioAsAccountTitle) does. It
+// starts a line of what was tried, before how it went.
+func FailureWayAsAccount() string { return In(i18n.Locale()).FailureWayAsAccount() }
+
+// FailureWayAsAccount says "As your account"
+// in the language of msgs.
+//
+// A way MixMusic tried to play a track that couldn't play, in the failure
+// details: asking YouTube for its audio as the user's YouTube Music
+// account, as Play audio as your account (audioAsAccountTitle) does. It
+// starts a line of what was tried, before how it went.
+func (msgs Messages) FailureWayAsAccount() string {
+	return Catalog.Format(msgs.locale, "failureWayAsAccount", nil)
 }
 
 // FailureWayFile says "The file"

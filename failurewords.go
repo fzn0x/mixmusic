@@ -44,6 +44,8 @@ func failureWay(what string) string {
 		return locales.FailureWaySurround()
 	case "YouTube's player API":
 		return locales.FailureWayPlayerAPI()
+	case "as your account":
+		return locales.FailureWayAsAccount()
 	}
 	return sentenceStart(what)
 }

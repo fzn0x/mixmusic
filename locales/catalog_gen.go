@@ -8856,6 +8856,24 @@ func (msgs Messages) ErrorLastfmNotAuthorized() string {
 	return Catalog.Format(msgs.locale, "errorLastfmNotAuthorized", nil)
 }
 
+// ErrorLibrefmNotServer says "this isn't the address of a server: write it as https://gnufm.example.com"
+// in the language the app shows.
+//
+// Why connecting in Settings › Accounts › Libre.fm failed, as a toast:
+// the address given for another GNU FM server isn't a web address. Keep the
+// example address as it is.
+func ErrorLibrefmNotServer() string { return In(i18n.Locale()).ErrorLibrefmNotServer() }
+
+// ErrorLibrefmNotServer says "this isn't the address of a server: write it as https://gnufm.example.com"
+// in the language of msgs.
+//
+// Why connecting in Settings › Accounts › Libre.fm failed, as a toast:
+// the address given for another GNU FM server isn't a web address. Keep the
+// example address as it is.
+func (msgs Messages) ErrorLibrefmNotServer() string {
+	return Catalog.Format(msgs.locale, "errorLibrefmNotServer", nil)
+}
+
 // ErrorListenBrainzNotServer says "this isn't the address of a server: write it as https://listenbrainz.example.com"
 // in the language the app shows.
 //
@@ -12596,6 +12614,506 @@ func LibraryUnsavedNotice(what string) string { return In(i18n.Locale()).Library
 // Notice once a playlist or album is taken out of the library.
 func (msgs Messages) LibraryUnsavedNotice(what string) string {
 	return Catalog.Format(msgs.locale, "libraryUnsavedNotice", map[string]any{"what": what})
+}
+
+// LibrefmSettingsAbout says "What you listen to joins your profile on {server}: a track counts once half of it played, or four minutes."
+// in the language the app shows.
+//
+// In Settings › Accounts › Libre.fm once connected, under "Scrobbling
+// as". {server} is Libre.fm, or the host of another GNU FM server.
+func LibrefmSettingsAbout(server string) string {
+	return In(i18n.Locale()).LibrefmSettingsAbout(server)
+}
+
+// LibrefmSettingsAbout says "What you listen to joins your profile on {server}: a track counts once half of it played, or four minutes."
+// in the language of msgs.
+//
+// In Settings › Accounts › Libre.fm once connected, under "Scrobbling
+// as". {server} is Libre.fm, or the host of another GNU FM server.
+func (msgs Messages) LibrefmSettingsAbout(server string) string {
+	return Catalog.Format(msgs.locale, "librefmSettingsAbout", map[string]any{"server": server})
+}
+
+// LibrefmSettingsAddress says "Address"
+// in the language the app shows.
+//
+// In Settings › Accounts › Libre.fm, the title of the box for the
+// address of another GNU FM server, shown once "Another GNU FM server" is
+// chosen.
+func LibrefmSettingsAddress() string { return In(i18n.Locale()).LibrefmSettingsAddress() }
+
+// LibrefmSettingsAddress says "Address"
+// in the language of msgs.
+//
+// In Settings › Accounts › Libre.fm, the title of the box for the
+// address of another GNU FM server, shown once "Another GNU FM server" is
+// chosen.
+func (msgs Messages) LibrefmSettingsAddress() string {
+	return Catalog.Format(msgs.locale, "librefmSettingsAddress", nil)
+}
+
+// LibrefmSettingsAnother says "Another GNU FM server"
+// in the language the app shows.
+//
+// In Settings › Accounts › Libre.fm, the second option of Server,
+// beside Libre.fm: a server that runs GNU FM, the free software Libre.fm
+// runs, at an address the user gives. Keep GNU FM as it is.
+func LibrefmSettingsAnother() string { return In(i18n.Locale()).LibrefmSettingsAnother() }
+
+// LibrefmSettingsAnother says "Another GNU FM server"
+// in the language of msgs.
+//
+// In Settings › Accounts › Libre.fm, the second option of Server,
+// beside Libre.fm: a server that runs GNU FM, the free software Libre.fm
+// runs, at an address the user gives. Keep GNU FM as it is.
+func (msgs Messages) LibrefmSettingsAnother() string {
+	return Catalog.Format(msgs.locale, "librefmSettingsAnother", nil)
+}
+
+// LibrefmSettingsApprove says "Approve MixMusic on {server}, in your browser"
+// in the language the app shows.
+//
+// A toast once the user chose to connect in Settings › Accounts ›
+// Libre.fm, while the server's page opens in the browser. {server} is
+// Libre.fm, or the host of another GNU FM server.
+func LibrefmSettingsApprove(server string) string {
+	return In(i18n.Locale()).LibrefmSettingsApprove(server)
+}
+
+// LibrefmSettingsApprove says "Approve MixMusic on {server}, in your browser"
+// in the language of msgs.
+//
+// A toast once the user chose to connect in Settings › Accounts ›
+// Libre.fm, while the server's page opens in the browser. {server} is
+// Libre.fm, or the host of another GNU FM server.
+func (msgs Messages) LibrefmSettingsApprove(server string) string {
+	return Catalog.Format(msgs.locale, "librefmSettingsApprove", map[string]any{"server": server})
+}
+
+// LibrefmSettingsAskFailed says "MixMusic couldn't ask {server} for a sign-in: check its address and your connection ({error})"
+// in the language the app shows.
+//
+// Why connecting in Settings › Accounts › Libre.fm failed, as a toast:
+// the server didn't give a sign-in token. {server} is Libre.fm, or the host
+// of another GNU FM server; {error} is the server's or the system's own
+// words.
+func LibrefmSettingsAskFailed(server string, error string) string {
+	return In(i18n.Locale()).LibrefmSettingsAskFailed(server, error)
+}
+
+// LibrefmSettingsAskFailed says "MixMusic couldn't ask {server} for a sign-in: check its address and your connection ({error})"
+// in the language of msgs.
+//
+// Why connecting in Settings › Accounts › Libre.fm failed, as a toast:
+// the server didn't give a sign-in token. {server} is Libre.fm, or the host
+// of another GNU FM server; {error} is the server's or the system's own
+// words.
+func (msgs Messages) LibrefmSettingsAskFailed(server string, error string) string {
+	return Catalog.Format(msgs.locale, "librefmSettingsAskFailed", map[string]any{"server": server, "error": error})
+}
+
+// LibrefmSettingsConnect says "connect to {server}"
+// in the language the app shows.
+//
+// The button that connects in Settings › Accounts › Libre.fm. {server}
+// is libre.fm, or the host of another GNU FM server.
+func LibrefmSettingsConnect(server string) string {
+	return In(i18n.Locale()).LibrefmSettingsConnect(server)
+}
+
+// LibrefmSettingsConnect says "connect to {server}"
+// in the language of msgs.
+//
+// The button that connects in Settings › Accounts › Libre.fm. {server}
+// is libre.fm, or the host of another GNU FM server.
+func (msgs Messages) LibrefmSettingsConnect(server string) string {
+	return Catalog.Format(msgs.locale, "librefmSettingsConnect", map[string]any{"server": server})
+}
+
+// LibrefmSettingsConnectFirst says "connect to Libre.fm first"
+// in the language the app shows.
+//
+// Why connecting again in Settings › Accounts › Libre.fm failed, as a
+// toast: the connection is gone.
+func LibrefmSettingsConnectFirst() string { return In(i18n.Locale()).LibrefmSettingsConnectFirst() }
+
+// LibrefmSettingsConnectFirst says "connect to Libre.fm first"
+// in the language of msgs.
+//
+// Why connecting again in Settings › Accounts › Libre.fm failed, as a
+// toast: the connection is gone.
+func (msgs Messages) LibrefmSettingsConnectFirst() string {
+	return Catalog.Format(msgs.locale, "librefmSettingsConnectFirst", nil)
+}
+
+// LibrefmSettingsConnectTitle says "Connect to Libre.fm"
+// in the language the app shows.
+//
+// What Settings' search shows for the form of Settings › Accounts ›
+// Libre.fm, before the user connected.
+func LibrefmSettingsConnectTitle() string { return In(i18n.Locale()).LibrefmSettingsConnectTitle() }
+
+// LibrefmSettingsConnectTitle says "Connect to Libre.fm"
+// in the language of msgs.
+//
+// What Settings' search shows for the form of Settings › Accounts ›
+// Libre.fm, before the user connected.
+func (msgs Messages) LibrefmSettingsConnectTitle() string {
+	return Catalog.Format(msgs.locale, "librefmSettingsConnectTitle", nil)
+}
+
+// LibrefmSettingsConnected says "Connected to {server}"
+// in the language the app shows.
+//
+// A toast once the user connected in Settings › Accounts › Libre.fm.
+// {server} is Libre.fm, or the host of another GNU FM server.
+func LibrefmSettingsConnected(server string) string {
+	return In(i18n.Locale()).LibrefmSettingsConnected(server)
+}
+
+// LibrefmSettingsConnected says "Connected to {server}"
+// in the language of msgs.
+//
+// A toast once the user connected in Settings › Accounts › Libre.fm.
+// {server} is Libre.fm, or the host of another GNU FM server.
+func (msgs Messages) LibrefmSettingsConnected(server string) string {
+	return Catalog.Format(msgs.locale, "librefmSettingsConnected", map[string]any{"server": server})
+}
+
+// LibrefmSettingsDisconnectBody says "MixMusic forgets your connection; your scrobbles stay on {server}.{waiting, plural, =0 {} one { # scrobble not sent y…"
+// in the language the app shows.
+//
+// The question that disconnecting in Settings › Accounts › Libre.fm
+// asks first. {server} is Libre.fm, or the host of another GNU FM server;
+// {waiting} is how many scrobbles wait to be sent.
+func LibrefmSettingsDisconnectBody(server string, waiting int) string {
+	return In(i18n.Locale()).LibrefmSettingsDisconnectBody(server, waiting)
+}
+
+// LibrefmSettingsDisconnectBody says "MixMusic forgets your connection; your scrobbles stay on {server}.{waiting, plural, =0 {} one { # scrobble not sent y…"
+// in the language of msgs.
+//
+// The question that disconnecting in Settings › Accounts › Libre.fm
+// asks first. {server} is Libre.fm, or the host of another GNU FM server;
+// {waiting} is how many scrobbles wait to be sent.
+func (msgs Messages) LibrefmSettingsDisconnectBody(server string, waiting int) string {
+	return Catalog.Format(msgs.locale, "librefmSettingsDisconnectBody", map[string]any{"server": server, "waiting": waiting})
+}
+
+// LibrefmSettingsDisconnectTitle says "disconnect {server}"
+// in the language the app shows.
+//
+// The title of the question that disconnecting in Settings › Accounts ›
+// Libre.fm asks first. {server} is Libre.fm, or the host of another GNU FM
+// server.
+func LibrefmSettingsDisconnectTitle(server string) string {
+	return In(i18n.Locale()).LibrefmSettingsDisconnectTitle(server)
+}
+
+// LibrefmSettingsDisconnectTitle says "disconnect {server}"
+// in the language of msgs.
+//
+// The title of the question that disconnecting in Settings › Accounts ›
+// Libre.fm asks first. {server} is Libre.fm, or the host of another GNU FM
+// server.
+func (msgs Messages) LibrefmSettingsDisconnectTitle(server string) string {
+	return Catalog.Format(msgs.locale, "librefmSettingsDisconnectTitle", map[string]any{"server": server})
+}
+
+// LibrefmSettingsExpired says "Connect again to go on scrobbling.{waiting, plural, =0 {} one { # scrobble waits to be sent.} other { # scrobbles wai…"
+// in the language the app shows.
+//
+// In Settings › Accounts › Libre.fm, under librefmSettingsGone, when
+// the server no longer accepts the connection. {waiting} is how many
+// scrobbles wait to be sent.
+func LibrefmSettingsExpired(waiting int) string {
+	return In(i18n.Locale()).LibrefmSettingsExpired(waiting)
+}
+
+// LibrefmSettingsExpired says "Connect again to go on scrobbling.{waiting, plural, =0 {} one { # scrobble waits to be sent.} other { # scrobbles wai…"
+// in the language of msgs.
+//
+// In Settings › Accounts › Libre.fm, under librefmSettingsGone, when
+// the server no longer accepts the connection. {waiting} is how many
+// scrobbles wait to be sent.
+func (msgs Messages) LibrefmSettingsExpired(waiting int) string {
+	return Catalog.Format(msgs.locale, "librefmSettingsExpired", map[string]any{"waiting": waiting})
+}
+
+// LibrefmSettingsForm says "Choose Libre.fm, or another server that runs GNU FM. Connect, then sign in and approve MixMusic on the page that open…"
+// in the language the app shows.
+//
+// Never shown: what Settings' search finds the Libre.fm form by, its steps
+// and labels, then words people search for. Translate it, and give the
+// words and synonyms people search for in your language.
+func LibrefmSettingsForm() string { return In(i18n.Locale()).LibrefmSettingsForm() }
+
+// LibrefmSettingsForm says "Choose Libre.fm, or another server that runs GNU FM. Connect, then sign in and approve MixMusic on the page that open…"
+// in the language of msgs.
+//
+// Never shown: what Settings' search finds the Libre.fm form by, its steps
+// and labels, then words people search for. Translate it, and give the
+// words and synonyms people search for in your language.
+func (msgs Messages) LibrefmSettingsForm() string {
+	return Catalog.Format(msgs.locale, "librefmSettingsForm", nil)
+}
+
+// LibrefmSettingsGone says "{server} no longer accepts this connection"
+// in the language the app shows.
+//
+// The title of the alert in Settings › Accounts › Libre.fm when the
+// server refuses the connection, as after the user revoked it. {server} is
+// Libre.fm, or the host of another GNU FM server.
+func LibrefmSettingsGone(server string) string { return In(i18n.Locale()).LibrefmSettingsGone(server) }
+
+// LibrefmSettingsGone says "{server} no longer accepts this connection"
+// in the language of msgs.
+//
+// The title of the alert in Settings › Accounts › Libre.fm when the
+// server refuses the connection, as after the user revoked it. {server} is
+// Libre.fm, or the host of another GNU FM server.
+func (msgs Messages) LibrefmSettingsGone(server string) string {
+	return Catalog.Format(msgs.locale, "librefmSettingsGone", map[string]any{"server": server})
+}
+
+// LibrefmSettingsHint says "MixMusic keeps the connection in your system's credential store, with the server."
+// in the language the app shows.
+//
+// Under the connect button of Settings › Accounts › Libre.fm.
+func LibrefmSettingsHint() string { return In(i18n.Locale()).LibrefmSettingsHint() }
+
+// LibrefmSettingsHint says "MixMusic keeps the connection in your system's credential store, with the server."
+// in the language of msgs.
+//
+// Under the connect button of Settings › Accounts › Libre.fm.
+func (msgs Messages) LibrefmSettingsHint() string {
+	return Catalog.Format(msgs.locale, "librefmSettingsHint", nil)
+}
+
+// LibrefmSettingsLovesDesc says "A like loves the song on {server}, and an unlike takes the love back."
+// in the language the app shows.
+//
+// In Settings › Accounts › Libre.fm once connected, under "Send likes
+// as loves". {server} is Libre.fm, or the host of another GNU FM server.
+func LibrefmSettingsLovesDesc(server string) string {
+	return In(i18n.Locale()).LibrefmSettingsLovesDesc(server)
+}
+
+// LibrefmSettingsLovesDesc says "A like loves the song on {server}, and an unlike takes the love back."
+// in the language of msgs.
+//
+// In Settings › Accounts › Libre.fm once connected, under "Send likes
+// as loves". {server} is Libre.fm, or the host of another GNU FM server.
+func (msgs Messages) LibrefmSettingsLovesDesc(server string) string {
+	return Catalog.Format(msgs.locale, "librefmSettingsLovesDesc", map[string]any{"server": server})
+}
+
+// LibrefmSettingsLovesSwitch says "Send likes to {server} as loves"
+// in the language the app shows.
+//
+// What screen readers say of the switch "Send likes as loves" in Settings
+// › Accounts › Libre.fm. {server} is Libre.fm, or the host of another
+// GNU FM server.
+func LibrefmSettingsLovesSwitch(server string) string {
+	return In(i18n.Locale()).LibrefmSettingsLovesSwitch(server)
+}
+
+// LibrefmSettingsLovesSwitch says "Send likes to {server} as loves"
+// in the language of msgs.
+//
+// What screen readers say of the switch "Send likes as loves" in Settings
+// › Accounts › Libre.fm. {server} is Libre.fm, or the host of another
+// GNU FM server.
+func (msgs Messages) LibrefmSettingsLovesSwitch(server string) string {
+	return Catalog.Format(msgs.locale, "librefmSettingsLovesSwitch", map[string]any{"server": server})
+}
+
+// LibrefmSettingsOwnAccount says "Use your own API account"
+// in the language the app shows.
+//
+// In Settings › Accounts › Libre.fm, the title of the switch that shows
+// the API key and shared secret boxes, for a server that wants an API
+// account of the user's.
+func LibrefmSettingsOwnAccount() string { return In(i18n.Locale()).LibrefmSettingsOwnAccount() }
+
+// LibrefmSettingsOwnAccount says "Use your own API account"
+// in the language of msgs.
+//
+// In Settings › Accounts › Libre.fm, the title of the switch that shows
+// the API key and shared secret boxes, for a server that wants an API
+// account of the user's.
+func (msgs Messages) LibrefmSettingsOwnAccount() string {
+	return Catalog.Format(msgs.locale, "librefmSettingsOwnAccount", nil)
+}
+
+// LibrefmSettingsOwnAccountDesc says "For a server that wants one. Libre.fm and GNU FM take MixMusic's own key, so there's no account to create."
+// in the language the app shows.
+//
+// In Settings › Accounts › Libre.fm, under "Use your own API account".
+// Keep GNU FM as it is.
+func LibrefmSettingsOwnAccountDesc() string { return In(i18n.Locale()).LibrefmSettingsOwnAccountDesc() }
+
+// LibrefmSettingsOwnAccountDesc says "For a server that wants one. Libre.fm and GNU FM take MixMusic's own key, so there's no account to create."
+// in the language of msgs.
+//
+// In Settings › Accounts › Libre.fm, under "Use your own API account".
+// Keep GNU FM as it is.
+func (msgs Messages) LibrefmSettingsOwnAccountDesc() string {
+	return Catalog.Format(msgs.locale, "librefmSettingsOwnAccountDesc", nil)
+}
+
+// LibrefmSettingsPasteKeys says "paste the API key and the shared secret of your API account on the server"
+// in the language the app shows.
+//
+// Why connecting in Settings › Accounts › Libre.fm failed, as a toast:
+// "Use your own API account" is on, and a box is empty.
+func LibrefmSettingsPasteKeys() string { return In(i18n.Locale()).LibrefmSettingsPasteKeys() }
+
+// LibrefmSettingsPasteKeys says "paste the API key and the shared secret of your API account on the server"
+// in the language of msgs.
+//
+// Why connecting in Settings › Accounts › Libre.fm failed, as a toast:
+// "Use your own API account" is on, and a box is empty.
+func (msgs Messages) LibrefmSettingsPasteKeys() string {
+	return Catalog.Format(msgs.locale, "librefmSettingsPasteKeys", nil)
+}
+
+// LibrefmSettingsPlain says "Plain http works only on your local network, and your password and session travel to the server unencrypted: anyone o…"
+// in the language the app shows.
+//
+// A warning in Settings › Accounts › Libre.fm under the address of a
+// server that starts with http://, and once connected to one.
+func LibrefmSettingsPlain() string { return In(i18n.Locale()).LibrefmSettingsPlain() }
+
+// LibrefmSettingsPlain says "Plain http works only on your local network, and your password and session travel to the server unencrypted: anyone o…"
+// in the language of msgs.
+//
+// A warning in Settings › Accounts › Libre.fm under the address of a
+// server that starts with http://, and once connected to one.
+func (msgs Messages) LibrefmSettingsPlain() string {
+	return Catalog.Format(msgs.locale, "librefmSettingsPlain", nil)
+}
+
+// LibrefmSettingsPlainRemote says "plain http is for a server on your local network alone, as your password and session would travel unencrypted: use th…"
+// in the language the app shows.
+//
+// Why connecting in Settings › Accounts › Libre.fm failed, as a toast:
+// the server's address starts with http:// and isn't on the local network.
+func LibrefmSettingsPlainRemote() string { return In(i18n.Locale()).LibrefmSettingsPlainRemote() }
+
+// LibrefmSettingsPlainRemote says "plain http is for a server on your local network alone, as your password and session would travel unencrypted: use th…"
+// in the language of msgs.
+//
+// Why connecting in Settings › Accounts › Libre.fm failed, as a toast:
+// the server's address starts with http:// and isn't on the local network.
+func (msgs Messages) LibrefmSettingsPlainRemote() string {
+	return Catalog.Format(msgs.locale, "librefmSettingsPlainRemote", nil)
+}
+
+// LibrefmSettingsScrobbleSwitch says "Scrobble to {server}"
+// in the language the app shows.
+//
+// What screen readers say of the switch beside "Scrobbling as" in Settings
+// › Accounts › Libre.fm. {server} is Libre.fm, or the host of another
+// GNU FM server.
+func LibrefmSettingsScrobbleSwitch(server string) string {
+	return In(i18n.Locale()).LibrefmSettingsScrobbleSwitch(server)
+}
+
+// LibrefmSettingsScrobbleSwitch says "Scrobble to {server}"
+// in the language of msgs.
+//
+// What screen readers say of the switch beside "Scrobbling as" in Settings
+// › Accounts › Libre.fm. {server} is Libre.fm, or the host of another
+// GNU FM server.
+func (msgs Messages) LibrefmSettingsScrobbleSwitch(server string) string {
+	return Catalog.Format(msgs.locale, "librefmSettingsScrobbleSwitch", map[string]any{"server": server})
+}
+
+// LibrefmSettingsServerDesc says "Libre.fm, or another server that runs GNU FM, the free software Libre.fm runs."
+// in the language the app shows.
+//
+// In Settings › Accounts › Libre.fm, under Server, the choice of where
+// to scrobble. Keep GNU FM as it is.
+func LibrefmSettingsServerDesc() string { return In(i18n.Locale()).LibrefmSettingsServerDesc() }
+
+// LibrefmSettingsServerDesc says "Libre.fm, or another server that runs GNU FM, the free software Libre.fm runs."
+// in the language of msgs.
+//
+// In Settings › Accounts › Libre.fm, under Server, the choice of where
+// to scrobble. Keep GNU FM as it is.
+func (msgs Messages) LibrefmSettingsServerDesc() string {
+	return Catalog.Format(msgs.locale, "librefmSettingsServerDesc", nil)
+}
+
+// LibrefmSettingsStep1 says "Choose Libre.fm, or another server that runs GNU FM."
+// in the language the app shows.
+//
+// The first step of connecting in Settings › Accounts › Libre.fm. Keep
+// GNU FM as it is.
+func LibrefmSettingsStep1() string { return In(i18n.Locale()).LibrefmSettingsStep1() }
+
+// LibrefmSettingsStep1 says "Choose Libre.fm, or another server that runs GNU FM."
+// in the language of msgs.
+//
+// The first step of connecting in Settings › Accounts › Libre.fm. Keep
+// GNU FM as it is.
+func (msgs Messages) LibrefmSettingsStep1() string {
+	return Catalog.Format(msgs.locale, "librefmSettingsStep1", nil)
+}
+
+// LibrefmSettingsStep2 says "Connect, then sign in and approve MixMusic on the page that opens in your browser: MixMusic never sees your password."
+// in the language the app shows.
+//
+// The second step of connecting in Settings › Accounts › Libre.fm.
+func LibrefmSettingsStep2() string { return In(i18n.Locale()).LibrefmSettingsStep2() }
+
+// LibrefmSettingsStep2 says "Connect, then sign in and approve MixMusic on the page that opens in your browser: MixMusic never sees your password."
+// in the language of msgs.
+//
+// The second step of connecting in Settings › Accounts › Libre.fm.
+func (msgs Messages) LibrefmSettingsStep2() string {
+	return Catalog.Format(msgs.locale, "librefmSettingsStep2", nil)
+}
+
+// LibrefmSettingsTooLong says "{server} did not hear from you in time: approve MixMusic in the browser, then connect again"
+// in the language the app shows.
+//
+// Why connecting in Settings › Accounts › Libre.fm failed, as a toast:
+// the user didn't approve in the browser within 5 minutes. {server} is
+// Libre.fm, or the host of another GNU FM server.
+func LibrefmSettingsTooLong(server string) string {
+	return In(i18n.Locale()).LibrefmSettingsTooLong(server)
+}
+
+// LibrefmSettingsTooLong says "{server} did not hear from you in time: approve MixMusic in the browser, then connect again"
+// in the language of msgs.
+//
+// Why connecting in Settings › Accounts › Libre.fm failed, as a toast:
+// the user didn't approve in the browser within 5 minutes. {server} is
+// Libre.fm, or the host of another GNU FM server.
+func (msgs Messages) LibrefmSettingsTooLong(server string) string {
+	return Catalog.Format(msgs.locale, "librefmSettingsTooLong", map[string]any{"server": server})
+}
+
+// LibrefmSettingsWaiting says "waiting for {server}…"
+// in the language the app shows.
+//
+// The connect button of Settings › Accounts › Libre.fm while it waits
+// for the user to approve MixMusic in the browser. {server} is Libre.fm, or
+// the host of another GNU FM server.
+func LibrefmSettingsWaiting(server string) string {
+	return In(i18n.Locale()).LibrefmSettingsWaiting(server)
+}
+
+// LibrefmSettingsWaiting says "waiting for {server}…"
+// in the language of msgs.
+//
+// The connect button of Settings › Accounts › Libre.fm while it waits
+// for the user to approve MixMusic in the browser. {server} is Libre.fm, or
+// the host of another GNU FM server.
+func (msgs Messages) LibrefmSettingsWaiting(server string) string {
+	return Catalog.Format(msgs.locale, "librefmSettingsWaiting", map[string]any{"server": server})
 }
 
 // ListenBrainzSettingsAboutListenBrainz says "What you listen to joins your ListenBrainz listens: a track counts once half of it played, or four minutes."

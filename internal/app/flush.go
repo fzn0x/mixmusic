@@ -40,8 +40,9 @@ func (a *App) Close() {
 // where episodes were left,
 // then settings.json where it holds no settings MixMusic can read: gone,
 // or with a mistake, which is kept as settings.json.broken, so that the
-// next start doesn't fall back to the settings of a new install. The
-// windows go first, as the main window saves the settings it changed,
+// next start doesn't fall back to the settings of a new install; last,
+// the backup of each quit, when the settings ask for one. The windows go
+// first, as the main window saves the settings it changed,
 // whose volume may be older than the player's. It runs on the main thread
 // as MixMusic quits, and never waits on the player's goroutine, which may
 // wait on the main thread itself.
@@ -67,4 +68,6 @@ func (a *App) flush() {
 	if err := a.settings.Flush(); err != nil {
 		log.Printf("mixmusic: saving settings.json: %v", err)
 	}
+	// Once all is saved, the backup of each quit, if the settings ask.
+	a.backupAtQuit()
 }

@@ -20,6 +20,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/addons"
 	"github.com/fzn0x/mixmusic/internal/artwork"
 	"github.com/fzn0x/mixmusic/internal/audio"
+	"github.com/fzn0x/mixmusic/internal/backup"
 	"github.com/fzn0x/mixmusic/internal/cast"
 	"github.com/fzn0x/mixmusic/internal/clips"
 	"github.com/fzn0x/mixmusic/internal/diag"
@@ -124,6 +125,14 @@ type Options struct {
 	// in place of net.Listen: tests, which listen on a port the system
 	// picks, set it.
 	OverlayListen OverlayListen
+	// BackupsDir is the folder of the automatic backups unless the user
+	// chooses one: "MixMusic backups" in the Documents folder when empty.
+	// A portable copy keeps them in its own folder, and tests in theirs.
+	BackupsDir string
+	// Restored is what the start swapped in of a restore staged, or its
+	// undo, before the app opened (backup.Apply), for the main window to
+	// tell.
+	Restored *backup.Applied
 }
 
 // App is MixMusic.
@@ -229,6 +238,8 @@ type App struct {
 	onNavigate *func(target string)
 	// updates keeps the user's choices of updates.
 	updates *store.File[updatePrefs]
+	// backups is what became of the backups (backup.go).
+	backups backupState
 	// checkUpdates has MixMusic look for a new version at once.
 	checkUpdates chan struct{}
 	// readingProfiles is set while the accounts' profiles are read in the
@@ -393,6 +404,7 @@ func New(opts Options) (*App, error) {
 	if err := a.openLocalFiles(); err != nil {
 		return nil, fmt.Errorf("opening the index of the music on this computer: %w", err)
 	}
+	a.takeRestored()
 	a.apply(s)
 	return a, nil
 }

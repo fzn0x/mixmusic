@@ -81,6 +81,7 @@ func (a *App) Start() {
 		notify()
 	}
 	a.watchUpdates()
+	a.watchBackups()
 	a.watchNetwork()
 	a.watchCast()
 	a.watchRemote()

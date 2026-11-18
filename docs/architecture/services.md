@@ -93,9 +93,16 @@
   answers of the shapes documented, and answers that
   `MIXMUSIC_LIVE=1 MIXMUSIC_YT_WRITE=1 go test ./internal/youtube -run LiveCollaboration`
   recorded, with a second account in `MIXMUSIC_YT_COOKIES2` that joins as
-  a collaborator and tries each edit. It lists the
+  a collaborator and tries each edit. A browser keeps a Google account
+  signed out of, as from another device, in its session at its index
+  (#582): a sign-in uses the first of indexes 0 to 9 whose account menu,
+  asked as it, names an account (`Client.UseFirstAccount`), and such a
+  probe's answer as signed out never ends the session (`callOptions.probe`);
+  `go test ./internal/youtube -run LiveSessionAccounts`, signed in, tells
+  which accounts a real session's list names. It lists the
   Google accounts of the session and their brand channels, from YouTube's
-  website, and uses a brand channel by its page ID: one whose page ID the
+  website, leaving out each account but the one in use whose menu answers
+  as signed out, and uses a brand channel by its page ID: one whose page ID the
   list doesn't tell is listed as `Unswitchable`, as without it the account
   itself would be used. Once the app switches to a brand channel, it goes
   back if YouTube Music answers as the Google account itself, as the list

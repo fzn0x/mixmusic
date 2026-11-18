@@ -30,15 +30,19 @@ func (c *Client) Token(ctx context.Context) (string, error) {
 		return "", err
 	}
 	if answer.Token == "" {
-		return "", errors.New("lastfm: the token response has no token")
+		return "", errors.New(serviceName(c.Name) + ": the token response has no token")
 	}
 	return answer.Token, nil
 }
 
 // AuthURL returns the address of the page where the user approves token, to
-// open in their browser.
+// open in their browser: Last.fm's, or the client's AuthPage.
 func (c *Client) AuthURL(token string) string {
-	return authURL + "?api_key=" + url.QueryEscape(c.APIKey) + "&token=" + url.QueryEscape(token)
+	page := c.AuthPage
+	if page == "" {
+		page = authURL
+	}
+	return page + "?api_key=" + url.QueryEscape(c.APIKey) + "&token=" + url.QueryEscape(token)
 }
 
 // Session exchanges a token the user approved for a session. While they
@@ -53,7 +57,7 @@ func (c *Client) Session(ctx context.Context, token string) (Session, error) {
 		return Session{}, err
 	}
 	if answer.Session.Key == "" {
-		return Session{}, errors.New("lastfm: the session response has no key")
+		return Session{}, errors.New(serviceName(c.Name) + ": the session response has no key")
 	}
 	return answer.Session, nil
 }

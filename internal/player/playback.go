@@ -521,7 +521,7 @@ func (p *Player) fellBack(why error) {
 	}
 	p.warned[why.Error()] = true
 	p.notify(Notice{
-		Message:  locales.PlayerFromYouTubeInstead(strings.TrimSuffix(p.errorWords.say(why), ".")),
+		Message:  locales.PlayerFromYouTubeInstead(sentenceStart(strings.TrimSuffix(p.errorWords.say(why), "."))),
 		Error:    true,
 		Settings: true,
 	})

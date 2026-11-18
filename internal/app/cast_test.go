@@ -327,7 +327,7 @@ func TestCastOutLoadFailure(t *testing.T) {
 	o, f, ev := newTestOut(t)
 	f.loadErr = &cast.RequestError{Type: "LOAD_FAILED"}
 	o.Load(streamURL("abcdefghijk"), audio.Cue{Autoplay: true})
-	ev.wait(t, "error "+castUnreachable)
+	ev.wait(t, "error "+castUnreachable().Error())
 	n := int64(1)
 	o.fetched = func() int64 { n++; return n }
 	o.Load(streamURL("abcdefghijk"), audio.Cue{Autoplay: true})

@@ -73,6 +73,12 @@ type Data struct {
 	// out of MixMusic's library, the last hidden first: they stay on
 	// their service.
 	Hidden []Mark `json:"hidden,omitempty"`
+
+	// Folders are the folders of the sidebar's Your mixes (folders.go):
+	// by name, until FoldersArranged, once the user moved one, and in
+	// their order from then on.
+	Folders         []Folder `json:"folders,omitempty"`
+	FoldersArranged bool     `json:"foldersArranged,omitempty"`
 }
 
 // Library is the user's library, kept in a file, and the log of every
@@ -275,7 +281,7 @@ func (l *Library) UpdatePlaylist(id, title, description string) error {
 	})
 }
 
-// DeletePlaylist deletes a playlist, and its pin.
+// DeletePlaylist deletes a playlist, its pin and its place in a folder.
 func (l *Library) DeletePlaylist(id string) error {
 	err := l.file.Update(func(d *Data) error {
 		n := len(d.Playlists)
@@ -285,6 +291,7 @@ func (l *Library) DeletePlaylist(id string) error {
 		}
 		mid := media.ID(media.SourceLocal, id)
 		d.Pins = slices.DeleteFunc(d.Pins, func(m Mark) bool { return m.ID == mid })
+		d.Folders = unfiled(d.Folders, mid)
 		return nil
 	})
 	l.indexMarks()

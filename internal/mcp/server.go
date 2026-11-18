@@ -104,7 +104,7 @@ func (s *Server) Start() error {
 	ln, err := listen()
 	if err != nil {
 		s.mu.Unlock()
-		return fmt.Errorf("MixMusic can't listen for AI assistants on this computer: %w", err)
+		return fmt.Errorf("%w: %w", ErrListen, err)
 	}
 	addr, ok := ln.Addr().(*net.TCPAddr)
 	if !ok || !addr.IP.IsLoopback() {
@@ -299,3 +299,7 @@ func readReach(dir string) (reach, error) {
 	}
 	return r, nil
 }
+
+// ErrListen is why the server didn't start: it can't listen on this
+// computer, for the error it wraps after it.
+var ErrListen = errors.New("MixMusic can't listen for AI assistants on this computer")

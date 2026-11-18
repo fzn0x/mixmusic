@@ -5872,7 +5872,7 @@
       }
     }
   },
-  "playlistImportDoneMixes": "Added {count, plural, one {# song} other {# songs}} to {mixes} mixes",
+  "playlistImportDoneMixes": "Added {count, plural, one {# song} other {# songs}} to {mixes, plural, one {# mix} other {# mixes}}",
   "@playlistImportDoneMixes": {
     "description": "A toast, once an import added its songs to several mixes, one of each list.",
     "placeholders": {

@@ -19160,7 +19160,7 @@ func (msgs Messages) PlaylistImportDoneMix(count int, mix string) string {
 	return Catalog.Format(msgs.locale, "playlistImportDoneMix", map[string]any{"count": count, "mix": mix})
 }
 
-// PlaylistImportDoneMixes says "Added {count, plural, one {# song} other {# songs}} to {mixes} mixes"
+// PlaylistImportDoneMixes says "Added {count, plural, one {# song} other {# songs}} to {mixes, plural, one {# mix} other {# mixes}}"
 // in the language the app shows.
 //
 // A toast, once an import added its songs to several mixes, one of each
@@ -19169,7 +19169,7 @@ func PlaylistImportDoneMixes(count int, mixes int) string {
 	return In(i18n.Locale()).PlaylistImportDoneMixes(count, mixes)
 }
 
-// PlaylistImportDoneMixes says "Added {count, plural, one {# song} other {# songs}} to {mixes} mixes"
+// PlaylistImportDoneMixes says "Added {count, plural, one {# song} other {# songs}} to {mixes, plural, one {# mix} other {# mixes}}"
 // in the language of msgs.
 //
 // A toast, once an import added its songs to several mixes, one of each

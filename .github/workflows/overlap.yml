@@ -52,6 +52,9 @@ jobs:
             retry git fetch -q origin "+refs/pull/$n/head:refs/overlap/$n"
           done < "$RUNNER_TEMP/others"
       - name: Merge with each of them
+        # bash itself, not the default bash -e: with pipefail, the step
+        # fails when the tool does, not only when tee does.
+        shell: bash
         env:
           BASE: origin/${{ github.base_ref }}
         run: |

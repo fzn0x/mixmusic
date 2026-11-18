@@ -482,6 +482,8 @@
   "copySongMenu": "Copiază",
   "copySongTitle": "Copiază titlul",
   "copySongTitleCopied": "Titlul a fost copiat",
+  "crossfadeGapless": "Păstrează albumele fără pauze",
+  "crossfadeGaplessDesc": "Piesele unui album se succed direct, fără crossfade. Ieșirea dintr-un album are în continuare crossfade.",
   "crossfadeOff": "Dezactivat: piesele se succed.",
   "crossfadeOverlap": "Piesele se suprapun cu {seconds} secunde.",
   "crossfadeTitle": "Crossfade",

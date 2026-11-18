@@ -482,6 +482,8 @@
   "copySongMenu": "Salin",
   "copySongTitle": "Salin judul",
   "copySongTitleCopied": "Judul disalin",
+  "crossfadeGapless": "Pertahankan album tanpa jeda",
+  "crossfadeGaplessDesc": "Lagu dalam satu album diputar langsung berurutan, tanpa crossfade. Peralihan keluar dari album tetap memakai crossfade.",
   "crossfadeOff": "Mati: lagu diputar berurutan.",
   "crossfadeOverlap": "Lagu saling tumpang tindih selama {seconds} detik.",
   "crossfadeTitle": "Crossfade",

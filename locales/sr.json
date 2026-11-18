@@ -482,6 +482,8 @@
   "copySongMenu": "Копирај",
   "copySongTitle": "Копирај наслов",
   "copySongTitleCopied": "Наслов је копиран",
+  "crossfadeGapless": "Задржи албуме без пауза",
+  "crossfadeGaplessDesc": "Нумере једног албума иду директно једна за другом, без преливања. Излазак из албума и даље има преливање.",
   "crossfadeOff": "Искључено: нумере иду једна за другом.",
   "crossfadeOverlap": "Нумере се преклапају {seconds} с.",
   "crossfadeTitle": "Преливање",

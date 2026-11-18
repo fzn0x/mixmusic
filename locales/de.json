@@ -482,6 +482,8 @@
   "copySongMenu": "Kopieren",
   "copySongTitle": "Titel kopieren",
   "copySongTitleCopied": "Titel kopiert",
+  "crossfadeGapless": "Alben lückenlos abspielen",
+  "crossfadeGaplessDesc": "Die Titel eines Albums folgen direkt aufeinander, ohne Überblendung. Beim Wechsel aus einem Album heraus wird weiterhin überblendet.",
   "crossfadeOff": "Aus: Titel folgen aufeinander.",
   "crossfadeOverlap": "Titel überlappen sich um {seconds} Sekunden.",
   "crossfadeTitle": "Überblendung",

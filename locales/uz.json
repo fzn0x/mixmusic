@@ -482,6 +482,8 @@
   "copySongMenu": "Nusxalash",
   "copySongTitle": "Nomini nusxalash",
   "copySongTitleCopied": "Nomi nusxalandi",
+  "crossfadeGapless": "Albomlarni uzilishsiz saqlash",
+  "crossfadeGaplessDesc": "Bitta albom treklari oʻtish effektisiz bevosita ketma-ket keladi. Albomdan chiqishda oʻtish effekti saqlanadi.",
   "crossfadeOff": "Oʻchiq: treklar ketma-ket keladi.",
   "crossfadeOverlap": "Treklar {seconds} soniyaga bir-birining ustiga tushadi.",
   "crossfadeTitle": "Oʻtish effekti",

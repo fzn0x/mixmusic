@@ -482,6 +482,8 @@
   "copySongMenu": "Kopjo",
   "copySongTitle": "Kopjo titullin",
   "copySongTitleCopied": "Titulli u kopjua",
+  "crossfadeGapless": "Mbaji albumet pa pauza",
+  "crossfadeGaplessDesc": "Këngët e një albumi vijnë menjëherë njëra pas tjetrës, pa kalim të butë. Dalja nga një album bëhet ende me kalim të butë.",
   "crossfadeOff": "Joaktive: këngët vijnë njëra pas tjetrës.",
   "crossfadeOverlap": "Këngët mbivendosen me {seconds} sekonda.",
   "crossfadeTitle": "Kalim i butë mes këngëve",

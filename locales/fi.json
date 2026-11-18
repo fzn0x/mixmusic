@@ -482,6 +482,8 @@
   "copySongMenu": "Kopioi",
   "copySongTitle": "Kopioi nimi",
   "copySongTitleCopied": "Nimi kopioitu",
+  "crossfadeGapless": "Soita albumit ilman taukoja",
+  "crossfadeGaplessDesc": "Saman albumin kappaleet soivat suoraan peräkkäin ilman ristiinhäivytystä. Albumista poistuttaessa ristiinhäivytys on yhä käytössä.",
   "crossfadeOff": "Pois: kappaleet seuraavat toisiaan.",
   "crossfadeOverlap": "Kappaleet menevät päällekkäin {seconds} sekuntia.",
   "crossfadeTitle": "Ristiinhäivytys",

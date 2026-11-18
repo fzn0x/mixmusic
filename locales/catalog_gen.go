@@ -6026,6 +6026,42 @@ func (msgs Messages) CopySongTitleCopied() string {
 	return Catalog.Format(msgs.locale, "copySongTitleCopied", nil)
 }
 
+// CrossfadeGapless says "Keep albums gapless"
+// in the language the app shows.
+//
+// In Settings › Playback › Sound, the title and the label of the switch
+// right under Crossfade, which shows while Crossfade is on: the songs of
+// one album then play straight on, without a crossfade between them.
+func CrossfadeGapless() string { return In(i18n.Locale()).CrossfadeGapless() }
+
+// CrossfadeGapless says "Keep albums gapless"
+// in the language of msgs.
+//
+// In Settings › Playback › Sound, the title and the label of the switch
+// right under Crossfade, which shows while Crossfade is on: the songs of
+// one album then play straight on, without a crossfade between them.
+func (msgs Messages) CrossfadeGapless() string {
+	return Catalog.Format(msgs.locale, "crossfadeGapless", nil)
+}
+
+// CrossfadeGaplessDesc says "The songs of one album play straight on, without a crossfade. The step out of an album still crossfades."
+// in the language the app shows.
+//
+// In Settings › Playback › Sound, under Keep albums gapless
+// (crossfadeGapless): what the switch does. 'The step out of an album' is
+// the change from an album's last song played to a track of something else.
+func CrossfadeGaplessDesc() string { return In(i18n.Locale()).CrossfadeGaplessDesc() }
+
+// CrossfadeGaplessDesc says "The songs of one album play straight on, without a crossfade. The step out of an album still crossfades."
+// in the language of msgs.
+//
+// In Settings › Playback › Sound, under Keep albums gapless
+// (crossfadeGapless): what the switch does. 'The step out of an album' is
+// the change from an album's last song played to a track of something else.
+func (msgs Messages) CrossfadeGaplessDesc() string {
+	return Catalog.Format(msgs.locale, "crossfadeGaplessDesc", nil)
+}
+
 // CrossfadeOff says "Off: tracks follow each other."
 // in the language the app shows.
 func CrossfadeOff() string { return In(i18n.Locale()).CrossfadeOff() }

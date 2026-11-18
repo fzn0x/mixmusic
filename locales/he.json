@@ -482,6 +482,8 @@
   "copySongMenu": "העתקה",
   "copySongTitle": "העתקת השם",
   "copySongTitleCopied": "השם הועתק",
+  "crossfadeGapless": "שמירת אלבומים ללא הפסקות",
+  "crossfadeGaplessDesc": "רצועות של אלבום אחד מתנגנות ישר ברצף, ללא מעבר הדרגתי. היציאה מאלבום עדיין נעשית במעבר הדרגתי.",
   "crossfadeOff": "כבוי: רצועות באות זו אחר זו.",
   "crossfadeOverlap": "רצועות חופפות ב-{seconds} שניות.",
   "crossfadeTitle": "מעבר הדרגתי",

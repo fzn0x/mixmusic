@@ -482,6 +482,8 @@
   "copySongMenu": "複製",
   "copySongTitle": "複製標題",
   "copySongTitleCopied": "已複製標題",
+  "crossfadeGapless": "專輯保持無縫播放",
+  "crossfadeGaplessDesc": "同一張專輯的曲目直接接續播放，不淡入淡出。離開專輯時仍會淡入淡出。",
   "crossfadeOff": "關閉：曲目依序播放。",
   "crossfadeOverlap": "曲目重疊 {seconds} 秒。",
   "crossfadeTitle": "淡入淡出",

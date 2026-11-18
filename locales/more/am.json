@@ -482,6 +482,8 @@
   "copySongMenu": "ቅዳ",
   "copySongTitle": "ርዕሱን ቅዳ",
   "copySongTitleCopied": "ርዕሱ ተቀድቷል",
+  "crossfadeGapless": "አልበሞችን ያለክፍተት አቆይ",
+  "crossfadeGaplessDesc": "የአንድ አልበም ትራኮች ያለ ክሮስፌድ በቀጥታ ይቀጥላሉ። ከአልበም ሲወጣ ግን ክሮስፌድ አሁንም ይደረጋል።",
   "crossfadeOff": "ጠፍቷል፦ ትራኮች አንዱ ሌላውን ይከተላሉ።",
   "crossfadeOverlap": "ትራኮች በ{seconds} ሰከንድ ይደራረባሉ።",
   "crossfadeTitle": "ክሮስፌድ",

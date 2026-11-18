@@ -482,6 +482,8 @@
   "copySongMenu": "Kopiatu",
   "copySongTitle": "Kopiatu izenburua",
   "copySongTitleCopied": "Izenburua kopiatu da",
+  "crossfadeGapless": "Mantendu albumak etenik gabe",
+  "crossfadeGaplessDesc": "Album bateko pistak zuzenean doaz elkarren segidan, crossfaderik gabe. Albumetik ateratzean crossfade-a mantentzen da.",
   "crossfadeOff": "Desaktibatuta: pistak elkarren segidan doaz.",
   "crossfadeOverlap": "Pistak {seconds} segundotan gainjartzen dira.",
   "crossfadeTitle": "Crossfade",

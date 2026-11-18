@@ -223,6 +223,16 @@ seconds; at 0, the default, it is off.
 - A track doesn't crossfade when it is shorter than three times the fade,
   when it or the next is a podcast's episode, while you cast, or when
   Spotify plays it.
+- **Keep albums gapless**, on by default, plays the songs of one album
+  straight on, as without a crossfade: both have the same album ID, which
+  tells its service, the next comes right after the one playing in the
+  queue's own order (with Shuffle on, the order from before it), and
+  neither is the radio's. Tracks that tell their track and disc numbers
+  (Spotify's, a YouTube Music album page's rows and a file's tags) must
+  follow on the disc, or go from the last of one disc to track 1 of the
+  next. A Spotify track played from YouTube Music joins only when both
+  recordings are songs, not music videos. The player decides again at
+  each time the engine tells, every 250 ms, until the fade would start.
 - A pause in a track's last seconds holds: the next track doesn't fade in
   behind it. Played again, it fades while there's time, or the next one
   starts as it ends.

@@ -735,6 +735,9 @@ func (p *Player) onProgress() {
 				p.markExplicit(next.Track.ID)
 			default:
 				p.lookUp(src) // its parts, as its stream is found
+				// How it plays tells whether an album plays straight on
+				// into it (gapless.go).
+				p.preparedNext(next.UID, src)
 			}
 		})
 	}
@@ -754,7 +757,7 @@ func (p *Player) onProgress() {
 	fade := time.Duration(p.svc.Settings().Crossfade) * time.Second
 	if fade > 0 && !p.crossfading && !p.paused && p.s.Source != nil && p.s.Source.Mode == ModeStream &&
 		hasNext && next.UID != entry.UID && dur > 0 && p.heard(p.endOf(dur)-pos) <= fade && p.heard(dur) > 3*fade && p.mayStart(next) &&
-		!spoken(entry.Track) && !spoken(next.Track) {
+		!spoken(entry.Track) && !spoken(next.Track) && !p.gapless(entry, next) {
 		p.crossfadeTo(next, fade)
 	}
 	p.reporting.call(p, func() {

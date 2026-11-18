@@ -482,6 +482,8 @@
   "copySongMenu": "Kwafi",
   "copySongTitle": "Kwafi suna",
   "copySongTitleCopied": "An kwafi sunan",
+  "crossfadeGapless": "Riƙe albam ba tare da tazara ba",
+  "crossfadeGaplessDesc": "Waƙoƙin albam ɗaya suna bin juna kai tsaye, ba tare da sauyawa a hankali ba. Fita daga albam har yanzu tana da sauyawa a hankali.",
   "crossfadeOff": "A kashe: waƙoƙi suna bin juna.",
   "crossfadeOverlap": "Waƙoƙi suna shiga juna da daƙiƙa {seconds}.",
   "crossfadeTitle": "Sauyawa a hankali",

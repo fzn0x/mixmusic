@@ -482,6 +482,8 @@
   "copySongMenu": "کاپی کریں",
   "copySongTitle": "عنوان کاپی کریں",
   "copySongTitleCopied": "عنوان کاپی ہو گیا",
+  "crossfadeGapless": "البمز بغیر وقفے کے رکھیں",
+  "crossfadeGaplessDesc": "ایک البم کے ٹریکس کراس فیڈ کے بغیر سیدھے ایک کے بعد ایک چلتے ہیں۔ البم سے باہر جاتے وقت کراس فیڈ اب بھی ہوتا ہے۔",
   "crossfadeOff": "بند: ٹریکس ایک کے بعد ایک چلتے ہیں۔",
   "crossfadeOverlap": "ٹریکس {seconds} سیکنڈ تک ایک دوسرے پر چڑھتے ہیں۔",
   "crossfadeTitle": "کراس فیڈ",

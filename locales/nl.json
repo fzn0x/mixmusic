@@ -482,6 +482,8 @@
   "copySongMenu": "Kopiëren",
   "copySongTitle": "Titel kopiëren",
   "copySongTitleCopied": "De titel is gekopieerd",
+  "crossfadeGapless": "Albums zonder pauzes afspelen",
+  "crossfadeGaplessDesc": "De nummers van één album lopen direct door, zonder crossfade. De overgang uit een album krijgt nog steeds een crossfade.",
   "crossfadeOff": "Uit: nummers volgen elkaar op.",
   "crossfadeOverlap": "Nummers overlappen {seconds} seconden.",
   "crossfadeTitle": "Crossfade",

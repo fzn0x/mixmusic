@@ -482,6 +482,8 @@
   "copySongMenu": "Kopijuoti",
   "copySongTitle": "Kopijuoti pavadinimą",
   "copySongTitleCopied": "Pavadinimas nukopijuotas",
+  "crossfadeGapless": "Groti albumus be pauzių",
+  "crossfadeGaplessDesc": "Vieno albumo takeliai groja tiesiai vienas po kito, be sklandaus perėjimo. Išeinant iš albumo sklandus perėjimas lieka.",
   "crossfadeOff": "Išjungta: takeliai eina vienas po kito.",
   "crossfadeOverlap": "Takeliai persidengia {seconds} sek.",
   "crossfadeTitle": "Sklandus perėjimas",

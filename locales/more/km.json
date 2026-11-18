@@ -482,6 +482,8 @@
   "copySongMenu": "ចម្លង",
   "copySongTitle": "ចម្លងចំណងជើង",
   "copySongTitleCopied": "បានចម្លងចំណងជើង",
+  "crossfadeGapless": "រក្សាអាល់ប៊ុមឱ្យគ្មានចន្លោះ",
+  "crossfadeGaplessDesc": "បទនៃអាល់ប៊ុមតែមួយចាក់បន្តគ្នាផ្ទាល់ ដោយគ្មានការលាយផ្លាស់។ ការចេញពីអាល់ប៊ុមនៅតែមានការលាយផ្លាស់។",
   "crossfadeOff": "បិទ៖ បទបន្តគ្នាមួយបន្ទាប់ពីមួយ។",
   "crossfadeOverlap": "បទត្រួតគ្នា {seconds} វិនាទី។",
   "crossfadeTitle": "ការលាយផ្លាស់",

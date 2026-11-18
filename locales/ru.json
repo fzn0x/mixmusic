@@ -482,6 +482,8 @@
   "copySongMenu": "Копировать",
   "copySongTitle": "Копировать название",
   "copySongTitleCopied": "Название скопировано",
+  "crossfadeGapless": "Воспроизводить альбомы без пауз",
+  "crossfadeGaplessDesc": "Треки одного альбома идут сразу один за другим, без кроссфейда. При выходе из альбома кроссфейд остаётся.",
   "crossfadeOff": "Выкл.: треки идут один за другим.",
   "crossfadeOverlap": "Треки перекрываются на {seconds} с.",
   "crossfadeTitle": "Кроссфейд",

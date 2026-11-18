@@ -482,6 +482,8 @@
   "copySongMenu": "Kopeeri",
   "copySongTitle": "Kopeeri pealkiri",
   "copySongTitleCopied": "Pealkiri kopeeritud",
+  "crossfadeGapless": "Säilita albumid pausideta",
+  "crossfadeGaplessDesc": "Ühe albumi lood mängivad otse järjest, ilma sujuva üleminekuta. Albumist väljumisel on sujuv üleminek ikka olemas.",
   "crossfadeOff": "Väljas: lood järgnevad üksteisele.",
   "crossfadeOverlap": "Lood kattuvad {seconds} sekundit.",
   "crossfadeTitle": "Sujuv üleminek",

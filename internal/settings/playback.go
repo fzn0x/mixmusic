@@ -54,6 +54,10 @@ type Playback struct {
 	AudioAsAccountOffered bool `json:"audioAsAccountOffered"`
 	// Crossfade overlaps tracks by this many seconds, from 0 to 12.
 	Crossfade int `json:"crossfade"`
+	// GaplessAlbums plays the songs of one album straight on, without a
+	// crossfade, while Crossfade is on: Keep albums gapless (#601). It is
+	// on at first, as in the settings of earlier versions.
+	GaplessAlbums bool `json:"gaplessAlbums"`
 	// Normalize runs Volume levelling, a compressor that squeezes loud and
 	// quiet moments closer together as they play.
 	Normalize bool `json:"normalize"`
@@ -117,6 +121,7 @@ func defaultPlayback() Playback {
 	var p Playback
 	p.SpotifyPlayback = defaultSpotifyPlayback(runtime.GOOS)
 	p.Quality = QualityBest
+	p.GaplessAlbums = true
 	p.Loudness = true
 	p.Autoplay = true
 	p.SongSpeed = 1

@@ -496,6 +496,9 @@ type Player struct {
 	// told is the last 5.1 surround audio YouTube told of after its stream
 	// was found, which the stream takes as it loads (surroundtold.go).
 	told toldSurround
+	// albums is how the next entry plays, as it was prepared, which tells
+	// whether a Spotify album plays straight on into it (gapless.go).
+	albums gaplessState
 	// stopWait stops the wait for the network under way, if any; radioWaits
 	// is set when the radio waits, at the end of the queue, rather than the
 	// current track. toldOffline is set once the user was told that the

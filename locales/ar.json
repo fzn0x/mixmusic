@@ -482,6 +482,8 @@
   "copySongMenu": "نسخ",
   "copySongTitle": "نسخ العنوان",
   "copySongTitleCopied": "تم نسخ العنوان",
+  "crossfadeGapless": "إبقاء الألبومات دون فواصل",
+  "crossfadeGaplessDesc": "تتتابع أغاني الألبوم الواحد مباشرةً، دون مزج بينها. أما الخروج من الألبوم فيبقى بالمزج.",
   "crossfadeOff": "متوقف: تتتابع الأغاني.",
   "crossfadeOverlap": "تتداخل الأغاني بمقدار {seconds} ثوانٍ.",
   "crossfadeTitle": "المزج بين الأغاني",

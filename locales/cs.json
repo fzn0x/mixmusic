@@ -482,6 +482,8 @@
   "copySongMenu": "Kopírovat",
   "copySongTitle": "Kopírovat název",
   "copySongTitleCopied": "Název zkopírován",
+  "crossfadeGapless": "Ponechat alba bez mezer",
+  "crossfadeGaplessDesc": "Skladby jednoho alba hrají přímo za sebou, bez prolínání. Přechod z alba ven se dál prolíná.",
   "crossfadeOff": "Vypnuto: skladby následují jedna za druhou.",
   "crossfadeOverlap": "Skladby se překrývají o {seconds} s.",
   "crossfadeTitle": "Prolínání",

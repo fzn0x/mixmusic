@@ -1816,6 +1816,14 @@
   "copySongMenu": "Copy",
   "copySongTitle": "Copy title",
   "copySongTitleCopied": "Copied the title",
+  "crossfadeGapless": "Keep albums gapless",
+  "@crossfadeGapless": {
+    "description": "In Settings › Playback › Sound, the title and the label of the switch right under Crossfade, which shows while Crossfade is on: the songs of one album then play straight on, without a crossfade between them."
+  },
+  "crossfadeGaplessDesc": "The songs of one album play straight on, without a crossfade. The step out of an album still crossfades.",
+  "@crossfadeGaplessDesc": {
+    "description": "In Settings › Playback › Sound, under Keep albums gapless (crossfadeGapless): what the switch does. 'The step out of an album' is the change from an album's last song played to a track of something else."
+  },
   "crossfadeOff": "Off: tracks follow each other.",
   "crossfadeOverlap": "Tracks overlap by {seconds} seconds.",
   "@crossfadeOverlap": {

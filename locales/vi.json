@@ -482,6 +482,8 @@
   "copySongMenu": "Sao chép",
   "copySongTitle": "Sao chép tên bài hát",
   "copySongTitleCopied": "Đã sao chép tên bài hát",
+  "crossfadeGapless": "Giữ album liền mạch",
+  "crossfadeGaplessDesc": "Các bài hát trong cùng một album nối tiếp nhau ngay, không chuyển bài mờ dần. Khi rời khỏi album vẫn có chuyển bài mờ dần.",
   "crossfadeOff": "Tắt: các bài hát nối tiếp nhau.",
   "crossfadeOverlap": "Các bài hát chồng lên nhau {seconds} giây.",
   "crossfadeTitle": "Chuyển bài mờ dần",

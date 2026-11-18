@@ -482,6 +482,8 @@
   "copySongMenu": "Nakili",
   "copySongTitle": "Nakili kichwa",
   "copySongTitleCopied": "Kichwa kimenakiliwa",
+  "crossfadeGapless": "Bakiza albamu bila mapengo",
+  "crossfadeGaplessDesc": "Nyimbo za albamu moja hufuatana moja kwa moja, bila kufifisha kati yake. Kutoka kwenye albamu bado kunafifishwa.",
   "crossfadeOff": "Imezimwa: nyimbo hufuatana.",
   "crossfadeOverlap": "Nyimbo hupishana kwa sekunde {seconds}.",
   "crossfadeTitle": "Kufifisha kati ya nyimbo",

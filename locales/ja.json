@@ -482,6 +482,8 @@
   "copySongMenu": "コピー",
   "copySongTitle": "タイトルをコピー",
   "copySongTitleCopied": "タイトルをコピーしました",
+  "crossfadeGapless": "アルバムをギャップレスで再生",
+  "crossfadeGaplessDesc": "同じアルバムの曲はクロスフェードせずにそのまま続けて再生されます。アルバムから別の曲に移るときはクロスフェードします。",
   "crossfadeOff": "オフ: 曲は順番に再生されます。",
   "crossfadeOverlap": "曲が{seconds}秒重なります。",
   "crossfadeTitle": "クロスフェード",

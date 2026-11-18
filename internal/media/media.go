@@ -106,6 +106,11 @@ type Track struct {
 	// Episode is set for a podcast's episode: what it has besides a
 	// track's.
 	Episode *Episode `json:"episode,omitempty"`
+	// TrackNumber and DiscNumber are the track's place on its album, from
+	// 1, where its source tells it: Spotify does, a YouTube Music album's
+	// page by its rows, and a file by its tags. 0 is unknown.
+	TrackNumber int `json:"trackNumber,omitempty"`
+	DiscNumber  int `json:"discNumber,omitempty"`
 }
 
 // The kinds of video of YouTube Music that MusicVideo takes, as VideoType

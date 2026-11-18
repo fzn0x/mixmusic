@@ -64,6 +64,10 @@
   (`Stream.Fading`), which a next track whose audio is late, or a pause,
   holds past its seconds. Until then the player starts no other, nor
   loads 5.1 audio, which would cut the track fading out off (#549).
+  While the settings keep albums gapless (`gapless.go`, #601), the next
+  song of the same album, right after the current one in the queue's own
+  order, plays without one; a Spotify track only when both recordings
+  are songs, as the next one's preparation tells (`preparedNext`).
 - **5.1 surround** (`surroundready.go`): a stream plays its 5.1 audio
   while the settings ask for it, once the app tells it plays at once
   (`Surrounds.SurroundReady`). Until then the engine plays its stereo

@@ -482,6 +482,8 @@
   "copySongMenu": "Kopyala",
   "copySongTitle": "Adı kopyala",
   "copySongTitleCopied": "Ad kopyalandı",
+  "crossfadeGapless": "Albomları fasiləsiz saxla",
+  "crossfadeGaplessDesc": "Bir albomun mahnıları keçid effekti olmadan birbaşa ardıcıl gəlir. Albomdan çıxışda keçid effekti yenə olur.",
   "crossfadeOff": "Söndürülüb: mahnılar ardıcıl gəlir.",
   "crossfadeOverlap": "Mahnılar {seconds} saniyə üst-üstə düşür.",
   "crossfadeTitle": "Keçid effekti",

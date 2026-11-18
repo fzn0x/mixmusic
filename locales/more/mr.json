@@ -482,6 +482,8 @@
   "copySongMenu": "कॉपी करा",
   "copySongTitle": "शीर्षक कॉपी करा",
   "copySongTitleCopied": "शीर्षक कॉपी केले",
+  "crossfadeGapless": "अल्बम विनाखंड ठेवा",
+  "crossfadeGaplessDesc": "एका अल्बमचे ट्रॅक क्रॉसफेडशिवाय थेट एकामागून एक वाजतात. अल्बममधून बाहेर पडताना क्रॉसफेड होतोच.",
   "crossfadeOff": "बंद: ट्रॅक एकामागून एक वाजतात.",
   "crossfadeOverlap": "ट्रॅक {seconds} सेकंदांनी एकमेकांवर येतात.",
   "crossfadeTitle": "क्रॉसफेड",

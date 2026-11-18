@@ -4,6 +4,7 @@ import (
 	"embed"
 	"encoding/json"
 	"io/fs"
+	"slices"
 	"strings"
 	"sync"
 )
@@ -57,31 +58,53 @@ func AddTranslations(fsys fs.FS) error {
 	return nil
 }
 
-// byMachine caches TranslatedByMachine, by tag.
-var byMachine sync.Map // string -> bool
+// fileMarks is what a catalog's file says of its translation, in the
+// attributes after "@@locale".
+type fileMarks struct {
+	Machine     bool     `json:"@@x-machine-translated"`
+	Translators []string `json:"@@x-translators"`
+}
+
+// marks caches the fileMarks of each language, by tag.
+var marks sync.Map // string -> fileMarks
+
+// marksOf reads the fileMarks of the catalog of tag the first time they
+// are asked of a language. Each attribute is read alone, so that one of
+// the wrong kind loses only itself.
+func marksOf(tag string) fileMarks {
+	if m, ok := marks.Load(tag); ok {
+		return m.(fileMarks)
+	}
+	var fsys fs.FS = files
+	if f, ok := added.Load(tag); ok {
+		fsys = f.(fs.FS)
+	}
+	var m fileMarks
+	var attrs map[string]json.RawMessage
+	if b, err := fs.ReadFile(fsys, tag+".json"); err == nil && json.Unmarshal(b, &attrs) == nil {
+		_ = json.Unmarshal(attrs["@@x-machine-translated"], &m.Machine)
+		var names []string
+		if json.Unmarshal(attrs["@@x-translators"], &names) == nil {
+			for _, n := range names {
+				if n = strings.TrimSpace(n); n != "" {
+					m.Translators = append(m.Translators, n)
+				}
+			}
+		}
+	}
+	marks.Store(tag, m)
+	return m
+}
 
 // TranslatedByMachine reports whether the catalog of tag, one of the
 // app's languages as "hi" or "pt-BR", was translated by machine and no
 // speaker of it has read it since: its file says
 //
 //	"@@x-machine-translated": true
+func TranslatedByMachine(tag string) bool { return marksOf(tag).Machine }
+
+// Translators returns the people who translated the catalog of tag, or
+// fixed its translation, as its file names them, in its order:
 //
-// It reads the file the first time it is asked of a language.
-func TranslatedByMachine(tag string) bool {
-	if by, ok := byMachine.Load(tag); ok {
-		return by.(bool)
-	}
-	var fsys fs.FS = files
-	if f, ok := added.Load(tag); ok {
-		fsys = f.(fs.FS)
-	}
-	var mark struct {
-		Machine bool `json:"@@x-machine-translated"`
-	}
-	by := false
-	if b, err := fs.ReadFile(fsys, tag+".json"); err == nil && json.Unmarshal(b, &mark) == nil {
-		by = mark.Machine
-	}
-	byMachine.Store(tag, by)
-	return by
-}
+//	"@@x-translators": ["Ada", "Grace"]
+func Translators(tag string) []string { return slices.Clone(marksOf(tag).Translators) }

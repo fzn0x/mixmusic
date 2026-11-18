@@ -46,6 +46,9 @@ en.json's layout:
   hasn't been read through by a speaker of the language. Settings › About
   says so, in the language, with a link to CONTRIBUTING. The speaker who
   has read and fixed the whole file removes the line.
+- `@@x-translators`, a list of names, comes next when people translated
+  the file or fixed it: `"@@x-translators": ["Ada", "Grace"]`. Settings ›
+  About names them, in the language.
 - Then the messages, each a key of en.json, sorted bytewise as there, and
   without en.json's `@key` descriptions. A message keeps the English one's
   placeholders (`{title}`) and select cases, and has the plural cases of its

@@ -441,6 +441,10 @@ people who speak them.
   then says, in the language, that a machine translated it, with a link
   here. A speaker who has read the whole file and fixed what was wrong
   removes the line, in the pull request of the fixes.
+- **Your name.** `"@@x-translators": ["Ada", "Grace"]`, after the lines
+  above, names the people who translated the language or fixed it, as
+  they want to be named; Settings › About shows them in the language. Add
+  yours in the pull request of your translation or fixes.
 - **Check it.** `bash .github/scripts/catalogs.sh` runs MyGo's checks of
   each catalog, and `go test ./locales` MixMusic's: the name, `@@locale`,
   messages that parse, keys en.json has, in order, the placeholders and

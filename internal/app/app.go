@@ -172,6 +172,9 @@ type App struct {
 	lyricsMemo   *memo[lyrics.Lyrics]
 	// lyricsTiming times music videos' lyrics to them (lyricsvideo.go).
 	lyricsTiming lyricsTiming
+	// lyricsOffset keeps how far the listener moved tracks' lyrics
+	// (lyricsoffset.go).
+	lyricsOffset *lyricsOffsets
 	related      *memo[[]media.Shelf]
 	artwork      *artwork.Client
 	artStore     *artwork.Store
@@ -307,6 +310,8 @@ func New(opts Options) (*App, error) {
 	if a.positions, err = library.OpenPositions(filepath.Join(opts.DataDir, "positions.json")); err != nil {
 		return nil, fmt.Errorf("opening where episodes were left: %w", err)
 	}
+	a.lyricsOffset = newLyricsOffsets(filepath.Join(opts.DataDir, "lyrics-offsets"))
+	a.OnFlush(a.lyricsOffset.flush)
 	if a.updates, err = store.Open(filepath.Join(opts.DataDir, "updater.json"), updatePrefs{}); err != nil {
 		return nil, fmt.Errorf("opening the update preferences: %w", err)
 	}

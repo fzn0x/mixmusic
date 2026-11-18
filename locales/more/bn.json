@@ -482,6 +482,8 @@
   "copySongMenu": "কপি",
   "copySongTitle": "শিরোনাম কপি করুন",
   "copySongTitleCopied": "শিরোনাম কপি হয়েছে",
+  "crossfadeGapless": "অ্যালবাম বিরতিহীন রাখুন",
+  "crossfadeGaplessDesc": "একটি অ্যালবামের গানগুলো ক্রসফেড ছাড়াই সরাসরি একটির পর একটি বাজে। অ্যালবাম থেকে বেরোনোর সময় তবুও ক্রসফেড হয়।",
   "crossfadeOff": "বন্ধ: গান একটির পর একটি বাজে।",
   "crossfadeOverlap": "গানগুলো {seconds} সেকেন্ড একে অপরের ওপর মিশে যায়।",
   "crossfadeTitle": "ক্রসফেড",

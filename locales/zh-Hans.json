@@ -484,6 +484,8 @@
   "copySongMenu": "复制",
   "copySongTitle": "复制标题",
   "copySongTitleCopied": "已复制标题",
+  "crossfadeGapless": "专辑保持无缝播放",
+  "crossfadeGaplessDesc": "同一张专辑的歌曲直接接续播放，不淡入淡出。离开专辑时仍会淡入淡出。",
   "crossfadeOff": "关闭：歌曲首尾相接播放。",
   "crossfadeOverlap": "歌曲重叠 {seconds} 秒。",
   "crossfadeTitle": "淡入淡出",

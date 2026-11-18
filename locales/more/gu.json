@@ -482,6 +482,8 @@
   "copySongMenu": "કૉપિ કરો",
   "copySongTitle": "શીર્ષક કૉપિ કરો",
   "copySongTitleCopied": "શીર્ષક કૉપિ કર્યું",
+  "crossfadeGapless": "આલ્બમ અંતર વિના રાખો",
+  "crossfadeGaplessDesc": "એક આલ્બમનાં ગીતો ક્રૉસફેડ વિના સીધાં એક પછી એક વાગે છે. આલ્બમમાંથી બહાર જતી વખતે ક્રૉસફેડ થાય જ છે.",
   "crossfadeOff": "બંધ: ગીતો એક પછી એક આવે છે.",
   "crossfadeOverlap": "ગીતો {seconds} સેકન્ડ એકબીજા પર ચડે છે.",
   "crossfadeTitle": "ક્રૉસફેડ",

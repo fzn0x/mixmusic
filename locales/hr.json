@@ -482,6 +482,8 @@
   "copySongMenu": "Kopiraj",
   "copySongTitle": "Kopiraj naslov",
   "copySongTitleCopied": "Naslov je kopiran",
+  "crossfadeGapless": "Zadrži albume bez pauza",
+  "crossfadeGaplessDesc": "Skladbe jednog albuma sviraju izravno jedna za drugom, bez križnog stišavanja. Izlazak iz albuma i dalje ima križno stišavanje.",
   "crossfadeOff": "Isključeno: skladbe slijede jedna drugu.",
   "crossfadeOverlap": "Skladbe se preklapaju {seconds} s.",
   "crossfadeTitle": "Križno stišavanje",

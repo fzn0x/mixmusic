@@ -482,6 +482,8 @@
   "copySongMenu": "Көшіру",
   "copySongTitle": "Атауын көшіру",
   "copySongTitleCopied": "Атауы көшірілді",
+  "crossfadeGapless": "Альбомдарды үзіліссіз ойнату",
+  "crossfadeGaplessDesc": "Бір альбомның тректері кроссфейдсіз бірден жалғасады. Альбомнан шыққанда кроссфейд бәрібір болады.",
   "crossfadeOff": "Өшірулі: тректер бірінен соң бірі ойналады.",
   "crossfadeOverlap": "Тректер {seconds} секундқа қабаттасады.",
   "crossfadeTitle": "Кроссфейд",

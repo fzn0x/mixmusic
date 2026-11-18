@@ -482,6 +482,8 @@
   "copySongMenu": "Kopiraj",
   "copySongTitle": "Kopiraj naslov",
   "copySongTitleCopied": "Naslov je kopiran",
+  "crossfadeGapless": "Obdrži albume brez premorov",
+  "crossfadeGaplessDesc": "Skladbe enega albuma si sledijo neposredno ena za drugo, brez prehajanja. Prehod iz albuma je še vedno s prehajanjem.",
   "crossfadeOff": "Izklopljeno: skladbe si sledijo ena za drugo.",
   "crossfadeOverlap": "Skladbe se prekrivajo za {seconds} s.",
   "crossfadeTitle": "Prehajanje",

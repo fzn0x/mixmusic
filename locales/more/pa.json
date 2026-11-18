@@ -482,6 +482,8 @@
   "copySongMenu": "ਕਾਪੀ ਕਰੋ",
   "copySongTitle": "ਸਿਰਲੇਖ ਕਾਪੀ ਕਰੋ",
   "copySongTitleCopied": "ਸਿਰਲੇਖ ਕਾਪੀ ਕੀਤਾ",
+  "crossfadeGapless": "ਐਲਬਮਾਂ ਬਿਨਾਂ ਵਕਫ਼ੇ ਦੇ ਰੱਖੋ",
+  "crossfadeGaplessDesc": "ਇੱਕ ਐਲਬਮ ਦੇ ਗੀਤ ਕ੍ਰਾਸਫ਼ੇਡ ਤੋਂ ਬਿਨਾਂ ਸਿੱਧੇ ਇੱਕ ਤੋਂ ਬਾਅਦ ਇੱਕ ਚੱਲਦੇ ਹਨ। ਐਲਬਮ ਤੋਂ ਬਾਹਰ ਜਾਣ ਵੇਲੇ ਕ੍ਰਾਸਫ਼ੇਡ ਫਿਰ ਵੀ ਹੁੰਦਾ ਹੈ।",
   "crossfadeOff": "ਬੰਦ: ਗੀਤ ਇੱਕ ਤੋਂ ਬਾਅਦ ਇੱਕ ਚੱਲਦੇ ਹਨ।",
   "crossfadeOverlap": "ਗੀਤ {seconds} ਸਕਿੰਟ ਇੱਕ ਦੂਜੇ ਉੱਤੇ ਚੜ੍ਹਦੇ ਹਨ।",
   "crossfadeTitle": "ਕ੍ਰਾਸਫ਼ੇਡ",

@@ -482,6 +482,8 @@
   "copySongMenu": "Copiar",
   "copySongTitle": "Copiar o título",
   "copySongTitleCopied": "Título copiado",
+  "crossfadeGapless": "Manter os álbums sen pausas",
+  "crossfadeGaplessDesc": "As cancións dun mesmo álbum soan seguidas, sen fundido cruzado. Ao saír dun álbum segue habendo fundido cruzado.",
   "crossfadeOff": "Desactivado: as cancións vanse sucedendo.",
   "crossfadeOverlap": "As cancións solápanse {seconds} segundos.",
   "crossfadeTitle": "Fundido cruzado",

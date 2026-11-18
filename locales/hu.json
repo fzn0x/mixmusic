@@ -482,6 +482,8 @@
   "copySongMenu": "Másolás",
   "copySongTitle": "Cím másolása",
   "copySongTitleCopied": "A cím másolva",
+  "crossfadeGapless": "Albumok lejátszása szünet nélkül",
+  "crossfadeGaplessDesc": "Egy album számai közvetlenül egymás után szólnak, átúsztatás nélkül. Az albumból kilépve továbbra is van átúsztatás.",
   "crossfadeOff": "Ki: a számok egymás után szólnak.",
   "crossfadeOverlap": "A számok {seconds} másodpercig átfedik egymást.",
   "crossfadeTitle": "Átúsztatás",

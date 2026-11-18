@@ -482,6 +482,8 @@
   "copySongMenu": "คัดลอก",
   "copySongTitle": "คัดลอกชื่อเพลง",
   "copySongTitleCopied": "คัดลอกชื่อเพลงแล้ว",
+  "crossfadeGapless": "เล่นอัลบั้มต่อเนื่องไม่มีช่วงเงียบ",
+  "crossfadeGaplessDesc": "เพลงในอัลบั้มเดียวกันเล่นต่อกันทันทีโดยไม่ครอสเฟด แต่ตอนออกจากอัลบั้มยังคงครอสเฟดอยู่",
   "crossfadeOff": "ปิด: เพลงเล่นต่อกันตามลำดับ",
   "crossfadeOverlap": "เพลงซ้อนกัน {seconds} วินาที",
   "crossfadeTitle": "ครอสเฟด",

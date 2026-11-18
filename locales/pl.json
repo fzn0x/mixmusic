@@ -482,6 +482,8 @@
   "copySongMenu": "Kopiuj",
   "copySongTitle": "Kopiuj tytuł",
   "copySongTitleCopied": "Skopiowano tytuł",
+  "crossfadeGapless": "Zachowaj albumy bez przerw",
+  "crossfadeGaplessDesc": "Utwory z jednego albumu grają od razu jeden po drugim, bez płynnego przejścia. Wyjście poza album nadal ma płynne przejście.",
   "crossfadeOff": "Wyłączone: utwory następują jeden po drugim.",
   "crossfadeOverlap": "Utwory nakładają się o {seconds} s.",
   "crossfadeTitle": "Płynne przejścia",

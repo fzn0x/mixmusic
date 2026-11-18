@@ -482,6 +482,8 @@
   "copySongMenu": "Kopēt",
   "copySongTitle": "Kopēt nosaukumu",
   "copySongTitleCopied": "Nosaukums nokopēts",
+  "crossfadeGapless": "Atskaņot albumus bez pauzēm",
+  "crossfadeGaplessDesc": "Viena albuma dziesmas skan uzreiz cita pēc citas, bez pārejas. Izejot no albuma, pāreja joprojām notiek.",
   "crossfadeOff": "Izslēgts: dziesmas seko cita citai.",
   "crossfadeOverlap": "Dziesmas pārklājas par {seconds} sekundēm.",
   "crossfadeTitle": "Pāreja starp dziesmām",

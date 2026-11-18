@@ -482,6 +482,8 @@
   "copySongMenu": "복사",
   "copySongTitle": "제목 복사",
   "copySongTitleCopied": "제목을 복사했습니다",
+  "crossfadeGapless": "앨범 끊김 없이 재생",
+  "crossfadeGaplessDesc": "한 앨범의 곡은 크로스페이드 없이 바로 이어서 재생됩니다. 앨범에서 다른 곡으로 넘어갈 때는 계속 크로스페이드됩니다.",
   "crossfadeOff": "끔: 곡이 차례로 재생됩니다.",
   "crossfadeOverlap": "곡이 {seconds}초 겹칩니다.",
   "crossfadeTitle": "크로스페이드",

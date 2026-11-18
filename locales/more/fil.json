@@ -482,6 +482,8 @@
   "copySongMenu": "Kopyahin",
   "copySongTitle": "Kopyahin ang pamagat",
   "copySongTitleCopied": "Nakopya ang pamagat",
+  "crossfadeGapless": "Panatilihing walang puwang ang mga album",
+  "crossfadeGaplessDesc": "Tuloy-tuloy ang mga track ng iisang album, nang walang crossfade. May crossfade pa rin sa paglabas sa album.",
   "crossfadeOff": "Off: sunod-sunod ang mga track.",
   "crossfadeOverlap": "Nagpapatong ang mga track nang {seconds} segundo.",
   "crossfadeTitle": "Crossfade",

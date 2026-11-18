@@ -482,6 +482,8 @@
   "copySongMenu": "Copia",
   "copySongTitle": "Copia titolo",
   "copySongTitleCopied": "Titolo copiato",
+  "crossfadeGapless": "Mantieni gli album senza pause",
+  "crossfadeGaplessDesc": "I brani di uno stesso album si susseguono direttamente, senza dissolvenza. L’uscita da un album resta in dissolvenza incrociata.",
   "crossfadeOff": "Disattivato: i brani si susseguono.",
   "crossfadeOverlap": "I brani si sovrappongono per {seconds} secondi.",
   "crossfadeTitle": "Dissolvenza incrociata",

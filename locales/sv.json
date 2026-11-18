@@ -482,6 +482,8 @@
   "copySongMenu": "Kopiera",
   "copySongTitle": "Kopiera titel",
   "copySongTitleCopied": "Kopierade titeln",
+  "crossfadeGapless": "Behåll album utan pauser",
+  "crossfadeGaplessDesc": "Låtarna på ett album spelas direkt efter varandra, utan övertoning. Övergången ut från ett album tonas fortfarande över.",
   "crossfadeOff": "Av: låtarna följer på varandra.",
   "crossfadeOverlap": "Låtarna överlappar med {seconds} sekunder.",
   "crossfadeTitle": "Övertoning",

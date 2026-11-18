@@ -482,6 +482,8 @@
   "copySongMenu": "Copia",
   "copySongTitle": "Copia el títol",
   "copySongTitleCopied": "S’ha copiat el títol",
+  "crossfadeGapless": "Mantén els àlbums sense pauses",
+  "crossfadeGaplessDesc": "Les cançons d’un mateix àlbum sonen seguides, sense fosa. En sortir d’un àlbum, la fosa entre cançons es manté.",
   "crossfadeOff": "Desactivada: les cançons sonen una darrere l’altra.",
   "crossfadeOverlap": "Les cançons se solapen {seconds} segons.",
   "crossfadeTitle": "Fosa entre cançons",

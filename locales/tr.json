@@ -482,6 +482,8 @@
   "copySongMenu": "Kopyala",
   "copySongTitle": "Başlığı kopyala",
   "copySongTitleCopied": "Başlık kopyalandı",
+  "crossfadeGapless": "Albümleri boşluksuz tut",
+  "crossfadeGaplessDesc": "Bir albümün parçaları çapraz geçiş olmadan doğrudan birbirini izler. Albümden çıkışta çapraz geçiş yine uygulanır.",
   "crossfadeOff": "Kapalı: parçalar birbirini izler.",
   "crossfadeOverlap": "Parçalar {seconds} saniye üst üste biner.",
   "crossfadeTitle": "Çapraz geçiş",

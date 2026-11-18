@@ -482,6 +482,8 @@
   "copySongMenu": "Copier",
   "copySongTitle": "Copier le titre",
   "copySongTitleCopied": "Titre copié",
+  "crossfadeGapless": "Garder les albums sans blancs",
+  "crossfadeGaplessDesc": "Les titres d’un même album s’enchaînent directement, sans fondu. La sortie d’un album reste en fondu enchaîné.",
   "crossfadeOff": "Désactivé : les titres s’enchaînent.",
   "crossfadeOverlap": "Les titres se chevauchent de {seconds} secondes.",
   "crossfadeTitle": "Fondu enchaîné",

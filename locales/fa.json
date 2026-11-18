@@ -482,6 +482,8 @@
   "copySongMenu": "کپی",
   "copySongTitle": "کپی عنوان",
   "copySongTitleCopied": "عنوان کپی شد",
+  "crossfadeGapless": "نگه داشتن آلبوم‌ها بدون فاصله",
+  "crossfadeGaplessDesc": "آهنگ‌های یک آلبوم بدون محو متقاطع، مستقیم پشت سر هم پخش می‌شوند. خروج از آلبوم همچنان با محو متقاطع است.",
   "crossfadeOff": "خاموش: آهنگ‌ها پشت سر هم می‌آیند.",
   "crossfadeOverlap": "آهنگ‌ها {seconds} ثانیه همپوشانی دارند.",
   "crossfadeTitle": "محو متقاطع",

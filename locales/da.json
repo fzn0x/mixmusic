@@ -482,6 +482,8 @@
   "copySongMenu": "Kopiér",
   "copySongTitle": "Kopiér titel",
   "copySongTitleCopied": "Kopierede titlen",
+  "crossfadeGapless": "Behold album uden pauser",
+  "crossfadeGaplessDesc": "Numrene fra ét album spiller lige efter hinanden uden overgang. Skiftet væk fra et album har stadig overgang.",
   "crossfadeOff": "Fra: numrene følger efter hinanden.",
   "crossfadeOverlap": "Numrene overlapper med {seconds} sekunder.",
   "crossfadeTitle": "Overgang",

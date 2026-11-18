@@ -8024,6 +8024,70 @@ func (msgs Messages) EpisodeDetails() string {
 	return Catalog.Format(msgs.locale, "episodeDetails", nil)
 }
 
+// EpisodeDetailsFailed says "The episode's details can't be loaded right now. Check your connection, or try again in a moment."
+// in the language the app shows.
+//
+// In the player's Details tab, when asking the service for the episode's
+// details failed.
+func EpisodeDetailsFailed() string { return In(i18n.Locale()).EpisodeDetailsFailed() }
+
+// EpisodeDetailsFailed says "The episode's details can't be loaded right now. Check your connection, or try again in a moment."
+// in the language of msgs.
+//
+// In the player's Details tab, when asking the service for the episode's
+// details failed.
+func (msgs Messages) EpisodeDetailsFailed() string {
+	return Catalog.Format(msgs.locale, "episodeDetailsFailed", nil)
+}
+
+// EpisodeDetailsNone says "No details found for this episode."
+// in the language the app shows.
+//
+// In the player's Details tab, when the episode's service has no details of
+// it.
+func EpisodeDetailsNone() string { return In(i18n.Locale()).EpisodeDetailsNone() }
+
+// EpisodeDetailsNone says "No details found for this episode."
+// in the language of msgs.
+//
+// In the player's Details tab, when the episode's service has no details of
+// it.
+func (msgs Messages) EpisodeDetailsNone() string {
+	return Catalog.Format(msgs.locale, "episodeDetailsNone", nil)
+}
+
+// EpisodeDetailsNotEpisode says "This track isn't a podcast's episode."
+// in the language the app shows.
+//
+// In the player's Details tab, where an episode's details show, when the
+// track playing isn't an episode.
+func EpisodeDetailsNotEpisode() string { return In(i18n.Locale()).EpisodeDetailsNotEpisode() }
+
+// EpisodeDetailsNotEpisode says "This track isn't a podcast's episode."
+// in the language of msgs.
+//
+// In the player's Details tab, where an episode's details show, when the
+// track playing isn't an episode.
+func (msgs Messages) EpisodeDetailsNotEpisode() string {
+	return Catalog.Format(msgs.locale, "episodeDetailsNotEpisode", nil)
+}
+
+// EpisodeDetailsSpotifySignIn says "Sign in to Spotify in Settings › Accounts to see this episode's details."
+// in the language the app shows.
+//
+// In the player's Details tab of a Spotify episode, when the user isn't
+// signed in to Spotify.
+func EpisodeDetailsSpotifySignIn() string { return In(i18n.Locale()).EpisodeDetailsSpotifySignIn() }
+
+// EpisodeDetailsSpotifySignIn says "Sign in to Spotify in Settings › Accounts to see this episode's details."
+// in the language of msgs.
+//
+// In the player's Details tab of a Spotify episode, when the user isn't
+// signed in to Spotify.
+func (msgs Messages) EpisodeDetailsSpotifySignIn() string {
+	return Catalog.Format(msgs.locale, "episodeDetailsSpotifySignIn", nil)
+}
+
 // EpisodeLooking says "Looking for the details…"
 // in the language the app shows.
 func EpisodeLooking() string { return In(i18n.Locale()).EpisodeLooking() }
@@ -18696,18 +18760,36 @@ func (msgs Messages) PodcastsSettingsPlayback() string {
 // in the language the app shows.
 //
 // On a Spotify podcast's page, where Spotify's episodes don't play in
-// MixMusic. {link} is podcastsSettingsPlayback, a link to that tab of
-// Settings.
+// MixMusic, and in the notice when one is played. {link} is
+// podcastsSettingsPlayback, a link to that tab of Settings on the page,
+// plain text in the notice.
 func PodcastsSpotifyOnly(link string) string { return In(i18n.Locale()).PodcastsSpotifyOnly(link) }
 
 // PodcastsSpotifyOnly says "Spotify's podcasts play only from Spotify: choose “In MixMusic, from Spotify” or “On Spotify Connect” in {link}."
 // in the language of msgs.
 //
 // On a Spotify podcast's page, where Spotify's episodes don't play in
-// MixMusic. {link} is podcastsSettingsPlayback, a link to that tab of
-// Settings.
+// MixMusic, and in the notice when one is played. {link} is
+// podcastsSettingsPlayback, a link to that tab of Settings on the page,
+// plain text in the notice.
 func (msgs Messages) PodcastsSpotifyOnly(link string) string {
 	return Catalog.Format(msgs.locale, "podcastsSpotifyOnly", map[string]any{"link": link})
+}
+
+// PodcastsSpotifySignIn says "Sign in to Spotify in Settings › Accounts to open its podcasts."
+// in the language the app shows.
+//
+// Where a Spotify podcast's page should show, when the user isn't signed in
+// to Spotify.
+func PodcastsSpotifySignIn() string { return In(i18n.Locale()).PodcastsSpotifySignIn() }
+
+// PodcastsSpotifySignIn says "Sign in to Spotify in Settings › Accounts to open its podcasts."
+// in the language of msgs.
+//
+// Where a Spotify podcast's page should show, when the user isn't signed in
+// to Spotify.
+func (msgs Messages) PodcastsSpotifySignIn() string {
+	return Catalog.Format(msgs.locale, "podcastsSpotifySignIn", nil)
 }
 
 // PodcastsUnfollowed says "{title}: no longer following"

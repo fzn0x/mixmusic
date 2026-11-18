@@ -2480,6 +2480,22 @@
     "description": "Heading of the downloaded tracks."
   },
   "episodeDetails": "Details",
+  "episodeDetailsFailed": "The episode's details can't be loaded right now. Check your connection, or try again in a moment.",
+  "@episodeDetailsFailed": {
+    "description": "In the player's Details tab, when asking the service for the episode's details failed."
+  },
+  "episodeDetailsNone": "No details found for this episode.",
+  "@episodeDetailsNone": {
+    "description": "In the player's Details tab, when the episode's service has no details of it."
+  },
+  "episodeDetailsNotEpisode": "This track isn't a podcast's episode.",
+  "@episodeDetailsNotEpisode": {
+    "description": "In the player's Details tab, where an episode's details show, when the track playing isn't an episode."
+  },
+  "episodeDetailsSpotifySignIn": "Sign in to Spotify in Settings › Accounts to see this episode's details.",
+  "@episodeDetailsSpotifySignIn": {
+    "description": "In the player's Details tab of a Spotify episode, when the user isn't signed in to Spotify."
+  },
   "episodeLooking": "Looking for the details…",
   "episodeLyrics": "Lyrics",
   "episodeNoChapters": "No chapters.",
@@ -5750,13 +5766,17 @@
   "podcastsSettingsPlayback": "Settings › Playback",
   "podcastsSpotifyOnly": "Spotify's podcasts play only from Spotify: choose “In MixMusic, from Spotify” or “On Spotify Connect” in {link}.",
   "@podcastsSpotifyOnly": {
-    "description": "On a Spotify podcast's page, where Spotify's episodes don't play in MixMusic. {link} is podcastsSettingsPlayback, a link to that tab of Settings.",
+    "description": "On a Spotify podcast's page, where Spotify's episodes don't play in MixMusic, and in the notice when one is played. {link} is podcastsSettingsPlayback, a link to that tab of Settings on the page, plain text in the notice.",
     "placeholders": {
       "link": {
         "type": "String",
         "example": "Settings › Playback"
       }
     }
+  },
+  "podcastsSpotifySignIn": "Sign in to Spotify in Settings › Accounts to open its podcasts.",
+  "@podcastsSpotifySignIn": {
+    "description": "Where a Spotify podcast's page should show, when the user isn't signed in to Spotify."
   },
   "podcastsUnfollowed": "{title}: no longer following",
   "@podcastsUnfollowed": {

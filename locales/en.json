@@ -819,8 +819,14 @@
   "audioAccount2Offer": "Your YouTube Music account has Premium, whose audio has a higher bitrate. MixMusic can ask for each track's audio as your account to play it. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before.",
   "audioAccount2Title": "play audio as your account",
   "audioAccount2TurnOn": "turn on",
-  "audioAsAccountDesc": "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before.",
-  "audioAsAccountSignIn": "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before. Sign in to YouTube Music in accounts first.",
+  "audioAsAccountDesc": "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account, which also plays the tracks YouTube plays only to signed-in viewers. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before.",
+  "@audioAsAccountDesc": {
+    "description": "In Settings › Playback › Sound, under Play audio as your account (audioAsAccountTitle): what the switch brings and what it risks."
+  },
+  "audioAsAccountSignIn": "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account, which also plays the tracks YouTube plays only to signed-in viewers. YouTube may flag an account used this way, and tracks may start more slowly. A track it can't get this way plays as before. Sign in to YouTube Music in accounts first.",
+  "@audioAsAccountSignIn": {
+    "description": "In Settings › Playback › Sound, under Play audio as your account (audioAsAccountTitle), while the user isn't signed in to YouTube Music: what the switch brings and what it risks, as audioAsAccountDesc, and to sign in first."
+  },
   "audioAsAccountTitle": "Play audio as your account",
   "cacheSettingsClear": "clear",
   "cacheSettingsClearCovers": "Clear covers",

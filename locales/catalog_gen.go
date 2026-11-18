@@ -2992,22 +2992,38 @@ func (msgs Messages) AudioAccount2TurnOn() string {
 	return Catalog.Format(msgs.locale, "audioAccount2TurnOn", nil)
 }
 
-// AudioAsAccountDesc says "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account. YouTu…"
+// AudioAsAccountDesc says "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account, which…"
 // in the language the app shows.
+//
+// In Settings › Playback › Sound, under Play audio as your account
+// (audioAsAccountTitle): what the switch brings and what it risks.
 func AudioAsAccountDesc() string { return In(i18n.Locale()).AudioAsAccountDesc() }
 
-// AudioAsAccountDesc says "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account. YouTu…"
+// AudioAsAccountDesc says "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account, which…"
 // in the language of msgs.
+//
+// In Settings › Playback › Sound, under Play audio as your account
+// (audioAsAccountTitle): what the switch brings and what it risks.
 func (msgs Messages) AudioAsAccountDesc() string {
 	return Catalog.Format(msgs.locale, "audioAsAccountDesc", nil)
 }
 
-// AudioAsAccountSignIn says "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account. YouTu…"
+// AudioAsAccountSignIn says "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account, which…"
 // in the language the app shows.
+//
+// In Settings › Playback › Sound, under Play audio as your account
+// (audioAsAccountTitle), while the user isn't signed in to YouTube Music:
+// what the switch brings and what it risks, as audioAsAccountDesc, and to
+// sign in first.
 func AudioAsAccountSignIn() string { return In(i18n.Locale()).AudioAsAccountSignIn() }
 
-// AudioAsAccountSignIn says "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account. YouTu…"
+// AudioAsAccountSignIn says "For YouTube Music Premium's higher bitrate, MixMusic asks for each track's audio as your YouTube Music account, which…"
 // in the language of msgs.
+//
+// In Settings › Playback › Sound, under Play audio as your account
+// (audioAsAccountTitle), while the user isn't signed in to YouTube Music:
+// what the switch brings and what it risks, as audioAsAccountDesc, and to
+// sign in first.
 func (msgs Messages) AudioAsAccountSignIn() string {
 	return Catalog.Format(msgs.locale, "audioAsAccountSignIn", nil)
 }

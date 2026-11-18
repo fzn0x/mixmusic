@@ -18,6 +18,8 @@ import (
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/netproxy"
+
+	"github.com/fzn0x/mixmusic/locales"
 )
 
 // releasesAPI answers with the newest release of MixMusic.
@@ -289,7 +291,7 @@ func (s *System) LatestRelease(ctx context.Context) (Release, error) {
 // nil, how far its download went.
 func (a *App) installUpdate(ctx context.Context, progress func(done, total int64)) (string, error) {
 	if !a.updating.TryLock() {
-		return "", errors.New("the update is downloading already")
+		return "", wordedLater("the update is downloading already", locales.UpdatesDownloadingAlready, nil)
 	}
 	defer a.updating.Unlock()
 	up, err := mygo.Updater.Check(ctx)
@@ -298,12 +300,12 @@ func (a *App) installUpdate(ctx context.Context, progress func(done, total int64
 	}
 	switch {
 	case errors.Is(err, mygo.ErrUpdatesDisabled):
-		return "", errors.New("this copy of MixMusic cannot replace its own files: download the new version instead")
+		return "", wordedLater("this copy of MixMusic cannot replace its own files: download the new version instead", locales.UpdatesCantReplace, nil)
 	case err != nil:
 		return "", err
 	case up == nil:
 		// GitHub lists a release before its update files are uploaded.
-		return "", errors.New("no update is ready to install yet; try again in a few minutes")
+		return "", wordedLater("no update is ready to install yet; try again in a few minutes", locales.UpdatesNotReady, nil)
 	}
 	if err := up.Install(ctx, progress); err != nil {
 		return "", err
@@ -373,7 +375,7 @@ func getUpdateFile(ctx context.Context, url string) (io.ReadCloser, error) {
 	}
 	if res.StatusCode != http.StatusOK {
 		res.Body.Close()
-		return nil, fmt.Errorf("GET %s: %s", url, res.Status)
+		return nil, wordedLater(fmt.Sprintf("GET %s: %s", url, res.Status), func() string { return locales.UpdatesFileFailed(res.Status) }, nil)
 	}
 	return res.Body, nil
 }
@@ -404,22 +406,22 @@ func latestRelease(ctx context.Context, client *http.Client, api, kind, arch, ru
 	req.Header.Set("User-Agent", "MixMusic/"+running)
 	res, err := client.Do(req)
 	if err != nil {
-		return Release{}, fmt.Errorf("asking GitHub for the newest version: %w", err)
+		return Release{}, wordedLater(fmt.Sprintf("asking GitHub for the newest version: %v", err), func() string { return locales.UpdatesGitHubUnreachable(ErrorText(err)) }, err)
 	}
 	defer res.Body.Close()
 	switch {
 	case res.StatusCode == http.StatusForbidden || res.StatusCode == http.StatusTooManyRequests:
-		return Release{}, errors.New("GitHub limits how often it answers; try again in an hour")
+		return Release{}, wordedLater("GitHub limits how often it answers; try again in an hour", locales.UpdatesGitHubLimit, nil)
 	case res.StatusCode != http.StatusOK:
-		return Release{}, fmt.Errorf("asking GitHub for the newest version: it answered %s", res.Status)
+		return Release{}, wordedLater(fmt.Sprintf("asking GitHub for the newest version: it answered %s", res.Status), func() string { return locales.UpdatesGitHubAnswered(res.Status) }, nil)
 	}
 	var gh githubRelease
 	if err := json.NewDecoder(io.LimitReader(res.Body, 4<<20)).Decode(&gh); err != nil {
-		return Release{}, fmt.Errorf("reading the newest version: %w", err)
+		return Release{}, wordedLater(fmt.Sprintf("reading the newest version: %v", err), locales.UpdatesUnreadable, err)
 	}
 	version := strings.TrimPrefix(gh.TagName, "v")
 	if version == "" {
-		return Release{}, errors.New("reading the newest version: the release has no version")
+		return Release{}, wordedLater("reading the newest version: the release has no version", locales.UpdatesUnreadable, nil)
 	}
 	r := Release{Version: version, Newer: newerVersion(version, running), Date: gh.PublishedAt, Notes: summary(gh.Body), Page: gh.HTMLURL}
 	if file := releaseFile(kind, version, arch); file != "" {

@@ -26762,6 +26762,22 @@ func (msgs Messages) UpdatesBuildRpm() string {
 	return Catalog.Format(msgs.locale, "updatesBuildRpm", nil)
 }
 
+// UpdatesCantReplace says "this copy of MixMusic can't replace its own files: download the new version instead"
+// in the language the app shows.
+//
+// Why an update didn't install, as a toast: this copy, as a package of the
+// system's, doesn't update itself.
+func UpdatesCantReplace() string { return In(i18n.Locale()).UpdatesCantReplace() }
+
+// UpdatesCantReplace says "this copy of MixMusic can't replace its own files: download the new version instead"
+// in the language of msgs.
+//
+// Why an update didn't install, as a toast: this copy, as a package of the
+// system's, doesn't update itself.
+func (msgs Messages) UpdatesCantReplace() string {
+	return Catalog.Format(msgs.locale, "updatesCantReplace", nil)
+}
+
 // UpdatesCheckAbout says "At start and every few hours, from the releases on GitHub.{asks}{last}"
 // in the language the app shows.
 func UpdatesCheckAbout(asks string, last string) string {
@@ -26904,6 +26920,22 @@ func (msgs Messages) UpdatesDownloading() string {
 	return Catalog.Format(msgs.locale, "updatesDownloading", nil)
 }
 
+// UpdatesDownloadingAlready says "the update is downloading already"
+// in the language the app shows.
+//
+// Why an update didn't start installing, as a toast: it is downloading
+// already.
+func UpdatesDownloadingAlready() string { return In(i18n.Locale()).UpdatesDownloadingAlready() }
+
+// UpdatesDownloadingAlready says "the update is downloading already"
+// in the language of msgs.
+//
+// Why an update didn't start installing, as a toast: it is downloading
+// already.
+func (msgs Messages) UpdatesDownloadingAlready() string {
+	return Catalog.Format(msgs.locale, "updatesDownloadingAlready", nil)
+}
+
 // UpdatesDownloadingPercent says "downloading {percent}%"
 // in the language the app shows.
 func UpdatesDownloadingPercent(percent int) string {
@@ -26916,6 +26948,22 @@ func (msgs Messages) UpdatesDownloadingPercent(percent int) string {
 	return Catalog.Format(msgs.locale, "updatesDownloadingPercent", map[string]any{"percent": percent})
 }
 
+// UpdatesFileFailed says "the update's file didn't download: GitHub answered {status}"
+// in the language the app shows.
+//
+// Why an update didn't install, as a toast. {status} is GitHub's answer, as
+// 404 Not Found, in English.
+func UpdatesFileFailed(status string) string { return In(i18n.Locale()).UpdatesFileFailed(status) }
+
+// UpdatesFileFailed says "the update's file didn't download: GitHub answered {status}"
+// in the language of msgs.
+//
+// Why an update didn't install, as a toast. {status} is GitHub's answer, as
+// 404 Not Found, in English.
+func (msgs Messages) UpdatesFileFailed(status string) string {
+	return Catalog.Format(msgs.locale, "updatesFileFailed", map[string]any{"status": status})
+}
+
 // UpdatesFlathub says " A new version comes from Flathub, through your software center."
 // in the language the app shows.
 func UpdatesFlathub() string { return In(i18n.Locale()).UpdatesFlathub() }
@@ -26924,6 +26972,60 @@ func UpdatesFlathub() string { return In(i18n.Locale()).UpdatesFlathub() }
 // in the language of msgs.
 func (msgs Messages) UpdatesFlathub() string {
 	return Catalog.Format(msgs.locale, "updatesFlathub", nil)
+}
+
+// UpdatesGitHubAnswered says "GitHub answered {status}"
+// in the language the app shows.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates. {status} is GitHub's answer, as 503 Service Unavailable, in
+// English.
+func UpdatesGitHubAnswered(status string) string {
+	return In(i18n.Locale()).UpdatesGitHubAnswered(status)
+}
+
+// UpdatesGitHubAnswered says "GitHub answered {status}"
+// in the language of msgs.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates. {status} is GitHub's answer, as 503 Service Unavailable, in
+// English.
+func (msgs Messages) UpdatesGitHubAnswered(status string) string {
+	return Catalog.Format(msgs.locale, "updatesGitHubAnswered", map[string]any{"status": status})
+}
+
+// UpdatesGitHubLimit says "GitHub limits how often it answers: try again in an hour"
+// in the language the app shows.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates.
+func UpdatesGitHubLimit() string { return In(i18n.Locale()).UpdatesGitHubLimit() }
+
+// UpdatesGitHubLimit says "GitHub limits how often it answers: try again in an hour"
+// in the language of msgs.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates.
+func (msgs Messages) UpdatesGitHubLimit() string {
+	return Catalog.Format(msgs.locale, "updatesGitHubLimit", nil)
+}
+
+// UpdatesGitHubUnreachable says "GitHub didn't answer: {error}"
+// in the language the app shows.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates. {error} is why, often the system's own words.
+func UpdatesGitHubUnreachable(error string) string {
+	return In(i18n.Locale()).UpdatesGitHubUnreachable(error)
+}
+
+// UpdatesGitHubUnreachable says "GitHub didn't answer: {error}"
+// in the language of msgs.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates. {error} is why, often the system's own words.
+func (msgs Messages) UpdatesGitHubUnreachable(error string) string {
+	return Catalog.Format(msgs.locale, "updatesGitHubUnreachable", map[string]any{"error": error})
 }
 
 // UpdatesGroup says "Updates"
@@ -27014,6 +27116,22 @@ func UpdatesNewest() string { return In(i18n.Locale()).UpdatesNewest() }
 // in the language of msgs.
 func (msgs Messages) UpdatesNewest() string {
 	return Catalog.Format(msgs.locale, "updatesNewest", nil)
+}
+
+// UpdatesNotReady says "no update is ready to install yet: try again in a few minutes"
+// in the language the app shows.
+//
+// Why an update didn't install, as a toast: GitHub lists the new version
+// before its files are there.
+func UpdatesNotReady() string { return In(i18n.Locale()).UpdatesNotReady() }
+
+// UpdatesNotReady says "no update is ready to install yet: try again in a few minutes"
+// in the language of msgs.
+//
+// Why an update didn't install, as a toast: GitHub lists the new version
+// before its files are there.
+func (msgs Messages) UpdatesNotReady() string {
+	return Catalog.Format(msgs.locale, "updatesNotReady", nil)
 }
 
 // UpdatesOffers says " A new version offers its download."
@@ -27168,6 +27286,22 @@ func UpdatesRestartNow() string { return In(i18n.Locale()).UpdatesRestartNow() }
 // in the language of msgs.
 func (msgs Messages) UpdatesRestartNow() string {
 	return Catalog.Format(msgs.locale, "updatesRestartNow", nil)
+}
+
+// UpdatesUnreadable says "the newest version's details couldn't be read"
+// in the language the app shows.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates: GitHub's answer wasn't what MixMusic reads.
+func UpdatesUnreadable() string { return In(i18n.Locale()).UpdatesUnreadable() }
+
+// UpdatesUnreadable says "the newest version's details couldn't be read"
+// in the language of msgs.
+//
+// Under Couldn't look for a newer version (updatesCouldntLook), in Settings
+// › Updates: GitHub's answer wasn't what MixMusic reads.
+func (msgs Messages) UpdatesUnreadable() string {
+	return Catalog.Format(msgs.locale, "updatesUnreadable", nil)
 }
 
 // UpdatesWhatsNew says "what's new"

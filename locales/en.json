@@ -8556,6 +8556,10 @@
   "updatesBuildPacman": "AUR package",
   "updatesBuildPortable": "portable",
   "updatesBuildRpm": ".rpm package",
+  "updatesCantReplace": "this copy of MixMusic can't replace its own files: download the new version instead",
+  "@updatesCantReplace": {
+    "description": "Why an update didn't install, as a toast: this copy, as a package of the system's, doesn't update itself."
+  },
   "updatesCheckAbout": "At start and every few hours, from the releases on GitHub.{asks}{last}",
   "@updatesCheckAbout": {
     "placeholders": {
@@ -8580,6 +8584,10 @@
   "updatesDownloadPortable": "download the portable zip",
   "updatesDownloadRpm": "download the .rpm",
   "updatesDownloading": "downloading…",
+  "updatesDownloadingAlready": "the update is downloading already",
+  "@updatesDownloadingAlready": {
+    "description": "Why an update didn't start installing, as a toast: it is downloading already."
+  },
   "updatesDownloadingPercent": "downloading {percent}%",
   "@updatesDownloadingPercent": {
     "placeholders": {
@@ -8588,7 +8596,38 @@
       }
     }
   },
+  "updatesFileFailed": "the update's file didn't download: GitHub answered {status}",
+  "@updatesFileFailed": {
+    "description": "Why an update didn't install, as a toast. {status} is GitHub's answer, as 404 Not Found, in English.",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
   "updatesFlathub": " A new version comes from Flathub, through your software center.",
+  "updatesGitHubAnswered": "GitHub answered {status}",
+  "@updatesGitHubAnswered": {
+    "description": "Under Couldn't look for a newer version (updatesCouldntLook), in Settings › Updates. {status} is GitHub's answer, as 503 Service Unavailable, in English.",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "updatesGitHubLimit": "GitHub limits how often it answers: try again in an hour",
+  "@updatesGitHubLimit": {
+    "description": "Under Couldn't look for a newer version (updatesCouldntLook), in Settings › Updates."
+  },
+  "updatesGitHubUnreachable": "GitHub didn't answer: {error}",
+  "@updatesGitHubUnreachable": {
+    "description": "Under Couldn't look for a newer version (updatesCouldntLook), in Settings › Updates. {error} is why, often the system's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "updatesGroup": "Updates",
   "updatesInstallAbout": "New versions download in the background and run at the next launch.",
   "updatesInstallTitle": "Install updates without asking",
@@ -8619,6 +8658,10 @@
   },
   "updatesLooking": "Looking for a newer version…",
   "updatesNewest": "This is the newest version",
+  "updatesNotReady": "no update is ready to install yet: try again in a few minutes",
+  "@updatesNotReady": {
+    "description": "Why an update didn't install, as a toast: GitHub lists the new version before its files are there."
+  },
   "updatesOffers": " A new version offers its download.",
   "updatesOut": "MixMusic {version} is out",
   "@updatesOut": {
@@ -8694,6 +8737,10 @@
   },
   "updatesRestartHint": "It runs once MixMusic restarts.",
   "updatesRestartNow": "restart now",
+  "updatesUnreadable": "the newest version's details couldn't be read",
+  "@updatesUnreadable": {
+    "description": "Under Couldn't look for a newer version (updatesCouldntLook), in Settings › Updates: GitHub's answer wasn't what MixMusic reads."
+  },
   "updatesWhatsNew": "what's new",
   "versionsCount": "{count, plural, one {# version} other {# versions}}",
   "@versionsCount": {

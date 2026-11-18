@@ -12,7 +12,8 @@ import (
 // The details of a failure as the window shows them, in its language
 // (#800): Copy's text, for an issue, stays English (failurereport.go).
 // The ways the player tried are the player's names of them, which it
-// gives in English; why each failed is its error's own words.
+// gives in English; why each failed it gives in English and as the window
+// said it then.
 
 // failureAgain ends the name of a way tried once more, as the player
 // names it.
@@ -51,9 +52,18 @@ func failureWay(what string) string {
 // tried, how many times, and why it failed.
 func failureStepSaid(st player.Step, pr privacy) string {
 	if st.Times > 1 {
-		return locales.FailureStepTimes(failureWay(st.What), st.Times, pr.clean(st.Why))
+		return locales.FailureStepTimes(failureWay(st.What), st.Times, pr.clean(failureWhy(st)))
 	}
-	return locales.FailureStep(failureWay(st.What), pr.clean(st.Why))
+	return locales.FailureStep(failureWay(st.What), pr.clean(failureWhy(st)))
+}
+
+// failureWhy is why a step of a failure failed, as the window said it, in
+// its language.
+func failureWhy(st player.Step) string {
+	if st.Said != "" {
+		return st.Said
+	}
+	return st.Why
 }
 
 // failureTrackSaid names the track of a failure as the window does: its

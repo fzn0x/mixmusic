@@ -119,7 +119,7 @@ func (s *shell) playbackErrorSettings(c *ui.Context) {
 			title := pr.clean(failureTrackSaid(f.Track))
 			line := failureWhen(f.At, c.Now())
 			if n := len(f.Steps); n > 0 {
-				line += " · " + pr.clean(f.Steps[n-1].Why)
+				line += " · " + pr.clean(failureWhy(f.Steps[n-1]))
 			}
 			s.row(c, title, line, func() {
 				if s.button(c, "failure-details-"+strconv.Itoa(f.ID), locales.PlaybackErrorsDetails(), false).Label(locales.PlaybackErrorsDetailsOf(title)).Clicked() {

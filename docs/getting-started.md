@@ -138,6 +138,7 @@ Every account is optional, and you add them in Settings › Accounts: [Accounts]
 - **Spotify.** Spotify lets an app serve up to five accounts, and only while the app's owner has Premium, so you sign in with a Spotify app of your own: [Spotify](spotify.md) walks you through it. You can then search Spotify too, see your Spotify library, and like, save and follow there. Spotify tracks play in MixMusic itself (with Premium, on Windows and macOS), on Spotify Connect (with Premium), or from their recording on YouTube Music, which needs no Premium.
 - **Last.fm.** Paste the API key and shared secret of a Last.fm API account of yours, and approve MixMusic in your browser: what you listen to joins your Last.fm profile once half of a track, or four minutes of it, played. Scrobbles made offline are sent once you're back online.
 - **ListenBrainz.** Paste the user token of your free ListenBrainz account, or one of a server of your own, such as Maloja: what you listen to joins your listens there by the same rules, beside Last.fm or without it.
+- **Libre.fm.** Connect, and approve MixMusic on Libre.fm's page in your browser, or on another GNU FM server's: what you listen to joins your profile there by the same rules, with no API account to create.
 
 ## Next
 

@@ -313,6 +313,21 @@
   loves (`track.love`, `track.unlove`). The app saves its queue in
   `lastfm-queue.json`; disconnecting is the only thing that deletes the
   file.
+- **`internal/librefm`** gives a `lastfm.Client` the addresses of
+  Libre.fm, or of another GNU FM server: GNU FM's pages don't give them,
+  so they are the paths of its code, `/2.0/` for the API and `/api/auth/`
+  for the approval page. GNU FM checks only that a key is 32 characters
+  long, so calls carry MixMusic's own `APIKey`, or the user's API account
+  for a server that wants one. The client reads GNU FM's errors of calls
+  it failed on its side, an object of the code and the message, as
+  Last.fm's: 9 refuses the session, 11, 16 and 29 are temporary.
+  `ParseServer` reads the address the user writes, and plain http goes to
+  the local network alone, as `listenbrainz.Local` tells. The app
+  (`internal/app/librefm.go`) keeps the server, the API account when it's
+  the user's own, and the session in the credential store, and the queue
+  in `librefm-queue.json`. `librefmtest` is a fake GNU FM server that
+  answers as its code does, which the tests connect, scrobble and love
+  with: a sign-in with a real Libre.fm account is still to be checked.
 - **`internal/listenbrainz`** calls ListenBrainz's API, or a server that
   speaks it, as Maloja at `/apis/listenbrainz`: `validate-token`;
   `submit-listens`, `playing_now` with `return_msid`, `single` for one

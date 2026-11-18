@@ -79,7 +79,8 @@ func setLogin(open bool) error {
 		}
 		// Nothing the portal wrote to remove.
 	case err != nil:
-		return fmt.Errorf("asking the desktop to start MixMusic at login: %w", err)
+		return wordedLater("asking the desktop to start MixMusic at login: "+err.Error(),
+			func() string { return locales.DesktopSettingsAutostartAskFailed(ErrorText(err)) }, err)
 	case answer.Autostart != open && open:
 		return worded("the desktop didn't let MixMusic start at login: allow it to run in the background in your system's settings for apps, then turn this on again",
 			locales.DesktopSettingsAutostartRefused(), nil)

@@ -15,24 +15,29 @@ type Home struct {
 	HomeShelves []HomeShelf `json:"homeShelves"`
 }
 
-// HomeShelf is a shelf of Home, where the user put it.
-type HomeShelf struct {
-	// Key names the shelf in words that stay the same in every language
-	// and from day to day, after where it comes from: "local:recent" for
-	// Recently played, "youtube:FEmusic_listen_again" for the shelf of
-	// YouTube Music whose title opens that page, "youtube:title:Quick
-	// picks" for one that opens none, "playlist:yt:PL…" for a playlist
-	// the user added.
+// HomeShelf is a shelf of Home, where the user put it. Its Key names the
+// shelf in words that stay the same in every language and from day to
+// day, after where it comes from: "local:recent" for Recently played,
+// "youtube:FEmusic_listen_again" for the shelf of YouTube Music whose
+// title opens that page, "youtube:title:Quick picks" for one that opens
+// none, "playlist:yt:PL…" for a playlist the user added.
+type HomeShelf = Arranged
+
+// Arranged is an item of a list the user arranges, where they put it: a
+// shelf of Home, or a tab of the Library.
+type Arranged struct {
+	// Key names the item in words that stay the same in every language.
 	Key string `json:"key"`
-	// Title is the shelf's title when the user last arranged Home, which
-	// names it while it's hidden or still loads.
+	// Title is the item's title when the user last arranged the list,
+	// which names it while it's hidden or still loads.
 	Title string `json:"title,omitempty"`
-	// Hidden keeps the shelf off Home, until the user brings it back.
+	// Hidden keeps the item out of its list, until the user brings it
+	// back.
 	Hidden bool `json:"hidden,omitempty"`
 }
 
-// ArrangeKey is the key the shelf moves by, in Edit home.
-func (sh HomeShelf) ArrangeKey() string { return sh.Key }
+// ArrangeKey is the key the item moves by, in Edit home or Edit tabs.
+func (a Arranged) ArrangeKey() string { return a.Key }
 
 // These bound what HomeShelves holds: how many shelves, and how long a
 // key and a title may be, in bytes.
@@ -53,22 +58,28 @@ func defaultHome() Home {
 // clean is h with each shelf named once, by a key of its own, without
 // those past maxHomeShelves, and titles cut to maxHomeTitle.
 func (h Home) clean() Home {
-	shelves := make([]HomeShelf, 0, len(h.HomeShelves))
+	h.HomeShelves = cleanArranged(h.HomeShelves, maxHomeShelves)
+	return h
+}
+
+// cleanArranged is list with each item named once, by a key of its own,
+// without those past most, and titles cut to maxHomeTitle.
+func cleanArranged(list []Arranged, most int) []Arranged {
+	out := make([]Arranged, 0, len(list))
 	seen := map[string]bool{}
-	for _, sh := range h.HomeShelves {
-		if sh.Key == "" || len(sh.Key) > maxHomeKey || seen[sh.Key] || len(shelves) == maxHomeShelves {
+	for _, a := range list {
+		if a.Key == "" || len(a.Key) > maxHomeKey || seen[a.Key] || len(out) == most {
 			continue
 		}
-		seen[sh.Key] = true
-		if len(sh.Title) > maxHomeTitle {
+		seen[a.Key] = true
+		if len(a.Title) > maxHomeTitle {
 			cut := maxHomeTitle
-			for cut > 0 && !utf8.RuneStart(sh.Title[cut]) {
+			for cut > 0 && !utf8.RuneStart(a.Title[cut]) {
 				cut--
 			}
-			sh.Title = sh.Title[:cut]
+			a.Title = a.Title[:cut]
 		}
-		shelves = append(shelves, sh)
+		out = append(out, a)
 	}
-	h.HomeShelves = shelves
-	return h
+	return out
 }

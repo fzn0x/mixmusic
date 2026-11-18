@@ -62,6 +62,29 @@
       "hidden": true
     }
   ],
+  "mixesSort": "title",
+  "mixesDescending": true,
+  "playlistsSort": "tracks",
+  "playlistsDescending": true,
+  "libraryTabs": [
+    {
+      "key": "mixes"
+    },
+    {
+      "key": "history",
+      "hidden": true
+    }
+  ],
+  "sidebarPlaces": [
+    {
+      "key": "downloads",
+      "after": "mix:mx:night-drive"
+    },
+    {
+      "key": "liked",
+      "hidden": true
+    }
+  ],
   "spotifyPlayback": "match",
   "spotifyDevice": "device-1",
   "quality": "saver",

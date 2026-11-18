@@ -198,6 +198,8 @@ type App struct {
 	episodeDetails *memo[media.EpisodeDetails]
 	// releases keeps what the artists the user follows put out lately.
 	releases releaseBook
+	// mixes keeps the mixes as they were sorted last (order.go).
+	mixes mixMemo
 
 	presence presence
 	// overlay serves what plays to the overlays of streams (overlay.go).

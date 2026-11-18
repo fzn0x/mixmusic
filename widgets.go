@@ -255,9 +255,15 @@ func (s *shell) pageHeader(c *ui.Context, title string, pivots []string, selecte
 // pageHeaderCounts is a page's header whose pivots count what they show:
 // counts[i], or nothing where it's below 0.
 func (s *shell) pageHeaderCounts(c *ui.Context, title string, pivots []string, counts []int, selected *int) {
+	s.pageHeaderWith(c, title, pivots, counts, selected, nil)
+}
+
+// pageHeaderWith is pageHeaderCounts with end at the end of its pivots,
+// if set, as the Library's Edit tabs.
+func (s *shell) pageHeaderWith(c *ui.Context, title string, pivots []string, counts []int, selected *int, end func()) {
 	k := &s.lk
 	if k.headings != headingsLight {
-		s.plainHeader(c, title, pivots, counts, selected)
+		s.plainHeader(c, title, pivots, counts, selected, end)
 		return
 	}
 	word := k.words(title)
@@ -342,6 +348,9 @@ func (s *shell) pageHeaderCounts(c *ui.Context, title string, pivots []string, c
 						}
 					})
 				}
+				if end != nil {
+					end()
+				}
 			})
 		}
 	})
@@ -352,7 +361,7 @@ func (s *shell) pageHeaderCounts(c *ui.Context, title string, pivots []string, c
 // ones, as the pane widens. It shrinks to fit the pane on one line, down
 // to 60% of its size, and wraps under that. Chips under it switch the
 // page's sections.
-func (s *shell) plainHeader(c *ui.Context, title string, pivots []string, counts []int, selected *int) {
+func (s *shell) plainHeader(c *ui.Context, title string, pivots []string, counts []int, selected *int, end func()) {
 	k := &s.lk
 	pane := s.paneWidth(c) - 2*k.gutter
 	window := pane + 2*k.gutter
@@ -377,7 +386,7 @@ func (s *shell) plainHeader(c *ui.Context, title string, pivots []string, counts
 			t.SingleLine()
 		}
 		if len(pivots) > 0 && selected != nil {
-			s.chips(c, pivots, counts, selected)
+			s.chipsWith(c, pivots, counts, selected, end)
 		}
 	})
 }
@@ -386,8 +395,13 @@ func (s *shell) plainHeader(c *ui.Context, title string, pivots []string, counts
 // in the fill of what is chosen; counts[i] counts what one shows, unless
 // it's below 0.
 func (s *shell) chips(c *ui.Context, pivots []string, counts []int, selected *int) {
+	s.chipsWith(c, pivots, counts, selected, nil)
+}
+
+// chipsWith is chips with end after them, if set.
+func (s *shell) chipsWith(c *ui.Context, pivots []string, counts []int, selected *int, end func()) {
 	k := &s.lk
-	ui.Row(c).Gap(8).Wrap().Children(func() {
+	ui.Row(c).Gap(8).Wrap().AlignItems(ui.Center).Children(func() {
 		for i, p := range pivots {
 			b := s.buttonBase(c.Key("pivot-" + p)).Height(32).PaddingX(16).Gap(6).Radius(k.round(32)).Label(p).Cursor(ui.CursorPointer)
 			fill, ink := k.surface2, k.text
@@ -411,6 +425,9 @@ func (s *shell) chips(c *ui.Context, pivots []string, counts []int, selected *in
 					ui.Text(c, count(counts[i])).FontSize(k.captionSize()).TextColor(ink.Alpha(0.8)).FontFeatures("tnum")
 				}
 			})
+		}
+		if end != nil {
+			end()
 		}
 	})
 }

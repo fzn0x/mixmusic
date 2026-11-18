@@ -3,19 +3,24 @@ package main
 import (
 	"context"
 	"slices"
+	"strings"
 
 	"github.com/egoist/mygo/ui"
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/locales"
 )
 
-// librarySections are the library's pivots, by their paths' last part.
-var librarySections = []struct {
+// librarySection is a pivot of the library, by its path's last part.
+type librarySection struct {
 	id    string
 	label func() string
-}{
+}
+
+// librarySections are the library's pivots, in their own order.
+var librarySections = []librarySection{
 	{"liked", locales.LibraryLiked}, {"mixes", locales.LibraryMixes}, {"podcasts", locales.LibraryPodcasts}, {"artists", locales.LibraryArtists}, {"downloads", locales.RailDownloads},
 	{"computer", locales.LibraryOnThisComputer}, {"history", locales.LibraryHistory},
 	{"disliked", locales.LibraryDisliked}, {"spotify", func() string { return "Spotify" }}, {"youtube", func() string { return "YouTube Music" }},
@@ -23,18 +28,32 @@ var librarySections = []struct {
 
 // libraryPage shows liked songs, the user's mixes, the history, the songs
 // they dislike once there are any, and the libraries of the services the
-// user signed in to.
+// user signed in to, in the tabs' order the user chose, without those
+// they hid but the one a link opened (librarytabs.go).
 func (s *shell) libraryPage(c *ui.Context, tab string) {
 	accounts := s.accounts()
 	disliked := s.svc.Collection.Disliked()
+	applies := func(id string) bool {
+		return (id != "spotify" || accounts.Spotify.SignedIn) && (id != "youtube" || accounts.YouTube.SignedIn) &&
+			(id != "disliked" || len(disliked) > 0)
+	}
+	if s.tabs.editing {
+		s.pageScroll(c, func() {
+			s.pageHeader(c, locales.RailLibrary(), nil, nil)
+			s.tabsEditor(c, applies)
+		})
+		return
+	}
 	var ids, labels []string
-	for _, sec := range librarySections {
-		if (sec.id == "spotify" && !accounts.Spotify.SignedIn) || (sec.id == "youtube" && !accounts.YouTube.SignedIn) ||
-			(sec.id == "disliked" && len(disliked) == 0) {
-			continue
+	for _, e := range s.libraryTabs() {
+		if applies(e.Key) && (!e.Hidden || e.Key == tab) && slices.ContainsFunc(librarySections, func(sec librarySection) bool { return sec.id == e.Key }) {
+			ids = append(ids, e.Key)
+			labels = append(labels, e.Title)
 		}
-		ids = append(ids, sec.id)
-		labels = append(labels, sec.label())
+	}
+	if len(ids) == 0 {
+		// Every tab that applies hidden: the first shows.
+		ids, labels = []string{"liked"}, []string{locales.LibraryLiked()}
 	}
 	selected := 0
 	for i, id := range ids {
@@ -65,7 +84,7 @@ func (s *shell) libraryPage(c *ui.Context, tab string) {
 				counts[i] = -1
 			}
 		}
-		s.pageHeaderCounts(c, locales.RailLibrary(), labels, counts, &selected)
+		s.pageHeaderWith(c, locales.RailLibrary(), labels, counts, &selected, func() { s.editTabsButton(c) })
 		if selected != before {
 			s.router.Replace("/library/" + ids[selected])
 		}
@@ -141,17 +160,6 @@ func (s *shell) dislikedSongs(c *ui.Context, disliked []media.Track) {
 	view := s.trackTools(c, "disliked", "list", disliked)
 	s.trackList(c, "disliked", view.tracks, trackListOptions{art: true, album: true,
 		empty: locales.LibraryNoDislikedMatch(s.searching("disliked"))})
-}
-
-func (s *shell) mixTiles(c *ui.Context) {
-	s.tileWrap(c, func() {
-		if s.newMixTile(c) {
-			s.newMix()
-		}
-		for i, p := range s.svc.Collection.Playlists() {
-			s.playlistTile(c, "mix-"+count(i), p)
-		}
-	})
 }
 
 // newMixTile makes a new mix when clicked: a flat tile in the Tiles
@@ -245,20 +253,27 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 			}
 		}
 	}
-	// The tiles of YouTube Music's playlists delete those the user made,
-	// or take out of the library those they saved: of its shelves, only
-	// this one, which shows them gone at once.
-	var more func(m *ui.Menu, p media.Playlist)
-	if key == "youtube" {
-		more = s.youtubeLibraryItems
-	}
+	// The tiles of the playlists and albums pin them, or hide them from
+	// MixMusic's library (libraryorder.go). Those of YouTube Music's
+	// playlists also delete those the user made, or take out of the
+	// library those they saved: of its shelves, only this one, which
+	// shows them gone at once.
+	more := s.libraryItems(key)
 	// The playlists of others the user collaborates on have a shelf of
 	// their own. Each shelf builds the tiles near the view alone, for a
 	// library of hundreds.
-	// Lists that are still coming show what they have read so far.
+	// Lists that are still coming show what they have read so far: those
+	// the user didn't hide, searched and sorted as they chose, the pinned
+	// ones first.
 	playlistList, albumList, artistList := playlists.shown(), albums.shown(), artists.shown()
+	query := s.order.playlistsQuery(key)
+	view := s.playlistsView(key, playlistList, strings.TrimSpace(*query))
+	if len(playlistList) > 0 {
+		s.sortTools(c, key+"-playlists", locales.LibraryPlaylistsSearchPlaceholder(), locales.LibraryPlaylistsSearchLabel(), query,
+			settings.PlaylistsSorts, playlistSortLabels(sourceName(source)), &s.set.PlaylistsSort, &s.set.PlaylistsDescending, len(view), len(playlistList))
+	}
 	var own []int
-	for i, p := range playlistList {
+	for i, p := range view {
 		if !collaboration(p) {
 			own = append(own, i)
 		}
@@ -267,25 +282,35 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 		s.shelfWith(c, key+"-playlists", locales.LibraryPlaylists(), links, func() {
 			s.nearShelfTiles(c, key+"-playlists", len(own), func(j int) {
 				i := own[j]
-				s.playlistTileWith(c, key+"-playlist-"+count(i), playlistList[i], more)
+				s.playlistTileWith(c, key+"-playlist-"+count(i), view[i], more)
 			})
 		})
 	}
-	s.collaborationsShelf(c, key, playlistList, more)
+	s.collaborationsShelf(c, key, view, more)
+	if q := strings.TrimSpace(*query); q != "" && len(view) == 0 && len(playlistList) > 0 {
+		s.emptyLine(c, locales.LibraryNoPlaylistMatch(q))
+	}
 	if playlists.growing() {
 		s.moreComing(c, key+"-playlists")
 	}
+	albumList = pinnedFirst(s, albumList, func(a media.Album) string { return a.ID }, true)
 	if len(albumList) > 0 {
 		s.shelf(c, key+"-albums", locales.LibraryAlbums(), func() {
 			groups := s.albumGroups(key+"-album", albumList)
 			s.nearShelfTiles(c, key+"-albums", len(groups), func(i int) {
-				s.albumTile(c, key+"-album-"+count(i), s.preferredVersion(groups[i]))
+				a := s.preferredVersion(groups[i])
+				s.albumTileWith(c, key+"-album-"+count(i), a, func(m *ui.Menu) {
+					m.Separator()
+					s.pinItem(m, albumMark(a))
+					s.hideItem(m, albumMark(a))
+				})
 			})
 		})
 	}
 	if albums.growing() {
 		s.moreComing(c, key+"-albums")
 	}
+	artistList = pinnedFirst(s, artistList, func(a media.Artist) string { return a.ID }, false)
 	if len(artistList) > 0 {
 		s.shelf(c, key+"-artists", locales.LibraryArtistsFollowed(), func() {
 			s.nearShelfTiles(c, key+"-artists", len(artistList), func(i int) {
@@ -297,6 +322,7 @@ func (s *shell) serviceLibrary(c *ui.Context, key string,
 		s.moreComing(c, key+"-artists")
 	}
 	liked(c)
+	s.hiddenSection(c, key, source)
 }
 
 func (s *shell) spotifyLibrary(c *ui.Context) {

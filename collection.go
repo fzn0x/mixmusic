@@ -262,6 +262,10 @@ func (s *shell) albumPage(c *ui.Context, page string) {
 			download: d,
 			menu:     s.withDownload(s.withShare(s.collectionMenu(a.Title, a.Tracks, a.URL, a.Source, ""), albumShare(a)), d),
 		}
+		// A saved album pins to the top of the library, and the sidebar.
+		if res.value.Saved || s.pinned(a.ID) {
+			h.menu = s.withPin(h.menu, albumMark(a))
+		}
 		if s.signedIn(a.Source) {
 			h.keep, h.keepLabel, h.keptLabel, h.keeping = &res.value.Saved, locales.LibrarySave(), locales.LibrarySaved(), s.keeping[key]
 			h.onKeep = func(on bool) {
@@ -322,6 +326,11 @@ func (s *shell) playlistPage(c *ui.Context, id string) {
 			importID = ""
 		}
 		menu := s.withShare(s.collectionMenu(p.Title, whole.Tracks, p.URL, p.Source, importID), s.mixShare(p, whole.Tracks))
+		// A mix, and a playlist of the user's library, pins to the top of
+		// the library, and the sidebar.
+		if local || p.Saved || p.Editable || p.Collaborative || s.pinned(p.ID) {
+			menu = s.withPin(menu, playlistMark(p))
+		}
 		if local {
 			base := menu
 			menu = func(m *ui.Menu) {
@@ -687,6 +696,9 @@ func (s *shell) artistPage(c *ui.Context, id string) {
 			playLabel: locales.CollectionPlayTopSongs(),
 			menu: func(m *ui.Menu) {
 				s.followItem(m, a)
+				if s.pinned(a.ID) || s.followsArtist(a) {
+					s.pinItem(m, artistMark(a))
+				}
 				if len(a.TopTracks) > 0 && a.Source != media.SourceFile && m.Item(locales.LibraryStartRadio()).Chosen() {
 					s.startRadio(a.TopTracks[0])
 				}

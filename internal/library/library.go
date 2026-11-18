@@ -65,6 +65,14 @@ type Data struct {
 	// Podcasts are the podcasts the user follows, without their episodes,
 	// the last followed first.
 	Podcasts []media.Podcast `json:"podcasts,omitempty"`
+
+	// Pins are what the user pinned to the top of their lists, in the
+	// order they put them (order.go).
+	Pins []Mark `json:"pins,omitempty"`
+	// Hidden are the playlists and albums of the services the user took
+	// out of MixMusic's library, the last hidden first: they stay on
+	// their service.
+	Hidden []Mark `json:"hidden,omitempty"`
 }
 
 // Library is the user's library, kept in a file, and the log of every
@@ -79,6 +87,9 @@ type Library struct {
 	// each of their rows as they draw; indexing orders its changes.
 	disliked atomic.Pointer[map[string]bool]
 	indexing sync.Mutex
+	// marks holds the IDs of what is pinned and hidden, as disliked does
+	// of the disliked tracks.
+	marks atomic.Pointer[markIndex]
 }
 
 // Open opens the library kept at path, and the play log beside it.
@@ -98,6 +109,7 @@ func Open(path string) (*Library, error) {
 	}
 	l := &Library{file: f, plays: plays, now: time.Now}
 	l.indexDisliked()
+	l.indexMarks()
 	return l, nil
 }
 
@@ -174,8 +186,9 @@ func (l *Library) indexDisliked() {
 	l.disliked.Store(&ids)
 }
 
-// Playlists returns the playlists, without their tracks, the last changed
-// first.
+// Playlists returns the playlists, without their tracks, in the user's
+// own order: a new one first, and each where the user moved it
+// (MovePlaylist). SortedPlaylists lists them as the user sorted them.
 func (l *Library) Playlists() []media.Playlist {
 	ps := l.file.Get().Playlists
 	out := make([]media.Playlist, 0, len(ps))
@@ -238,17 +251,16 @@ func (l *Library) CreatePlaylist(title, description string, tracks []media.Track
 	return p.media(), err
 }
 
-// editPlaylist changes a playlist with fn, and moves it first.
+// editPlaylist changes a playlist with fn, which keeps its place: only
+// the time it changed, which Recently changed sorts by, is new.
 func (l *Library) editPlaylist(id string, fn func(p *Playlist)) error {
 	return l.file.Update(func(d *Data) error {
 		i := slices.IndexFunc(d.Playlists, func(p Playlist) bool { return p.ID == id })
 		if i < 0 {
 			return ErrNoPlaylist
 		}
-		p := d.Playlists[i]
-		fn(&p)
-		p.Updated = l.now()
-		d.Playlists = slices.Insert(slices.Delete(d.Playlists, i, i+1), 0, p)
+		fn(&d.Playlists[i])
+		d.Playlists[i].Updated = l.now()
 		return nil
 	})
 }
@@ -263,16 +275,20 @@ func (l *Library) UpdatePlaylist(id, title, description string) error {
 	})
 }
 
-// DeletePlaylist deletes a playlist.
+// DeletePlaylist deletes a playlist, and its pin.
 func (l *Library) DeletePlaylist(id string) error {
-	return l.file.Update(func(d *Data) error {
+	err := l.file.Update(func(d *Data) error {
 		n := len(d.Playlists)
 		d.Playlists = slices.DeleteFunc(d.Playlists, func(p Playlist) bool { return p.ID == id })
 		if len(d.Playlists) == n {
 			return ErrNoPlaylist
 		}
+		mid := media.ID(media.SourceLocal, id)
+		d.Pins = slices.DeleteFunc(d.Pins, func(m Mark) bool { return m.ID == mid })
 		return nil
 	})
+	l.indexMarks()
+	return err
 }
 
 // AddToPlaylist appends tracks to a playlist, leaving out those it has.

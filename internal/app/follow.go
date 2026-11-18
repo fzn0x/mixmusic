@@ -8,6 +8,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/fzn0x/mixmusic/internal/library"
 	"github.com/fzn0x/mixmusic/internal/media"
 	"github.com/fzn0x/mixmusic/internal/spotify"
 	"github.com/fzn0x/mixmusic/locales"
@@ -45,7 +46,9 @@ func (c *Collection) YouTubePlaylists(ctx context.Context) ([]media.Playlist, er
 			take(read)
 		})
 	}
+	account := c.a.listAccount(ctx, media.SourceYouTube)
 	playlists, err := c.a.youtube.LibraryPlaylists(ctx)
+	keepListed(c.a, ctx, media.SourceYouTube, library.MarkPlaylist, account, playlists, err, playlistMark)
 	if len(playlists) > 0 {
 		// The partial lists share these playlists: mark a copy.
 		playlists = slices.Clone(playlists)
@@ -102,13 +105,19 @@ func markOwn(playlists []media.Playlist, account string) {
 
 // YouTubeAlbums returns the albums the user saved on YouTube Music.
 func (c *Collection) YouTubeAlbums(ctx context.Context) ([]media.Album, error) {
-	return c.a.youtube.LibraryAlbums(ctx)
+	account := c.a.listAccount(ctx, media.SourceYouTube)
+	albums, err := c.a.youtube.LibraryAlbums(ctx)
+	keepListed(c.a, ctx, media.SourceYouTube, library.MarkAlbum, account, albums, err, albumMark)
+	return albums, err
 }
 
 // YouTubeArtists returns the artists the user subscribes to on YouTube
 // Music.
 func (c *Collection) YouTubeArtists(ctx context.Context) ([]media.Artist, error) {
-	return c.a.youtube.LibraryArtists(ctx)
+	account := c.a.listAccount(ctx, media.SourceYouTube)
+	artists, err := c.a.youtube.LibraryArtists(ctx)
+	keepListed(c.a, ctx, media.SourceYouTube, library.MarkArtist, account, artists, err, artistMark)
+	return artists, err
 }
 
 // syncYouTubeLike likes or unlikes a YouTube Music track on YouTube Music

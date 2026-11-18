@@ -27,6 +27,7 @@ type Settings struct {
 	Appearance
 	Lyrics
 	Home
+	Library
 	Playback
 	Cache
 	Translation
@@ -46,6 +47,7 @@ func Default() Settings {
 	s.Appearance = defaultAppearance()
 	s.Lyrics = defaultLyrics()
 	s.Home = defaultHome()
+	s.Library = defaultLibrary()
 	s.Playback = defaultPlayback()
 	s.Cache = defaultCache()
 	s.Downloads = defaultDownloads()
@@ -103,6 +105,7 @@ func (s Settings) Clean() Settings {
 	s.Appearance = s.Appearance.clean(d.Appearance)
 	s.Lyrics = s.Lyrics.clean()
 	s.Home = s.Home.clean()
+	s.Library = s.Library.clean(d.Library)
 	s.Playback = s.Playback.clean(d.Playback)
 	s.Cache = s.Cache.clean()
 	s.Translation = s.Translation.clean()

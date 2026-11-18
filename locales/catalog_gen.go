@@ -12608,6 +12608,132 @@ func (msgs Messages) LibraryDisliked() string {
 	return Catalog.Format(msgs.locale, "libraryDisliked", nil)
 }
 
+// LibraryEditTabs says "Edit tabs"
+// in the language the app shows.
+//
+// Button at the end of the Library's tabs, and what screen readers call it:
+// it lists the tabs to move and hide.
+func LibraryEditTabs() string { return In(i18n.Locale()).LibraryEditTabs() }
+
+// LibraryEditTabs says "Edit tabs"
+// in the language of msgs.
+//
+// Button at the end of the Library's tabs, and what screen readers call it:
+// it lists the tabs to move and hide.
+func (msgs Messages) LibraryEditTabs() string {
+	return Catalog.Format(msgs.locale, "libraryEditTabs", nil)
+}
+
+// LibraryEditTabsHint says "Drag a tab onto another to move it there, or press Alt+Up or Alt+Down on it. A tab you hide waits under them, and sti…"
+// in the language the app shows.
+//
+// Under the buttons of Edit tabs, over the list of the Library's tabs.
+func LibraryEditTabsHint() string { return In(i18n.Locale()).LibraryEditTabsHint() }
+
+// LibraryEditTabsHint says "Drag a tab onto another to move it there, or press Alt+Up or Alt+Down on it. A tab you hide waits under them, and sti…"
+// in the language of msgs.
+//
+// Under the buttons of Edit tabs, over the list of the Library's tabs.
+func (msgs Messages) LibraryEditTabsHint() string {
+	return Catalog.Format(msgs.locale, "libraryEditTabsHint", nil)
+}
+
+// LibraryEditTabsReset says "reset tabs"
+// in the language the app shows.
+//
+// Button of Edit tabs, and the title of the question it asks: it puts the
+// Library's tabs back as they come.
+func LibraryEditTabsReset() string { return In(i18n.Locale()).LibraryEditTabsReset() }
+
+// LibraryEditTabsReset says "reset tabs"
+// in the language of msgs.
+//
+// Button of Edit tabs, and the title of the question it asks: it puts the
+// Library's tabs back as they come.
+func (msgs Messages) LibraryEditTabsReset() string {
+	return Catalog.Format(msgs.locale, "libraryEditTabsReset", nil)
+}
+
+// LibraryEditTabsResetBody says "Put the Library's tabs back in their own order, and show those you hid?"
+// in the language the app shows.
+//
+// The question reset tabs asks, before it does.
+func LibraryEditTabsResetBody() string { return In(i18n.Locale()).LibraryEditTabsResetBody() }
+
+// LibraryEditTabsResetBody says "Put the Library's tabs back in their own order, and show those you hid?"
+// in the language of msgs.
+//
+// The question reset tabs asks, before it does.
+func (msgs Messages) LibraryEditTabsResetBody() string {
+	return Catalog.Format(msgs.locale, "libraryEditTabsResetBody", nil)
+}
+
+// LibraryHiddenHint says "Hidden here only: they stay in your library on {service}."
+// in the language the app shows.
+//
+// Under libraryHiddenTitle. {service} is Spotify or YouTube Music.
+func LibraryHiddenHint(service string) string { return In(i18n.Locale()).LibraryHiddenHint(service) }
+
+// LibraryHiddenHint says "Hidden here only: they stay in your library on {service}."
+// in the language of msgs.
+//
+// Under libraryHiddenTitle. {service} is Spotify or YouTube Music.
+func (msgs Messages) LibraryHiddenHint(service string) string {
+	return Catalog.Format(msgs.locale, "libraryHiddenHint", map[string]any{"service": service})
+}
+
+// LibraryHiddenNotice says "{title} is hidden from your library. Hidden, at the foot of the page, shows it again."
+// in the language the app shows.
+//
+// Toast after Hide from library. {title} is the playlist's or album's name;
+// Hidden is libraryHiddenTitle.
+func LibraryHiddenNotice(title string) string { return In(i18n.Locale()).LibraryHiddenNotice(title) }
+
+// LibraryHiddenNotice says "{title} is hidden from your library. Hidden, at the foot of the page, shows it again."
+// in the language of msgs.
+//
+// Toast after Hide from library. {title} is the playlist's or album's name;
+// Hidden is libraryHiddenTitle.
+func (msgs Messages) LibraryHiddenNotice(title string) string {
+	return Catalog.Format(msgs.locale, "libraryHiddenNotice", map[string]any{"title": title})
+}
+
+// LibraryHiddenTitle says "Hidden"
+// in the language the app shows.
+//
+// Title of the section at the foot of Library › Spotify and Library ›
+// YouTube Music that lists the playlists and albums the user hid from the
+// library.
+func LibraryHiddenTitle() string { return In(i18n.Locale()).LibraryHiddenTitle() }
+
+// LibraryHiddenTitle says "Hidden"
+// in the language of msgs.
+//
+// Title of the section at the foot of Library › Spotify and Library ›
+// YouTube Music that lists the playlists and albums the user hid from the
+// library.
+func (msgs Messages) LibraryHiddenTitle() string {
+	return Catalog.Format(msgs.locale, "libraryHiddenTitle", nil)
+}
+
+// LibraryHideFromLibrary says "Hide from library"
+// in the language the app shows.
+//
+// Menu item of a playlist or an album in Library › Spotify or Library ›
+// YouTube Music: it takes it out of MixMusic's library and changes nothing
+// on the service.
+func LibraryHideFromLibrary() string { return In(i18n.Locale()).LibraryHideFromLibrary() }
+
+// LibraryHideFromLibrary says "Hide from library"
+// in the language of msgs.
+//
+// Menu item of a playlist or an album in Library › Spotify or Library ›
+// YouTube Music: it takes it out of MixMusic's library and changes nothing
+// on the service.
+func (msgs Messages) LibraryHideFromLibrary() string {
+	return Catalog.Format(msgs.locale, "libraryHideFromLibrary", nil)
+}
+
 // LibraryHistory says "History"
 // in the language the app shows.
 //
@@ -12730,6 +12856,38 @@ func (msgs Messages) LibraryMixes() string {
 	return Catalog.Format(msgs.locale, "libraryMixes", nil)
 }
 
+// LibraryMixesSearchLabel says "Search your mixes"
+// in the language the app shows.
+//
+// What screen readers call the box over Library › Mixes and over the
+// sidebar's Your mixes that filters them by name.
+func LibraryMixesSearchLabel() string { return In(i18n.Locale()).LibraryMixesSearchLabel() }
+
+// LibraryMixesSearchLabel says "Search your mixes"
+// in the language of msgs.
+//
+// What screen readers call the box over Library › Mixes and over the
+// sidebar's Your mixes that filters them by name.
+func (msgs Messages) LibraryMixesSearchLabel() string {
+	return Catalog.Format(msgs.locale, "libraryMixesSearchLabel", nil)
+}
+
+// LibraryMixesSearchPlaceholder says "search your mixes"
+// in the language the app shows.
+//
+// Placeholder of the box over Library › Mixes and over the sidebar's Your
+// mixes that filters them by name.
+func LibraryMixesSearchPlaceholder() string { return In(i18n.Locale()).LibraryMixesSearchPlaceholder() }
+
+// LibraryMixesSearchPlaceholder says "search your mixes"
+// in the language of msgs.
+//
+// Placeholder of the box over Library › Mixes and over the sidebar's Your
+// mixes that filters them by name.
+func (msgs Messages) LibraryMixesSearchPlaceholder() string {
+	return Catalog.Format(msgs.locale, "libraryMixesSearchPlaceholder", nil)
+}
+
 // LibraryNewMixAbout says "tracks of every service, together"
 // in the language the app shows.
 //
@@ -12814,6 +12972,40 @@ func (msgs Messages) LibraryNoLikedOnYouTube() string {
 	return Catalog.Format(msgs.locale, "libraryNoLikedOnYouTube", nil)
 }
 
+// LibraryNoMixMatch says "No mix matches “{query}”."
+// in the language the app shows.
+//
+// In Library › Mixes and the sidebar's Your mixes, when no mix's name
+// holds what the user searched. {query} is the search.
+func LibraryNoMixMatch(query string) string { return In(i18n.Locale()).LibraryNoMixMatch(query) }
+
+// LibraryNoMixMatch says "No mix matches “{query}”."
+// in the language of msgs.
+//
+// In Library › Mixes and the sidebar's Your mixes, when no mix's name
+// holds what the user searched. {query} is the search.
+func (msgs Messages) LibraryNoMixMatch(query string) string {
+	return Catalog.Format(msgs.locale, "libraryNoMixMatch", map[string]any{"query": query})
+}
+
+// LibraryNoPlaylistMatch says "No playlist matches “{query}”."
+// in the language the app shows.
+//
+// In Library › Spotify and Library › YouTube Music, when no playlist's
+// name holds what the user searched. {query} is the search.
+func LibraryNoPlaylistMatch(query string) string {
+	return In(i18n.Locale()).LibraryNoPlaylistMatch(query)
+}
+
+// LibraryNoPlaylistMatch says "No playlist matches “{query}”."
+// in the language of msgs.
+//
+// In Library › Spotify and Library › YouTube Music, when no playlist's
+// name holds what the user searched. {query} is the search.
+func (msgs Messages) LibraryNoPlaylistMatch(query string) string {
+	return Catalog.Format(msgs.locale, "libraryNoPlaylistMatch", map[string]any{"query": query})
+}
+
 // LibraryNoSpotifyLiked says "No liked songs on Spotify."
 // in the language the app shows.
 func LibraryNoSpotifyLiked() string { return In(i18n.Locale()).LibraryNoSpotifyLiked() }
@@ -12868,6 +13060,44 @@ func (msgs Messages) LibraryOpenOn(source string) string {
 	return Catalog.Format(msgs.locale, "libraryOpenOn", map[string]any{"source": source})
 }
 
+// LibraryPinToTop says "Pin to top"
+// in the language the app shows.
+//
+// Menu item of a mix, of a playlist, album or artist of the user's library
+// on Spotify or YouTube Music, and of its page's More menu: it puts the
+// item at the top of every list it's in, in the Library, the sidebar and
+// Add to mix.
+func LibraryPinToTop() string { return In(i18n.Locale()).LibraryPinToTop() }
+
+// LibraryPinToTop says "Pin to top"
+// in the language of msgs.
+//
+// Menu item of a mix, of a playlist, album or artist of the user's library
+// on Spotify or YouTube Music, and of its page's More menu: it puts the
+// item at the top of every list it's in, in the Library, the sidebar and
+// Add to mix.
+func (msgs Messages) LibraryPinToTop() string {
+	return Catalog.Format(msgs.locale, "libraryPinToTop", nil)
+}
+
+// LibraryPinnedTile says "{title}, pinned"
+// in the language the app shows.
+//
+// What screen readers call the tile or the sidebar's entry of a mix,
+// playlist, album or artist the user pinned to the top. {title} is its
+// name.
+func LibraryPinnedTile(title string) string { return In(i18n.Locale()).LibraryPinnedTile(title) }
+
+// LibraryPinnedTile says "{title}, pinned"
+// in the language of msgs.
+//
+// What screen readers call the tile or the sidebar's entry of a mix,
+// playlist, album or artist the user pinned to the top. {title} is its
+// name.
+func (msgs Messages) LibraryPinnedTile(title string) string {
+	return Catalog.Format(msgs.locale, "libraryPinnedTile", map[string]any{"title": title})
+}
+
 // LibraryPlay says "play"
 // in the language the app shows.
 //
@@ -12908,6 +13138,40 @@ func LibraryPlaylists() string { return In(i18n.Locale()).LibraryPlaylists() }
 // Shelf title.
 func (msgs Messages) LibraryPlaylists() string {
 	return Catalog.Format(msgs.locale, "libraryPlaylists", nil)
+}
+
+// LibraryPlaylistsSearchLabel says "Search your playlists"
+// in the language the app shows.
+//
+// What screen readers call the box over the playlists of Library ›
+// Spotify and Library › YouTube Music that filters them by name.
+func LibraryPlaylistsSearchLabel() string { return In(i18n.Locale()).LibraryPlaylistsSearchLabel() }
+
+// LibraryPlaylistsSearchLabel says "Search your playlists"
+// in the language of msgs.
+//
+// What screen readers call the box over the playlists of Library ›
+// Spotify and Library › YouTube Music that filters them by name.
+func (msgs Messages) LibraryPlaylistsSearchLabel() string {
+	return Catalog.Format(msgs.locale, "libraryPlaylistsSearchLabel", nil)
+}
+
+// LibraryPlaylistsSearchPlaceholder says "search your playlists"
+// in the language the app shows.
+//
+// Placeholder of the box over the playlists of Library › Spotify and
+// Library › YouTube Music that filters them by name.
+func LibraryPlaylistsSearchPlaceholder() string {
+	return In(i18n.Locale()).LibraryPlaylistsSearchPlaceholder()
+}
+
+// LibraryPlaylistsSearchPlaceholder says "search your playlists"
+// in the language of msgs.
+//
+// Placeholder of the box over the playlists of Library › Spotify and
+// Library › YouTube Music that filters them by name.
+func (msgs Messages) LibraryPlaylistsSearchPlaceholder() string {
+	return Catalog.Format(msgs.locale, "libraryPlaylistsSearchPlaceholder", nil)
 }
 
 // LibraryPlaysNext says "{title} plays next"
@@ -13026,6 +13290,40 @@ func (msgs Messages) LibrarySavedNotice(what string) string {
 	return Catalog.Format(msgs.locale, "librarySavedNotice", map[string]any{"what": what})
 }
 
+// LibraryShowAgain says "show again"
+// in the language the app shows.
+//
+// Button of a row of the Hidden section of Library › Spotify or Library
+// › YouTube Music: it puts the playlist or album back in the library.
+func LibraryShowAgain() string { return In(i18n.Locale()).LibraryShowAgain() }
+
+// LibraryShowAgain says "show again"
+// in the language of msgs.
+//
+// Button of a row of the Hidden section of Library › Spotify or Library
+// › YouTube Music: it puts the playlist or album back in the library.
+func (msgs Messages) LibraryShowAgain() string {
+	return Catalog.Format(msgs.locale, "libraryShowAgain", nil)
+}
+
+// LibraryShowAgainTitle says "Show {title} again"
+// in the language the app shows.
+//
+// What screen readers call libraryShowAgain, with the name of the playlist
+// or album it shows again.
+func LibraryShowAgainTitle(title string) string {
+	return In(i18n.Locale()).LibraryShowAgainTitle(title)
+}
+
+// LibraryShowAgainTitle says "Show {title} again"
+// in the language of msgs.
+//
+// What screen readers call libraryShowAgain, with the name of the playlist
+// or album it shows again.
+func (msgs Messages) LibraryShowAgainTitle(title string) string {
+	return Catalog.Format(msgs.locale, "libraryShowAgainTitle", map[string]any{"title": title})
+}
+
 // LibraryShuffle says "shuffle"
 // in the language the app shows.
 //
@@ -13096,6 +13394,202 @@ func (msgs Messages) LibrarySongsTitle() string {
 	return Catalog.Format(msgs.locale, "librarySongsTitle", nil)
 }
 
+// LibrarySortAToZ says "A to Z"
+// in the language the app shows.
+//
+// Button beside a Sort by menu of the library, while it sorts by title: it
+// shows the other way, Z to A, when clicked.
+func LibrarySortAToZ() string { return In(i18n.Locale()).LibrarySortAToZ() }
+
+// LibrarySortAToZ says "A to Z"
+// in the language of msgs.
+//
+// Button beside a Sort by menu of the library, while it sorts by title: it
+// shows the other way, Z to A, when clicked.
+func (msgs Messages) LibrarySortAToZ() string {
+	return Catalog.Format(msgs.locale, "librarySortAToZ", nil)
+}
+
+// LibrarySortAdded says "Recently added"
+// in the language the app shows.
+//
+// Choice of the Sort by menu of Library › Mixes: by the day each mix was
+// made.
+func LibrarySortAdded() string { return In(i18n.Locale()).LibrarySortAdded() }
+
+// LibrarySortAdded says "Recently added"
+// in the language of msgs.
+//
+// Choice of the Sort by menu of Library › Mixes: by the day each mix was
+// made.
+func (msgs Messages) LibrarySortAdded() string {
+	return Catalog.Format(msgs.locale, "librarySortAdded", nil)
+}
+
+// LibrarySortChanged says "Recently changed"
+// in the language the app shows.
+//
+// Choice of the Sort by menu of Library › Mixes: by the last time each
+// mix changed.
+func LibrarySortChanged() string { return In(i18n.Locale()).LibrarySortChanged() }
+
+// LibrarySortChanged says "Recently changed"
+// in the language of msgs.
+//
+// Choice of the Sort by menu of Library › Mixes: by the last time each
+// mix changed.
+func (msgs Messages) LibrarySortChanged() string {
+	return Catalog.Format(msgs.locale, "librarySortChanged", nil)
+}
+
+// LibrarySortFewest says "Fewest tracks first"
+// in the language the app shows.
+//
+// Button beside a Sort by menu of the library, while it sorts by track
+// count: it shows the other way, Most tracks first, when clicked.
+func LibrarySortFewest() string { return In(i18n.Locale()).LibrarySortFewest() }
+
+// LibrarySortFewest says "Fewest tracks first"
+// in the language of msgs.
+//
+// Button beside a Sort by menu of the library, while it sorts by track
+// count: it shows the other way, Most tracks first, when clicked.
+func (msgs Messages) LibrarySortFewest() string {
+	return Catalog.Format(msgs.locale, "librarySortFewest", nil)
+}
+
+// LibrarySortMost says "Most tracks first"
+// in the language the app shows.
+//
+// Button beside a Sort by menu of the library, while it sorts by track
+// count: it shows the other way, Fewest tracks first, when clicked.
+func LibrarySortMost() string { return In(i18n.Locale()).LibrarySortMost() }
+
+// LibrarySortMost says "Most tracks first"
+// in the language of msgs.
+//
+// Button beside a Sort by menu of the library, while it sorts by track
+// count: it shows the other way, Fewest tracks first, when clicked.
+func (msgs Messages) LibrarySortMost() string {
+	return Catalog.Format(msgs.locale, "librarySortMost", nil)
+}
+
+// LibrarySortNewest says "Newest first"
+// in the language the app shows.
+//
+// Button beside the Sort by menu of Library › Mixes, while it sorts by a
+// time: it shows the other way, Oldest first, when clicked.
+func LibrarySortNewest() string { return In(i18n.Locale()).LibrarySortNewest() }
+
+// LibrarySortNewest says "Newest first"
+// in the language of msgs.
+//
+// Button beside the Sort by menu of Library › Mixes, while it sorts by a
+// time: it shows the other way, Oldest first, when clicked.
+func (msgs Messages) LibrarySortNewest() string {
+	return Catalog.Format(msgs.locale, "librarySortNewest", nil)
+}
+
+// LibrarySortOldest says "Oldest first"
+// in the language the app shows.
+//
+// Button beside the Sort by menu of Library › Mixes, while it sorts by a
+// time: it shows the other way, Newest first, when clicked.
+func LibrarySortOldest() string { return In(i18n.Locale()).LibrarySortOldest() }
+
+// LibrarySortOldest says "Oldest first"
+// in the language of msgs.
+//
+// Button beside the Sort by menu of Library › Mixes, while it sorts by a
+// time: it shows the other way, Newest first, when clicked.
+func (msgs Messages) LibrarySortOldest() string {
+	return Catalog.Format(msgs.locale, "librarySortOldest", nil)
+}
+
+// LibrarySortService says "{service}'s order"
+// in the language the app shows.
+//
+// Choice of the Sort by menu of the playlists of Library › Spotify and
+// Library › YouTube Music: the order the service lists them in. {service}
+// is Spotify or YouTube Music.
+func LibrarySortService(service string) string { return In(i18n.Locale()).LibrarySortService(service) }
+
+// LibrarySortService says "{service}'s order"
+// in the language of msgs.
+//
+// Choice of the Sort by menu of the playlists of Library › Spotify and
+// Library › YouTube Music: the order the service lists them in. {service}
+// is Spotify or YouTube Music.
+func (msgs Messages) LibrarySortService(service string) string {
+	return Catalog.Format(msgs.locale, "librarySortService", map[string]any{"service": service})
+}
+
+// LibrarySortTitle says "Title"
+// in the language the app shows.
+//
+// Choice of the Sort by menu of Library › Mixes and of the playlists of
+// Library › Spotify and Library › YouTube Music: by name.
+func LibrarySortTitle() string { return In(i18n.Locale()).LibrarySortTitle() }
+
+// LibrarySortTitle says "Title"
+// in the language of msgs.
+//
+// Choice of the Sort by menu of Library › Mixes and of the playlists of
+// Library › Spotify and Library › YouTube Music: by name.
+func (msgs Messages) LibrarySortTitle() string {
+	return Catalog.Format(msgs.locale, "librarySortTitle", nil)
+}
+
+// LibrarySortTracks says "Track count"
+// in the language the app shows.
+//
+// Choice of the Sort by menu of Library › Mixes and of the playlists of
+// Library › Spotify and Library › YouTube Music: by how many tracks
+// each holds.
+func LibrarySortTracks() string { return In(i18n.Locale()).LibrarySortTracks() }
+
+// LibrarySortTracks says "Track count"
+// in the language of msgs.
+//
+// Choice of the Sort by menu of Library › Mixes and of the playlists of
+// Library › Spotify and Library › YouTube Music: by how many tracks
+// each holds.
+func (msgs Messages) LibrarySortTracks() string {
+	return Catalog.Format(msgs.locale, "librarySortTracks", nil)
+}
+
+// LibrarySortYourOrder says "Your order"
+// in the language the app shows.
+//
+// Choice of the Sort by menu of Library › Mixes: the mixes in the order
+// the user put them in, by dragging them.
+func LibrarySortYourOrder() string { return In(i18n.Locale()).LibrarySortYourOrder() }
+
+// LibrarySortYourOrder says "Your order"
+// in the language of msgs.
+//
+// Choice of the Sort by menu of Library › Mixes: the mixes in the order
+// the user put them in, by dragging them.
+func (msgs Messages) LibrarySortYourOrder() string {
+	return Catalog.Format(msgs.locale, "librarySortYourOrder", nil)
+}
+
+// LibrarySortZToA says "Z to A"
+// in the language the app shows.
+//
+// Button beside a Sort by menu of the library, while it sorts by title: it
+// shows the other way, A to Z, when clicked.
+func LibrarySortZToA() string { return In(i18n.Locale()).LibrarySortZToA() }
+
+// LibrarySortZToA says "Z to A"
+// in the language of msgs.
+//
+// Button beside a Sort by menu of the library, while it sorts by title: it
+// shows the other way, A to Z, when clicked.
+func (msgs Messages) LibrarySortZToA() string {
+	return Catalog.Format(msgs.locale, "librarySortZToA", nil)
+}
+
 // LibraryStartRadio says "Start radio"
 // in the language the app shows.
 //
@@ -13122,6 +13616,22 @@ func LibraryTrackCount(count int) string { return In(i18n.Locale()).LibraryTrack
 // How many tracks a list holds.
 func (msgs Messages) LibraryTrackCount(count int) string {
 	return Catalog.Format(msgs.locale, "libraryTrackCount", map[string]any{"count": count})
+}
+
+// LibraryUnpin says "Unpin"
+// in the language the app shows.
+//
+// Menu item of something the user pinned to the top (libraryPinToTop): it
+// goes back to its place in its list.
+func LibraryUnpin() string { return In(i18n.Locale()).LibraryUnpin() }
+
+// LibraryUnpin says "Unpin"
+// in the language of msgs.
+//
+// Menu item of something the user pinned to the top (libraryPinToTop): it
+// goes back to its place in its list.
+func (msgs Messages) LibraryUnpin() string {
+	return Catalog.Format(msgs.locale, "libraryUnpin", nil)
 }
 
 // LibraryUnsavedNotice says "{what}: no longer saved"
@@ -21078,6 +21588,22 @@ func (msgs Messages) RailExpand() string {
 	return Catalog.Format(msgs.locale, "railExpand", nil)
 }
 
+// RailHideFromSidebar says "Hide from the sidebar"
+// in the language the app shows.
+//
+// Menu item of Liked songs and of Downloads in the sidebar's Your mixes: it
+// takes the entry out of the sidebar. The page itself stays in the Library.
+func RailHideFromSidebar() string { return In(i18n.Locale()).RailHideFromSidebar() }
+
+// RailHideFromSidebar says "Hide from the sidebar"
+// in the language of msgs.
+//
+// Menu item of Liked songs and of Downloads in the sidebar's Your mixes: it
+// takes the entry out of the sidebar. The page itself stays in the Library.
+func (msgs Messages) RailHideFromSidebar() string {
+	return Catalog.Format(msgs.locale, "railHideFromSidebar", nil)
+}
+
 // RailHome says "Home"
 // in the language the app shows.
 func RailHome() string { return In(i18n.Locale()).RailHome() }
@@ -21148,6 +21674,24 @@ func (msgs Messages) RailNewMix() string {
 	return Catalog.Format(msgs.locale, "railNewMix", nil)
 }
 
+// RailNothingMatches says "Nothing matches “{query}”."
+// in the language the app shows.
+//
+// Under the search box of the sidebar's Your mixes, when no mix or pinned
+// playlist, album or artist has a name that holds what the user searched.
+// {query} is the search.
+func RailNothingMatches(query string) string { return In(i18n.Locale()).RailNothingMatches(query) }
+
+// RailNothingMatches says "Nothing matches “{query}”."
+// in the language of msgs.
+//
+// Under the search box of the sidebar's Your mixes, when no mix or pinned
+// playlist, album or artist has a name that holds what the user searched.
+// {query} is the search.
+func (msgs Messages) RailNothingMatches(query string) string {
+	return Catalog.Format(msgs.locale, "railNothingMatches", map[string]any{"query": query})
+}
+
 // RailNothingPlaying says "Nothing playing yet"
 // in the language the app shows.
 func RailNothingPlaying() string { return In(i18n.Locale()).RailNothingPlaying() }
@@ -21186,6 +21730,24 @@ func RailSettings() string { return In(i18n.Locale()).RailSettings() }
 // in the language of msgs.
 func (msgs Messages) RailSettings() string {
 	return Catalog.Format(msgs.locale, "railSettings", nil)
+}
+
+// RailShowInSidebar says "Show {title} in the sidebar"
+// in the language the app shows.
+//
+// Menu item of the title Your mixes in the sidebar, while Liked songs or
+// Downloads is hidden from it: it shows the entry again where it was.
+// {title} is Liked songs or Downloads.
+func RailShowInSidebar(title string) string { return In(i18n.Locale()).RailShowInSidebar(title) }
+
+// RailShowInSidebar says "Show {title} in the sidebar"
+// in the language of msgs.
+//
+// Menu item of the title Your mixes in the sidebar, while Liked songs or
+// Downloads is hidden from it: it shows the entry again where it was.
+// {title} is Liked songs or Downloads.
+func (msgs Messages) RailShowInSidebar(title string) string {
+	return Catalog.Format(msgs.locale, "railShowInSidebar", map[string]any{"title": title})
 }
 
 // RailStats says "Stats"

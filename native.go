@@ -210,6 +210,11 @@ type shell struct {
 	moving movingCovers
 	// home is Home's own state, as the user arranges it (homeedit.go).
 	home homeArrange
+	// order is how the user searches and moves the lists of their library
+	// (libraryorder.go), and tabs the Library's tabs as they edit them
+	// (librarytabs.go).
+	order libraryOrder
+	tabs  tabsArrange
 	// The pages' own state. local are the home page's own shelves, of the
 	// library at localVersion, in the language localLocale, once
 	// localBuilt.

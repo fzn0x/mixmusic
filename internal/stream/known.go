@@ -37,7 +37,9 @@ func (r *Resolver) known(videoID string, surround bool) (Stream, bool) {
 		if !res.fresh() {
 			return Stream{}, false
 		}
-		return res.stream, true
+		// With the 5.1 audio found after it, as Resolve gives it.
+		s, _ := r.result(res)
+		return s, true
 	default:
 		return Stream{}, false
 	}

@@ -11,13 +11,21 @@ import (
 // the windows show, in the interface's language (#800).
 
 // wordedError is an error of text, in English, which the windows show as
-// said, wrapping the error it tells of, if any.
+// say says, wrapping the error it tells of, if any.
 type wordedError struct {
-	text, said string
-	err        error
+	text string
+	say  func() string
+	err  error
 }
 
-func worded(text, said string, err error) error { return &wordedError{text, said, err} }
+func worded(text, said string, err error) error {
+	return &wordedError{text, func() string { return said }, err}
+}
+
+// wordedLater is worded, whose words say gives when the windows show it, in
+// the language of then: for an error a state keeps, which the windows show
+// later.
+func wordedLater(text string, say func() string, err error) error { return &wordedError{text, say, err} }
 func (e *wordedError) Error() string            { return e.text }
 func (e *wordedError) Unwrap() error            { return e.err }
 
@@ -31,7 +39,7 @@ func ErrorWords(err error) string {
 	case err == nil:
 		return ""
 	case errors.As(err, &w):
-		return w.said
+		return w.say()
 	}
 	for _, known := range ownErrors {
 		if errors.Is(err, known) {
@@ -52,7 +60,7 @@ var ownErrors = []error{errListenBrainzToken, errPlainRemote, errSpotifyEpisode,
 // of each error of a chain.
 func WordsOf(err error) (string, bool) {
 	if w, ok := err.(*wordedError); ok {
-		return w.said, true
+		return w.say(), true
 	}
 	switch err {
 	case errListenBrainzToken:

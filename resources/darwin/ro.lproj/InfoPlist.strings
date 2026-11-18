@@ -1,0 +1,4 @@
+/* The reasons macOS shows as it asks for a permission: those of
+   mygo.config.ts's infoPlist, translated. */
+"NSLocalNetworkUsageDescription" = "MixMusic găsește dispozitivele de proiecție din rețeaua ta, cum ar fi Chromecast și boxele Nest, pentru a reda pe ele, și MixMusic de pe celelalte computere ale tale, pentru a-l controla.";
+"NSAudioCaptureUsageDescription" = "MixMusic aude piesele Spotify pe care le redă, pentru vizualizatorul său și analizorul pluginurilor. Nu le înregistrează și nu le trimite niciodată.";

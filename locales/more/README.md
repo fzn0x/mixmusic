@@ -8,9 +8,12 @@ named in itself, and the computer's language picks it.
 MyGo's `generate`, `i18n check` and `build` read the JSON files at the root
 of `locales/` alone, and not this folder. So:
 
-- A language added here touches no other file. Every translation lands here
-  first: the doc comment of `../catalog_gen.go` lists each language at the
-  root, so two pull requests that each added one there would conflict.
+- A language added here touches no other file. Every new language lands
+  here first: the doc comment of `../catalog_gen.go` lists each language at
+  the root, so two pull requests that each added one there would conflict.
+- The languages the Windows installer can be in have moved to the root of
+  `locales/`, as `../de.json` (see below), and are fixed there, in the same
+  layout.
 - The Windows installer, the languages macOS lists for the app and the
   Linux desktop entry don't know these languages: there MixMusic is named
   in English. MyGo 0.8.1's Windows build fails for a language its
@@ -61,19 +64,20 @@ en.json, and `go test ./locales` MixMusic's.
 
 ## Moving a language to locales/
 
-The languages the Windows installer can be in (MyGo's table:
-`nsisLanguages` in MyGo's `cmd/mygo/languages.go`) move to the root
-together, in one pull request, so that the installer, macOS and Linux name
-MixMusic in them:
+A language the Windows installer can be in (MyGo's table:
+`nsisLanguages` in MyGo's `cmd/mygo/languages.go`) moves to the root after
+it lands here, in a pull request of its own, so that the installer, macOS
+and Linux name MixMusic in it. Those of 2026 moved together, in #564:
 
 1. `git mv locales/more/<tag>.json locales/<tag>.json` for each.
 2. Give each catalog `mygo.appName`, MixMusic's name in it, and add
    `resources/darwin/<tag>.lproj/InfoPlist.strings` with the reasons of
    `mygo.config.ts`'s `infoPlist`: `go test ./locales` asks for both.
 3. Generate `locales/catalog_gen.go` again, as `.github/scripts/catalogs.sh`
-   runs MyGo, or with `bunx mygo generate`. For `ja`, `zh-Hans` or
-   `zh-Hant`, it imports MyGo's own translation, which changes
-   `vendorHash` in `nix/package.nix`: `nix build` tells the new one.
+   runs MyGo, or with `bunx mygo generate`. For a language MyGo has its own
+   translation of, it imports that package, which changes `vendorHash` in
+   `nix/package.nix` (`nix build` tells the new one) and
+   `packaging/flathub/go-modules.json` (`go run ./tools/flathub`).
 4. Run `bash .github/scripts/catalogs.sh` and `go test ./locales`.
 
 Nothing else changes: the app reads both, and `@@x-machine-translated`

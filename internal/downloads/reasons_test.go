@@ -43,7 +43,7 @@ func TestFailureReasons(t *testing.T) {
 func TestReasonOf(t *testing.T) {
 	for err, want := range map[error]string{
 		tools.ErrNoYTDLP: ReasonNeedsYTDLP, match.ErrNoMatch: ReasonNoMatch, errBadAudio: ReasonBadAudio,
-		errNotYouTube: ReasonNotYouTube, errNoMatcher: ReasonNoMatcher, errors.New("something else"): "",
+		errNotYouTube: ReasonNotYouTube, errNoMatcher: ReasonNoMatcher, errHidden: ReasonExplicit, errors.New("something else"): "",
 	} {
 		if got := reasonOf(err); got != want {
 			t.Errorf("reasonOf(%v) = %q, want %q", err, got, want)

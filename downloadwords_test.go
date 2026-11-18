@@ -24,7 +24,7 @@ func TestDownloadWords(t *testing.T) {
 		said[st.HoldKind+strings.Join(st.HoldArgs, ",")] = downloadHold(st)
 	}
 	for _, r := range []string{downloads.ReasonNeedsYTDLP, downloads.ReasonNoAudio, downloads.ReasonNoMatch, downloads.ReasonBadAudio,
-		downloads.ReasonNotYouTube, downloads.ReasonNoMatcher, downloads.ReasonNetwork, downloads.ReasonDiskFull} {
+		downloads.ReasonNotYouTube, downloads.ReasonNoMatcher, downloads.ReasonNetwork, downloads.ReasonDiskFull, downloads.ReasonExplicit} {
 		said[r] = downloadReason(r, "the English words")
 	}
 	said["phase"] = downloadPhase(downloads.PhaseFinding)

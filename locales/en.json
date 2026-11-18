@@ -2409,6 +2409,10 @@
   "@downloadsReasonDiskFull": {
     "description": "Why a track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing."
   },
+  "downloadsReasonExplicit": "it's explicit, and your settings hide explicit content",
+  "@downloadsReasonExplicit": {
+    "description": "Why a track couldn't download: it is explicit, or, of a Spotify track, its recording on YouTube Music that downloads in its place is, and Hide explicit content in Settings › Playback is on. It goes in the {reason} of downloadsMarkFailed and downloadsStatusFailed, so it starts in lowercase where the language has cases."
+  },
   "downloadsReasonNeedsYTDLP": "it needs yt-dlp, which Settings › Playback installs",
   "@downloadsReasonNeedsYTDLP": {
     "description": "Why a track couldn't download: it goes in the {reason} of downloadsMarkFailed, downloadsStatusFailed and downloadsHoldFailing, so it starts in lowercase where the language has cases."

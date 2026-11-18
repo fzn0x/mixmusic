@@ -64,6 +64,10 @@ type Options struct {
 	// Exists is set for a folder the user chose, which Open doesn't make
 	// when it's missing: it waits for it, as for a drive plugged in again.
 	Exists bool
+	// Hides reports whether the settings hide t, as explicit: a track they
+	// hide doesn't download, nor a Spotify track whose recording they hide
+	// (#583).
+	Hides func(t media.Track) bool
 }
 
 // These are the times the manager keeps; tests shorten them.

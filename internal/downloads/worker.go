@@ -30,6 +30,9 @@ var (
 	// errNoMatcher is returned for a Spotify track where nothing finds its
 	// recording.
 	errNoMatcher = errors.New("nothing here finds the recordings of Spotify tracks")
+	// errHidden is returned for a track the settings hide, or whose
+	// recording they hide, as explicit.
+	errHidden = errors.New("it's explicit, and the settings hide explicit content")
 )
 
 // minBest is the bitrate a track the cache holds needs, in kbit/s, to be
@@ -135,6 +138,9 @@ func (m *Manager) pick() (*job, time.Duration, chan struct{}) {
 	return j, 0, nil
 }
 
+// hides reports whether the settings hide t, as explicit.
+func (m *Manager) hides(t media.Track) bool { return m.opts.Hides != nil && m.opts.Hides(t) }
+
 // setPhase tells what a job does.
 func (m *Manager) setPhase(j *job, phase string) {
 	m.mu.Lock()
@@ -147,8 +153,12 @@ func (m *Manager) setPhase(j *job, phase string) {
 
 // fetch downloads the track of j: it finds a Spotify track's recording,
 // shares the file of a track of the same recording, takes it from the
-// cache, or downloads it.
+// cache, or downloads it. A track the settings hide, or whose recording
+// they hide, doesn't.
 func (m *Manager) fetch(j *job) error {
+	if m.hides(j.track) {
+		return errHidden
+	}
 	rec := j.recording
 	if rec == nil && j.track.Source == media.SourceYouTube {
 		t := j.track
@@ -171,6 +181,9 @@ func (m *Manager) fetch(j *job) error {
 		}
 		m.mu.Unlock()
 		m.setPhase(j, "")
+	}
+	if m.hides(*rec) {
+		return errHidden
 	}
 	_, video, err := media.ParseID(rec.ID)
 	if err != nil || rec.Source != media.SourceYouTube || !stream.ValidVideoID(video) {
@@ -400,7 +413,7 @@ func (m *Manager) failed(id string, e *entry, err error) {
 	case errors.Is(err, tools.ErrNoYTDLP):
 		e.Failed, e.Reason = "it needs yt-dlp, which Settings › Playback installs", reason
 	case errors.Is(err, stream.ErrUnavailable), errors.Is(err, stream.ErrNoAudio), errors.Is(err, match.ErrNoMatch),
-		errors.Is(err, errBadAudio), errors.Is(err, errNotYouTube), errors.Is(err, errNoMatcher):
+		errors.Is(err, errBadAudio), errors.Is(err, errNotYouTube), errors.Is(err, errNoMatcher), errors.Is(err, errHidden):
 		e.Failed, e.Reason = why, reason
 	case stream.IsNetwork(err) && m.opts.Network != nil:
 		// Gone with the network, it waits for it, without spending a try.
@@ -431,6 +444,9 @@ const (
 	ReasonNetwork = "network"
 	// ReasonDiskFull: the disk is full.
 	ReasonDiskFull = "diskFull"
+	// ReasonExplicit: the track, or its recording, is explicit, and the
+	// settings hide explicit content.
+	ReasonExplicit = "explicit"
 )
 
 // reasonOf is the reason of err, a failure, or "" for another.
@@ -448,6 +464,8 @@ func reasonOf(err error) string {
 		return ReasonNotYouTube
 	case errors.Is(err, errNoMatcher):
 		return ReasonNoMatcher
+	case errors.Is(err, errHidden):
+		return ReasonExplicit
 	case diskFull(err):
 		return ReasonDiskFull
 	case stream.IsNetwork(err):
@@ -510,7 +528,8 @@ func (m *Manager) checkNetwork(id, why, reason string) {
 // plain says why a download failed, in plain words.
 func plain(err error) string {
 	switch {
-	case errors.Is(err, match.ErrNoMatch), errors.Is(err, errBadAudio), errors.Is(err, errNotYouTube), errors.Is(err, errNoMatcher):
+	case errors.Is(err, match.ErrNoMatch), errors.Is(err, errBadAudio), errors.Is(err, errNotYouTube), errors.Is(err, errNoMatcher),
+		errors.Is(err, errHidden):
 		return err.Error()
 	case diskFull(err):
 		return "the disk is full"

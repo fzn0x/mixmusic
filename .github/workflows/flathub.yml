@@ -42,8 +42,11 @@ on:
 permissions:
   contents: read
 
+# A pull request's newer run takes the place of its older one. Elsewhere
+# each commit has a run of its own, so a re-run of an older commit's run on
+# main never cancels a newer commit's (#849).
 concurrency:
-  group: flathub-${{ github.event.pull_request.number || github.ref }}
+  group: flathub-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
 env:

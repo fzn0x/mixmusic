@@ -96,6 +96,8 @@ type Library struct {
 	// marks holds the IDs of what is pinned and hidden, as disliked does
 	// of the disliked tracks.
 	marks atomic.Pointer[markIndex]
+	// folders keeps the folders as they listed last (folders.go).
+	folders folderMemo
 }
 
 // Open opens the library kept at path, and the play log beside it.

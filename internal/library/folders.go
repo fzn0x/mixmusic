@@ -14,6 +14,7 @@ import (
 	"errors"
 	"slices"
 	"strings"
+	"sync"
 	"unicode/utf8"
 
 	"golang.org/x/text/unicode/norm"
@@ -50,19 +51,30 @@ func FolderName(name string) string {
 	return name
 }
 
+// folderMemo is the folders as they listed last, of the library at
+// version: the sidebar lists them in every frame, which sorts them once.
+type folderMemo struct {
+	mu      sync.Mutex
+	version uint64
+	list    []Folder
+}
+
 // Folders returns the folders, with what each holds, as the sidebar lists
-// them: by name, or in the user's order once they moved one.
+// them: by name, or in the user's order once they moved one. Their Items
+// are shared: don't change them.
 func (l *Library) Folders() []Folder {
-	d := l.file.Get()
-	out := make([]Folder, len(d.Folders))
-	for i, f := range d.Folders {
-		f.Items = slices.Clone(f.Items)
-		out[i] = f
+	m := &l.folders
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if v := l.file.Version(); m.list == nil || m.version != v {
+		d := l.file.Get()
+		m.list = slices.Clone(d.Folders)
+		if !d.FoldersArranged {
+			byName(m.list)
+		}
+		m.version = v
 	}
-	if !d.FoldersArranged {
-		byName(out)
-	}
-	return out
+	return slices.Clone(m.list)
 }
 
 // byName sorts folders by name, as readers do.

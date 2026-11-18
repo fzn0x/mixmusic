@@ -251,10 +251,10 @@ func (o *castOut) load(gen int, m cast.Media, speed float64) {
 
 // castUnreachable tells of a cast device that couldn't reach MixMusic, as
 // a firewall keeps it out: on Windows, Settings › Desktop › Windows
-// Firewall tells why, and lets it in (#496).
+// Firewall tells why, and lets the user allow the connection (#496).
 func castUnreachable() error {
 	if firewall.Supported {
-		return worded("The cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets it in",
+		return worded("The cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets you allow the connection",
 			locales.CastUnreachableFirewall(), nil)
 	}
 	return worded("The cast device couldn't reach MixMusic: let MixMusic take connections from your network in the firewall",

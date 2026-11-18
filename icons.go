@@ -27,6 +27,9 @@ var iconPaths = map[string]string{
 	"volumeMute":   "M4 9.5h3.5L12 5.5v13l-4.5-4H4zM16 9.5l5 5M21 9.5l-5 5",
 	"plus":         "M12 4.5v15M4.5 12h15",
 	"more":         "M5.5 12h.01M12 12h.01M18.5 12h.01",
+	"pin":          "M9 3.5h6M10 3.5v6.5L6.5 14h11L14 10V3.5M12 14v6.5",
+	"sort-up":      "M8 19.5v-15M4 8l4-3.5L12 8M14 7h6M14 12h4.5M14 17h3",
+	"sort-down":    "M8 4.5v15M4 16l4 3.5 4-3.5M14 7h3M14 12h4.5M14 17h6",
 	"close":        "M5.5 5.5l13 13M18.5 5.5l-13 13",
 	"back":         "M14.5 5.5 8 12l6.5 6.5M8.5 12H20",
 	"forward":      "M9.5 5.5 16 12l-6.5 6.5M15.5 12H4",
@@ -58,9 +61,6 @@ var iconPaths = map[string]string{
 	"highlight":    "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z",
 	"video":        "M3.5 5.5h17v13h-17zM10 9v6l5-3z",
 	"speed":        "M6 18A8.5 8.5 0 1 1 18 18M12 12l3.5-3.5",
-	"pin":          "M9 3.5h6M10 3.5v6.5L6.5 14h11L14 10V3.5M12 14v6.5",
-	"sort-up":      "M8 19.5v-15M4 8l4-3.5L12 8M14 7h6M14 12h4.5M14 17h3",
-	"sort-down":    "M8 4.5v15M4 16l4 3.5 4-3.5M14 7h3M14 12h4.5M14 17h6",
 }
 
 // icons are iconPaths drawn as lines, and solidIcons as filled shapes, as

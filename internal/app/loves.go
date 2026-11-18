@@ -15,21 +15,24 @@ import (
 // service accepts.
 func (a *App) sendLoves(ctx context.Context, track media.Track, liked bool) {
 	a.mu.Lock()
-	lf, lb := a.lastfm, a.listenbrainz.conn
+	lf, lb, fm := a.lastfm, a.listenbrainz.conn, a.librefm.conn
 	a.mu.Unlock()
 	id, t := scrobbleTrack(NowPlaying{Track: &track})
-	if lf == nil && lb == nil || id == "" {
+	if lf == nil && lb == nil && fm == nil || id == "" {
 		return
 	}
 	s := a.settings.Get()
 	a.mu.Lock()
-	var lfOn, lbOn bool
-	var token string
+	var lfOn, lbOn, fmOn bool
+	var token, fmKey string
 	if lf != nil {
 		lfOn = s.LastfmLoves && !lf.expired
 	}
 	if lb != nil {
 		lbOn, token = s.ListenBrainzLoves && !lb.expired, lb.creds.Token
+	}
+	if fm != nil {
+		fmOn, fmKey = s.LibrefmLoves && !fm.expired, fm.creds.Session.Key
 	}
 	a.mu.Unlock()
 	if lfOn {
@@ -44,6 +47,11 @@ func (a *App) sendLoves(ctx context.Context, track media.Track, liked bool) {
 	if lbOn {
 		if err := lb.love(ctx, token, t, liked); err != nil {
 			log.Printf("mixmusic: sending a love to ListenBrainz: %v", err)
+		}
+	}
+	if fmOn {
+		if err := fm.client.Love(ctx, fmKey, t, liked); err != nil {
+			log.Printf("mixmusic: sending a love to Libre.fm: %v", err)
 		}
 	}
 }

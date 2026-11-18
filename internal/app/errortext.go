@@ -10,6 +10,7 @@ import (
 	"github.com/fzn0x/mixmusic/internal/colorfile"
 	"github.com/fzn0x/mixmusic/internal/firewall"
 	"github.com/fzn0x/mixmusic/internal/lastfm"
+	"github.com/fzn0x/mixmusic/internal/librefm"
 	"github.com/fzn0x/mixmusic/internal/listenbrainz"
 	"github.com/fzn0x/mixmusic/internal/localfiles"
 	"github.com/fzn0x/mixmusic/internal/spotify"
@@ -120,6 +121,8 @@ func serviceErrorText(err error) (string, bool) {
 		return locales.ErrorLastfmNotAuthorized(), true
 	case err == listenbrainz.ErrNotServer:
 		return locales.ErrorListenBrainzNotServer(), true
+	case err == librefm.ErrNotServer:
+		return locales.ErrorLibrefmNotServer(), true
 	}
 	if txt, ok := streamReasonText(stream.Reason(err)); ok {
 		return txt, true

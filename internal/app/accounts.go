@@ -48,6 +48,8 @@ type AccountsStatus struct {
 	// ListenBrainz is the connection to ListenBrainz, or to the user's own
 	// server of its API.
 	ListenBrainz ListenBrainzAccount `json:"listenbrainz"`
+	// Librefm is the connection to Libre.fm, or to another GNU FM server.
+	Librefm LibrefmAccount `json:"librefm"`
 }
 
 // Accounts signs the user in and out of their music services.
@@ -97,6 +99,7 @@ func (a *App) knownAccountsStatus() AccountsStatus {
 	}
 	status.Spotify.Profile = spotifyMe
 	status.ListenBrainz = a.listenbrainzAccount()
+	status.Librefm = a.librefmAccount()
 	read := false
 	if status.Spotify.SignedIn && spotifyMe == nil {
 		status.Spotify.Error, status.Spotify.Fault = errorString(errs.spotify), errs.spotify
@@ -152,7 +155,8 @@ func (a *App) accountsStatus(ctx context.Context) AccountsStatus {
 			sp.Profile = &me
 		}
 	}
-	return AccountsStatus{Spotify: sp, YouTube: a.youtubeAccount(ctx), Lastfm: a.lastfmAccount(), ListenBrainz: a.listenbrainzAccount()}
+	return AccountsStatus{Spotify: sp, YouTube: a.youtubeAccount(ctx), Lastfm: a.lastfmAccount(), ListenBrainz: a.listenbrainzAccount(),
+		Librefm: a.librefmAccount()}
 }
 
 // spotifyProfile returns the signed-in Spotify user, asking Spotify once.

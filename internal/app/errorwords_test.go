@@ -28,7 +28,7 @@ func TestErrorWords(t *testing.T) {
 			errs = append(errs, webViewMissing(what, goos))
 		}
 	}
-	errs = append(errs, errListenBrainzToken, fmt.Errorf("connecting: %w", errPlainRemote),
+	errs = append(errs, errListenBrainzToken, fmt.Errorf("connecting: %w", errPlainRemote), fmt.Errorf("connecting: %w", errPlainGNUFM),
 		worded("connect to Last.fm first", locales.AccountSettingsLastfmConnectFirst(), nil),
 		errSpotifyEpisode, fmt.Errorf("opening: %w", errSpotifyShows))
 	for _, err := range errs {

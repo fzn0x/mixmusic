@@ -35,9 +35,9 @@ type scrobbling struct {
 // that is connected and on, which sends what it has to beside the app.
 func (a *App) scrobble(np NowPlaying) {
 	a.mu.Lock()
-	lf, lb := a.lastfm, a.listenbrainz.conn
+	lf, lb, fm := a.lastfm, a.listenbrainz.conn, a.librefm.conn
 	a.mu.Unlock()
-	if lf == nil && lb == nil {
+	if lf == nil && lb == nil && fm == nil {
 		return
 	}
 	s := a.settings.Get()
@@ -47,6 +47,9 @@ func (a *App) scrobble(np NowPlaying) {
 	}
 	if lb != nil && s.ListenBrainzScrobbling {
 		a.feed(&lb.scrobbling, np, id, t)
+	}
+	if fm != nil && s.LibrefmScrobbling {
+		a.feed(&fm.scrobbling, np, id, t)
 	}
 }
 
@@ -234,12 +237,15 @@ func (a *App) userAgent() string {
 // stopScrobbling stops the scrobblers' sends, as the app closes.
 func (a *App) stopScrobbling() {
 	a.mu.Lock()
-	lf, lb := a.lastfm, a.listenbrainz.conn
+	lf, lb, fm := a.lastfm, a.listenbrainz.conn, a.librefm.conn
 	a.mu.Unlock()
 	if lf != nil {
 		lf.sends.stop()
 	}
 	if lb != nil {
 		lb.sends.stop()
+	}
+	if fm != nil {
+		fm.sends.stop()
 	}
 }

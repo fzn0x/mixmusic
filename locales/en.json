@@ -6214,6 +6214,10 @@
   "railCreate": "create",
   "railDownloads": "Downloads",
   "railExpand": "Expand the sidebar",
+  "railHideFromSidebar": "Hide from the sidebar",
+  "@railHideFromSidebar": {
+    "description": "Menu item of Liked songs and of Downloads in the sidebar's Your mixes: it takes the entry out of the sidebar. The page itself stays in the Library."
+  },
   "railHome": "Home",
   "railLibrary": "Library",
   "railLikedSongs": "Liked songs",
@@ -6228,10 +6232,28 @@
   },
   "railName": "Name",
   "railNewMix": "New mix",
+  "railNothingMatches": "Nothing matches “{query}”.",
+  "@railNothingMatches": {
+    "description": "Under the search box of the sidebar's Your mixes, when no mix or pinned playlist, album or artist has a name that holds what the user searched. {query} is the search.",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
   "railNothingPlaying": "Nothing playing yet",
   "railOpenNowPlaying": "Open now playing",
   "railSearch": "Search",
   "railSettings": "Settings",
+  "railShowInSidebar": "Show {title} in the sidebar",
+  "@railShowInSidebar": {
+    "description": "Menu item of the title Your mixes in the sidebar, while Liked songs or Downloads is hidden from it: it shows the entry again where it was. {title} is Liked songs or Downloads.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "railStats": "Stats",
   "railUpNext": "Up next",
   "railYourMixes": "Your mixes",

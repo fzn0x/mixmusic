@@ -20018,6 +20018,22 @@ func (msgs Messages) RailExpand() string {
 	return Catalog.Format(msgs.locale, "railExpand", nil)
 }
 
+// RailHideFromSidebar says "Hide from the sidebar"
+// in the language the app shows.
+//
+// Menu item of Liked songs and of Downloads in the sidebar's Your mixes: it
+// takes the entry out of the sidebar. The page itself stays in the Library.
+func RailHideFromSidebar() string { return In(i18n.Locale()).RailHideFromSidebar() }
+
+// RailHideFromSidebar says "Hide from the sidebar"
+// in the language of msgs.
+//
+// Menu item of Liked songs and of Downloads in the sidebar's Your mixes: it
+// takes the entry out of the sidebar. The page itself stays in the Library.
+func (msgs Messages) RailHideFromSidebar() string {
+	return Catalog.Format(msgs.locale, "railHideFromSidebar", nil)
+}
+
 // RailHome says "Home"
 // in the language the app shows.
 func RailHome() string { return In(i18n.Locale()).RailHome() }
@@ -20088,6 +20104,24 @@ func (msgs Messages) RailNewMix() string {
 	return Catalog.Format(msgs.locale, "railNewMix", nil)
 }
 
+// RailNothingMatches says "Nothing matches “{query}”."
+// in the language the app shows.
+//
+// Under the search box of the sidebar's Your mixes, when no mix or pinned
+// playlist, album or artist has a name that holds what the user searched.
+// {query} is the search.
+func RailNothingMatches(query string) string { return In(i18n.Locale()).RailNothingMatches(query) }
+
+// RailNothingMatches says "Nothing matches “{query}”."
+// in the language of msgs.
+//
+// Under the search box of the sidebar's Your mixes, when no mix or pinned
+// playlist, album or artist has a name that holds what the user searched.
+// {query} is the search.
+func (msgs Messages) RailNothingMatches(query string) string {
+	return Catalog.Format(msgs.locale, "railNothingMatches", map[string]any{"query": query})
+}
+
 // RailNothingPlaying says "Nothing playing yet"
 // in the language the app shows.
 func RailNothingPlaying() string { return In(i18n.Locale()).RailNothingPlaying() }
@@ -20126,6 +20160,24 @@ func RailSettings() string { return In(i18n.Locale()).RailSettings() }
 // in the language of msgs.
 func (msgs Messages) RailSettings() string {
 	return Catalog.Format(msgs.locale, "railSettings", nil)
+}
+
+// RailShowInSidebar says "Show {title} in the sidebar"
+// in the language the app shows.
+//
+// Menu item of the title Your mixes in the sidebar, while Liked songs or
+// Downloads is hidden from it: it shows the entry again where it was.
+// {title} is Liked songs or Downloads.
+func RailShowInSidebar(title string) string { return In(i18n.Locale()).RailShowInSidebar(title) }
+
+// RailShowInSidebar says "Show {title} in the sidebar"
+// in the language of msgs.
+//
+// Menu item of the title Your mixes in the sidebar, while Liked songs or
+// Downloads is hidden from it: it shows the entry again where it was.
+// {title} is Liked songs or Downloads.
+func (msgs Messages) RailShowInSidebar(title string) string {
+	return Catalog.Format(msgs.locale, "railShowInSidebar", map[string]any{"title": title})
 }
 
 // RailStats says "Stats"

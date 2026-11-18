@@ -39,3 +39,19 @@ func TestPseudoLocaleLibraryOrder(t *testing.T) {
 		t.Errorf("Hidden doesn't show in en-XA: %q", tt.Texts())
 	}
 }
+
+// TestPseudoLocaleSidebarMixes shows the sidebar's Your mixes with a pin
+// of YouTube Music and a mix, then searched without a match, in en-XA.
+func TestPseudoLocaleSidebarMixes(t *testing.T) {
+	usePseudoLocale(t)
+	s, tt, _ := sideShell(t, "Night drive", "Night drive", "Rainy day")
+	tt.SetLocale("en-XA")
+	tt.Frame()
+	checkPseudo(t, "Your mixes", tt.Texts(), "Night drive", "Rainy day", "Road trip")
+	s.order.side = "snow day"
+	tt.Frame()
+	if !tt.HasText(locales.In("en-XA").RailNothingMatches("snow day")) {
+		t.Errorf("the search without a match says nothing: %q", tt.Texts())
+	}
+	checkPseudo(t, "Your mixes searched", tt.Texts(), "snow day")
+}

@@ -375,44 +375,6 @@ func (s *shell) tonalNav(c *ui.Context, key, label string, svg *ui.SVG, path str
 	})
 }
 
-// mixes lists liked songs and the user's mixes, with their counts.
-func (s *shell) mixes(c *ui.Context, path string) {
-	k := &s.lk
-	ui.Column(c).Grow(1).MinHeight(mixesLeast).Children(func() {
-		ui.Row(c).Justify(ui.SpaceBetween).Margin(0, 0, 8).Children(func() {
-			ui.Text(c, k.words(locales.RailYourMixes())).FontSize(k.bodySize()).TextColor(k.accent)
-			if s.iconButton(c, "new-mix", "plus", locales.RailNewMix(), false, 18).Clicked() {
-				s.newMix()
-			}
-		})
-		ui.Scroll(c).Grow(1).MinHeight(0).Children(func() {
-			s.sideLink(c, "liked", k.words(locales.RailLikedSongs()), len(s.svc.Collection.Liked()), "/library/liked", path)
-			if s.kept.Any() {
-				s.sideLink(c, "downloads", k.words(locales.RailDownloads()), s.kept.Status().Tracks, "/library/downloads", path)
-			}
-			for _, m := range s.svc.Collection.Playlists() {
-				s.sideLink(c, "mix-"+m.ID, m.Title, m.TrackCount, playlistPath(m.ID), path)
-			}
-		})
-	})
-}
-
-func (s *shell) sideLink(c *ui.Context, key, title string, n int, to, path string) {
-	k := &s.lk
-	link := s.buttonBase(c.Key(key)).Justify(ui.SpaceBetween).Gap(12).Padding(7, 0).Label(title).Cursor(ui.CursorPointer)
-	if link.Clicked() {
-		s.navigate(to)
-	}
-	ink := k.text
-	if link.Hovered() || path == to {
-		ink = k.accent
-	}
-	link.Children(func() {
-		ui.Text(c, title).FontSize(k.bodySize()).TextColor(ink).SingleLine().Grow(1).MinWidth(0)
-		ui.Text(c, count(n)).FontSize(k.smallSize()).TextColor(k.accent).FontFeatures("tnum")
-	})
-}
-
 // newMix asks for the name of a mix, makes it and opens it.
 func (s *shell) newMix() {
 	s.promptName(locales.RailNewMix(), locales.RailName(), "", locales.RailCreate(), func(name string) {

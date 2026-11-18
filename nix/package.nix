@@ -59,7 +59,7 @@ in
   # only the packages imported, so a new import of a module MixMusic already
   # uses leaves it as it is (#839).
   proxyVendor = true;
-  vendorHash = "sha256-Py5hGcPM5K5Ryrd9FV1ObEnZHDAveQIkMCXbp6vqOwE=";
+  vendorHash = "sha256-tyTdWuY2b0M/9XHoTCLEVhsxs99xM93wqvgmmeVtlZo=";
 
   subPackages = [ "." ];
   env.CGO_ENABLED = "0";

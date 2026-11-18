@@ -1510,6 +1510,20 @@
   "@castDeviceGone": {
     "description": "A notice, as casting starts to a device that has left the network."
   },
+  "castFLACBeyond": "{device} plays FLAC only up to 96 kHz and 24 bits, which this file goes beyond",
+  "@castFLACBeyond": {
+    "description": "Where a song on this computer couldn't play, as it was cast to a Google Cast device, whose media player plays FLAC files of at most 96 kHz and 24 bits, and the file has a higher sample rate or more bits.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room TV"
+      }
+    }
+  },
+  "castGroupModel": "Speaker group",
+  "@castGroupModel": {
+    "description": "In the cast menu and the mini player's Cast section, beside the name of a Google Cast group of speakers, which plays as one device, in place of a device's model, as in \"Everywhere · Speaker group\"."
+  },
   "castLiveNotYet": "live streams don't play on cast devices yet",
   "@castLiveNotYet": {
     "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. The track is a live stream, and MixMusic casts to a device."
@@ -1620,6 +1634,16 @@
   "castUnreachableFirewall": "the cast device couldn't reach MixMusic: Settings › Desktop › Windows Firewall tells why, and lets you allow the connection",
   "@castUnreachableFirewall": {
     "description": "Why a track couldn't play: {error} of playerCouldntPlay, and a step of a failure's details. On Windows, the cast device never fetched the audio from this computer, as a firewall may keep it out."
+  },
+  "castWAVFloat": "{device} doesn't play WAV files of floating-point samples",
+  "@castWAVFloat": {
+    "description": "Where a song on this computer couldn't play, as it was cast to a Google Cast device, whose media player plays WAV files only of whole-number (integer PCM) samples, and the file's samples are floating-point numbers.",
+    "placeholders": {
+      "device": {
+        "type": "String",
+        "example": "Living Room TV"
+      }
+    }
   },
   "cleanVersionsDesc": "An album that comes explicit and clean shows its clean version, and its page opens on it. Its version switch still has the explicit one.",
   "cleanVersionsFixed": "On while explicit content is hidden: an album that comes explicit and clean shows its clean version alone.",
@@ -9154,6 +9178,44 @@
     "description": "The name of a computer paired for remote control that MixMusic no longer knows by name."
   },
   "remoteBothWays": "Can control this computer; You control it from here",
+  "remoteBroughtLeft": "Moved here from {name}, and paused there, but for {count, plural, one {# track} other {# tracks}}, files of {name} this computer doesn't have{next, select, yes {: it plays from the next one} other {}}",
+  "@remoteBroughtLeft": {
+    "description": "A notice once what played on the computer named {name} moved to this one, from that computer's remote control page, but for {count} music files of that computer which this one has no file of the same song of. {next} is yes when the track that played there was one of them, and this computer plays from the track after it.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Desktop"
+      },
+      "count": {
+        "type": "int",
+        "example": "2"
+      },
+      "next": {
+        "type": "String",
+        "example": "yes"
+      }
+    }
+  },
+  "remoteBroughtNone": "This computer has none of the tracks on {name}, files of that computer: they play on there",
+  "@remoteBroughtNone": {
+    "description": "A notice when moving what plays on the computer named {name} to this one, from that computer's remote control page, moved nothing: every track there is a music file of that computer, and this one has no file of the same songs.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Desktop"
+      }
+    }
+  },
+  "remoteBroughtPaused": "Moved here from {name}, and paused there",
+  "@remoteBroughtPaused": {
+    "description": "A notice once what played on the computer named {name} moved to this one, from that computer's remote control page, and that computer paused.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Desktop"
+      }
+    }
+  },
   "remoteCanControl": "Can control this computer",
   "remoteCodeAsks": "{name} asks to control MixMusic on this computer. To let it, type this code there:",
   "@remoteCodeAsks": {
@@ -9267,7 +9329,25 @@
     "description": "Toast when there is nothing to move to another computer."
   },
   "remoteFirewallHint": "Windows Firewall keeps the other computers from reaching this one. Windows Firewall, below, tells why, and how to let them in.",
+  "remoteMoveHere": "move here",
+  "@remoteMoveHere": {
+    "description": "A button on the remote control page of another computer, beside the track that plays there: it moves what plays there (the queue, the track, where it is, shuffle and repeat) to this computer, which plays it in its place. Lowercase, as the button \"move to {name}\" beside it."
+  },
+  "remoteMovingHere": "moving here…",
+  "@remoteMovingHere": {
+    "description": "The button \"move here\" on the remote control page of another computer, while what plays there moves to this computer."
+  },
   "remoteNoPaired": "No computer is paired yet. To control another computer, choose it in the player bar's devices menu, the cast button's.",
+  "remoteNoteBroughtAway": "Moved to {name}, which asked for it, and paused here",
+  "@remoteNoteBroughtAway": {
+    "description": "A notice on the computer controlled, once the computer named {name}, which controls it, moved what played here to itself, with \"move here\" on its remote control page, and this computer paused.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Laptop"
+      }
+    }
+  },
   "remoteNoteHandedOver": "{name} moved what it played to this computer",
   "@remoteNoteHandedOver": {
     "description": "Toast when the computer named {name} moved its queue and the track it played to this one.",
@@ -9340,6 +9420,16 @@
     "placeholders": {
       "name": {
         "type": "String"
+      }
+    }
+  },
+  "remoteOlderModes": "MixMusic on {name} is older: update it there to bring its music here, and to set its shuffle, repeat, mute, like and output device from this computer.",
+  "@remoteOlderModes": {
+    "description": "Under the remote control page of the computer named {name}, whose MixMusic is older than this one's, and can't move what plays there to this computer, nor take shuffle, repeat, mute, like and the output device from here.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Desktop"
       }
     }
   },

@@ -69,6 +69,12 @@ type Host interface {
 	// TakeOver plays what the computer of the key fp hands over, in place
 	// of what plays, and tells how it took it.
 	TakeOver(fp Fingerprint, h HandOver) Taken
+	// Give is what plays, which the computer of the key fp asks for, to
+	// play it there: false when nothing plays.
+	Give(fp Fingerprint) (HandOver, bool)
+	// Given tells that the computer of the key fp took what Give handed it
+	// over, as t tells, a track or more: the player pauses.
+	Given(fp Fingerprint, t Taken)
 	// Watch has fn told, without waiting on it, when the state changes,
 	// until cancel.
 	Watch(fn func()) (cancel func())
@@ -428,6 +434,9 @@ func (s *Server) session(c *serverConn) {
 	go func() {
 		defer close(ended)
 		defer c.conn.Close()
+		// gave is the ID of the last hand-over this computer gave as asked,
+		// which the other tells how it took.
+		var gave int64
 		for {
 			m, err := c.w.receive(t.silence())
 			if err != nil {
@@ -435,29 +444,40 @@ func (s *Server) session(c *serverConn) {
 			}
 			command := m.Type == "command" && m.Command != nil
 			handOver := m.Type == "handover" && m.HandOver != nil
-			if !command && !handOver {
+			bring := m.Type == "bring" && m.Bring != nil
+			took := m.Type == "took" && m.Taken != nil
+			if !command && !handOver && !bring && !took {
 				continue
 			}
 			// A computer removed a moment ago may still have a command
-			// or a hand-over on the way.
+			// or a hand-over on the way: what plays here goes only to one
+			// that may control it.
 			if !s.Host.Allowed(c.peer) {
 				return
 			}
-			if handOver {
+			switch {
+			case handOver:
 				if s.takeOver(c, *m.HandOver) != nil {
 					return
 				}
-				continue
-			}
-			if cmd, ok := m.Command.clean(); ok {
-				s.Host.Do(cmd)
+			case bring:
+				if gave, err = s.give(c, *m.Bring); err != nil {
+					return
+				}
+			case took:
+				s.given(c, gave, *m.Taken)
+				gave = 0
+			default:
+				if cmd, ok := m.Command.clean(); ok {
+					s.Host.Do(cmd)
+				}
 			}
 		}
 	}()
 	tick := time.NewTicker(t.ping())
 	defer tick.Stop()
 	for {
-		st := cleanState(s.Host.State())
+		st := fitState(cleanState(s.Host.State()))
 		if err := c.w.send(message{Type: "state", State: &st}, t.silence()); err != nil {
 			c.conn.Close()
 			<-ended

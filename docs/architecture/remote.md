@@ -55,7 +55,8 @@ and how much.
   and lists the paired computers with Remove; the player bar's devices
   menu, the cast button's, lists the computers found; `/remote/{id}` pairs
   with one, then shows what plays there with its controls and its queue
-  (`remotequeue.go`), and what plays here, to move there
+  (`remotequeue.go`), its shuffle, repeat, mute, like and output device,
+  and move here (`remotemodes.go`), and what plays here, to move there
   (`remotehandover.go`); and a dialog shows the code while another
   computer pairs with this one.
 
@@ -205,12 +206,15 @@ sessions, which it tells that it is off, and the discovery answers.
 
 After `hello`, the computer controlled answers `welcome`, and sends what
 its player does (`state`: the track, playing or paused, where it is, how
-long it is, the volume, and up to 20 tracks of the queue after it) as it
-changes, at most 5 times a second, and every 2 s besides; the other sends
-commands (`command`: play, pause, next, previous, seek, volume, and those
-on the queue below), a hand-over (`handover`, below), and a `ping` every
-2 s. The computer controlled checks, before each command and each
-hand-over, that the one that sends it is still paired. Either side
+long it is, the volume, and up to 40 tracks of the queue after it, fewer
+when the message would be longer than 1 MiB) as it changes, at most 5
+times a second, and every 2 s besides; the other sends commands
+(`command`: play, pause, next, previous, seek, volume, those on the queue
+below, and those of the modes and the places below), a hand-over
+(`handover`, below), a request for what plays there (`bring`, below), and
+a `ping` every 2 s. The computer controlled checks, before each command
+and each hand-over, given or taken, that the one that sends it is still
+paired. Either side
 drops a connection after 6 s with no message, as from a computer that
 went to sleep or left the network, and the controlling one connects again,
 after 1 s, then 2, then up to 10, while its page shows, and looks for it
@@ -233,16 +237,20 @@ changes only when two MixMusic apps can no longer understand each other:
 then they refuse each other, and say to update both. What is added since
 goes by name, in the `features` of `hello` and `welcome`: `queue` for the
 commands on the queue, `handover` for taking what the other hands over,
-and `keep`, in the `hello` that asks to pair, for waiting for `paired`
-while the other keeps the pairing. An older MixMusic doesn't know the field, so it tells none, and ignores
+`bring` for handing over what plays there as the other asks, `modes` for
+shuffle, repeat, mute and like, and the 40 tracks after the one that
+plays, `outputs` for the places it plays, and `keep`, in the `hello` that
+asks to pair, for waiting for `paired` while the other keeps the
+pairing. An older MixMusic doesn't know the field, so it tells none, and ignores
 the other's; it skips a message of a type it doesn't know, as `handover`,
 and runs no command it doesn't know. So:
 
 - a newer computer that controls an older one shows what plays there and
-  controls it as before; it sends neither the commands on the queue nor a
-  hand-over, as the older one's `welcome` tells no features, and its page
-  says to update MixMusic there; the older one's states tell no `parts`,
-  so the page's seek bar marks none;
+  controls it as before; it sends no command, hand-over or `bring` of a
+  feature the older one's `welcome` doesn't tell, its page shows none of
+  their controls, and says to update MixMusic there; the older one's
+  states tell no `parts`, so the page's seek bar marks none, and 20
+  tracks after the one that plays;
 - a newer computer that pairs with an older one waits 30 s more for
   `paired`, which the older one sends once it kept the pairing, however
   long that took: the two disagree only past those 30 s, not past a
@@ -254,8 +262,9 @@ and runs no command it doesn't know. So:
   shows as "Couldn't reach …" or "… stopped answering";
 - an older computer that controls a newer one gets states whose tracks
   name their entries (`entry`), and that tell the parts the player passes
-  over (`parts`), fields it ignores, and the `features` of `welcome`,
-  which it ignores too.
+  over (`parts`), the modes and the places, fields it ignores, and the
+  `features` of `welcome`, which it ignores too; it shows the first 20
+  of the 40 tracks after the one that plays.
 
 ## The queue
 
@@ -299,6 +308,39 @@ after it, 1,000 tracks at most, and fewer when its message would be
 longer than 1 MiB. The computer that takes it cleans it as it cleans a
 state: control characters out, lengths bounded, IDs of printable ASCII,
 covers from `https://` only, the index in the queue.
+
+The page's Move here hands over the other way (#556), to a computer
+whose `welcome` tells `bring`: this computer sends `bring`, with an ID,
+and the computer controlled, which checks that this one may still control
+it, answers `brought`, a hand-over of what plays there as Move to sends
+one, with the ID, cut to the same bounds, or an empty queue when nothing
+plays. This computer cleans it and plays it as it takes a hand-over, its
+files matched to its own the same way, and answers `took`, with the ID,
+how many tracks it plays and how many it left out. The computer
+controlled pauses once this one took a track or more, and says so; an
+answer of another ID, or that took nothing, changes nothing there. One
+hand-over, given or taken, runs at a time, and this computer waits 30 s
+at most for `brought`.
+
+## Modes and places
+
+A computer whose `welcome` tells `modes` tells in its states its shuffle,
+its repeat (`all`, `one`, or neither) and whether the track that plays is
+among its liked songs, and takes `shuffle`, `repeat`, `mute` and `like`,
+each with the value to set, `like` with the entry of the track, which is
+the one that plays on the page. A like there is a like of that computer,
+as its own windows make one: it takes a dislike back, and syncs with the
+services as they do. Its state goes again once the like is kept.
+
+A computer whose `welcome` tells `outputs` tells in its states where it
+can play, 64 places at most, and the one it plays on: its system's
+default sound output, its other sound outputs, by name, which it lists
+again every 10 s at most, and the cast devices it found, by name and
+model or kind. Each goes by an ID that computer makes of a hash of the
+device's own, which tells nothing of it, and `output` names the place to
+play on by it: a cast device, which it casts to, or a sound output, which
+brings back what plays on a cast device and becomes its output device,
+as its settings choose one.
 
 ## Listening on the network
 

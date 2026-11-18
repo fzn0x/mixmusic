@@ -88,10 +88,12 @@ func (s *shell) remoteCodeEntry(c *ui.Context, id, name string) {
 }
 
 // remotePlayer shows what plays on the computer id, as v's state tells,
-// with its controls: the cover, the title and the artists, where the track
-// is, which moves on as it plays, with the parts it passes over marked
-// (remotemarks.go), the transport, the volume, what plays here, to move
-// there (remotehandover.go), and the tracks after it (remotequeue.go).
+// with its controls: the cover, the title and the artists, with like and
+// move here (remotemodes.go), where the track is, which moves on as it
+// plays, with the parts it passes over marked (remotemarks.go), the
+// transport, with shuffle and repeat, the volume, with mute, and the place
+// it plays, what plays here, to move there (remotehandover.go), and the
+// tracks after it (remotequeue.go).
 func (s *shell) remotePlayer(c *ui.Context, id string, v app.RemoteView) {
 	k := &s.lk
 	st := v.State
@@ -113,6 +115,8 @@ func (s *shell) remotePlayer(c *ui.Context, id string, v app.RemoteView) {
 				}
 				ui.Text(c, line).FontSize(k.smallSize()).TextColor(k.muted)
 			})
+			s.remoteLike(c, id, v)
+			s.remoteMoveHere(c, id, v)
 		})
 	}
 	s.remoteProgress(c, id, v)
@@ -120,6 +124,7 @@ func (s *shell) remotePlayer(c *ui.Context, id string, v app.RemoteView) {
 	// page.
 	ui.Row(c).Direction(ui.LeftToRight).AlignSelf(ui.Start).Gap(12).AlignItems(ui.Center).Children(func() {
 		has := st.Track != nil
+		s.remoteShuffle(c, id, v)
 		if s.roundButton(c, "remote-previous", "previous", locales.PlayerPrevious(), false, !has).Clicked() {
 			s.remoteDo(id, remote.Command{Op: remote.OpPrevious})
 		}
@@ -133,9 +138,11 @@ func (s *shell) remotePlayer(c *ui.Context, id string, v app.RemoteView) {
 		if s.roundButton(c, "remote-next", "next", locales.PlayerNext(), false, !has).Clicked() {
 			s.remoteDo(id, remote.Command{Op: remote.OpNext})
 		}
+		s.remoteRepeat(c, id, v)
 		s.remoteHighlight(c, id, st)
 		ui.Box(c).Width(24)
-		s.remoteVolume(c, id, st)
+		s.remoteVolume(c, id, v)
+		s.remoteOutput(c, id, v)
 	})
 	s.remoteHandOver(c, id, v)
 	s.remoteQueue(c, id, v)
@@ -194,15 +201,12 @@ func (s *shell) remoteProgress(c *ui.Context, id string, v app.RemoteView) {
 	})
 }
 
-// remoteVolume shows the volume there, and sets it.
-func (s *shell) remoteVolume(c *ui.Context, id string, st remote.State) {
+// remoteVolume shows the volume there, and sets it, beside mute.
+func (s *shell) remoteVolume(c *ui.Context, id string, v app.RemoteView) {
 	r := &s.remote
+	st := v.State
 	ui.Row(c).Gap(4).Width(180).AlignItems(ui.Center).Children(func() {
-		name := "volume"
-		if st.Muted || st.Volume == 0 {
-			name = "volumeMute"
-		}
-		ui.Icon(c, icon(name)).FontSize(18).TextColor(s.lk.muted)
+		s.remoteMute(c, id, v)
 		// The volume the user sets shows until the state of it comes.
 		if now := c.Now(); now.Sub(r.volumeAt) > remoteHold {
 			r.volume = st.Volume

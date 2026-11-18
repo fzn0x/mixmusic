@@ -28,7 +28,8 @@ type BrowseOptions struct {
 
 // Browse finds the cast devices on the computer's networks: it asks for
 // them by mDNS, and gathers what they answer for opts.Wait. Groups of
-// speakers are left out. The devices come sorted by name.
+// speakers come as devices of their own, with Group set. The devices come
+// sorted by name.
 //
 // It asks as a one-shot querier does (RFC 6762, 6.7), from a port of its
 // own rather than mDNS's, so that the devices answer it alone, and
@@ -233,7 +234,7 @@ func (f *findings) missing() []question {
 }
 
 // devices returns the devices found whole: each where its service is, by
-// its ID, its name and its model, but groups.
+// its ID, its name and its model, and whether it is a group.
 func (f *findings) devices() []Device {
 	var out []Device
 	for _, inst := range f.instances {
@@ -250,9 +251,7 @@ func (f *findings) devices() []Device {
 		}
 		txt := txtValues(f.txt[inst])
 		d := Device{ID: txt["id"], Name: txt["fn"], Model: txt["md"], Host: host.String(), Port: int(srv.port)}
-		if d.Model == groupModel {
-			continue
-		}
+		d.Group = d.Model == groupModel
 		if d.ID == "" {
 			d.ID = inst
 		}

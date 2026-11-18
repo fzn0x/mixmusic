@@ -22,6 +22,10 @@ type Device struct {
 	Name string
 	// Model is what it is, as "Chromecast" or "Google Nest Mini".
 	Model string
+	// Group is set for a group of speakers, which plays as one device: it
+	// announces itself on a port of its own, at the address of the member
+	// that leads it, with the model "Google Cast Group".
+	Group bool
 	// Host and Port are where it speaks the protocol.
 	Host string
 	Port int
@@ -47,6 +51,5 @@ const (
 // apps and holds the volume.
 const receiverID = "receiver-0"
 
-// groupModel is the model cast groups announce themselves as: groups of
-// speakers aren't played on yet.
+// groupModel is the model groups of speakers announce themselves as.
 const groupModel = "Google Cast Group"

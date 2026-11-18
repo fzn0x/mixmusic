@@ -201,9 +201,11 @@ type Session struct {
 	done     chan struct{}
 	once     sync.Once
 	// handed counts the hand-overs, and taken waits for the answer to the
-	// one under way.
-	handed int64
-	taken  chan Taken
+	// one under way; brought waits for what the computer controlled hands
+	// over, as asked (Bring).
+	handed  int64
+	taken   chan Taken
+	brought chan HandOver
 }
 
 // Name returns the name of the computer controlled, as it told it.
@@ -240,14 +242,14 @@ func (s *Session) tell() {
 	}
 }
 
-// Do sends a command. A command on the queue goes only to a computer
-// that takes them: ErrOlder.
+// Do sends a command. A command a feature brought, as those on the
+// queue, goes only to a computer that tells it: ErrOlder.
 func (s *Session) Do(c Command) error {
 	c, ok := c.clean()
 	if !ok {
 		return errors.New("remote: no such command")
 	}
-	if queueOp(c.Op) && !s.Can(FeatureQueue) {
+	if f := featureOf(c.Op); f != "" && !s.Can(f) {
 		return ErrOlder
 	}
 	select {
@@ -312,6 +314,10 @@ func (s *Session) read() {
 		case "taken":
 			if m.Taken != nil {
 				s.tookOver(*m.Taken)
+			}
+		case "brought":
+			if m.HandOver != nil {
+				s.broughtOver(cleanHandOver(*m.HandOver))
 			}
 		case "refused":
 			s.end(errOf(m.Reason))

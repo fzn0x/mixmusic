@@ -3,8 +3,9 @@
 
 With MixMusic on two computers of the same network, as a desktop and a
 laptop, one can show what the other plays and control it: play, pause,
-next, previous, seeking, the volume and the queue. It can also move what
-plays on it to the other. There is no server and no account: the two
+next, previous, seeking, the volume, shuffle, repeat, mute, like, where
+it plays and the queue. It can also move what plays on it to the other,
+and what plays on the other to it. There is no server and no account: the two
 find each other on the network and talk directly.
 
 ## Turn it on
@@ -43,16 +44,24 @@ The two computers remember each other from then on, and pair no more.
 ## Control it
 
 The page of a computer paired shows what plays there: the cover, the
-title, the artists and the album, where the track is, which moves on as
-it plays, and the tracks after it. Under them:
+title, the artists and the album, with **Like**, which likes the track
+there, as its own window does, where the heart shows it liked, and the
+next 40 tracks. Under them:
 
-- **Previous**, **Play** or **Pause**, and **Next**, with **Jump to the
-  highlight** when the track that plays there has one;
+- **Shuffle**, **Previous**, **Play** or **Pause**, **Next** and
+  **Repeat** (off, all, one), with **Jump to the highlight** when the
+  track that plays there has one: shuffle and repeat show as they are
+  there;
 - the seek bar, which seeks once you let go of it, and marks the parts
   that computer [skips](playing-music.md#skipping-parts-of-videos) as its
   own seek bar does, with their kinds and times under the pointer: a
   computer with an older MixMusic tells none;
-- the volume of that computer.
+- **Mute** and the volume of that computer;
+- **Output device**, which picks where that computer plays: its system's
+  default, one of its sound outputs, as its
+  [output device](playing-music.md#the-output-device) setting chooses
+  it, or a [cast device](casting.md) it found. Choosing one of its sound
+  outputs brings back what it casts.
 
 Its queue, under **Next on …**, works as this computer's does: click a
 track's cover, or double-click the track, to play it there; drag a track
@@ -63,6 +72,24 @@ the queue there after the track that plays.
 What you do there, on its own window, its keys or its media controls,
 shows here too. The page connects again by itself when the other computer
 was asleep or left the network a moment.
+
+## Move what plays there here
+
+While something plays on the other computer, its page shows **move here**
+beside the track. That moves what plays there to this computer: the
+queue, the track that plays and where it is, whether it plays, shuffle
+and repeat. This computer plays it in place of what it played, and the
+other pauses, once this one took at least one track, and says so. It
+keeps the bounds of **Move to …** below: up to 100 tracks before the one
+that plays and 1,000 in all.
+
+The tracks play here as those moved there play there: YouTube Music and
+Spotify tracks as this computer plays theirs, and the other computer's
+music files as this one's own files of the same songs, matched the same
+way. This computer says how many it left out. When it has none of the
+tracks, nothing moves, and the music plays on there.
+
+Only a computer paired to control the other can move what plays there.
 
 ## Move what plays here there
 
@@ -160,10 +187,11 @@ it on, your system may ask about it:
   network answers at the address of the computer paired. MixMusic doesn't
   talk to it.
 - **"MixMusic on … is older"**: update MixMusic there. Until then its page
-  here shows what plays there and controls it, but doesn't change its
-  queue or move what plays here to it.
+  here shows what plays there and controls it, but doesn't change what
+  that MixMusic doesn't take yet: its queue, moving what plays here to
+  it or what plays there here, shuffle, repeat, mute, like or its output
+  device. Its page shows the next 20 tracks.
 
 ## Not yet
 
-Seeing more than the other computer's next 20 tracks, and moving what
-plays there to this computer.
+Seeing more than the other computer's next 40 tracks.

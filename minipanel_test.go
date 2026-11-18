@@ -399,10 +399,12 @@ func miniWordsOf(s *shell, r ui.Rect, text string, words ...string) []ui.Rect {
 
 // TestMiniOutputPanel chooses where what plays plays from the output
 // panel: the devices of this computer, and the cast devices on the
-// network beside it, which screen readers read as choices.
+// network beside it, a group of speakers as one, which screen readers
+// read as choices.
 func TestMiniOutputPanel(t *testing.T) {
 	s := miniShell(t, []app.OutputDevice{{ID: "hp", Name: "Headphones"}, {ID: "sp", Name: "Speakers", Default: true}},
-		cast.Device{ID: "tv", Name: "Living Room TV", Model: "Chromecast", Host: "192.0.2.1", Port: 8009})
+		cast.Device{ID: "tv", Name: "Living Room TV", Model: "Chromecast", Host: "192.0.2.1", Port: 8009},
+		cast.Device{ID: "all", Name: "Everywhere", Model: "Google Cast Group", Host: "192.0.2.1", Port: 32187, Group: true})
 	tt, f := miniAt(t, s, 100, 100, 420, 132)
 	click(t, s, tt, "Output device")
 	f.settle(t, s)
@@ -426,7 +428,7 @@ func TestMiniOutputPanel(t *testing.T) {
 	if a, ok := tt.AccessByRole(ui.RoleRadio, "This computer"); !ok || !a.Checked {
 		t.Errorf("this computer isn't the cast's choice: %+v (%v)", a, ok)
 	}
-	showsAll(t, tt, "the cast devices", "Living Room TV", "Chromecast")
+	showsAll(t, tt, "the cast devices", "Living Room TV", "Chromecast", "Everywhere", "Speaker group")
 }
 
 // TestMiniConnectPanel lists the Spotify Connect devices in the output

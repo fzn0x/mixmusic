@@ -114,6 +114,11 @@ type remoteState struct {
 	control  *remoteControl
 	pairing  *remotePairing
 	watchers []*func(string)
+	// sounds are the sound outputs the computers that control this one
+	// see (remoteoutputs.go), and pokes are told when what they see
+	// changes otherwise than as the player does, as a track liked.
+	sounds remoteSounds
+	pokes  []*func()
 }
 
 // Remote is remote control, for the windows.

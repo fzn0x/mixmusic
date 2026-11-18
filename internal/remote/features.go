@@ -16,10 +16,22 @@ const (
 	// FeatureHandOver: the computer controlled takes what the other hands
 	// over to it (handover).
 	FeatureHandOver = "handover"
+	// FeatureBring: the computer controlled hands what plays there over to
+	// the one that controls it, as that one asks (Bring).
+	FeatureBring = "bring"
+	// FeatureModes: the computer controlled takes OpShuffle, OpRepeat,
+	// OpMute and OpLike, and its states tell its shuffle and repeat,
+	// whether the track that plays is liked, and up to MaxNext tracks
+	// after it, where an older MixMusic tells 20.
+	FeatureModes = "modes"
+	// FeatureOutputs: the states of the computer controlled tell where it
+	// can play, its sound outputs and the cast devices it found, and it
+	// takes OpOutput.
+	FeatureOutputs = "outputs"
 )
 
 // features are those of this MixMusic.
-var features = []string{FeatureQueue, FeatureHandOver}
+var features = []string{FeatureQueue, FeatureHandOver, FeatureBring, FeatureModes, FeatureOutputs}
 
 // FeatureKeep: the computer that pairs, which tells it in its hello to
 // pair, waits for paired as long as the one controlled may take to keep

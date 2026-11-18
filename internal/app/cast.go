@@ -46,6 +46,9 @@ type CastDevice struct {
 	// it tells nothing (ModelOf).
 	Name, Model string
 	Kind        CastKind
+	// Group is set for a Google Cast group of speakers, which plays as one
+	// device.
+	Group bool
 }
 
 // castState is the app's casting: the devices found, and the one the
@@ -98,7 +101,7 @@ func (c *casting) end(stop bool) {
 }
 
 func castDeviceOf(d cast.Device) CastDevice {
-	return CastDevice{ID: d.ID, Name: d.Name, Model: d.Model}
+	return CastDevice{ID: d.ID, Name: d.Name, Model: d.Model, Group: d.Group}
 }
 
 // watchCast looks for cast devices a moment after start, then every
@@ -321,9 +324,11 @@ func (a *App) castTo(ctx context.Context, id string) error {
 		return errors.New(locales.CastCouldntServe(d.Name, err.Error()))
 	}
 	out.served, out.fetched, out.contentType, out.native = server.url, server.fetched.Load, a.castContentType, a.setNative
-	out.upNext = upNextOf(a)
+	out.upNext, out.art, out.keep = upNextOf(a), a.castArt(server), server.keep
 	if f.far != nil {
 		f.far.attach(a, session, server, out, d.Name)
+	} else {
+		out.source = a.googleSource(server, d.Name)
 	}
 	out.start(session)
 

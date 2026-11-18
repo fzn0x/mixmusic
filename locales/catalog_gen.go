@@ -4900,6 +4900,42 @@ func (msgs Messages) CastDeviceGone() string {
 	return Catalog.Format(msgs.locale, "castDeviceGone", nil)
 }
 
+// CastFLACBeyond says "{device} plays FLAC only up to 96 kHz and 24 bits, which this file goes beyond"
+// in the language the app shows.
+//
+// Where a song on this computer couldn't play, as it was cast to a Google
+// Cast device, whose media player plays FLAC files of at most 96 kHz and 24
+// bits, and the file has a higher sample rate or more bits.
+func CastFLACBeyond(device string) string { return In(i18n.Locale()).CastFLACBeyond(device) }
+
+// CastFLACBeyond says "{device} plays FLAC only up to 96 kHz and 24 bits, which this file goes beyond"
+// in the language of msgs.
+//
+// Where a song on this computer couldn't play, as it was cast to a Google
+// Cast device, whose media player plays FLAC files of at most 96 kHz and 24
+// bits, and the file has a higher sample rate or more bits.
+func (msgs Messages) CastFLACBeyond(device string) string {
+	return Catalog.Format(msgs.locale, "castFLACBeyond", map[string]any{"device": device})
+}
+
+// CastGroupModel says "Speaker group"
+// in the language the app shows.
+//
+// In the cast menu and the mini player's Cast section, beside the name of a
+// Google Cast group of speakers, which plays as one device, in place of a
+// device's model, as in "Everywhere · Speaker group".
+func CastGroupModel() string { return In(i18n.Locale()).CastGroupModel() }
+
+// CastGroupModel says "Speaker group"
+// in the language of msgs.
+//
+// In the cast menu and the mini player's Cast section, beside the name of a
+// Google Cast group of speakers, which plays as one device, in place of a
+// device's model, as in "Everywhere · Speaker group".
+func (msgs Messages) CastGroupModel() string {
+	return Catalog.Format(msgs.locale, "castGroupModel", nil)
+}
+
 // CastLiveNotYet says "live streams don't play on cast devices yet"
 // in the language the app shows.
 //
@@ -5216,6 +5252,24 @@ func CastUnreachableFirewall() string { return In(i18n.Locale()).CastUnreachable
 // from this computer, as a firewall may keep it out.
 func (msgs Messages) CastUnreachableFirewall() string {
 	return Catalog.Format(msgs.locale, "castUnreachableFirewall", nil)
+}
+
+// CastWAVFloat says "{device} doesn't play WAV files of floating-point samples"
+// in the language the app shows.
+//
+// Where a song on this computer couldn't play, as it was cast to a Google
+// Cast device, whose media player plays WAV files only of whole-number
+// (integer PCM) samples, and the file's samples are floating-point numbers.
+func CastWAVFloat(device string) string { return In(i18n.Locale()).CastWAVFloat(device) }
+
+// CastWAVFloat says "{device} doesn't play WAV files of floating-point samples"
+// in the language of msgs.
+//
+// Where a song on this computer couldn't play, as it was cast to a Google
+// Cast device, whose media player plays WAV files only of whole-number
+// (integer PCM) samples, and the file's samples are floating-point numbers.
+func (msgs Messages) CastWAVFloat(device string) string {
+	return Catalog.Format(msgs.locale, "castWAVFloat", map[string]any{"device": device})
 }
 
 // CleanVersionsDesc says "An album that comes explicit and clean shows its clean version, and its page opens on it. Its version switch still ha…"
@@ -28370,6 +28424,66 @@ func (msgs Messages) RemoteBothWays() string {
 	return Catalog.Format(msgs.locale, "remoteBothWays", nil)
 }
 
+// RemoteBroughtLeft says "Moved here from {name}, and paused there, but for {count, plural, one {# track} other {# tracks}}, files of {name} th…"
+// in the language the app shows.
+//
+// A notice once what played on the computer named {name} moved to this one,
+// from that computer's remote control page, but for {count} music files of
+// that computer which this one has no file of the same song of. {next} is
+// yes when the track that played there was one of them, and this computer
+// plays from the track after it.
+func RemoteBroughtLeft(name string, count int, next string) string {
+	return In(i18n.Locale()).RemoteBroughtLeft(name, count, next)
+}
+
+// RemoteBroughtLeft says "Moved here from {name}, and paused there, but for {count, plural, one {# track} other {# tracks}}, files of {name} th…"
+// in the language of msgs.
+//
+// A notice once what played on the computer named {name} moved to this one,
+// from that computer's remote control page, but for {count} music files of
+// that computer which this one has no file of the same song of. {next} is
+// yes when the track that played there was one of them, and this computer
+// plays from the track after it.
+func (msgs Messages) RemoteBroughtLeft(name string, count int, next string) string {
+	return Catalog.Format(msgs.locale, "remoteBroughtLeft", map[string]any{"name": name, "count": count, "next": next})
+}
+
+// RemoteBroughtNone says "This computer has none of the tracks on {name}, files of that computer: they play on there"
+// in the language the app shows.
+//
+// A notice when moving what plays on the computer named {name} to this one,
+// from that computer's remote control page, moved nothing: every track
+// there is a music file of that computer, and this one has no file of the
+// same songs.
+func RemoteBroughtNone(name string) string { return In(i18n.Locale()).RemoteBroughtNone(name) }
+
+// RemoteBroughtNone says "This computer has none of the tracks on {name}, files of that computer: they play on there"
+// in the language of msgs.
+//
+// A notice when moving what plays on the computer named {name} to this one,
+// from that computer's remote control page, moved nothing: every track
+// there is a music file of that computer, and this one has no file of the
+// same songs.
+func (msgs Messages) RemoteBroughtNone(name string) string {
+	return Catalog.Format(msgs.locale, "remoteBroughtNone", map[string]any{"name": name})
+}
+
+// RemoteBroughtPaused says "Moved here from {name}, and paused there"
+// in the language the app shows.
+//
+// A notice once what played on the computer named {name} moved to this one,
+// from that computer's remote control page, and that computer paused.
+func RemoteBroughtPaused(name string) string { return In(i18n.Locale()).RemoteBroughtPaused(name) }
+
+// RemoteBroughtPaused says "Moved here from {name}, and paused there"
+// in the language of msgs.
+//
+// A notice once what played on the computer named {name} moved to this one,
+// from that computer's remote control page, and that computer paused.
+func (msgs Messages) RemoteBroughtPaused(name string) string {
+	return Catalog.Format(msgs.locale, "remoteBroughtPaused", map[string]any{"name": name})
+}
+
 // RemoteCanControl says "Can control this computer"
 // in the language the app shows.
 func RemoteCanControl() string { return In(i18n.Locale()).RemoteCanControl() }
@@ -28608,6 +28722,42 @@ func (msgs Messages) RemoteFirewallHint() string {
 	return Catalog.Format(msgs.locale, "remoteFirewallHint", nil)
 }
 
+// RemoteMoveHere says "move here"
+// in the language the app shows.
+//
+// A button on the remote control page of another computer, beside the track
+// that plays there: it moves what plays there (the queue, the track, where
+// it is, shuffle and repeat) to this computer, which plays it in its place.
+// Lowercase, as the button "move to {name}" beside it.
+func RemoteMoveHere() string { return In(i18n.Locale()).RemoteMoveHere() }
+
+// RemoteMoveHere says "move here"
+// in the language of msgs.
+//
+// A button on the remote control page of another computer, beside the track
+// that plays there: it moves what plays there (the queue, the track, where
+// it is, shuffle and repeat) to this computer, which plays it in its place.
+// Lowercase, as the button "move to {name}" beside it.
+func (msgs Messages) RemoteMoveHere() string {
+	return Catalog.Format(msgs.locale, "remoteMoveHere", nil)
+}
+
+// RemoteMovingHere says "moving here…"
+// in the language the app shows.
+//
+// The button "move here" on the remote control page of another computer,
+// while what plays there moves to this computer.
+func RemoteMovingHere() string { return In(i18n.Locale()).RemoteMovingHere() }
+
+// RemoteMovingHere says "moving here…"
+// in the language of msgs.
+//
+// The button "move here" on the remote control page of another computer,
+// while what plays there moves to this computer.
+func (msgs Messages) RemoteMovingHere() string {
+	return Catalog.Format(msgs.locale, "remoteMovingHere", nil)
+}
+
 // RemoteNoPaired says "No computer is paired yet. To control another computer, choose it in the player bar's devices menu, the cast button's."
 // in the language the app shows.
 func RemoteNoPaired() string { return In(i18n.Locale()).RemoteNoPaired() }
@@ -28616,6 +28766,24 @@ func RemoteNoPaired() string { return In(i18n.Locale()).RemoteNoPaired() }
 // in the language of msgs.
 func (msgs Messages) RemoteNoPaired() string {
 	return Catalog.Format(msgs.locale, "remoteNoPaired", nil)
+}
+
+// RemoteNoteBroughtAway says "Moved to {name}, which asked for it, and paused here"
+// in the language the app shows.
+//
+// A notice on the computer controlled, once the computer named {name},
+// which controls it, moved what played here to itself, with "move here" on
+// its remote control page, and this computer paused.
+func RemoteNoteBroughtAway(name string) string { return In(i18n.Locale()).RemoteNoteBroughtAway(name) }
+
+// RemoteNoteBroughtAway says "Moved to {name}, which asked for it, and paused here"
+// in the language of msgs.
+//
+// A notice on the computer controlled, once the computer named {name},
+// which controls it, moved what played here to itself, with "move here" on
+// its remote control page, and this computer paused.
+func (msgs Messages) RemoteNoteBroughtAway(name string) string {
+	return Catalog.Format(msgs.locale, "remoteNoteBroughtAway", map[string]any{"name": name})
 }
 
 // RemoteNoteHandedOver says "{name} moved what it played to this computer"
@@ -28744,6 +28912,26 @@ func RemoteNoteWrongCode(name string) string { return In(i18n.Locale()).RemoteNo
 // computer showed.
 func (msgs Messages) RemoteNoteWrongCode(name string) string {
 	return Catalog.Format(msgs.locale, "remoteNoteWrongCode", map[string]any{"name": name})
+}
+
+// RemoteOlderModes says "MixMusic on {name} is older: update it there to bring its music here, and to set its shuffle, repeat, mute, like and …"
+// in the language the app shows.
+//
+// Under the remote control page of the computer named {name}, whose
+// MixMusic is older than this one's, and can't move what plays there to
+// this computer, nor take shuffle, repeat, mute, like and the output device
+// from here.
+func RemoteOlderModes(name string) string { return In(i18n.Locale()).RemoteOlderModes(name) }
+
+// RemoteOlderModes says "MixMusic on {name} is older: update it there to bring its music here, and to set its shuffle, repeat, mute, like and …"
+// in the language of msgs.
+//
+// Under the remote control page of the computer named {name}, whose
+// MixMusic is older than this one's, and can't move what plays there to
+// this computer, nor take shuffle, repeat, mute, like and the output device
+// from here.
+func (msgs Messages) RemoteOlderModes(name string) string {
+	return Catalog.Format(msgs.locale, "remoteOlderModes", map[string]any{"name": name})
 }
 
 // RemotePageAskPair says "Pair with {name} to see what plays there and control it from here. {name} shows a code of 6 digits, which you type here."

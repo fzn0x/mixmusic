@@ -66,6 +66,11 @@ type castOut struct {
 	// upNext tells what plays next, which a device that queues shows.
 	source func(rawURL string) (path, contentType string, err error)
 	upNext func() *media.Track
+	// art, when set, serves the cover of a song on this computer, whose
+	// stream is of, and returns its address; keep has the server serve
+	// the files of the streams of alone (castServer.keep).
+	art  func(t media.Track, of string) string
+	keep func(of ...string)
 	// events is told what the device does: the player, while the output is
 	// its own.
 	events audio.Events
@@ -86,9 +91,11 @@ type castOut struct {
 	loading bool
 	gen     int
 	// loadedURL and loadedCue are the last load's, which loads again, from
-	// at, to play once the media ended or stopped (idle).
+	// at, to play once the media ended or stopped (idle); nextURL is the
+	// stream handed to the device ahead, to play after it.
 	loadedURL string
 	loadedCue audio.Cue
+	nextURL   string
 	idle      bool
 	at        time.Duration
 	// state, pos, rate and duration are the device's player's, as it told
@@ -182,21 +189,18 @@ func (o *castOut) Load(rawURL string, cue audio.Cue) error {
 	u, _ := url.Parse(rawURL)
 	m := cast.Media{URL: o.served(path) + query(u), ContentType: contentType,
 		Start: cue.Start, Autoplay: cue.Autoplay}
-	if t := cue.Track; t != nil {
-		m.Title, m.Artist, m.Image = t.Title, t.ArtistNames(), coverOf(*t)
-		if t.Album != nil {
-			m.Album = t.Album.Name
-		}
-		m.Duration = time.Duration(t.DurationMs) * time.Millisecond
-	}
 	o.mu.Lock()
 	o.gen++
 	gen := o.gen
 	o.loading, o.idle = true, false
-	o.loadedURL, o.loadedCue, o.at = rawURL, cue, cue.Start
+	o.loadedURL, o.loadedCue, o.at, o.nextURL = rawURL, cue, cue.Start, ""
 	o.pos, o.posAt, o.state = cue.Start, time.Now(), cast.Buffering
 	o.wantPlay = cue.Autoplay
 	o.mu.Unlock()
+	if t := cue.Track; t != nil {
+		o.describe(&m, *t, rawURL)
+	}
+	o.serveOnly()
 	o.native(true)
 	o.load(gen, m, cue.Speed)
 	return nil
@@ -341,8 +345,9 @@ func (o *castOut) unload() {
 	o.mu.Lock()
 	had := o.loading || o.media != 0 && !o.idle
 	o.gen++
-	o.media, o.idle, o.loading, o.loadedURL = 0, true, false, ""
+	o.media, o.idle, o.loading, o.loadedURL, o.nextURL = 0, true, false, "", ""
 	o.mu.Unlock()
+	o.serveOnly()
 	if had {
 		o.do(func(ctx context.Context) { _ = o.session.Stop(ctx) })
 	}

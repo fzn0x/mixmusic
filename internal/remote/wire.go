@@ -115,9 +115,12 @@ type message struct {
 	State   *State   `json:"state,omitempty"`
 	Command *Command `json:"command,omitempty"`
 	// handover and taken: what the computer that controls hands over to
-	// the one controlled, and how that one took it.
+	// the one controlled, and how that one took it. bring, brought and
+	// took: the computer that controls asks for what plays on the one
+	// controlled, which hands it over, and tells how it took it.
 	HandOver *HandOver `json:"handOver,omitempty"`
 	Taken    *Taken    `json:"taken,omitempty"`
+	Bring    *Bring    `json:"bring,omitempty"`
 }
 
 // wire sends and receives messages over a connection, as Frames does.

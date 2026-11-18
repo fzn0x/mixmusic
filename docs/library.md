@@ -50,7 +50,7 @@ A mix is a playlist of MixMusic's own, which holds tracks of every service.
 - **A mix's page** has Play, Shuffle and Download, the search and Sort of its tracks, and in its More menu Rename and Delete. Deleting asks first; the tracks stay where they came from. Remove from this mix, in a track's menu there, takes it out.
 - **Put a mix in order** by dragging a track onto another, which it takes the place of: a line shows where it goes. From the keyboard, <kbd>Tab</kbd> to a track's play button, then <kbd>Alt</kbd> <kbd>↑</kbd> and <kbd>Alt</kbd> <kbd>↓</kbd> (<kbd>⌥</kbd> <kbd>↑</kbd> and <kbd>⌥</kbd> <kbd>↓</kbd> on macOS) move it a place up or down, and the focus goes with it. The mix keeps its new order at once. While its tracks show sorted or searched, they don't move: choose the mix's own order in Sort and clear the search first.
 
-Your mixes show in the sidebar under Your mixes, with how many tracks each holds, and on Home's Your mixes tile and shelf.
+Your mixes show in the sidebar under Your mixes, with how many tracks each holds, [in folders](#folders) if you group them, and on Home's Your mixes tile and shelf.
 
 ### The order of your mixes
 
@@ -74,6 +74,20 @@ Your mixes keep the order you put them in. A new mix goes first, and changing on
 **Hide from library**, in the menu of a playlist or a saved album in Library › Spotify or Library › YouTube Music, takes it out of MixMusic's library, and changes nothing on the service: unlike Remove from library on a saved YouTube Music playlist, which takes it out of your library on YouTube Music. **Hidden**, at the foot of the page, lists what you hid, with **Show again**.
 
 MixMusic keeps your pins and what you hid in `library.json` in your [data folder](data-and-privacy.md#the-data-folder), by ID. One of a service goes only once that service listed your whole library without it, under the account or [brand channel](accounts.md#several-google-accounts-and-brand-channels) you pinned or hid it under: never while the list loads, fails, comes in part or you're signed out, nor while another brand channel is chosen. An artist you follow in MixMusic keeps their pin while you do. Deleting a mix takes its pin with it.
+
+### Folders
+
+Group your mixes, and the playlists of Spotify and YouTube Music in your library, in folders of the sidebar's Your mixes, one level deep: by mood, by person or by season. The folders show after Liked songs, Downloads and the pins in no folder, and before the mixes in none.
+
+- **Put one in a folder** with **Move to folder** in its menu: on its tile, in the More menu of its page, or with a right click on it in the sidebar. It lists every folder, then **New folder…**, which asks for a name. Or drag it in the sidebar onto a folder's header. A mix or a playlist is in one folder at most.
+- **Take it out** with **Remove from folder**, in the same menus, or drag it onto an entry of the sidebar outside the folders. A folder with nothing left goes away.
+- **Names** hold up to 64 characters. The spaces around a name go, and each run of spaces in it becomes one. Names that differ only in case or spacing are one folder: a new folder of a name taken is that folder, and a rename to it makes the two one.
+- **The header** shows the folder's name and how many playlists it holds. A click on it, or <kbd>Enter</kbd>, closes the folder or opens it again; `settings.json` keeps the folders you closed as `collapsedFolders`. A closed folder opens by itself while the sidebar's search finds what it holds, and once the page open is one of its playlists.
+- **Their order:** folders show by name until you drag one onto another, or press <kbd>Alt</kbd> <kbd>↑</kbd> or <kbd>Alt</kbd> <kbd>↓</kbd> (<kbd>⌥</kbd> on macOS) on a header; then they keep your order, and a new folder goes first. In a folder, the pinned playlists come first, then the others in the order they came in, which you change the same way.
+- **The header's menu** has **Play folder**, which plays all its playlists one after another, each track once: a playlist that doesn't load is left out, and a toast names it. **Rename folder…** names it anew, and **Ungroup folder** takes the folder away and keeps its playlists.
+- **The sidebar's search** finds a folder by its name, and shows all it holds, and by the names of its playlists, and shows those.
+
+MixMusic keeps your folders in `library.json`, by the playlists' IDs, and they never reach a service. Spotify's Web API neither gives apps playlist folders nor makes them ([Spotify's playlists guide](https://developer.spotify.com/documentation/web-api/concepts/playlists)), so folders made in Spotify's app don't show. A playlist of a service keeps its folder as it keeps its pin: until that service listed your whole library without it. Hiding a playlist, or deleting a mix, takes it out of its folder.
 
 ### A mix's cover
 

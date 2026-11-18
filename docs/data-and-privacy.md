@@ -54,8 +54,8 @@ AppImage or archive copy's.
 - `library.json`: your liked and disliked songs, your mixes, the last
   1,000 tracks you played, which the history reads, your
   last 20 searches, the shows you follow, the artists you follow
-  in MixMusic, and what you [pinned and hid](library.md#pin-to-top), by
-  ID.
+  in MixMusic, what you [pinned and hid](library.md#pin-to-top), and
+  your [folders](library.md#folders) of mixes and playlists, by ID.
 - `plays.jsonl`: every track you played, once it counted, a line each,
   which the stats, Your year and the Plays sort read: when, and the
   track's ID, service, title, artists, album and length, without covers.

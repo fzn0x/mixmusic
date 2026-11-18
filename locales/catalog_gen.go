@@ -2516,6 +2516,22 @@ func (msgs Messages) AssistantsAbout() string {
 	return Catalog.Format(msgs.locale, "assistantsAbout", nil)
 }
 
+// AssistantsCantListen says "MixMusic can't listen for AI assistants on this computer: {error}"
+// in the language the app shows.
+//
+// Why AI assistants can't connect, in the {problem} of assistantsProblem,
+// in Settings › AI assistants. {error} is the system's own words.
+func AssistantsCantListen(error string) string { return In(i18n.Locale()).AssistantsCantListen(error) }
+
+// AssistantsCantListen says "MixMusic can't listen for AI assistants on this computer: {error}"
+// in the language of msgs.
+//
+// Why AI assistants can't connect, in the {problem} of assistantsProblem,
+// in Settings › AI assistants. {error} is the system's own words.
+func (msgs Messages) AssistantsCantListen(error string) string {
+	return Catalog.Format(msgs.locale, "assistantsCantListen", map[string]any{"error": error})
+}
+
 // AssistantsCommand says "Command"
 // in the language the app shows.
 func AssistantsCommand() string { return In(i18n.Locale()).AssistantsCommand() }
@@ -5038,6 +5054,58 @@ func ComputerEmptyTitle() string { return In(i18n.Locale()).ComputerEmptyTitle()
 // in the language of msgs.
 func (msgs Messages) ComputerEmptyTitle() string {
 	return Catalog.Format(msgs.locale, "computerEmptyTitle", nil)
+}
+
+// ComputerFolderDenied says "MixMusic isn't allowed to read it"
+// in the language the app shows.
+//
+// Why a music folder can't be read, in the {problem} of
+// computerSettingsProblem, in Settings › This computer: the system
+// doesn't let MixMusic read it.
+func ComputerFolderDenied() string { return In(i18n.Locale()).ComputerFolderDenied() }
+
+// ComputerFolderDenied says "MixMusic isn't allowed to read it"
+// in the language of msgs.
+//
+// Why a music folder can't be read, in the {problem} of
+// computerSettingsProblem, in Settings › This computer: the system
+// doesn't let MixMusic read it.
+func (msgs Messages) ComputerFolderDenied() string {
+	return Catalog.Format(msgs.locale, "computerFolderDenied", nil)
+}
+
+// ComputerFolderMissing says "It isn't there: is its drive plugged in?"
+// in the language the app shows.
+//
+// Why a music folder can't be read, in the {problem} of
+// computerSettingsProblem, in Settings › This computer.
+func ComputerFolderMissing() string { return In(i18n.Locale()).ComputerFolderMissing() }
+
+// ComputerFolderMissing says "It isn't there: is its drive plugged in?"
+// in the language of msgs.
+//
+// Why a music folder can't be read, in the {problem} of
+// computerSettingsProblem, in Settings › This computer.
+func (msgs Messages) ComputerFolderMissing() string {
+	return Catalog.Format(msgs.locale, "computerFolderMissing", nil)
+}
+
+// ComputerFolderUnreadable says "It can't be read"
+// in the language the app shows.
+//
+// Why a music folder can't be read, in the {problem} of
+// computerSettingsProblem, in Settings › This computer, for another
+// reason.
+func ComputerFolderUnreadable() string { return In(i18n.Locale()).ComputerFolderUnreadable() }
+
+// ComputerFolderUnreadable says "It can't be read"
+// in the language of msgs.
+//
+// Why a music folder can't be read, in the {problem} of
+// computerSettingsProblem, in Settings › This computer, for another
+// reason.
+func (msgs Messages) ComputerFolderUnreadable() string {
+	return Catalog.Format(msgs.locale, "computerFolderUnreadable", nil)
 }
 
 // ComputerFromFolders says "From {count, plural, one {# folder} other {# folders}} · "
@@ -8846,6 +8914,22 @@ func ErrorLocalFilesRemovableDrive() string { return In(i18n.Locale()).ErrorLoca
 // leads it.
 func (msgs Messages) ErrorLocalFilesRemovableDrive() string {
 	return Catalog.Format(msgs.locale, "errorLocalFilesRemovableDrive", nil)
+}
+
+// ErrorLocalFilesWatchFailed says "the system can't watch it"
+// in the language the app shows.
+//
+// Why MixMusic can't watch a music folder for changes, in the {reason} of
+// computerUnwatched, for a reason the system doesn't tell.
+func ErrorLocalFilesWatchFailed() string { return In(i18n.Locale()).ErrorLocalFilesWatchFailed() }
+
+// ErrorLocalFilesWatchFailed says "the system can't watch it"
+// in the language of msgs.
+//
+// Why MixMusic can't watch a music folder for changes, in the {reason} of
+// computerUnwatched, for a reason the system doesn't tell.
+func (msgs Messages) ErrorLocalFilesWatchFailed() string {
+	return Catalog.Format(msgs.locale, "errorLocalFilesWatchFailed", nil)
 }
 
 // ErrorLocalFilesWatchLimit says "the system's limit on watched folders is reached"

@@ -649,6 +649,15 @@
     }
   },
   "assistantsAbout": "AI assistants on this computer that speak MCP, the Model Context Protocol, can tell what plays, play, pause, skip, search, and play your playlists. Each thing one does shows here. Nothing on the network can reach it.",
+  "assistantsCantListen": "MixMusic can't listen for AI assistants on this computer: {error}",
+  "@assistantsCantListen": {
+    "description": "Why AI assistants can't connect, in the {problem} of assistantsProblem, in Settings › AI assistants. {error} is the system's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "assistantsCommand": "Command",
   "assistantsCommandNote": ". An assistant starts it, as a server of MCP that runs a command (stdio), to reach MixMusic while it runs.",
   "assistantsConfigNote": "For the assistants that keep their servers in a JSON file, as mcpServers. ",
@@ -1470,6 +1479,18 @@
   "computerCantPlayFiles": "MixMusic can't play these files",
   "computerEmptyText": "Add a folder of music, or open files: they play from your computer, beside Spotify and YouTube Music, in your queue and your mixes. Nothing of them is uploaded.",
   "computerEmptyTitle": "Nothing on this computer yet",
+  "computerFolderDenied": "MixMusic isn't allowed to read it",
+  "@computerFolderDenied": {
+    "description": "Why a music folder can't be read, in the {problem} of computerSettingsProblem, in Settings › This computer: the system doesn't let MixMusic read it."
+  },
+  "computerFolderMissing": "It isn't there: is its drive plugged in?",
+  "@computerFolderMissing": {
+    "description": "Why a music folder can't be read, in the {problem} of computerSettingsProblem, in Settings › This computer."
+  },
+  "computerFolderUnreadable": "It can't be read",
+  "@computerFolderUnreadable": {
+    "description": "Why a music folder can't be read, in the {problem} of computerSettingsProblem, in Settings › This computer, for another reason."
+  },
   "computerFromFolders": "From {count, plural, one {# folder} other {# folders}} · ",
   "@computerFromFolders": {
     "description": "Line above the songs: the folders the music comes from, then a link to manage them.",
@@ -2704,6 +2725,10 @@
   "errorLocalFilesRemovableDrive": "it's on a removable drive, which a watch would keep from being ejected",
   "@errorLocalFilesRemovableDrive": {
     "description": "Why a folder of music isn't watched for changes, inside a message that leads it."
+  },
+  "errorLocalFilesWatchFailed": "the system can't watch it",
+  "@errorLocalFilesWatchFailed": {
+    "description": "Why MixMusic can't watch a music folder for changes, in the {reason} of computerUnwatched, for a reason the system doesn't tell."
   },
   "errorLocalFilesWatchLimit": "the system's limit on watched folders is reached",
   "@errorLocalFilesWatchLimit": {

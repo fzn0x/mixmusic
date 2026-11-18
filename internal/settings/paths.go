@@ -29,6 +29,7 @@ func (s *Settings) readPaths() { s.paths(store.DecodePath) }
 // music folders in a list of their own: the one s held is its caller's
 // too.
 func (s *Settings) paths(fn func(string) string) {
+	s.BackupFolder = fn(s.BackupFolder)
 	s.ColorFile = fn(s.ColorFile)
 	s.DownloadsFolder = fn(s.DownloadsFolder)
 	if s.MusicFolders != nil {

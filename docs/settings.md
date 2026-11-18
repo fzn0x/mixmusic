@@ -89,6 +89,15 @@ The **On the desktop** group:
 
 [On the desktop](desktop.md) tells what each does.
 
+The **Backups** group: **Back up…** saves your library, settings and
+add-ons in a file, and **Restore…** brings a backup back, after a
+preview, and restarts MixMusic; **Undo the last restore**, after one,
+puts back what it replaced. **Back up automatically**, off at first,
+backs up daily, weekly, monthly or each time MixMusic quits, to the
+**Folder for backups**, and **Keep** says how many it keeps.
+[Back up and restore](data-and-privacy.md#back-up-and-restore) tells
+more.
+
 The **Remote control** group: **Allow remote control**, off at first,
 lets the other computers with MixMusic on your network find this one,
 pair with it by a code it shows, and control it; and the computers
@@ -353,6 +362,9 @@ while you're not typing in a text field. The ID is the command's name in
 |---|---|---|---|
 | Reload add-ons | none | none | `addons.reload` |
 | Open the settings file | none | none | `settings.openFile` |
+| Back up MixMusic | none | none | `backup.now` |
+| Restore a backup | none | none | `backup.restore` |
+| Undo the last restore, after one | none | none | `backup.undo` |
 | Theme: *name*, one for each theme | none | none | `theme.<theme id>` |
 | Lyrics style: *name*, one for each [style of the full-screen lyrics](lyrics.md#full-screen-lyrics) | none | none | `lyrics.style.<style id>` |
 

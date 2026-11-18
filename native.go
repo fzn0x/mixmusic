@@ -412,6 +412,9 @@ type shell struct {
 	// computer is what Library › On this computer keeps between frames.
 	computer computerPage
 
+	// backups is what the backups and their dialogs keep between frames.
+	backups backupView
+
 	// main is set in the main window, which alone tells of settings.json.
 	// file is settings.json as refresh read it last, toldFile the last of
 	// its notices the window told or let go, and fileNotice the one the

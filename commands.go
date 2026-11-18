@@ -87,6 +87,7 @@ func (s *shell) commands() []command {
 		}},
 		{"settings.openFile", locales.CmdSettingsOpenFile(), "", locales.CmdGroupSettings(), s.openSettingsFile},
 	}
+	cmds = append(cmds, s.backupCommands()...)
 	cmds = append(cmds, s.themeCommands...)
 	cmds = append(cmds, s.lyricStyleCommands()...)
 	cmds = append(cmds, s.sleepCommands()...)

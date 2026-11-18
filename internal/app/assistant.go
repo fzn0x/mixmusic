@@ -84,10 +84,7 @@ func (a *App) applyAssistants(s settings.Settings) {
 	}
 	if err := srv.Start(); err != nil {
 		log.Printf("mixmusic: AI assistants: %v", err)
-		why := ErrorText(err)
-		if errors.Is(err, mcp.ErrListen) {
-			why = locales.AssistantsCantListen(causeOf(err, mcp.ErrListen))
-		}
+		why := assistantProblem(err)
 		h.problem.Store(&why)
 		notify()
 		return
@@ -189,4 +186,13 @@ func assistantConfig(cmd string, args []string, env map[string]string) string {
 		return ""
 	}
 	return string(data)
+}
+
+// assistantProblem is why the AI assistants' server didn't start, as
+// Settings says it.
+func assistantProblem(err error) string {
+	if errors.Is(err, mcp.ErrListen) {
+		return locales.AssistantsCantListen(causeOf(err, mcp.ErrListen))
+	}
+	return ErrorText(err)
 }

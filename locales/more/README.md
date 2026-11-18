@@ -78,8 +78,7 @@ and Linux name MixMusic in it. Those of 2026 moved together, in #564:
    `mygo.config.ts`'s `infoPlist`: `go test ./locales` asks for both.
 3. Generate `locales/catalog_gen.go` again, as `.github/scripts/catalogs.sh`
    runs MyGo, or with `bunx mygo generate`. For a language MyGo has its own
-   translation of, it imports that package, which changes `vendorHash` in
-   `nix/package.nix` (`nix build` tells the new one) and
+   translation of, it imports that package, which changes
    `packaging/flathub/go-modules.json` (`go run ./tools/flathub`).
 4. Run `bash .github/scripts/catalogs.sh` and `go test ./locales`.
 

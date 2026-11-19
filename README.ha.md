@@ -8,7 +8,7 @@
 
 <p align="center"><strong>Mai kunnawa guda ɗaya don YouTube Music da Spotify.</strong></p>
 
-<p align="center">Manhajar YouTube Music da Spotify don macOS, Windows da Linux. YouTube Music yana aiki ba tare da asusu ba. Bincike ɗaya, jerin gaba ɗaya, playlist ɗin da aka haɗa, kalmomin waƙa masu daidaita da waƙar, jigogi da plugin.</p>
+<p align="center">Manhajar YouTube Music da Spotify don macOS, Windows da Linux. YouTube Music yana aiki ba tare da asusu ba. Bincike ɗaya, jerin gaba ɗaya, playlist ɗin da aka haɗa, kalmomin waƙa masu daidaita da waƙar, podcast, fayilolin kiɗanka na kanka, kunna a wata naʼura, jigogi da plugin.</p>
 
 <p align="center"><sub>Wannan fassara ce ta <a href="README.md">README na Turanci</a>. Idan akwai bambanci, na Turanci shi ne mafi sabo.</sub></p>
 
@@ -25,9 +25,10 @@
 </p>
 
 <p align="center">
-  <a href="https://fzn0x.github.io/mixmusic/">Shafin yanar gizo</a> ·
+  <a href="https://mixmusic.functionx.dev/">Shafin yanar gizo</a> ·
   <a href="https://github.com/fzn0x/mixmusic/releases/latest">Zazzage</a> ·
-  <a href="https://fzn0x.github.io/mixmusic/docs/">Takardu</a> ·
+  <a href="https://mixmusic.functionx.dev/docs/">Takardu</a> ·
+  <a href="docs/features.md">Kowace siffa</a> ·
   <a href="CHANGELOG.md">Jerin canje-canje</a>
 </p>
 
@@ -45,7 +46,7 @@ biyu. MixMusic yana haɗa ayyukan biyu a cikin mai kunnawa guda ɗaya:
   yana alamta kowane sakamako da aikin da ya fito daga gare shi.
 - **Jerin gaba ɗaya da ɗakin waƙoƙi ɗaya.** Waƙar Spotify na iya biyo bayan
   waƙar YouTube Music kai tsaye, kuma playlist ɗaya na iya ɗaukar waƙoƙi daga
-  duka biyun.
+  duka biyun, da kuma daga fayilolin kiɗan da ke kwamfutarka.
 - **Ba ya buƙatar asusu.** YouTube Music yana kunnawa da zarar ka buɗe
   manhajar. Ka shiga ne kawai idan kana son ɗakin waƙoƙinka na kanka. Spotify
   na zaɓi ne.
@@ -55,78 +56,186 @@ biyu. MixMusic yana haɗa ayyukan biyu a cikin mai kunnawa guda ɗaya:
 - **Naka ne ka sauya shi.** Yana zuwa da tsari huɗu da jigogi goma sha huɗu,
   alʼumma na ƙara jigogi da plugin, kuma kowane umarni na iya samun maɓalli
   naka na kanka.
+- **A harshenka.** Taga tana zuwa da harsuna 66 baya ga Turanci, kuma ana
+  shimfiɗa ta daga dama zuwa hagu don Larabci, Ibrananci, Farisanci da Urdu.
 - **Sirri.** MixMusic ba shi da asusu, sabar, nazari ko telemetry na kansa.
 - **Kyauta kuma open source,** a ƙarƙashin lasisin MIT ko GPL 3.0.
 
 ## Siffofi
 
+Abin da MixMusic yake yi, fanni da fanni, da inda za ka same shi a cikin
+manhajar. **Built in** (a ciki) yana nufin yana aiki da kansa.
+[Siffofi](docs/features.md) yana lissafa duka siffofi 363 daga 0.1.0 zuwa
+0.5.12, layi ɗaya kowacce, tare da sigar da ta shigo a cikinta.
+
 ### Bincike da kunnawa
 
 - **Bincike ɗaya don ayyukan biyu.** Sakamakon YouTube Music da Spotify a
-  gefe da gefe, kowanne da alamar aikinsa. Sakamakon YouTube Music yana nuna
-  sau nawa aka kunna kowace waƙa, don a rarrabe ta asali daga waɗanda aka
-  sake rerawa.
+  gefe da gefe, kowanne da alamar aikinsa, tare da fayilolin kiɗanka na kanka.
+  Sakamakon YouTube Music yana nuna sau nawa aka kunna kowace waƙa, don a
+  rarrabe ta asali daga waɗanda aka sake rerawa. *Sandar sama*
+- **Kowane irin sakamako.** Waƙoƙi, bidiyoyi, albam, mawaƙa, playlist da
+  podcast, a jere bisa mafi dacewa, mafi yawan kunnawa ko mafi sabo, da
+  YouTube kansa don waɗansu kide-kide kai tsaye da abubuwan da aka ɗora waɗanda
+  kundin kiɗa ba shi da su. Hanyar YouTube ko ta Spotify da aka liƙa a
+  akwatin bincike tana kunnawa nan take. *Bincike*
 - **Jerin gaba ɗaya.** Haɗa waƙoƙin ayyukan biyu, ka gauraya ko ka maimaita a
-  tsakaninsu, kuma ka bar radio ya ci gaba idan jerin gaba ya ƙare.
-- **Explore (Bincika).** Sabbin fitarwa, waƙoƙin da ake yi, jadawalin waƙoƙi,
-  yanayi da nauʼoʼi, da waƙoƙin da suka dace da wadda ake kunnawa.
-- **Kalmomin waƙa masu daidaita da waƙar** waɗanda suke bin waƙar, ko rubutu
-  kawai idan ka fi so.
-- **Ƙaramin mai kunnawa** da yake tsayawa a saman sauran tagoginka.
+  tsakaninsu, ka mayar da waƙa ta zama ta gaba, kuma ka bar radio ya ci gaba
+  idan jerin gaba ya ƙare. Yana dawowa yadda ka bar shi bayan sake farawa.
+  *Mashayin mai kunnawa, Jerin gaba*
+- **Shafi ga kowane abu.** Albam, mawaƙa da playlist tare da Play da Shuffle,
+  duka waƙoƙin mawaƙi, da waƙoƙin da suka shafi abin da ake kunnawa.
+  *Bincike, Gida*
+- **Tsallake abin da ba ka so.** Ƙi waƙoƙi don radio su wuce su, tsallake
+  waƙoƙin da aka yi da AI da sassan bidiyo da SponsorBlock ya yi wa alama, da
+  ɓoye abun da bai dace da yara ba ko fifita sigogi masu tsabta. *Mashayin
+  mai kunnawa, Settings › Playback*
+- **Mai ƙidayar barci da gudu.** Tsayawa bayan wani lokaci, bayan waƙa ɗaya ko
+  bayan jerin gaba, da raguwar sauti a hankali, ko kai tsaye da dare, da
+  kunna waƙoƙi da podcast da sauri ko a hankali da sautinsu na asali.
+  *Mashayin mai kunnawa*
+- **Bidiyon waƙa da murfuna masu motsi.** Bidiyon waƙa maimakon murfinta, da
+  gajerun bidiyoyin da wasu albam suke maimaitawa. *Ana kunnawa,
+  Settings › Playback*
+- **Zaɓa, raba da dubawa sosai.** Zaɓi waƙoƙi da yawa don saka a jerin gaba,
+  ƙarawa ko zazzagewa a lokaci guda, raba waƙa ko albam a matsayin katin hoto,
+  ka kuma ga inda waƙa ta fito da dalilin da ya hana ta kunnawa. *Menu na
+  waƙa*
+
+### Gida da Explore
+
+- **Gida** da shiryayyunka, Komawa daga inda ka tsaya da sabbin fitarwa na
+  mawaƙan da kake bi, a shirya yadda kake so. *Gida*
+- **Explore (Bincika):** sabbin fitarwa, jadawalin waƙoƙi, yanayi da nauʼoʼi.
+  *Explore*
+
+### Kalmomin waƙa
+
+- **Kalmomin waƙa masu daidaita da waƙar** waɗanda suke bin waƙar, kalma bayan
+  kalma inda tushen yake da hakan, har da cikakken allo, ko rubutu kawai idan
+  ka fi so. *Allon kalmomin waƙa, Ana kunnawa*
+- **Fassara da haruffan Latin:** fassara a ƙasan kowane layi, romaji don
+  Japananci, da haruffan Latin don Koriyanci, Sinanci, Rashanci, Larabci da
+  wasu rubutu da yawa. *Allon kalmomin waƙa*
+- **Zaɓin tushenka:** Better Lyrics, Unison, LRCLIB, YouTube Music da
+  rubutun YouTube, bisa tsarin da ka saita, tare da wani tushe, bincike,
+  gyare-gyarenka da daidaita lokaci a danna ɗaya. *Settings › Playback ›
+  Lyrics, Allon kalmomin waƙa*
+- **Nema a cikin kalmomin waƙa,** raba layukansu a matsayin kati, da karanta
+  kalmomin waƙa da fayilolin waƙoƙinka suke ɗauke da su. *Allon kalmomin waƙa*
+
+### Podcast
+
+- **Podcast na YouTube Music da Spotify.** Nemo ka bi shirye-shirye, fara kowane
+  kashi daga inda ka tsaya, yi wa kashi alamar an saurare shi, karanta
+  babuka da rubutun furucinsu, kuma ka ba su gudu na daban da na waƙoƙi.
+  *Bincike, Shafin shiri, Ɗakin waƙoƙi › Podcast*
 
 ### Ɗakin waƙoƙinka
 
-- **Mixes:** playlist ɗin da suke ɗaukar waƙoƙi daga kowane aiki. Shigar da
-  playlist na wani aiki cikin mix, ka bincika ka kuma tsara a cikin kowanne
-  daga cikinsu.
-- **Waƙoƙin da ka so** daga ayyukan biyu a jeri ɗaya.
-- **Tarihi da ƙididdigar saurare,** rana da rana.
-- **Asusunka.** Ka shiga YouTube Music a shafin Google na kansa don samun
-  shafin gida, waƙoƙin da ka so, playlist, albam da mawaƙa, a matsayin
-  asusunka ko ɗaya daga cikin tashoshin alamar kasuwancinsa. Ka shiga Spotify
-  don ɗakin waƙoƙinka a can. Waƙoƙin da ka so, albam da playlist ɗin da ka
-  adana, da mawaƙan da kake bi suna kai wa aikin ma. Abin da kake kunnawa
-  yana shiga tarihin YouTube Music ɗinka, wanda shawarwarinsa suke fitowa
-  daga gare shi.
+- **Mixes:** playlist ɗin da suke ɗaukar waƙoƙi daga kowane aiki, a tsarin da
+  ka zaɓa, a bincika a kuma tsara, da murfuna naka na kanka. *Ɗakin waƙoƙi ›
+  Mixes, Gefen allo*
+- **Waƙoƙin da ka so** daga ayyukan biyu a jeri ɗaya, da playlist, albam da
+  mawaƙan YouTube Music da Spotify ɗinka, waɗanda za ka iya adanawa, yi, raba
+  da yin aiki tare a kansu. Abin da ka so ko ka adana yana kai wa aikin ma.
+  *Ɗakin waƙoƙi*
+- **Maƙalli, manyan fayiloli da alamomi** suna kiyaye tsarin babban ɗakin
+  waƙoƙi, kuma abin da ba ka so a ciki za a iya ɓoye shi. *Gefen allo, Menu na
+  tayal*
+- **Bin mawaƙa,** da asusu ko ba shi, da ganin sabbin fitarwarsu. *Shafin
+  mawaƙi, Ɗakin waƙoƙi › Mawaƙa*
+- **Tarihi, Ƙididdiga da Shekararka:** mintuna a kowace rana, waƙoƙinka da
+  mawaƙanka mafi yawa, da kati na su don raba. *Ɗakin waƙoƙi › Tarihi,
+  Ƙididdiga*
+- **Zazzagewa** don kunnawa ba tare da intanet ba, da maʼajiyar waƙoƙin da ka
+  kunna. *Menu na waƙa, Ɗakin waƙoƙi › Zazzagewa*
+
+### Kiɗa a wannan kwamfutar
+
+- **Fayilolin kiɗanka na kanka** a cikin ɗakin waƙoƙi da bincike, daga manyan
+  fayilolin da MixMusic yake sa ido a kansu: MP3, FLAC, WAV, M4A, Opus da
+  Vorbis, tare da tags da murfunansu. *Settings › Playback › Music on this
+  computer*
+- **Gyara tags ɗinsu,** tara kwafin waƙa ɗaya, da buɗewa ko jefa fayiloli don
+  kunna su. *Menu na waƙa, Jefa a kan taga*
+
+### Asusu da ayyuka
+
+- **YouTube Music.** Shiga a shafin Google na kansa, ta burauzarka ko da zaman
+  burauza, a matsayin asusunka ko ɗaya daga cikin tashoshin alamar
+  kasuwancinsa, don shafin gida, waƙoƙin da ka so, playlist, albam da
+  mawaƙa. Abin da kake kunnawa yana shiga tarihin YouTube Music ɗinka, wanda
+  shawarwarinsa suke fitowa daga gare shi. *Settings › Accounts*
+- **Last.fm:** kowace waƙa da ka kunna har rabinta, ko na minti huɗu, tana
+  shiga bayananka, kuma scrobbles da aka yi ba tare da intanet ba ana aika su
+  idan ka dawo kan intanet. *Settings › Accounts*
+- **ListenBrainz:** haka ma, tare da Last.fm ko ba tare da shi ba, zuwa
+  ListenBrainz ko sabarka ta kanka, kamar Maloja. Waƙoƙin da ka so za su iya
+  zuwa kowanne daga cikinsu a matsayin loves. *Settings › Accounts*
+- **Libre.fm:** haka ma, zuwa Libre.fm ko wata sabar GNU FM, ba tare da ka
+  ƙirƙiri asusun API ba. *Settings › Accounts*
+- **Discord:** bayananka suna nuna abin da ake kunnawa, tare da hotonsa da
+  lokacin da ya rage, yadda ka zaɓa. *Settings › Desktop*
 
 ### Spotify ta hanyoyi uku
 
 - **A cikin MixMusic kansa,** da ingancin Spotify, ba tare da manhajar
   Spotify a buɗe ba (Premium, a Windows da macOS).
-- **A Spotify Connect:** manhajar Spotify ɗinka, wayarka ko lasifika.
+- **A Spotify Connect:** manhajar Spotify ɗinka, wayarka ko lasifika, a
+  lossless idan manhajar Spotify tana da shi a kunne.
 - **Daga YouTube Music:** MixMusic yana kunna rikodin waƙar Spotify a
   YouTube Music, wanda ba ya buƙatar Premium don kunnawa.
 
+Zaɓi a Settings › Playback › Spotify tracks.
+
 ### Sauti
 
-- Crossfade, daidaita ƙarar waƙoƙi da daidaita ƙarar sauti.
-- Equalizer mai madaurai goma tare da saitunan da aka shirya.
-- Visualizer.
-- Maʼajiyar waƙoƙin da ka kunna don sauraro ba tare da intanet ba.
+- **Equalizer mai madaurai goma** tare da saitunan da aka shirya 23 da naka na
+  kanka, yanayi mai sauƙi na Bass, Mid da Treble, da gyaran belun kunne sama da
+  8,800 daga AutoEq. *Settings › Playback › Equalizer*
+- **Crossfade, albam marasa tazara, daidaita ƙarar waƙoƙi da daidaita ƙarar
+  sauti.** *Settings › Playback › Sound*
+- **Reverb, echo, crossfeed, daidaita hagu da dama da faɗin stereo.**
+  *Settings › Playback*
+- **Surround 5.1** inda waƙa take da shi, da naʼurar fitar da sauti da ka zaɓa.
+  *Mashayin mai kunnawa, Settings › Playback › Sound*
+- **Visualizer,** da aka zana daga injin sautin MixMusic na kansa. *Ana
+  kunnawa*
+
+### Kunna a wata naʼura, abokai da sauran kwamfutoci
+
+- **Kunna a wata naʼura** zuwa Chromecast, lasifikan Google Home da Nest da
+  rukunoninsu, masu kunnawa na DLNA da UPnP da masu karɓar FCast, har da
+  fayilolin kiɗanka na kanka. *Mashayin mai kunnawa, Ƙaramin mai kunnawa*
+- **Saurare tare da abokai:** buɗe ɗaki da yake kunnawa tare a kwamfutocin
+  abokanka, a hanyar sadarwarka ko ko ina da hanyar gayyata. *Menu na kunna a
+  wata naʼura na mashayin mai kunnawa*
+- **Sarrafa daga nesa:** sarrafa MixMusic a wata kwamfuta ta hanyar sadarwarka,
+  da mayar da abin da ake kunnawa daga ɗaya zuwa ɗaya. *Menu na kunna a wata
+  naʼura na mashayin mai kunnawa, Settings › Desktop*
+- **Mataimakan AI** a kwamfutarka na iya sanin abin da ake kunnawa, bincike,
+  kunnawa da saita mai ƙidayar barci, ta Model Context Protocol. *Settings ›
+  Desktop › AI assistants*
 
 ### A kan kwamfutarka
 
-- Maɓallan mai jarida da sarrafa mai jarida na tsarin a Windows, macOS da
-  Linux.
-- Gajerun hanyoyi na duniya naka na kanka don kunnawa, dakatarwa, tsallakewa,
-  sauya ƙara, rufe sauti, so ko ƙin abin da ake kunnawa ko nuna MixMusic, ko
-  wace taga ce a gaba.
-- Maɓallan mai kunnawa a hoton ɗan ƙaramin taskbar a Windows.
-- Sarrafawa daga tray, sanarwar sabbin waƙoƙi, da farawa idan ka shiga
-  kwamfuta.
-- Hanyoyin `mixmusic://`.
-- **Last.fm:** kowace waƙa da ka ji tana shiga bayananka, kuma scrobbles da
-  aka yi ba tare da intanet ba ana aika su idan ka dawo kan intanet.
-- **ListenBrainz:** haka ma, tare da Last.fm ko ba tare da shi ba, zuwa
-  ListenBrainz ko sabarka ta kanka, kamar Maloja. Waƙoƙin da ka so za su
-  iya zuwa kowanne daga cikinsu a matsayin loves.
-- **Libre.fm:** haka ma, zuwa Libre.fm ko wata sabar GNU FM, ba tare da ka
-  ƙirƙiri asusun API ba.
-- **Discord:** bayananka suna nuna abin da ake kunnawa, tare da hotonsa da
-  lokacin da ya rage.
-- **Sabuntawa:** MixMusic yana duba sabuwar fitarwa a farawa da kuma bayan
-  kowane ƴan saʼoʼi, yana duba sa hannunta, yana kuma shigar da ita idan ka
-  ce, ko da kansa idan ka zaɓi haka.
+- **Ƙaramin mai kunnawa** da yake tsayawa a saman sauran tagoginka, da jerin
+  gaba da kalmomin waƙa a cikin allonsa. *Mashayin mai kunnawa, <kbd>Ctrl</kbd>
+  <kbd>M</kbd>*
+- **Maɓallan mai jarida** da sarrafa mai jarida na tsarin a Windows, macOS da
+  Linux. *Built in*
+- **Gajerun hanyoyi na duniya** naka na kanka don kunnawa, dakatarwa,
+  tsallakewa, sauya ƙara, rufe sauti, so ko ƙin abin da ake kunnawa ko nuna
+  MixMusic, ko wace taga ce a gaba. *Settings › Shortcuts*
+- **Maɓallan mai kunnawa** a hoton ɗan ƙaramin taskbar a Windows, da mai
+  kunnawa a kewayen notch na MacBook. *Built in, Settings › Desktop*
+- **Sarrafawa daga tray,** sanarwar sabbin waƙoƙi, kasancewa a sama da
+  farawa idan ka shiga kwamfuta. *Settings › Desktop*
+- **Hanyoyin `mixmusic://`** da tutoci kamar `--next`, don maɓallin Stream
+  Deck ko rubutun umarni. *Layin umarni*
+- **Abin da ake kunnawa don overlays:** kati na abin da ake kunnawa don tushen
+  burauza na OBS, da bayanansa don shafinka na kanka. *Settings › Desktop*
 
 ### Ka mayar da shi naka
 
@@ -136,23 +245,45 @@ biyu. MixMusic yana haɗa ayyukan biyu a cikin mai kunnawa guda ɗaya:
   siffar kwaya da mashayin mai kunnawa mai shawagi. Crate ba shi da ƙawa
   mai yawa, don murfuna su yi aikin, kuma Tiles shi ne kamannin MixMusic na
   farko, da tayal-tayal masu lebur da manyan kalmomi na ƙananan haruffa.
+  *Settings › Appearance*
 - **Jigogi.** Goma sha huɗu a ciki, kowanne a kowane tsari, da tasirin da za
   ka iya daidaitawa, jigo ɗaya don yanayin haske da ɗaya don yanayin duhu, da
   launin ado naka ko wanda aka ɗauko daga hoton waƙar da ake kunnawa. Material
-  da Material Dark suna yin kowane launi daga na murfin.
-- **Jigogi da plugin na alʼumma,** a danna sau ɗaya a kasuwa.
+  da Material Dark suna yin kowane launi daga na murfin. *Settings ›
+  Appearance*
+- **Jigogi da plugin na alʼumma,** a danna sau ɗaya a kasuwa. *Kasuwa*
 - **Plugin** suna ƙara shafuka, umarni, ayyukan waƙa da widgets ta hanyar API
-  mai nauʼi, ana zana su da jigonka.
+  mai nauʼi, ana zana su da jigonka. *Settings › Plugins*
 - **Madannai da farko.** Gajerun hanyoyi don duk abin da ake yawan yi, maɓalli
   naka na kowane umarni har da na plugin, maɓallan da ke sarrafa waƙoƙi daga
   kowace manhaja, da command palette (<kbd>Ctrl</kbd> <kbd>K</kbd>) don
   sauran.
+- **Harshenka.** Harsuna 66 baya ga Turanci, daga dama zuwa hagu inda harshen
+  yake karantuwa haka, da kwanuka da lambobi yadda yankinka yake rubuta su.
+  *Settings › Appearance › Language*
+- **Don masu karanta allo da madannai.** Sunaye da sanarwa don masu karanta
+  allo, kowane sarrafawa a cikin isar madannai, girman rubutu, zuƙowa da
+  rage motsi. *Built in, Settings › Appearance*
 - **Fayil na saituna.** Saitunanka su ne `settings.json` a babban fayil ɗin
   bayananka (`%AppData%\MixMusic` a Windows, `~/Library/Application Support/MixMusic`
   a macOS, `~/.config/MixMusic` a Linux), wanda za ka iya ajiyewa tare da
   dotfiles ɗinka. Ka ajiye shi yayin da MixMusic yake aiki, sai ya fara aiki
-  nan da nan; Settings › Desktop › Settings file (Saituna › Desktop › Fayil
-  na saituna) yana buɗe shi.
+  nan da nan. *Settings › Desktop › Settings file*
+
+### Ajiyar kwafi, shigowa da fitarwa
+
+- **Ajiye kwafi da maido** ɗakin waƙoƙinka, saitunanka da ƙarin abubuwanka, da
+  hannu ko kai tsaye, a wannan kwamfutar ko wata. *Settings › Desktop ›
+  Backups*
+- **Shigo da playlist** daga fayiloli da daga bayananka na Spotify da Google,
+  da fitar da jeri da ɗakin waƙoƙinka zuwa fayilolin da sauran masu kunnawa
+  suke karantawa. *Ɗakin waƙoƙi › Mixes, Menu na More na shafi*
+
+### Sabuntawa
+
+- MixMusic yana duba sabuwar fitarwa a farawa da kuma bayan kowane ƴan saʼoʼi,
+  yana duba sa hannunta, yana kuma shigar da ita idan ka ce, ko da kansa idan
+  ka zaɓi haka. *Settings › About*
 
 ## Duba kewaye
 
@@ -163,10 +294,44 @@ biyu. MixMusic yana haɗa ayyukan biyu a cikin mai kunnawa guda ɗaya:
 <p align="center"><sub><b>Saurara.</b> A tsakiya, ana kunna アイドル na YOASOBI: kowane layi yana haskakawa yayin da ake rera shi, da romaji da fassara a ƙasansa. A hagu, albam; a dama, podcast da kake bi.</sub></p>
 
 <p align="center">
-  <img src="docs/look-yours.webp" alt="Ƙarin MixMusic, a tsaye a kan wani fage mai duhu yana fuskantarka: Settings › Appearance (Saituna › Kamanni) da tsare-tsare huɗun a tsakiya, an zagaye da hoda; jigon Material wanda murfin waƙar da ake kunnawa ya ba shi launi a hagu, da jigogin alʼumma na kasuwa a dama" />
+  <img src="docs/look-yours.webp" alt="Ƙarin MixMusic, a tsaye a kan wani fage mai duhu yana fuskantarka: Settings › Appearance da tsare-tsare huɗun a tsakiya, an zagaye da hoda; jigon Material wanda murfin waƙar da ake kunnawa ya ba shi launi a hagu, da jigogin alʼumma na kasuwa a dama" />
 </p>
 
 <p align="center"><sub><b>Ka mayar da shi naka.</b> A tsakiya, tsare-tsare huɗun: Blend, na asali, Expressive, Crate da Tiles, a ƙarƙashin jigogi. A hagu, jigon Material wanda yake ɗaukar launukansa daga murfin da ake kunnawa. A dama, jigogin alʼumma a kasuwa.</sub></p>
+
+## Takardu
+
+Jagororin suna a shafin yanar gizo, a
+[mixmusic.functionx.dev/docs](https://mixmusic.functionx.dev/docs/), da kuma a
+[fzn0x.github.io/mixmusic/docs](https://fzn0x.github.io/mixmusic/docs/),
+inda bincike yake samo kowanne daga cikinsu, da kuma a [`docs/`](docs) a nan.
+
+- **Farawa:** [Farawa](docs/getting-started.md),
+  [Siffofi](docs/features.md), [Asusu](docs/accounts.md),
+  [Spotify](docs/spotify.md), [Magance matsaloli](docs/troubleshooting.md)
+- **Amfani da MixMusic:** [Kunna kiɗa](docs/playing-music.md),
+  [Gida](docs/home.md), [Ɗakin waƙoƙinka](docs/library.md),
+  [Shigowa da fitar da playlist](docs/import-export.md),
+  [Kiɗa a wannan kwamfutar](docs/local-music.md),
+  [Kalmomin waƙa](docs/lyrics.md),
+  [Podcast](docs/podcasts.md), [Kamanni da jin daɗi](docs/look-and-feel.md),
+  [A kwamfuta](docs/desktop.md),
+  [Overlays don yawo kai tsaye](docs/stream-overlay.md),
+  [Kunna a wata naʼura](docs/casting.md),
+  [Sarrafa daga nesa](docs/remote-control.md),
+  [Saurare tare da abokai](docs/listen-with-friends.md),
+  [Mataimakan AI](docs/ai-assistants.md),
+  [Kasuwa](docs/marketplace.md), [Saituna](docs/settings.md)
+- **Yadda yake aiki:** [Yadda MixMusic yake aiki](docs/how-it-works.md),
+  [Injin sauti](docs/audio-engine.md),
+  [Inda rafukan sauti suke fitowa](docs/streams.md),
+  [Yadda ake kunna waƙoƙin Spotify](docs/spotify-playback.md),
+  [Bayananka da sirri](docs/data-and-privacy.md)
+- **Yi naka:** [Jigogi](docs/themes.md), [Plugin](docs/plugins.md)
+- **Aikin:** [Yabo](docs/credits.md), [Lasisi](docs/license.md),
+  [Gine-gine](docs/architecture/README.md),
+  [Gudummawa](CONTRIBUTING.md), [Kaʼidar ɗabiʼa](CODE_OF_CONDUCT.md),
+  [Tsaro](SECURITY.md)
 
 ## Shigarwa
 
@@ -187,7 +352,7 @@ Zazzage fayil ɗin tsarinka daga
 
 `<arch>` shi ne `amd64` don x64 da `arm64` don Arm. Kowace fitarwa tana da
 jerin `SHA256SUMS` don tabbatar da abubuwan da ka zazzage. Ba ka buƙatar
-fayilolin da ake kira `update-…`, `….delta`, `mixmusic-<version>-macos-…` ko
+fayilolin da ake kira `update-…`, `….delta`, `mixmusic-<version>-darwin-universal.tar.gz` ko
 `-windows-<arch>.tar.gz`: manhajojin da aka shigar suna sabuntawa daga gare
 su.
 
@@ -197,16 +362,19 @@ MixMusic yana gaya maka idan sabon sigar ta fito kuma yana zazzage maka ita.
 `mixmusic-bin` na AUR yana sabuntawa tare da sauran tsarinka. Don zip mai
 ɗaukuwa, buɗe shi a ko ina sannan ka buɗe `MixMusic.exe`. Don AppImage, mayar
 da shi mai aiwatarwa (`chmod +x`) sannan ka buɗe shi. Don Flatpak, buɗe shi da
-cibiyar manhajojin ka, ko ka gudanar da
+cibiyar manhajojinka, ko ka gudanar da
 `flatpak install ./mixmusic-<version>-linux-<arch>.flatpak`; a karon farko,
 Flatpak yana ɗauko GNOME runtime daga Flathub.
 
-A Mac, [Homebrew](https://brew.sh)
-yana shigar da MixMusic, kuma `brew upgrade` yana sabunta shi.
+A Mac, [Homebrew](https://brew.sh) yana shigar da MixMusic ma, kuma
+`brew upgrade` yana sabunta shi:
 
 ```sh
 brew install --cask fzn0x/tap/mixmusic
 ```
+
+[Farawa](docs/getting-started.md) yana jagorantarka a shigarwa da farawa na
+farko a kowane tsari.
 
 ### Farawa na farko
 
@@ -235,22 +403,44 @@ brew install --cask fzn0x/tap/mixmusic
   # Fedora
   sudo dnf install gtk3 pulseaudio-libs webkit2gtk4.1 libayatana-appindicator-gtk3 libsecret
   ```
+
+  MixMusic ba shi da font na haruffan Sinanci, Japananci da Koriyanci, kuma a
+  Linux harafin da babu wani font da aka shigar da shi yana bayyana a matsayin
+  fanko. `.deb` da `.rpm` suna neman ɗaya; da sauran, shigar da ɗaya da kanka
+  sannan ka sake kunna MixMusic:
+
+  ```sh
+  # Debian and Ubuntu
+  sudo apt install fonts-noto-cjk
+  # Fedora
+  sudo dnf install google-noto-sans-cjk-vf-fonts
+  # Arch
+  sudo pacman -S noto-fonts-cjk
+  ```
 - **Kowane tsari:** MixMusic yana samun sautin yawancin waƙoƙin YouTube Music
   da kansa. Don sauran, kamar waƙoƙin da aka yi wa yara, yana amfani da
   [yt-dlp](https://github.com/yt-dlp/yt-dlp), wanda yake shigar maka daga
-  Settings › Playback (Saituna › Kunnawa) kuma yake sabuntawa. yt-dlp yana
-  buƙatar JavaScript runtime: [Deno](https://deno.com), Node.js, Bun ko
-  QuickJS. Flatpak yana da Node.js.
+  Settings › Playback kuma yake sabuntawa. yt-dlp yana buƙatar JavaScript
+  runtime: [Deno](https://deno.com), Node.js, Bun ko QuickJS. Flatpak yana
+  da Node.js.
 
 ### Flatpak
 
 Flatpak yana gudanar da MixMusic a cikin keɓaɓɓen wuri, wanda yake ganin
-hanyar sadarwa, sabar sauti, allo da GPU, amma ba ya ganin babban fayil ɗin
-gidanka ko kaɗan. MixMusic yana adana saitunansa da ɗakin waƙoƙinsa a
+hanyar sadarwa, sabar sauti, allo da GPU, kuma ba ya ganin babban fayil ɗin
+gidanka sai bayanan martaba na burauzoz da aka shigar daga Flathub, a karantawa
+kawai, wanda za a iya shigo da shigar YouTube Music daga gare su. Yana zuwa
+don x64 da Arm64, kamar Raspberry Pi 5, Asahi Linux da kwamfutocin
+Snapdragon. MixMusic ba ya kan Flathub a yanzu: shigar da `.flatpak` na
+fitarwa.
+
+Flatpak yana adana saitunansa da ɗakin waƙoƙinsa a
 `~/.var/app/io.github.fzn0x.mixmusic`, a keɓe daga kwafin `.deb`, `.rpm`,
 AppImage ko kundi, kuma duka biyun na iya gudana a lokaci guda. Don kawo
-saituna da ɗakin waƙoƙin wani kwafi, rufe duka biyun, sannan ka kwafi
-`settings.json`, `library.json`, `queue.json`, `positions.json` da manyan
+saituna da ɗakin waƙoƙin wani kwafi, ajiye shi a Settings › Desktop › Backups
+sannan ka maido da fayil ɗin a Flatpak. Don kwafar fayilolin da hannu maimakon
+haka, rufe duka biyun, sannan ka kwafi `settings.json`, `library.json`,
+`plays.jsonl`, `local-copies.json`, `queue.json`, `positions.json` da manyan
 fayilolin `addons` da `mix-covers` daga `~/.config/MixMusic` zuwa
 `~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`. Ka rufe duka biyun da
 farko: MixMusic da ke aiki yana riƙe `library.json` da yawancin sauran
@@ -271,11 +461,11 @@ yake aiki a kwamfutarka.
 ### Asusu (duka na zaɓi ne)
 
 - **YouTube Music:** zaɓi Sign in to YouTube Music a Settings › Accounts
-  (Saituna › Asusu) sannan ka shiga Google a taga da ta buɗe. Abin da ka rubuta
+  sannan ka shiga Google a taga da ta buɗe. Abin da ka rubuta
   yana tafiya zuwa Google kaɗai. MixMusic yana adana zaman a ɓoye, da maɓalli
   a keyring na tsarinka idan akwai. Inda wannan taga ba za ta buɗe ba, ko
   Google ta ƙi ta, shiga da burauzarka, wadda MixMusic yake buɗewa da sabuwar
-  bayanan martaba nata kuma yake share ta da zarar ka shiga; ko ka shigo da
+  bayanan martaba nata kuma yake share ta da zarar ka shiga; ka shigo da
   zaman burauzar da ka shiga da ita (MixMusic yana karanta shi da yt-dlp
   ɗinsa, kuma yana riƙe da kukis na YouTube kaɗai); ko ka liƙa Cookie header
   na shafin music.youtube.com da aka shiga.
@@ -295,13 +485,27 @@ yake aiki a kwamfutarka.
 - **Discord:** muddin manhajar Discord tana aiki, bayananka suna nuna abin da
   kake saurara. Kashe shi a Settings › Desktop.
 
-Wani abu ba ya aiki? [docs/troubleshooting.md](docs/troubleshooting.md)
-yana ƙunshe da matsalolin da aka fi samu da kuma matsalolin da aka sani.
+[Asusu](docs/accounts.md) yana bayyana kowane matakin shiga mataki da mataki.
+
+### Iyakokin da aka sani
+
+- **Windows a kan Arm** ba a gwada shi sosai kamar x64, kuma zip mai ɗaukuwa
+  ba ya rajistar hanyoyin `mixmusic://`.
+- **Manhajojin Spotify a yanayin ci gaba,** kamar wadda kake shiga da ita,
+  suna ba da sakamakon bincike goma na kowane irin, kuma waƙoƙin playlist ɗin
+  da ba naka ba suna ɓoye.
+- **A Linux,** Spotify yana kunnawa ta Spotify Connect a asali, domin
+  WebKitGTK ba zai iya kunna sautin Spotify da aka kare ba.
+- **YouTube** na iya sauya mahaɗansa ya karya bincike, kunnawa ko shiga har
+  sai MixMusic ko yt-dlp sun cim masa.
+
+Wani abu ba ya aiki? [Magance matsaloli](docs/troubleshooting.md) yana ƙunshe
+da matsalolin da aka fi samu da kuma matsalolin da aka sani.
 
 ## Gina daga tushe
 
 Kana buƙatar [Go](https://go.dev/dl/) 1.27.3 ko sama da haka,
-[Bun](https://bun.sh) 1.2 ko sama da haka, wanda yake gudanar da layin umarni
+[Bun](https://bun.sh) 1.4 ko sama da haka, wanda yake gudanar da layin umarni
 na MyGo, da Git. MyGo ba ya buƙatar C compiler, don haka kowane tsari na iya
 gina MixMusic ga kowane tsari.
 
@@ -364,9 +568,10 @@ bun run dev
 ### Nix
 
 Da [Nix](https://nixos.org), `nix develop` yana ba ka kayan aikin da ake gina
-fitarwa da su, a sigogin da `flake.lock` ya kulle: Go, Bun, NSIS, GoReleaser
-da Zola. `nix build` yana gina MixMusic don Linux daga tushe, zuwa cikin
-`result/`.
+fitarwa da su, a sigogin da `flake.lock` ya kulle: Go 1.27, Bun, GoReleaser,
+jq, zip da Zola, kuma a Linux NSIS, osslsigncode da binutils. `nix build`
+yana gina MixMusic don Linux daga tushe, zuwa cikin `result/`, kuma
+`nix run github:fzn0x/mixmusic` yana gudanar da shi.
 
 ### Haɓakawa
 
@@ -389,14 +594,15 @@ suke yi. `bun run build` kawai a can yana yin shirin Linux wanda yake neman
 loader na Nix, kuma yana farawa ne kawai a NixOS.
 `go run ./tools/elfloader build/linux-amd64` yana duba gini.
 
-[Shafin yanar gizo](https://fzn0x.github.io/mixmusic/) yana cikin `site/`,
+[Shafin yanar gizo](https://mixmusic.functionx.dev/) yana cikin `site/`,
 an gina shi da [Zola](https://www.getzola.org), kuma jagororin da ke cikin
 `docs/` su ne shafukansa na `/docs/`. `go run ./tools/sitedocs && zola --root site serve`
 yana nuna shi kafin a buga. Ana gina fitarwa a cikin Nix shell kuma
 [GoReleaser](https://goreleaser.com) ne yake bugawa (`.goreleaser.yaml`).
 
-[docs/architecture](docs/architecture/README.md) yana bayyana yadda sassan
-suke haɗuwa.
+[CONTRIBUTING.md](CONTRIBUTING.md) yana da gwaje-gwajen da za a gudanar kafin
+pull request, kuma [docs/architecture](docs/architecture/README.md) yana
+bayyana yadda sassan suke haɗuwa, shafi ɗaya ga kowanne.
 
 ### Tsari
 
@@ -409,25 +615,46 @@ rubuta su a
 *.go                 the app and its windows: the pages, the player bar, the
                      mini player, the tray, media keys, deep links
 fonts/               the typefaces the windows draw with
+locales/             the app's words, in English and 66 other languages
 internal/app         the services the windows call, and the desktop integration
 internal/player      the queue, played by the audio engine or on Spotify's devices
 internal/audio       MixMusic's audio engine, and the system's audio output
-internal/plugins     plugins, each in a JavaScript engine of its own
+internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/youtube     YouTube Music's catalog, and your account there
 internal/spotify     the Spotify Web API, its sign-in and Spotify Connect
-internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/match       Spotify tracks matched to their YouTube Music recordings
-internal/romaji      Japanese lyrics in romaji, kanji read by kagome
 internal/library     liked and disliked songs, mixes, history and stats
-internal/lastfm      scrobbling to Last.fm
+internal/localfiles  the music on this computer; tags and tagwrite, its tags
+internal/romaji      Japanese lyrics in romaji, kanji read by kagome;
+                     romanize, the Latin letters of other scripts
+internal/cast        casting to Chromecasts; upnp, to DLNA renderers; fcast,
+                     to FCast receivers; dnssd finds them on the network
+internal/room        Listen with friends; remote, remote control; portmap,
+                     the router's forwarded port
+internal/mcp         AI assistants, over the Model Context Protocol
+internal/lastfm      scrobbling to Last.fm; listenbrainz and librefm, to
+                     theirs; scrobble, which plays count
 internal/discord     what plays, on your Discord profile
-internal/diag        the log, without secrets, and the reports of crashes
+internal/plugins     plugins, each in a JavaScript engine of its own
 internal/addons      themes and plugins, and the community registry
+internal/backup      backups and restores; playlistio and export, the files
+                     of lists and tracks in and out
+internal/diag        the log, without secrets, and the reports of crashes
+internal/settings    your preferences and their defaults
 builtin/themes       the themes MixMusic ships with
-public/              the page of Spotify's player, on Windows
+public/              the pages MyGo embeds: Spotify's player, on Windows and
+                     macOS, and the picture of music videos
 sdk/                 the types of the plugin API
 community/           community themes and plugins, and their registry
+docs/                the guides, the website's /docs/ pages
+site/                the website, built with Zola
+tools/               the commands that build and check the repository's parts
+packaging/, nix/     the Flatpak, Flathub, AUR and Homebrew packages, and Nix
+changelog.d/         the changelog entries of what isn't released yet
 ```
+
+[docs/architecture](docs/architecture/README.md) yana bayyana sauran packages
+na `internal/`, shafi ɗaya ga kowane sashe na manhajar.
 
 Packages ɗin da za ka iya shigowa da su:
 
@@ -435,6 +662,8 @@ Packages ɗin da za ka iya shigowa da su:
 opus/                an Opus decoder in pure Go, a port of libopus's
 aac/                 an AAC-LC decoder in pure Go
 ac3/                 an AC-3 and E-AC-3 decoder in pure Go, written from ATSC A/52
+flac/                a FLAC decoder in pure Go, as RFC 9639 has it
+ogg/                 the packets of Ogg files, as RFC 3533 has them
 webm/                the audio of WebM files: packets, times and seeking
 mp4/                 the audio of MP4 files: packets, times and seeking
 resample/            sample rate conversion, with Kaiser-windowed sincs
@@ -467,12 +696,12 @@ da [spectrum](community/plugins/spectrum) na alʼumma misalai ne masu aiki.
 ### Raba shi
 
 1. Yi fork na wannan repository.
-2. Ƙara babban fayil guda ɗaya: `community/themes/<id>/` don jigo, ko
-   `community/plugins/<id>/` don plugin, tare da `plugin.json` da
-   `index.ts` ɗinsa.
-3. Gudanar da `bun run build:plugins`, `go run ./tools/registry` da
-   `go run ./tools/registry -check`.
-4. Buɗe pull request.
+2. Ƙara babban fayil guda ɗaya: `community/themes/<id>/` tare da
+   `theme.json` ɗinsa don jigo, ko `community/plugins/<id>/` tare da
+   `plugin.json` da `index.ts` ɗinsa don plugin.
+3. Gudanar da `bun install`, `bun run build:plugins`, `go run ./tools/registry`
+   da `go run ./tools/registry -check`.
+4. Buɗe pull request, tare da hoton allo.
 
 Da zarar an haɗa shi, CI yana buga shi a
 [reshen registry](https://github.com/fzn0x/mixmusic/tree/registry), kuma
@@ -487,28 +716,34 @@ da:
 - **YouTube da Google:** kundin YouTube Music, rafukansa da yadda kowace waƙa
   take da ƙara, ana tambaya yayin da ba a shiga ba, da hotunan murfi; wasu
   rafuka ta yt-dlp. Idan an shiga, ɗakin waƙoƙinka a can, kuma, sai dai ka
-  kashe a Settings › Accounts (Saituna › Asusu), waƙoƙin da kake kunnawa, waɗanda
-  suke shiga tarihin YouTube Music ɗinka.
+  kashe a Settings › Accounts, waƙoƙin da kake kunnawa, waɗanda suke shiga
+  tarihin YouTube Music ɗinka. YouTube kansa, ba tare da shiga ba kuma ba
+  tare da kukis ba, don zaɓin bincike na YouTube, duba waƙoƙin da aka yi da
+  AI, rubutun bidiyo a matsayin kalmomin waƙa da rubutun furuci, da kalmomin
+  waƙa da aka daidaita da bidiyon waƙa.
 - **Spotify,** da zarar ka shiga: ɗakin waƙoƙinka, naʼurorinka na Spotify
   Connect, da mai kunnawa na Spotify, wanda ake lodawa daga `sdk.scdn.co`,
   idan Spotify yana kunnawa a MixMusic.
+- **Better Lyrics:** taken waƙar da ake kunnawa, mawaƙinta na farko, albam
+  ɗinta da tsawonta, don samo kalmomin waƙarta, da zarar tana da albam da
+  tsawo.
 - **Unison:** ID ɗin bidiyon waƙar da ake kunnawa, ko, idan babu shi, taken
   waƙar, mawaƙanta, albam ɗinta da tsawonta, don samo kalmomin waƙarta. Sai
-  yayin da ka kunna fassara, ko rubuta da haruffan Latin, a gefen kalmomin
-  waƙa, kalmomin waƙar da ake kunnawa, tare da ID ɗin bidiyonta, waɗanda
-  Unison yake sa Google ta fassara.
+  yayin da ka kunna fassara, ko rubuta Larabci da haruffan Latin, a gefen
+  kalmomin waƙa, kalmomin waƙar da ake kunnawa, tare da ID ɗin bidiyonta,
+  waɗanda Unison yake sa Google ta fassara ko ta rubuta da haruffan Latin.
 - **LRCLIB:** taken waƙar da ake kunnawa, mawaƙanta, albam ɗinta da tsawonta,
   don samo kalmomin waƙarta.
-- **SponsorBlock:** sai yayin da ka kunna Skip the parts SponsorBlock marks
-  (Tsallake sassan da SponsorBlock ya yi wa alama): haruffa 4 na farko na
-  hash ɗin ID ɗin kowane bidiyo, ba ID ɗin kansa ba, don samo sassan da ya
-  yi wa alama.
+- **SponsorBlock,** sai yayin da ka kunna Skip the parts SponsorBlock marks:
+  haruffa 4 na farko na hash ɗin ID ɗin kowane bidiyo, ba ID ɗin kansa ba,
+  don samo sassan da ya yi wa alama.
 - **GitHub:** duba sabuwar sigar a farawa da kuma bayan kowane ƴan saʼoʼi,
-  wanda za ka iya kashewa a Settings › About (Saituna › Game da); rajistar
-  alʼumma idan ka buɗe kasuwa; abubuwan zazzagewa na yt-dlp; kuma, a karon
-  farko da ka kunna romaji a gefen kalmomin waƙar Japananci, ƙamus ɗin
-  karatun kanji (11.7 MB). Ana yin romaji a kwamfutarka: ba a aika kalmomin
-  waƙar.
+  wanda za ka iya kashewa a Settings › About; rajistar alʼumma idan ka buɗe
+  kasuwa; abubuwan zazzagewa na yt-dlp; jerin belun kunne na AutoEq da
+  bayanin da ka zaɓa; kuma, a karon farko da ka kunna romaji a gefen
+  kalmomin waƙar Japananci, ƙamus ɗin karatun kanji (11.7 MB). Ana yin
+  romaji, da haruffan Latin na sauran rubutu in ban da Larabci, a
+  kwamfutarka: ba a aika kalmomin waƙar.
 - **Last.fm,** da zarar ka haɗa shi: abin da kake kunnawa.
 - **ListenBrainz,** ko sabarka ta kanka mai API ɗinsa, da zarar ka haɗa
   shi: abin da kake kunnawa.
@@ -516,14 +751,33 @@ da:
   kunnawa.
 - **Discord,** sai dai ka kashe shi: abin da ake kunnawa, ana aika shi zuwa
   manhajar Discord a kwamfutarka, wadda take nuna shi a bayananka.
+- **Naʼurorin da kake kunna wa,** a hanyar sadarwarka: taken waƙa, mawaƙi da
+  murfin abin da ake kunnawa. Suna ɗauko sautin daga MixMusic.
+- **Sauran kwamfutoci masu MixMusic,** don sarrafa daga nesa da Saurare tare
+  da abokai, a ɓoye, a hanyar sadarwarka ko, yayin da kake barin abokai a
+  wajenta su shiga, ta intanet. Sai a nemi router ɗinka ya tura tashar jiragen
+  ruwa ɗaya, kuma hanyar gayyatarka tana ɗauke da adireshin intanet ɗinka.
+- **Mataimakan AI** a kwamfutarka, yayin da ka ba su izini: abin da ake
+  kunnawa, jerin gaba, sakamakon bincikensu da sunayen playlist ɗinka, wanda
+  mataimaki na iya mikawa ga samfurin AI da yake amfani da shi.
+- **YouTube da Spotify,** don sanin ko hanyar sadarwa tana amsawa: buƙata ta
+  HTTPS don amsa mara komai.
+
+Plugin na iya aika duk abin da suke so: ana nuna maka izinin plugin, ba a tilasta
+shi, shi ya sa MixMusic yake neman ka amince da plugin kafin ya kunna shi.
+[Bayananka da sirri](docs/data-and-privacy.md#what-each-feature-sends-where)
+yana da tebur na abin da kowace siffa take aikawa da inda.
 
 Abin da yake adanawa a kwamfutarka:
 
 - Saitunanka da ɗakin waƙoƙinka (waƙoƙin da ka so da waɗanda ka ƙi, mixes,
-  tarihi da binciken kwanan nan), a babban fayil ɗin da Settings › About ya
+  kowane kunnawa da ƙididdigarka take ƙirgawa, mawaƙa da shirye-shiryen da
+  kake bi, maƙalli, manyan fayiloli da alamomi, tarihi, binciken kwanan nan,
+  da ƙundin fayilolin kiɗanka), a babban fayil ɗin da Settings › About ya
   ambata.
 - Waƙoƙin da ka kunna, a cikin maʼajiya, gwargwadon abin da ka yarda a
-  Settings › Playback, da yadda YouTube ya auna ƙararsu.
+  Settings › Playback, da yadda YouTube ya auna ƙararsu. Waƙoƙin da ka
+  zazzage, a babban fayil ɗin zazzagewa.
 - Murfunan da ka gani, har zuwa 256 MB.
 - Fassarar kalmomin waƙar da ka kunna, bisa waƙa da harshe, da ƙamus ɗin da
   romaji yake karanta kanji da shi, da zarar ka kunna shi.
@@ -535,6 +789,9 @@ Abin da yake adanawa a kwamfutarka:
 
 Shafin tarihi na ɗakin waƙoƙi yana goge abin da ka kunna, Settings › Playback
 yana goge maʼajiya da murfuna, kuma fita daga wani aiki yana share shigarsa.
+[Goge, mayar ko sake farawa](docs/data-and-privacy.md#clear-move-or-reset)
+yana bayyana yadda ake mayar da bayananka, ajiye kwafi mai ɗaukuwa da
+`MIXMUSIC_DATA_DIR`, ko fara sabo.
 
 A Windows, visualizer yana jin sautin Spotify da ake kunnawa a wannan
 kwamfutar, a MixMusic ko a manhajar Spotify, ta process loopback na Windows,
@@ -573,6 +830,12 @@ An gina MixMusic a kan waɗannan ayyuka:
   AppImage.
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**, wanda yake samo sautin
   waƙoƙin da MixMusic ba zai iya samowa da kansa ba.
+- **[SponsorBlock](https://sponsor.ajay.app)**, buɗaɗɗen rumbun bayanai na
+  sassan bidiyon YouTube da jamaʼa ke bayarwa, na Ajay Ramachandran da
+  masu ba da gudummawarsa, wanda MixMusic yake tsallake sassansa idan ka
+  roƙe shi. Uses SponsorBlock data licensed under
+  [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+  from https://sponsor.ajay.app/.
 - **[Better Lyrics](https://betterlyrics.org)**, sabis da ke adana kalmomin waƙa masu daidaita kalma bayan kalma.
 - **[Unison](https://unison.betterlyrics.org)**, buɗaɗɗen maʼajiyar kalmomin
   waƙa da jamaʼa ke bayarwa, a ƙarƙashin Unison Community License, da **[LRCLIB](https://lrclib.net)**,
@@ -587,6 +850,17 @@ An gina MixMusic a kan waɗannan ayyuka:
   decoder na Opus, da **[SharpJaad](https://github.com/jimm98y/SharpJaad)**,
   fassarar C# ta [JAAD](https://sourceforge.net/projects/jaadec/) wadda
   decoder na AAC ya samo asali daga gare ta.
+- **[Chromium](https://www.chromium.org)**, Web Audio nasa, wanda biquad,
+  DynamicsCompressor da AnalyserNode ɗinsa su ne tushen matattarun equalizer,
+  daidaita ƙarar sauti da visualizer.
+- **[AutoEq](https://github.com/jaakkopasanen/AutoEq)**, na Jaakko Pasanen
+  da masu ba da gudummawarsa, wanda bayanansa suke gyara sautin belun kunne,
+  a tsarin [Equalizer APO](https://sourceforge.net/projects/equalizerapo/).
+- **[go-mp3](https://github.com/hajimehoshi/go-mp3)** da
+  **[jfreymuth/vorbis](https://github.com/jfreymuth/vorbis)**, waɗanda suke
+  decoding na fayilolin MP3 da Vorbis a kwamfutarka, da
+  **[Xiph.Org](https://xiph.org)**, wanda `flac` da `ogg` suke karanta FLAC
+  da Ogg ɗinsa.
 - **[FFmpeg](https://ffmpeg.org)**, wanda gwaje-gwajen decoders suke kwatantawa
   da shi.
 - **[Selawik](https://github.com/microsoft/Selawik)**,
@@ -603,20 +877,26 @@ An gina MixMusic a kan waɗannan ayyuka:
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), yake kunnawa a
   shafin yanar gizo.
 
+[Yabo](docs/credits.md) yana ambaton kowane aiki, takarda da maʼauni da
+MixMusic yake ginuwa a kansu.
+
 ## Gudummawa
 
 Gyare-gyare, sabbin siffofi, jigogi, plugin da rahotannin kurakurai duka ana
 maraba da su.
 
-- **Ba da rahoton matsala** daga Settings › About › report a problem
-  (Saituna › Game da › ba da rahoton matsala). Yana buɗe sabon issue na GitHub
-  da sigarka, tsarinka, jigonka da plugin ɗinka a cike. Ko kuma
-  [buɗe issue](https://github.com/fzn0x/mixmusic/issues/new) da kanka.
+- **Ba da rahoton matsala** daga Settings › About › report a problem. Yana
+  buɗe sabon issue na GitHub da sigarka, tsarinka, jigonka da plugin ɗinka a
+  cike. Ko kuma [buɗe issue](https://github.com/fzn0x/mixmusic/issues/new)
+  da kanka.
 - **Aika canji** a matsayin pull request. [CONTRIBUTING.md](CONTRIBUTING.md)
   yana bayyana gwaje-gwajen da za a gudanar, salon commit, da shigar jerin
   canje-canje da canjin da mutane za su lura da shi yake buƙata.
 - **Raba jigo ko plugin:** duba [Ƙungiya](#ƙungiya).
+- **Ba da rahoton rauni na tsaro** a asirce, yadda [SECURITY.md](SECURITY.md)
+  ya bayyana.
 
+Duk wanda yake shiga cikin aikin yana bin [kaʼidar ɗabiʼa](CODE_OF_CONDUCT.md).
 [CONTRIBUTORS.md](CONTRIBUTORS.md) yana gode wa mutanen da lambarsu,
 raʼayoyinsu da rahotanninsu suka tsara MixMusic.
 
@@ -633,7 +913,10 @@ Open Font License: [na Selawik](fonts/OFL.txt),
 a ƙarƙashin [lasisin BSD ɗinsa](opus/LICENSE.libopus), decoder na AAC ya samo
 asali daga SharpJaad, a ƙarƙashin [lasisin MIT ɗinsa](aac/LICENSE.sharpjaad),
 kuma kimiyyar launi ta HCT fassara ce ta Material Color Utilities, a ƙarƙashin
-[lasisin Apache ɗinsa](internal/hct/LICENSE.material-color-utilities).
+[lasisin Apache ɗinsa](internal/hct/LICENSE.material-color-utilities). Sauran
+sassa suna riƙe lasisin abin da suka samo asali daga gare shi, kamar matattarun
+Web Audio na Chromium, go-mp3, jfreymuth/vorbis, kagome da bayanan Unihan:
+[Lasisi](docs/license.md) yana lissafa kowanne.
 
 MixMusic ba shi da alaƙa da Spotify ko Google, kuma ba su amince da shi ko
 sun ɗauki nauyinsa ba. Yana kunna abin da waɗannan ayyuka suke bai wa

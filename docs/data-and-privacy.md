@@ -283,8 +283,8 @@ Where the credential store can't keep a secret:
 **To bring your data to another copy**, as to another computer or into
 the Flatpak, [back it up](#back-up-and-restore) there and restore the
 file here. By hand, quit both copies, copy `settings.json`, `library.json`,
-`queue.json`, `positions.json` and the `addons` and `mix-covers` folders
-into the other copy's data folder, and sign in to your accounts again
+`plays.jsonl`, `local-copies.json`, `queue.json`, `positions.json` and the
+`addons` and `mix-covers` folders into the other copy's data folder, and sign in to your accounts again
 there: sign-ins stay in the credential store of the computer they were
 made on. Both must be quit, because a running MixMusic keeps
 `library.json` and most other files in memory and writes over a copied

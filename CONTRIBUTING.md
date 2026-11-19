@@ -12,7 +12,7 @@ plugin: a pull request adding one folder.
 
 ## The app
 
-You need [Go](https://go.dev/dl/) 1.27.3 or later and [Bun](https://bun.sh) 1.2 or later.
+You need [Go](https://go.dev/dl/) 1.27.3 or later and [Bun](https://bun.sh) 1.4 or later, which reads `bun.lock`.
 
 ```sh
 git clone https://github.com/fzn0x/mixmusic

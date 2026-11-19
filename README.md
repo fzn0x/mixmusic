@@ -489,7 +489,7 @@ the common problems and the known issues.
 ## Build from source
 
 You need [Go](https://go.dev/dl/) 1.27.3 or later, [Bun](https://bun.sh)
-1.2 or later, which runs MyGo's command line, and Git. MyGo needs no C
+1.4 or later, which runs MyGo's command line, and Git. MyGo needs no C
 compiler, so any system builds MixMusic for every system.
 
 ### Windows
@@ -550,9 +550,10 @@ bun run dev
 ### Nix
 
 With [Nix](https://nixos.org), `nix develop` gives you the tools releases
-are built with, at the versions `flake.lock` pins: Go, Bun, NSIS,
-GoReleaser and Zola. `nix build` builds MixMusic for Linux from source,
-into `result/`.
+are built with, at the versions `flake.lock` pins: Go 1.27, Bun,
+GoReleaser, jq, zip and Zola, and on Linux NSIS, osslsigncode and
+binutils. `nix build` builds MixMusic for Linux from source, into
+`result/`, and `nix run github:fzn0x/mixmusic` runs it.
 
 ### Develop
 
@@ -575,14 +576,15 @@ In the Nix shell, build Linux downloads with
 and it starts only on NixOS. `go run ./tools/elfloader build/linux-amd64`
 checks a build.
 
-The [website](https://fzn0x.github.io/mixmusic/) is in `site/`, built with
+The [website](https://mixmusic.functionx.dev/) is in `site/`, built with
 [Zola](https://www.getzola.org), and the guides in `docs/` are its
 `/docs/` pages. `go run ./tools/sitedocs && zola --root site serve`
 previews it. Releases are built in the Nix shell and published by
 [GoReleaser](https://goreleaser.com) (`.goreleaser.yaml`).
 
-[docs/architecture](docs/architecture/README.md) explains how the parts fit
-together.
+[CONTRIBUTING.md](CONTRIBUTING.md) has the checks to run before a pull
+request, and [docs/architecture](docs/architecture/README.md) explains how
+the parts fit together, a page for each.
 
 ### Layout
 
@@ -594,25 +596,46 @@ packages outside `internal/` are for anyone to import, and documented on
 *.go                 the app and its windows: the pages, the player bar, the
                      mini player, the tray, media keys, deep links
 fonts/               the typefaces the windows draw with
+locales/             the app's words, in English and 66 other languages
 internal/app         the services the windows call, and the desktop integration
 internal/player      the queue, played by the audio engine or on Spotify's devices
 internal/audio       MixMusic's audio engine, and the system's audio output
-internal/plugins     plugins, each in a JavaScript engine of its own
+internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/youtube     YouTube Music's catalog, and your account there
 internal/spotify     the Spotify Web API, its sign-in and Spotify Connect
-internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/match       Spotify tracks matched to their YouTube Music recordings
-internal/romaji      Japanese lyrics in romaji, kanji read by kagome
 internal/library     liked and disliked songs, mixes, history and stats
-internal/lastfm      scrobbling to Last.fm
+internal/localfiles  the music on this computer; tags and tagwrite, its tags
+internal/romaji      Japanese lyrics in romaji, kanji read by kagome;
+                     romanize, the Latin letters of other scripts
+internal/cast        casting to Chromecasts; upnp, to DLNA renderers; fcast,
+                     to FCast receivers; dnssd finds them on the network
+internal/room        Listen with friends; remote, remote control; portmap,
+                     the router's forwarded port
+internal/mcp         AI assistants, over the Model Context Protocol
+internal/lastfm      scrobbling to Last.fm; listenbrainz and librefm, to
+                     theirs; scrobble, which plays count
 internal/discord     what plays, on your Discord profile
-internal/diag        the log, without secrets, and the reports of crashes
+internal/plugins     plugins, each in a JavaScript engine of its own
 internal/addons      themes and plugins, and the community registry
+internal/backup      backups and restores; playlistio and export, the files
+                     of lists and tracks in and out
+internal/diag        the log, without secrets, and the reports of crashes
+internal/settings    your preferences and their defaults
 builtin/themes       the themes MixMusic ships with
-public/              the page of Spotify's player, on Windows
+public/              the pages MyGo embeds: Spotify's player, on Windows and
+                     macOS, and the picture of music videos
 sdk/                 the types of the plugin API
 community/           community themes and plugins, and their registry
+docs/                the guides, the website's /docs/ pages
+site/                the website, built with Zola
+tools/               the commands that build and check the repository's parts
+packaging/, nix/     the Flatpak, Flathub, AUR and Homebrew packages, and Nix
+changelog.d/         the changelog entries of what isn't released yet
 ```
+
+[docs/architecture](docs/architecture/README.md) tells of the other
+packages of `internal/`, a page for each part of the app.
 
 The packages you can import:
 
@@ -620,6 +643,8 @@ The packages you can import:
 opus/                an Opus decoder in pure Go, a port of libopus's
 aac/                 an AAC-LC decoder in pure Go
 ac3/                 an AC-3 and E-AC-3 decoder in pure Go, written from ATSC A/52
+flac/                a FLAC decoder in pure Go, as RFC 9639 has it
+ogg/                 the packets of Ogg files, as RFC 3533 has them
 webm/                the audio of WebM files: packets, times and seeking
 mp4/                 the audio of MP4 files: packets, times and seeking
 resample/            sample rate conversion, with Kaiser-windowed sincs

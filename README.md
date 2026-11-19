@@ -698,7 +698,9 @@ talks to:
   each track is, asked for while signed out, and the artwork; some streams
   through yt-dlp. Signed in, your library there, and, unless you turn it
   off in Settings › Accounts, the tracks you play, which join your YouTube
-  Music history.
+  Music history. YouTube itself, signed out and with no cookies, for the
+  YouTube choice of search, the check for songs made with AI, captions as
+  lyrics and transcripts, and lyrics timed to music videos.
 - **Spotify,** once you sign in: your library, your Spotify Connect devices,
   and Spotify's player, loaded from `sdk.scdn.co`, when Spotify plays in
   MixMusic.
@@ -706,8 +708,9 @@ talks to:
   that plays, to find its lyrics, once it has an album and a length.
 - **Unison:** the video ID of the track that plays, or, without one, its
   title, artists, album and length, to find its lyrics. Only while you
-  turn on translate, or romanize, beside the lyrics, the lyrics of the
-  track that plays, with its video ID, which Unison has Google translate.
+  turn on translate, or romanize Arabic, beside the lyrics, the lyrics of
+  the track that plays, with its video ID, which Unison has Google
+  translate or romanize.
 - **LRCLIB:** the title, artists, album and length of the track that plays,
   to find its lyrics.
 - **SponsorBlock,** while you turn on Skip the parts SponsorBlock marks:
@@ -715,10 +718,11 @@ talks to:
   find the parts it marks.
 - **GitHub:** a check for a new version at start and every few hours,
   which you can turn off in Settings › About; the community registry when
-  you open the marketplace; the downloads of yt-dlp; and, the first time
-  you turn on romaji beside Japanese lyrics, the dictionary of the
-  readings of kanji (11.7 MB). Romaji is made on your computer: the
-  lyrics aren't sent.
+  you open the marketplace; the downloads of yt-dlp; AutoEq's list of
+  headphones and the profile you pick; and, the first time you turn on
+  romaji beside Japanese lyrics, the dictionary of the readings of kanji
+  (11.7 MB). Romaji, and the Latin letters of other scripts but Arabic,
+  are made on your computer: the lyrics aren't sent.
 - **Last.fm,** once you connect it: what you play.
 - **ListenBrainz,** or your own server of its API, once you connect it:
   what you play.
@@ -726,13 +730,32 @@ talks to:
   play.
 - **Discord,** unless you turn it off: what plays, sent to the Discord app
   on your computer, which shows it on your profile.
+- **The devices you cast to,** on your network: the title, artist and cover
+  of what plays. They fetch the audio from MixMusic.
+- **Other computers with MixMusic,** for remote control and Listen with
+  friends, encrypted, on your network or, while you let friends outside it
+  join, over the internet. Then your router is asked to forward one port,
+  and your invite link carries your internet address.
+- **AI assistants** on your computer, while you let them: what plays, the
+  queue, the results of their searches and the names of your playlists,
+  which an assistant may pass on to the AI model it uses.
+- **YouTube and Spotify,** to learn whether the network answers: a request
+  over HTTPS for an empty answer.
+
+Plugins can send what they like: a plugin's permissions are shown to you,
+not enforced, which is why MixMusic asks you to trust a plugin before it
+enables it. [Your data and privacy](docs/data-and-privacy.md#what-each-feature-sends-where)
+has a table of what each feature sends where.
 
 What it keeps on your computer:
 
-- Your settings and library (liked and disliked songs, mixes, history and
-  recent searches), in the folder Settings › About names.
+- Your settings and library (liked and disliked songs, mixes, every play
+  your stats count, followed artists and shows, pins, folders and tags,
+  history, recent searches, and the index of your music files), in the
+  folder Settings › About names.
 - The tracks you played, in the cache, as much as you allow in Settings ›
-  Playback, and how loud YouTube measured them.
+  Playback, and how loud YouTube measured them. The songs you download, in
+  the downloads folder.
 - The covers you saw, up to 256 MB.
 - The translations of lyrics you turned on, by track and language, and
   the dictionary romaji reads kanji with, once you turned it on.
@@ -744,7 +767,9 @@ What it keeps on your computer:
 
 The library's history page clears what you played, Settings › Playback
 clears the cache and the covers, and signing out of a service deletes its
-sign-in.
+sign-in. [Clear, move or reset](docs/data-and-privacy.md#clear-move-or-reset)
+tells how to move your data, keep a portable copy with
+`MIXMUSIC_DATA_DIR`, or start afresh.
 
 On Windows, the visualizer hears the audio of Spotify playing on this
 computer, in MixMusic or in the Spotify app, through Windows' process

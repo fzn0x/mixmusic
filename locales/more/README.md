@@ -16,7 +16,7 @@ of `locales/` alone, and not this folder. So:
   layout.
 - The Windows installer, the languages macOS lists for the app and the
   Linux desktop entry don't know these languages: there MixMusic is named
-  in English. MyGo 0.8.1's Windows build fails for a language its
+  in English. MyGo 0.10.0's Windows build fails for a language its
   installer's table lacks, such as Hindi, Bengali, Urdu, Hausa, Amharic,
   Tamil, Telugu, Swahili and Filipino, so those stay here.
 

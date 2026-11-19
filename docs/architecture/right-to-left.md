@@ -5,7 +5,7 @@ are, the windows are laid out mirrored (#564): the rail on the right, rows
 from the right, the side panel on the left, and back arrows pointing right.
 MyGo lays a window out in the direction of the app's language, and mirrors
 rows, columns, the start and end forms of edges and its own controls
-([its guide](https://github.com/egoist/mygo/blob/v0.8.1/docs/ui/right-to-left.md)).
+([its guide](https://github.com/egoist/mygo/blob/v0.10.0/docs/ui/right-to-left.md)).
 It mirrors neither physical edges nor what an app draws, so the views
 follow a few rules:
 

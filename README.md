@@ -338,7 +338,7 @@ Download the file for your system from the
 
 `<arch>` is `amd64` for x64 and `arm64` for Arm. Each release lists
 `SHA256SUMS` to check the downloads with. You don't need the files named
-`update-…`, `….delta`, `mixmusic-<version>-macos-…` or
+`update-…`, `….delta`, `mixmusic-<version>-darwin-universal.tar.gz` or
 `-windows-<arch>.tar.gz`: installed apps update from them.
 
 The installers, the portable zip and the Linux archive update themselves.
@@ -357,6 +357,9 @@ On a Mac, [Homebrew](https://brew.sh) installs MixMusic too, and
 ```sh
 brew install --cask fzn0x/tap/mixmusic
 ```
+
+[Getting started](docs/getting-started.md) walks through the install and
+the first launch on each system.
 
 ### The first launch
 
@@ -385,6 +388,20 @@ brew install --cask fzn0x/tap/mixmusic
   # Fedora
   sudo dnf install gtk3 pulseaudio-libs webkit2gtk4.1 libayatana-appindicator-gtk3 libsecret
   ```
+
+  MixMusic carries no font for Chinese, Japanese and Korean letters, and on
+  Linux a letter that no installed font has shows as blank space. The
+  `.deb` and the `.rpm` ask for one; with the others, install one yourself
+  and restart MixMusic:
+
+  ```sh
+  # Debian and Ubuntu
+  sudo apt install fonts-noto-cjk
+  # Fedora
+  sudo dnf install google-noto-sans-cjk-vf-fonts
+  # Arch
+  sudo pacman -S noto-fonts-cjk
+  ```
 - **Every system:** MixMusic finds the audio of most YouTube Music tracks
   itself. For the rest, such as tracks made for children, it uses
   [yt-dlp](https://github.com/yt-dlp/yt-dlp), which it installs for you
@@ -395,12 +412,20 @@ brew install --cask fzn0x/tap/mixmusic
 ### The Flatpak
 
 The Flatpak runs MixMusic in a sandbox, which sees the network, the sound
-server, the display and the GPU, and none of your home folder. MixMusic
-keeps its settings and library in `~/.var/app/io.github.fzn0x.mixmusic`,
-apart from a `.deb`, `.rpm`, AppImage or archive copy, and both can run at
-once. To bring a copy's settings and library over, quit both, then copy
-`settings.json`, `library.json`, `queue.json`, `positions.json` and the
-`addons` and `mix-covers` folders from `~/.config/MixMusic` into
+server, the display and the GPU, and none of your home folder but the
+profiles of browsers installed from Flathub, read only, which a YouTube
+Music sign-in can be imported from. It comes for x64 and for Arm64, such
+as the Raspberry Pi 5, Asahi Linux and Snapdragon laptops. MixMusic isn't
+on Flathub for now: install the release's `.flatpak`.
+
+The Flatpak keeps its settings and library in
+`~/.var/app/io.github.fzn0x.mixmusic`, apart from a `.deb`, `.rpm`,
+AppImage or archive copy, and both can run at once. To bring a copy's
+settings and library over, back it up in Settings › Desktop › Backups and
+restore the file in the Flatpak. To copy the files by hand instead, quit
+both, then copy `settings.json`, `library.json`, `plays.jsonl`,
+`local-copies.json`, `queue.json`, `positions.json` and the `addons` and
+`mix-covers` folders from `~/.config/MixMusic` into
 `~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`. Quit both first:
 a running MixMusic keeps `library.json` and most other files in memory
 and writes over a copied one at its next save. Then sign in to your
@@ -444,8 +469,22 @@ desktop.
 - **Discord:** while the Discord app runs, your profile shows what you
   listen to. Turn it off in Settings › Desktop.
 
-Something not working? [docs/troubleshooting.md](docs/troubleshooting.md)
-covers the common problems and the known issues.
+[Accounts](docs/accounts.md) tells each sign-in step by step.
+
+### Known limits
+
+- **Windows on Arm** is less tested than x64, and the portable zip doesn't
+  register `mixmusic://` links.
+- **Spotify apps in development mode,** as the one you sign in with is,
+  get ten search results of each kind, and the tracks of playlists you
+  don't own stay hidden.
+- **On Linux,** Spotify plays through Spotify Connect by default, as
+  WebKitGTK can't play Spotify's protected audio.
+- **YouTube** can change its interfaces and break search, playback or the
+  sign-in until MixMusic or yt-dlp catches up.
+
+Something not working? [Troubleshooting](docs/troubleshooting.md) covers
+the common problems and the known issues.
 
 ## Build from source
 

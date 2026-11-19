@@ -94,6 +94,10 @@ type options struct {
 	out    string // the docs section of the site's content, under root: a folder of content/
 	repo   string // the repository on GitHub, as https://github.com/owner/name
 	branch string // the branch GitHub links point at
+
+	// anchors holds, for each doc a link named a heading of, GitHub's
+	// anchors of its headings mapped to Zola's (headings.go).
+	anchors map[string]map[string]string
 }
 
 // section is the docs section's path in the site's content, which Zola's
@@ -138,6 +142,7 @@ func main() {
 
 // run makes the pages of every doc, and returns the docs.
 func run(o options) ([]*doc, error) {
+	o.anchors = map[string]map[string]string{}
 	docs, err := read(o.root)
 	if err != nil {
 		return nil, err
@@ -648,6 +653,8 @@ func (d *doc) resolve(target string, image, html bool, o options, targets map[st
 	if t := targets[strings.ToLower(p)]; t != nil {
 		if t.anchor != "" && !strings.Contains(suffix, "#") {
 			suffix += "#" + t.anchor
+		} else if before, fragment, ok := strings.Cut(suffix, "#"); ok && fragment != "" {
+			suffix = before + "#" + o.siteAnchor(filepath.Join(o.root, filepath.FromSlash(t.file)), fragment)
 		}
 		if html {
 			return "../" + escape(t.slug) + "/" + suffix, nil

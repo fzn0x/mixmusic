@@ -256,5 +256,6 @@
   "Security": "নিরাপত্তা",
   "Report a vulnerability privately": "দুর্বলতা গোপনে জানান",
   "Free and open source under the <a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-MIT\">MIT license</a> or the <a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-GPL\">GNU GPL, version 3</a>. Spotify and YouTube Music are trademarks of their owners; MixMusic is not made by either.": "<a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-MIT\">MIT লাইসেন্স</a> বা <a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-GPL\">GNU GPL, সংস্করণ ৩</a>-এর অধীনে বিনামূল্যে ও ওপেন সোর্স। Spotify ও YouTube Music তাদের মালিকদের ট্রেডমার্ক; MixMusic এদের কারও তৈরি নয়।",
-  "Languages": "ভাষা"
+  "Languages": "ভাষা",
+  "Every feature, and where to find it": "প্রতিটি ফিচার, আর কোথায় পাবেন"
 }

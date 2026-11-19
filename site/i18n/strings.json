@@ -710,6 +710,11 @@
     "where": "#panel-accounts p"
   },
   {
+    "text": "Every feature, and where to find it",
+    "kind": "text",
+    "where": "#features a"
+  },
+  {
     "text": "Two services, one queue",
     "kind": "text",
     "where": "h2#merge-title"

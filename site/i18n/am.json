@@ -256,5 +256,6 @@
   "Security": "ደህንነት",
   "Report a vulnerability privately": "ተጋላጭነትን በግል ሪፖርት ያድርጉ",
   "Free and open source under the <a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-MIT\">MIT license</a> or the <a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-GPL\">GNU GPL, version 3</a>. Spotify and YouTube Music are trademarks of their owners; MixMusic is not made by either.": "ነጻና ክፍት ምንጭ በ<a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-MIT\">MIT ፈቃድ</a> ወይም በ<a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-GPL\">GNU GPL ስሪት 3</a> ስር። Spotify እና YouTube Music የባለቤቶቻቸው የንግድ ምልክቶች ናቸው፤ MixMusic በሁለቱም አልተሠራም።",
-  "Languages": "ቋንቋዎች"
+  "Languages": "ቋንቋዎች",
+  "Every feature, and where to find it": "እያንዳንዱ ባህሪ፣ እና የት እንደሚገኝ"
 }

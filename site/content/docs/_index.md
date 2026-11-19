@@ -16,3 +16,6 @@ setting, how it works inside, how to make a theme or a plugin for it, and
 how to take part in the project. Every page is a file of the repository's
 [docs folder](https://github.com/fzn0x/mixmusic/tree/main/docs), which a
 pull request can change.
+
+New here? [Features](@/docs/features/index.md) lists everything MixMusic
+does, one line each, and where to find it in the app.

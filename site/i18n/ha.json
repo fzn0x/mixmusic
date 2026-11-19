@@ -256,5 +256,6 @@
   "Security": "Tsaro",
   "Report a vulnerability privately": "Ba da rahoton rauni a asirce",
   "Free and open source under the <a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-MIT\">MIT license</a> or the <a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-GPL\">GNU GPL, version 3</a>. Spotify and YouTube Music are trademarks of their owners; MixMusic is not made by either.": "Kyauta kuma open source a ƙarƙashin <a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-MIT\">lasisin MIT</a> ko <a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-GPL\">GNU GPL, sigar 3</a>. Spotify da YouTube Music alamun kasuwanci ne na masu su; ba kowanne daga cikinsu ne ya yi MixMusic ba.",
-  "Languages": "Harsuna"
+  "Languages": "Harsuna",
+  "Every feature, and where to find it": "Kowace siffa, da inda za a same ta"
 }

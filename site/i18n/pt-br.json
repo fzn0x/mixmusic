@@ -256,5 +256,6 @@
   "Security": "Segurança",
   "Report a vulnerability privately": "Relate uma vulnerabilidade em privado",
   "Free and open source under the <a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-MIT\">MIT license</a> or the <a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-GPL\">GNU GPL, version 3</a>. Spotify and YouTube Music are trademarks of their owners; MixMusic is not made by either.": "Gratuito e de código aberto sob a <a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-MIT\">licença MIT</a> ou a <a href=\"https://github.com/fzn0x/mixmusic/blob/main/LICENSE-GPL\">GNU GPL, versão 3</a>. Spotify e YouTube Music são marcas registradas de seus donos; o MixMusic não é feito por nenhum dos dois.",
-  "Languages": "Idiomas"
+  "Languages": "Idiomas",
+  "Every feature, and where to find it": "Todos os recursos, e onde encontrar cada um"
 }

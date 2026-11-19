@@ -821,6 +821,8 @@ kbd {
 .link:hover { color: var(--brand-text); }
 .link .icon { transition: transform var(--fast) var(--ease); }
 .link:hover .icon { transform: translate(2px, -2px); }
+/* Under the features' tabs: the docs' list of every feature. */
+.features-all { margin: 32px 0 0; text-align: center; }
 
 /* Download. */
 

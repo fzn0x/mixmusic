@@ -6,6 +6,838 @@ All notable changes to MixMusic are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.12] - 2026-11-19
+
+Listen with friends: rooms on your network play the host's music in
+step, joined by a code or a link, and friends anywhere join from an
+invite link (#561, #562, #734). MixMusic comes in 66 languages besides
+English, Arabic, Hebrew, Persian and Urdu laid out right to left, and
+you choose its language (#559, #564, #800). Choose and order the lyrics
+sources (#566), pick another source or edit the lyrics (#598), move them
+earlier or later (#610), and find words in them (#603). Skip what
+SponsorBlock marks (#548), play and shuffle all of an artist's songs
+(#543, #572), and scrobble to ListenBrainz and Libre.fm (#568, #599).
+The equalizer gets presets of your own, sound effects, reverb and echo,
+and a correction of your headphones from AutoEq (#615, #546, #616).
+Albums play without gaps, and with Crossfade off the next song starts on
+the next sample (#601, #600). Cast to DLNA and FCast devices and speaker
+groups, the songs on this computer too (#617, #556). Import and export
+playlists (#613), keep your mixes in folders, your own order and tags
+(#611, #587, #612), set a sleep timer (#594), and back up the library
+(#592). Stats keep every play (#545). MixMusic 0.3.0 and later offer
+this version in Settings › About, except the Linux x64 copies of 0.5.6,
+which don't start: install it from the release page.
+
+### Added
+
+- Reverb and Echo, in Settings › Playback beside the equalizer. Reverb
+  plays the music in a room: a small room, a hall, a plate or a large
+  space, from about 0.6 to 4 seconds, each with its own pre-delay and
+  its own fall of the high notes, at a Mix from 0 to 100%. Echo repeats
+  the music, with three presets, a slapback, a quarter note and a long
+  tail, and a Time from 20 to 2,000 ms, a Feedback up to 90% and a Mix of
+  its own. Both play after the equalizer, glide without a click, do
+  nothing at all when off, stop with Sound effects, and work on 5.1. A
+  seek, or playback stopping, clears what still rings; the next track
+  lets it ring out (#546).
+- Skip the parts SponsorBlock marks, in Settings › Playback › Skip parts
+  of videos, off at first, passes over the intros, sponsor reads and
+  parts without music of music videos, uploads and episodes, as
+  SponsorBlock's community marks them, with a box for each of its 9
+  kinds: Non-music parts, Sponsor and Self-promotion are ticked at
+  first. A part at the start is passed over with no gap, a toast tells
+  of each one skipped, with undo, and every seek bar marks them, in a
+  colour for each kind, with the highlight, which Jump to the highlight
+  plays from. Skipped parts count for nothing in plays and Last.fm
+  scrobbles. Only the first 4 characters of a hash of each video's ID go
+  to SponsorBlock, whose data is under CC BY-NC-SA 4.0 (#548).
+- Songs on this computer cast to Google Cast devices, in every kind the
+  library plays, with their cover on the device's screen: a FLAC file
+  beyond 96 kHz and 24 bits, or a WAV file of floating-point samples,
+  says why it doesn't play there. Renderers and FCast receivers show the
+  covers of these songs too, and the device fetches a song's file only
+  while it plays there or comes next. Groups of Google Cast speakers show
+  in the cast menu and the mini player's Cast section as one device, with
+  "Speaker group" in place of a model. A paired computer's page has
+  **move here**, which brings its queue, track, position, shuffle and
+  repeat to this computer and pauses it there, its files matched to this
+  computer's as **Move to …** does; and Shuffle, Repeat, Mute, Like and
+  Output device, which picks one of its sound outputs or a cast device it
+  found, with its next 40 tracks in place of 20 (#556).
+- The words of the interface are messages of a catalog,
+  `locales/en.json`, ready for translations, with **Language** first in
+  Settings › Appearance: **System**, the default, takes the first of the
+  computer's preferred languages MixMusic has, or else English, which is
+  all it has so far. CI checks the catalog, and a test shows the pages in
+  MyGo's pseudo-language to catch English left in the code (#559).
+- Listen with friends: start a room in the cast button's menu, or in
+  Settings › Desktop, and friends on the same network join it with its
+  6-character code or its invite link, see who hosts, what plays and
+  how many listen, and hear what you play, in step, on their own
+  computers, within about 50 ms. The code is never sent; 5 wrong ones
+  make a computer wait a minute, and 30 in a minute the whole room. The
+  host removes or blocks a guest, and New code shuts out one that comes
+  back under a new name; a guest that drops off comes back by itself,
+  and gets its own queue back as it leaves. Your audio is never sent:
+  each computer plays the same track from where it can (#561).
+- Friends outside your network join your room: turn on Let friends
+  outside this network join on its page, and MixMusic asks your router
+  to forward the room's port by UPnP, NAT-PMP or PCP, and the invite
+  link carries your router's address, your IPv6 address, or one you type
+  for invites, as a VPN's. There is no server: friends reach your
+  computer directly. The page says what was set up, or why it can't be,
+  as behind your provider's router; a web link opens the room for chat
+  apps that don't open mixmusic:// links. Join a room takes a link, or
+  an address and a code, and a guest that drops off tries to come back
+  for 15 minutes (#562).
+- Settings › About names the people who translated the language it shows,
+  or fixed its translation, as Simplified Chinese's translator; a
+  translator adds their name to the language's file (#564).
+- With MixMusic in Urdu, share, recap and lyrics cards set Urdu in
+  Nastaliq, the hand Urdu is read in, when the computer has a Nastaliq
+  font: Noto Nastaliq Urdu, which macOS has and Linux distributions
+  package, or Windows' Urdu Typesetting, from its Urdu supplemental
+  fonts (#564).
+- The Windows installer speaks 46 of MixMusic's languages, as German,
+  Arabic, Japanese and Brazilian Portuguese, and picks the one Windows
+  shows; macOS lists them for the app in System Settings, and asks for
+  the local network and Spotify's audio in them. Japanese and Chinese
+  also take MyGo's own words for menus and controls (#564).
+- MixMusic in Hindi, Bengali, Indonesian, Portuguese (Brazil), Russian,
+  Urdu, Hausa and Amharic: choose one in Settings › Appearance › Language,
+  or keep **System** on a computer that prefers it. A machine translated
+  them, so some words may be wrong: Settings › About says so in each and
+  asks speakers to help fix it (#564).
+- MixMusic in Spanish, French, German, Italian, Portuguese (Portugal),
+  Korean, Turkish and Vietnamese: choose one in Settings › Appearance ›
+  Language, or keep **System** on a computer that prefers it. A machine
+  translated them, so some words may be wrong: Settings › About says so in
+  each and asks speakers to help fix it (#564).
+- MixMusic in Thai, Polish, Czech, Hungarian, Romanian, Galician, Arabic,
+  Hebrew and Persian: choose one in Settings › Appearance › Language, or
+  keep **System** on a computer that prefers it. A machine translated
+  them, so some words may be wrong: Settings › About says so in each and
+  asks speakers to help fix it (#564).
+- MixMusic in Chinese (Traditional), Japanese, Swedish, Dutch, Danish,
+  Norwegian Bokmål, Finnish and Greek: choose one in Settings › Appearance
+  › Language, or keep **System** on a computer that prefers it. A machine
+  translated them, so some words may be wrong: Settings › About says so in
+  each and asks speakers to help fix it (#564).
+- MixMusic in Bulgarian, Ukrainian, Croatian, Lithuanian, Slovak, Serbian,
+  Slovenian and Latvian: choose one in Settings › Appearance › Language,
+  or keep **System** on a computer that prefers it. A machine translated
+  them, so some words may be wrong: Settings › About says so in each and
+  asks speakers to help fix it (#564).
+- MixMusic in Estonian, Malay, Catalan, Filipino, Basque, Swahili, Marathi
+  and Gujarati: choose one in Settings › Appearance › Language, or keep
+  **System** on a computer that prefers it. A machine translated them, so
+  some words may be wrong: Settings › About says so in each and asks
+  speakers to help fix it (#564).
+- MixMusic in Telugu, Tamil, Nepali, Malayalam, Sinhala, Khmer, Kannada
+  and Azerbaijani: choose one in Settings › Appearance › Language, or keep
+  **System** on a computer that prefers it. A machine translated them, so
+  some words may be wrong: Settings › About says so in each and asks
+  speakers to help fix it (#564).
+- MixMusic in Kazakh, Georgian, Punjabi, Uzbek, Albanian, Armenian,
+  Macedonian and Burmese: choose one in Settings › Appearance › Language,
+  or keep **System** on a computer that prefers it. A machine translated
+  them, so some words may be wrong: Settings › About says so in each and
+  asks speakers to help fix it (#564).
+- A music video's lyrics that are its song's, from LRCLIB, keep time with
+  the video: MixMusic compares the two recordings' audio on your
+  computer, finds where the song starts in the video, and moves the
+  lines there, so a video that opens with a scene gets its lyrics in
+  time, and one longer only by its outro keeps them synced. The first
+  play says "Timing these lyrics to the video…" for a few seconds, then
+  the lyrics switch in place, with a note such as "Timed to this video
+  (+29.1 s)", remembered for 180 days. Settings › Playback › Lyrics
+  turns Time lyrics to music videos off (#565).
+- Settings › Playback › Lyrics lists the lyrics sources, a row each with
+  a switch and what the source gets. Drag a row, or press Alt+Up and
+  Alt+Down on it, to change the order MixMusic asks them in, switch off
+  a source it should never ask, and reset to default to put them back.
+  Prefer word-by-word lyrics has lyrics timed word by word from a lower
+  source win over lyrics timed line by line from a higher one. Of two
+  sources with plain lyrics, the longer now wins, and No lyrics found
+  offers try again whenever a source couldn't be reached (#566).
+- YouTube captions, a new lyrics source, last by default, shows the
+  timed captions of the video that plays, for live versions and uploads
+  no lyrics service has, never those YouTube makes from speech. Caption
+  language chooses their language. A podcast episode of YouTube Music
+  shows its captions under its details as a timed transcript (#566).
+- LRCLIB's lyrics light word by word where LRCLIB has their words timed
+  (#566).
+- Scrobble to ListenBrainz, or to a server of your own that speaks its
+  API, such as Maloja, beside Last.fm or without it: Settings › Accounts
+  › ListenBrainz takes your user token and, optionally, the server, whose
+  plain http address works on your local network alone, with a warning
+  that the token travels unencrypted. Listens count by Last.fm's rules,
+  wait while the server can't be reached or refuses the token, and go up
+  to 1,000 at a time. Send likes as loves, off at first, sends your likes
+  to Last.fm and to ListenBrainz as loves (#568).
+- Moving covers: with Show moving covers on, in Settings › Playback or
+  the command palette, a GIF cover moves in the now playing page's
+  sleeve, pausing with the music, and in the head of a mix's page.
+  Change cover… takes a GIF, kept as its centre square of at most 600
+  pixels beside a still of its first frame, which tiles show. A GIF a
+  music file holds, or a cover.gif beside it, moves too. Elsewhere, while
+  your system asks for less motion, and for a GIF over 24 MB decoded,
+  the still shows. Albums' own looping clips wait for a source of them
+  (#569).
+- Your mixes keep the order you put them in: drag one onto another in
+  Library › Mixes or the sidebar's Your mixes, or press Alt with the
+  arrows on it, while they show in Your order, searched or not. Changing
+  a mix no longer moves it first, and a new mix goes first. They start
+  in today's order, so nothing moves as you update (#587).
+- Library › Mixes has a search and a Sort: Your order, Recently changed,
+  Recently added, Title and Track count, each way, kept in
+  settings.json. The sidebar, Add to mix, Home, Edit home, the
+  assistants and plugins list the mixes in that order; the sidebar has
+  the search too (#587).
+- The playlists of Library › Spotify and Library › YouTube Music have a
+  search and a Sort: the service's order, Title and Track count (#587).
+- Pin to top, in the menu of a mix, a playlist or album of your library
+  on Spotify or YouTube Music, or an artist you follow, and in its
+  page's More menu, puts it first in every list it's in, with a pin
+  mark. The pinned playlists, albums and artists show in the sidebar
+  under Liked songs and Downloads, which you can drag among them or
+  hide (#587).
+- Hide from library takes a playlist or a saved album out of Library ›
+  Spotify or Library › YouTube Music without changing it on the
+  service; Hidden, at the foot of the page, shows it again (#587).
+- Edit tabs, at the end of the Library's tabs, moves and hides them, as
+  Edit home does Home's shelves (#587).
+- Play, pause and skip from a Stream Deck key, a keyboard macro or a
+  script, with no window coming forward: the links mixmusic://toggle,
+  play, pause, next, previous, mute, shuffle, repeat, volume-up and
+  volume-down, or the flags of the same names given to MixMusic's
+  program, as `MixMusic --next`. The volume turns by 5%, as the global
+  shortcuts turn it. With no MixMusic running, a flag says "MixMusic
+  isn't running" and ends with status 1, rather than start it. Starting
+  MixMusic again with no flag, or with the link of a page or a track,
+  still shows its window (#590).
+- Back up and restore, in Settings › Desktop › Backups and the command
+  palette: Back up… saves your library, settings, add-ons, queue and
+  episode positions, and a list of your downloads, as you tick them, in
+  a zip whose manifest tells where it came from and checks each file.
+  Restore… checks the file, previews what it holds, and swaps in what you
+  tick as MixMusic restarts, every file going back should one fail;
+  Undo the last restore puts back what it replaced. The library replaces
+  yours, or adds to it. On another computer, your songs are found in the
+  folder that matches theirs, the songs downloaded download again, the
+  settings of that computer stay, and plugins come back switched off.
+  Sign-ins, pairings, scrobble queues, the index of your music, yt-dlp,
+  the cache, logs and audio are never in a backup. Back up automatically
+  makes one daily, weekly, monthly or each time MixMusic quits, to
+  "MixMusic backups" in Documents or a folder you choose, none while
+  nothing changed, and keeps the last 3 to 30, all, or one (#592).
+- A sleep timer of MixMusic's own: the moon button by the player, beside
+  the speed button, pauses the music after 5 to 90 minutes, or any whole
+  number from 1 to 9999, at the end of this track, of the queue or of 2
+  to 20 tracks, fading it out first, 30 seconds by default, without
+  moving your volume. A track on repeat counts, the last plays to its
+  real end, and the end of the queue doesn't go round or start
+  Autoplay's songs. Let the track finish stops at the end of the track
+  that plays as the time runs out. The button shows the time left, to
+  the second, with +5 min, +15 min and Cancel. It pauses a track that
+  loads and a Spotify Connect device elsewhere too, stepping a device's
+  or a cast speaker's own volume down and putting it back, and the
+  computer's sleep ends it. It is in the mini player's and the tray's
+  menus, the command palette, two global shortcuts and the AI
+  assistants' tools, and Start the sleep timer by itself, in Settings ›
+  Playback › Sleep timer, starts it at its last length as music starts
+  playing inside a window of the night, the same every day or one for
+  each day of the week (#594).
+- Pick where the lyrics of the song that plays come from. Above the
+  lyrics, in the lyrics panel and on the now playing page, beside synced
+  and plain text, and under "No lyrics found for this track.", source
+  opens a menu of every lyrics source that is on, each with what it
+  answered: showing, found (timed word by word, by line or not timed,
+  with its number of lines), not found, can't be reached, or not asked
+  yet. A video lists each caption track its uploader wrote by its
+  language. A source that found lyrics shows them at once, and one not
+  asked yet is asked only when you pick it. The pick is kept for the
+  track, for 10,000 tracks, and Automatic goes back to MixMusic's own
+  choice. The mini player, the notch, shared cards, translation and
+  romanization follow it (#598).
+- Search by title and artist…, in the same menu, asks every source that
+  is on for a title and artist you can change, and lists each one's
+  answer with its credit, how it's timed, its number of lines and its
+  first lines, or that it can't be reached. The one you show is asked
+  again the next time the track plays (#598).
+- Edit lyrics…, in the same menu, opens the lyrics shown as text with
+  their LRC times, to correct a word or a line. Your edit keeps the
+  credit of the lyrics it started from, and shows before a file's lyrics
+  and every source until you pick another (#598).
+- Scrobble to Libre.fm, or to another server that runs GNU FM, beside
+  Last.fm and ListenBrainz or without them: Settings › Accounts ›
+  Libre.fm connects as Last.fm does, in your browser on the server's own
+  page, with no API account to create, and takes your own API account
+  for a server that wants one. A server's plain http address works on
+  your local network alone. Scrobbles count by Last.fm's rules, wait
+  while the server can't be reached or refuses the connection, and Send
+  likes as loves sends your likes there too (#599).
+- Keep albums gapless, right under Crossfade in Settings › Playback ›
+  Sound while Crossfade is on, and on by default, in new installs and in
+  older settings: the songs of one album play straight on, without a
+  crossfade, as a live album's or a concept album's run into each other.
+  The step out of an album, Repeat all's step back to its first track,
+  the step into a radio and the songs of a shuffled album that don't land
+  in order still crossfade. Tracks now keep their track and disc numbers,
+  from Spotify, a YouTube Music album's page and a file's tags, so only
+  the next track of the album joins. A Spotify track played from YouTube
+  Music joins only when both recordings are songs, not music videos
+  (#601).
+- Find in the lyrics: a search button in the lyrics panel's head, and
+  beside Share lines on the now playing page, opens a box that finds the
+  lines holding the words you type, from the first letter, regardless of
+  case, quotes, and accents on Latin, Greek and Cyrillic letters, by their
+  words as written and by their Latin letters and translation while those
+  show. The lines found show tinted, "2 of 5" says which is current, ↑ and
+  ↓ step through them, and Enter plays the song from the line found, as a
+  click on it does, with its timing. While the box holds words, no line
+  dims and synced lyrics stay on the line found. Escape empties the box,
+  then closes it. The command palette's Find in the lyrics opens it, with
+  no keys of its own: Ctrl+F stays the music search (#603).
+- Lyrics timing: above synced lyrics, in the lyrics panel and on the now
+  playing page, beside synced and plain text, Earlier and Later move the
+  song's lyrics 0.05 s, or 1 s with Shift, and the line sung now changes
+  at once. Between them, the timing shows in words, as "0.35 s earlier",
+  and takes one typed in milliseconds, with reset while the lyrics are
+  moved. It is kept for the track, for the lyrics of the source it was
+  set for, 10,000 tracks at most. Lyrics timing in Settings › Playback ›
+  Lyrics moves every song's lyrics, for an output that sounds late, as
+  Bluetooth headphones may: 10 s either way on its slider, and up to
+  120 s typed. The full-screen lyrics, the mini player, the notch player,
+  the words lit one by one and a line clicked follow both, and plugins
+  get them with the lyrics (#610).
+- Folders in the sidebar's Your mixes group your mixes and the
+  playlists of Spotify and YouTube Music in your library, one level
+  deep. Move to folder, in the menu of a mix or a playlist, of its page
+  and of its entry in the sidebar, puts it in one, or in a New folder…;
+  so does a drag onto a folder's header. Remove from folder, or a drag
+  out, takes it out, and a folder with nothing left goes (#611).
+- A folder's header shows its name and how many playlists it holds, and
+  closes or opens with a click, which settings.json keeps. A closed
+  folder opens while the sidebar's search finds what it holds, and for
+  the page of one of its playlists. Folders list by name until you drag
+  one, or move it with Alt and the arrows; its menu has Play folder,
+  Rename folder… and Ungroup folder (#611).
+- Folders stay in MixMusic, by the playlists' IDs: a playlist of a
+  service keeps its folder until its service listed your whole library
+  without it (#611).
+- Tag your mixes, the playlists and saved albums of Spotify and YouTube
+  Music in your library, and the albums on this computer: Tags…, in the
+  menu of a tile or of a page's More menu, puts your tags on it, takes
+  them off and makes a new one. An item takes any number of tags, and an
+  album's tags hold for all its versions (#612).
+- Manage tags makes, renames, recolours, orders and deletes your tags,
+  of 25 colours that read on every theme, light and dark; its Choose
+  items… tags many playlists and albums at once (#612).
+- A row of chips above Library › Mixes, and in a new Library › Tags,
+  which shows your mixes, playlists and albums of everywhere together,
+  chooses the tags they show: any of them, or all. settings.json keeps
+  the choice, and Show tag filters, in Settings › Appearance, hides the
+  row above Library › Mixes (#612).
+- Tags stay in MixMusic, by the items' IDs: a playlist or an album of a
+  service keeps its tags until its service listed your whole library
+  without it (#612).
+- Import a playlist…, a tile beside New mix in Library › Mixes and a
+  command of the palette, brings in playlists from CSV and TSV files,
+  M3U and M3U8 lists, JSON, text of links or "Artist - Title" lines, and
+  the archives of Spotify's and Google's data downloads; dropping them on
+  the window does too. Up to 100 files and 20,000 songs at once. Links,
+  IDs and files become their tracks without a search; the rest are found
+  in your library, then on YouTube Music, 4 searches at once, and marked
+  Found, To check or Not found for you to review, tick, replace or save
+  as a CSV file. They go to a new mix, a mix of yours or Liked songs; an
+  import goes on after a restart, and importing a list again adds only
+  what's new. Export the list…, in the More menu of mixes, playlists and
+  albums and on Liked songs, and Export the library… in the palette,
+  write CSV, M3U8 or JSON, which MixMusic reads back as they were (#613).
+- Paste a link of YouTube, YouTube Music or Spotify in the search box,
+  and Enter opens what it names rather than search its text: a song or a
+  Spotify track plays at once, a YouTube radio plays its song with that
+  radio after it, and an album, a playlist, an artist, a Spotify show or
+  episode opens its page. The box suggests the linked item alone, with
+  its cover, and the command palette offers Open link in place of Search
+  for. Links aren't kept among the recent searches; a link that can't be
+  read says why in a toast, and a Spotify link signed out says to sign in
+  under Settings › Accounts (#614).
+- The equalizer keeps presets of your own: Save as… beside the Preset
+  menu keeps the bands, the preamp, balance, mono, crossfeed and stereo
+  width under a name of up to 48 characters, asking before it replaces
+  one of the same name, and the menu lists them after the built-in ones,
+  with Rename…, Delete, Export…, Export all… and Import… under it, to
+  move one or all as a JSON file. The built-in presets go from 9 to 23,
+  with Bass and Treble reducers, Spoken word, Classical, Dance, Hip-hop,
+  Jazz, Metal, Piano, Pop, R&B, Live, Small speakers and Warm. Simple
+  mode moves the ten bands with three sliders, Bass, Mid and Treble.
+  Auto headroom, on by default, turns the preamp down by as much as the
+  bands boost, so no note comes out louder than it went in: presets that
+  boost play quieter than before. The preamp goes down to -30 dB. Sound
+  effects, at the head of the group, turns the equalizer, crossfeed and
+  width off at once. Settings › Playback › Sound gains Balance, with a
+  rest at the centre, Mono, for one ear or one earbud, Crossfeed for
+  headphones, and Stereo width from mono to twice as wide; on 5.1,
+  crossfeed and width are skipped. Each glides without a click (#615).
+- Headphones, in Settings › Playback › Equalizer, corrects the sound of
+  your headphones. Choose… lists AutoEq's profiles, over 8,800 of some
+  6,000 models, each with who measured it and on what rig, to search by
+  model or source; Import file… reads a ParametricEQ.txt in Equalizer
+  APO's format, with its preamp and up to 20 peaking, shelf, low-pass
+  and high-pass filters, each of its own frequency, gain and Q, and says
+  which line doesn't read, and why, changing nothing. The correction
+  plays after the bands, whether the equalizer is on or not, on 5.1's
+  six speakers too, and fades in without a click; None turns it off. The
+  list downloads from AutoEq on GitHub as it first opens, and is checked
+  once a week at most; a profile downloads as you pick it. Both are kept
+  in the data folder, and the correction in the settings, so it plays
+  offline. AutoEq is under the MIT license (#616).
+- Play on DLNA and UPnP renderers, such as smart TVs, AV receivers and
+  network speakers without Chromecast, and on FCast receivers, from the
+  cast menu and the mini player's Cast section, beside Google Cast
+  devices, listed by name and model. A renderer gets Opus in WebM only
+  where it lists it, else the track's AAC, and the songs on this computer
+  in their own format where it plays it; its screen shows the cover,
+  title, artist, album and length, and the next track goes to it ahead,
+  so it plays without a gap. FCast receivers that speak version 4
+  connect over TLS 1.3, their key checked against the one they
+  announced, and older ones over version 3. The music comes back to this
+  computer, paused, when either stops answering, and the cast ends when
+  another app takes it over (#617).
+- Add to queue in one step: with the pointer over a song's or an
+  episode's row, a queue button takes the place of its length, and with
+  the keyboard's focus in a row, Shift+Enter adds it to the queue and
+  Alt+Enter (⌥Enter on macOS) plays it next. Song tiles on Home, Explore
+  and the now playing page show Add to queue and Play next beside their
+  play button. While nothing plays, every Add to queue of the window, of
+  a row, a tile, a menu, the bar of the tracks selected or a list's More
+  menu, plays what it adds; plugins and AI assistants only queue (#618).
+- A shelf of songs on Home, Explore and the now playing page has Play
+  and Shuffle buttons in its title row, before its scroll arrows. Play
+  queues the songs of the shelf in the order shown, and Shuffle queues
+  them with shuffle on, as a playlist page's buttons do. A shelf that
+  mixes in albums or playlists plays only its songs (#629).
+- The search page has a Sort by select beside the services. Most played
+  puts the songs, videos and playlists with the most plays or views
+  first, with Spotify's results, which have no counts, after YouTube
+  Music's, and Newest puts the newest albums first on the Albums pivot
+  (#630).
+- A track in Up next has Play next in its menu, which moves it right after
+the track playing, in the queue and in the mini player's panel. A radio
+track moved so counts as one you added. The docs now say where Add to
+queue puts a track during an album or a playlist (#631).
+- Full-screen lyrics: the lyrics of what plays over its cover, blurred and
+  darkened, with the buttons of the player at the left of the cover and the
+  covers of the next tracks in the queue at the right, which a click plays.
+  A style (Spotlight, Glow, Focus, Simple, Bold or Calm), the size of the
+  text and a ball that hops from word to word over the line sung, touching
+  its letters, and flies to the next line in a motion of your choice (a
+  mix, hop, boomerang, loop, dive or ricochet), for lyrics timed word by
+  word, are set in Settings › Appearance › Lyrics
+  style, with a small preview. The lyrics glide up to each line as it is
+  sung. Open them with the full-screen button of the lyrics panel or of
+  the now playing page, with Ctrl+Shift+F (⇧⌘F on macOS), or from
+  Settings (#688).
+- The search page offers YouTube itself as a scope, beside Spotify and
+  YouTube Music: what the music catalog doesn't have, as tutorials,
+  vlogs and live streams. Its results are videos, and their audio plays
+  through the same stream finder as a song's, so nothing more is needed
+  to hear them (#690).
+- Listen with friends: guests add songs to the room from a song's menu,
+  which the host adds at once, accepts first, as at first, or takes none
+  of, as YouTube Music or Spotify tell them; the host lets guests play,
+  pause and skip, and lets in each friend who joins, if they choose; and
+  Make host moves the room to a guest's computer, once its user agrees,
+  if the others can reach it. The host checks each of these itself. A
+  crossfade on the host waits for the guests as a track change does, a
+  guest's SponsorBlock skips rest in a room as its crossfade does, and a
+  room started before macOS lets MixMusic use the local network is found
+  once it may (#734).
+- Leave marked parts out of exports, in Settings › Playback › Skip parts
+  of videos, off at first, leaves the parts SponsorBlock marks that the
+  player skips out of the Opus copies Export… writes, without changing
+  their sound: a part at the start or the end to the sample, one between
+  to the nearest 10 ms. M4A copies keep their parts (#735).
+- The page of a computer you control by remote control marks on its
+  seek bar the parts SponsorBlock marks that the other computer skips,
+  as that computer's own seek bars do, with their kinds and times under
+  the pointer, and offers Jump to the highlight. A computer with an
+  older MixMusic tells no parts, and is controlled as before (#735).
+- A music video that plays its song a fraction of a percent slower or
+  faster than the song's recording gets its lyrics timed too: MixMusic
+  finds the video's speed as well as where the song starts, and moves
+  each line there, so late lines land as well as early ones. The note
+  then names the speed, as in "Timed to this video (+2.9 s, 0.26%
+  slower)" (#748).
+
+### Changed
+
+- Installing or updating yt-dlp tries again when GitHub fails the
+  download for a while, with a 502, a 504 or a download broken off: a
+  second later, then twice as long after each failure, for up to two
+  minutes, rather than failing at once. The progress starts again from
+  zero with each try (#538).
+- A song file that holds several lyrics now shows the same ones whatever
+order its tags are in. An MP3 or WAV with several synced SYLT frames
+shows the one of lyrics, else the transcription, else other text, and
+never chords, events or links. Plain lyrics come from the format's own
+place first (USLT, the LYRICS comment, the M4A lyrics item), then the
+other tags in a fixed order (#554).
+- Clearer words in a few places translators found unclear: the note on a
+  Spotify show's page names its two settings in quotes, the shortcut
+  button's screen-reader label says "stop changing" while keys are being
+  pressed, and the notices for a song made with AI and for a list where
+  nothing can play read as whole sentences (#564).
+- Waiting Last.fm scrobbles go out once the network comes back, and
+  after a failed send on a timer of 15 seconds that doubles up to every
+  5 minutes, not only when a track starts. A batch Last.fm rejects goes
+  again in halves, so that only the scrobble at fault is dropped, a line
+  under Scrobbling as says how many wait, and Last.fm hears MixMusic's
+  version (#568).
+- An artist's tile has a shuffle button like the playlists' play button,
+  and its menu has Play and Shuffle, which play all of the artist's
+  songs. AI assistants that play an artist now play all their songs, not
+  only their top tracks, and Spotify's artist page has Shuffle too
+  (#572).
+- With Crossfade off, the next track starts on the sample right after the
+  last one of the track before, with no silence and no fade-in, at any
+  speed, so a live album or a concept album plays on as it was recorded.
+  The same goes for the songs of an album that Keep albums gapless plays
+  straight on, and wherever a track ends without a crossfade, and the
+  app, the media controls and Discord see one track change. With Even
+  loudness on, the next song of the same album starts at the level of the
+  one before and glides to its own. At a speed other than 1×, a track no
+  longer fades into a moment of silence at its end (#600).
+- The mini player's progress line waves too with Wavy progress bar on: it
+moves while the track plays, lies flat when it pauses, and holds still
+when the computer asks for less motion, as the seek bar does (#632).
+- The search's first services choice is named All music, not both: with
+YouTube beside Spotify and YouTube Music, it covers the two services and
+the music on this computer (#690).
+- Library › YouTube Music shows its playlists, albums, artists, songs
+  and podcasts as their pages come, with "Loading more…" under a list
+  until it ends, rather than all at once at the end, and so do Library
+  › Artists, Library › Podcasts and Add to YouTube Music playlist. A
+  large library can be browsed while the rest is read (#722).
+- Clearer words in more places translators found unclear: a failed pairing
+  of remote control says why once, YouTube Music's errors name what they
+  are about, a guest who adds too many songs to a room is told what to
+  wait for, and a room's page says when MixMusic doesn't ask the router
+  to open a port. Bit depths and an artist's partly loaded songs take each
+  language's forms for their numbers (#800).
+- Dates, times and numbers follow the computer's region format, not the
+  interface's language: English on a computer set to the United Kingdom,
+  Australia or Ireland, or with another country's formats, writes "17
+  Nov" and "15:04" where it wrote "Nov 17" and "3:04 PM", and the system
+  settings' 12- or 24-hour clock shows as set. The words stay those of
+  the language shown (#801).
+
+### Fixed
+
+- A search lists only the Spotify playlists MixMusic can open: Spotify
+  shows apps the tracks of the playlists you own or collaborate on only,
+  and those of others failed with an error. One you follow shows its
+  name, cover and owner, with Save and a way to play it on Spotify; its
+  tile no longer offers Play or Download, nor Home a shelf of it, which
+  failed the same way. Spotify's own playlists, as a Daily Mix, which
+  Spotify shows apps nothing of, open the same way rather than with
+  "Resource not found" (#530).
+- On macOS, an update no longer has the Keychain ask again whether
+  MixMusic may use your sign-ins, as Spotify's: every release is signed
+  with the same certificate, by which the Keychain knows an update for
+  the app it replaces. The update to this version asks one last time
+  (#532).
+- Saving a Spotify playlist to your library, or taking it out, works with
+  a Client ID made since February 2026, which Spotify gives no route for
+  it but the library's own. One made before still works (#536).
+- Pairing for remote control ends the same way on both computers. When
+  the computer controlled took more than 6 seconds to keep the pairing,
+  as on a slow or busy disk, it said Paired while the other said it
+  stopped answering and kept nothing. The other now waits 30 seconds
+  more, and a pairing that doesn't finish is dropped on both: the
+  computer controlled says it didn't finish, and the other that it
+  couldn't keep the pairing, rather than that it may be asleep (#537).
+- With 5.1 surround on, a track whose stream yt-dlp's quick run found
+  offers its 5.1 mix, as tracks found the other ways do: the quick run
+  lists no 5.1 audio, so such a track played in stereo alone. It still
+  starts in stereo at once, while yt-dlp's full run looks for the mix
+  behind it; the 5.1 button shows once it is found, and the track goes
+  on in 5.1 from where it is. With 5.1 off, nothing more runs (#540).
+- A YouTube Music artist's Play plays all their songs, the list that
+  Top songs links to, rather than the five or so on the page, and a new
+  Shuffle shuffles them, in the head and the top bar. The first hundred
+  start at once and the rest join the queue as they load. Show all,
+  beside Top songs, opens the list. An artist of the music on this
+  computer gets Shuffle too (#543).
+- Stats, Your year and the Plays sort count every play, rather than your
+  last 1,000: All time said "You played 1,000 tracks" and never more, and
+  a year's recap held only its last months. MixMusic keeps each play in
+  `plays.jsonl` in your data folder, about 1 MB a year at 10 plays a
+  day, and fills it once from the last 1,000 plays of the history. Clear
+  history empties it too (#545).
+- With Crossfade on, a next track whose audio comes late no longer jumps
+  in loud: the one playing keeps its volume until that audio is there,
+  and the next fades in from silence then, or starts at full volume with
+  under half a second of the one before left. A pause during a fade,
+  however long, no longer drops the track fading out (#549).
+- A song on this computer shows the lyrics its file holds, or a .lrc
+  file of its name beside it, rather than "No lyrics found for this
+  track.": at once, offline too, and when its file names no artist.
+  MixMusic reads the lyrics tags of MP3, WAV, FLAC, Ogg, Opus and M4A
+  files, timed ones too, and lights word by word the LRC whose words
+  are timed. Synced lyrics of the file show without asking the
+  sources; plain ones give way only to synced lyrics from them, and
+  stay offline. The line under the lyrics names the file (#554).
+- On Linux, the .deb and the .rpm ask for a font with Chinese, Japanese and
+  Korean letters, and the AUR package lists one as optional, so those
+  letters no longer show as blank space. Getting started and
+  Troubleshooting name the font to install for the other ways to install
+  (#558).
+- Share, recap and lyrics cards draw the letters of Hindi, Bengali, Thai,
+  Amharic and the other scripts the window shows, from the fonts the
+  system has, on Windows, macOS and Linux, fonts in your own folders
+  included. They were blank before (#563).
+- Scrobbles are no longer lost when Last.fm stops accepting MixMusic's
+  connection. Plays heard meanwhile wait with the earlier ones, Settings
+  › Accounts › Last.fm offers "connect again" in place, which sends them
+  all, and, if another Last.fm user approves, asks whether to send them
+  to that profile or drop them. Disconnecting says how many scrobbles it
+  drops (#567).
+- A long Spotify playlist goes on loading when Spotify asks MixMusic to
+  wait: the page waits as long as Spotify asks, up to a minute, says
+  "Spotify asked MixMusic to wait" with how many tracks came, and reads
+  the rest by itself, rather than stopping partway with Try again (#570).
+- Play on a Spotify artist's page plays all of their songs, read from
+  every album and single, not the ten of their top songs. Sound starts
+  with the first release and the others join the queue as they are read
+  (#571).
+- The Material themes no longer turn the whole window cyan or pink for a
+  black, white or grey cover: a cover without a colour of its own makes a
+  grey window, and a nearly grey one a calm tint of its hue (#573).
+- Library › Spotify shows all of your Spotify playlists, saved albums,
+  followed artists and saved podcasts, rather than the first 200, or 50
+  albums, and so do Library › Artists, Library › Podcasts, Add to
+  Spotify playlist and Add a shelf. A page that fails is tried again; a
+  list that still came in part shows what came, says "Showing 200 of 250
+  playlists" with Try again, and no longer has new releases forget the
+  artists it missed. Home's Spotify playlists shelf shows the first 50,
+  so that Home doesn't wait (#574).
+- A podcast episode's now playing page shows its related shelves, as a
+  song's does: its Related tab is found by its kind, not by the start of
+  its ID, which an episode's does not share with a song's (#575).
+- The now playing page no longer draws the visualizer over the cover while
+  the system asks for less motion: the cover shows whole, and the page asks
+  for no animation frames for it (#576).
+- A track YouTube plays only to signed-in viewers no longer says to turn
+  on Play audio as your account while it is on. It says what to change
+  for your account to be asked: sign in to YouTube Music, or again, the
+  first Google account of your session, the best Quality, or yt-dlp and a
+  JavaScript runtime; or that YouTube didn't give it to your account
+  either. Tracks for signed-in adults, a channel's members or YouTube
+  Music Premium's say whether your account was asked too. The toast
+  offers settings while there is something to change, and the details
+  start with how asking as your account went (#577).
+- With Play audio as your account on, a track YouTube plays only to
+  signed-in viewers no longer fails on every play until a restart once
+  YouTube refuses the audio found as your account, as after a move to
+  another network: MixMusic asks as your account once more. The track is
+  found signed out for 10 minutes at most after such a refusal, and
+  turning the switch off or on, signing in or out, or another Google
+  account ends that sooner (#578).
+- With Play audio as your account on, a track YouTube plays only to
+  YouTube Music Premium members plays again with Premium once YouTube
+  refuses its audio found as your account: MixMusic asks as your account
+  once more, as it does for a track only signed-in viewers can play.
+  Signing in, or choosing another Google account or channel, asks as
+  your account again at once for the tracks found signed out after such
+  a refusal, rather than at the next track (#578).
+- Start radio keeps the radio apart from the songs you add: Add to queue
+  after it puts a track ahead of the radio, as it does after autoplay's
+  radio, rather than behind all of it (#579).
+- A music folder that is a link, a symbolic link or on Windows a
+  directory junction, lists the music of the folder it points to rather
+  than 0 tracks, plays when dropped on the window, and on Linux is
+  watched for changes. A folder listed twice, by its path and by a link
+  to it, counts once (#580).
+- A song started from a shelf that lists no lengths, such as Quick picks
+  on Home or Trending on Explore, adds its minutes to Stats, its day chart
+  and Your year: the play is recorded with the length its stream told
+  (#581).
+- Importing or pasting a browser session signed in to several Google
+  accounts works when the first of them was signed out of, as from
+  another device: MixMusic signs in as the first account still signed
+  in, keeps it, and the Account and channel list leaves out the ones
+  signed out. It fails only when none is still signed in (#582).
+- With Hide explicit content on, a clean Spotify song no longer plays
+  the explicit version of its recording on YouTube Music. The match now
+  prefers the recording marked explicit or clean as Spotify marks the
+  track, and looks among the videos for a clean one when the songs have
+  only the explicit one. A Spotify track whose recording is explicit
+  counts as explicit while it would play from that recording: the queue
+  passes over it, picking it tells why, and it doesn't download. Hidden
+  explicit songs no longer download either (#583).
+- The Sleep Timer plugin's "at the end of this track" pauses the music as
+  the track ends, before a crossfade or the next track starts, instead
+  of letting the next track play on. It also stops on Repeat: one, and
+  at the end of the queue, and a press of Next no longer counts as the
+  end. A timed pause that falls while a track loads is sent again until
+  the music stops, and the volume comes back after it. The page has its
+  45-minute tile, and "The sleep timer stops in 30:00." reads right
+  (#584).
+- Library › YouTube Music shows all of your YouTube Music playlists,
+  albums, artists, songs and saved podcasts, up to some 24,000 of each,
+  rather than about the first 1,000, and so do Library › Artists,
+  Library › Podcasts, Add to YouTube Music playlist and Add a shelf. A
+  page that fails is tried again; a list that still came in part shows
+  what came, says "Showing the first 1,200 songs" with Try again, and
+  no longer has new releases forget the artists it missed. The menu of
+  a song a partial Songs list lacks asks YouTube Music whether you keep
+  it, so a song saved long ago offers Remove from library (#586).
+- When an album or a playlist ends, Autoplay's radio carries on as
+  smoothly as any next song: MixMusic finds the radio while the last
+  song plays, so its first song starts as that one ends, or fades in
+  under it with Crossfade on, rather than after a pause and without a
+  fade. Each new batch of the radio comes the same way. The radio's
+  songs show in Up next from then, marked radio, and turning Autoplay
+  off, or Repeat on, before they play takes them out (#595).
+- The player around the notch names where its lyrics come from, and who
+  submitted them: under the lines, a muted "lyrics from Unison ·
+  submitted by <name>", linked as in the lyrics panel, which Unison's
+  licence asks for wherever its lyrics show. Lyrics from Better Lyrics
+  and the other sources name their source the same way (#597).
+- After LRCLIB, Better Lyrics or Unison answers "Too Many Requests",
+  MixMusic leaves it alone for as long as it asks (with a little more),
+  instead of asking again at once for the next track or on try again; the
+  other sources answer meanwhile. LRCLIB's cached lookup is tried only
+  after a server error (#619).
+- The number above an equalizer band or the preamp shows its half
+  decibels: +0.5, -0.5, +1.5 and +2.5 dB, where +1.5 and +2.5 both read
+  +2 and a half step near zero read +0. Whole values read as before
+  (#620).
+- Data saver and the 5.1 mix play a video's original audio when yt-dlp
+  finds the stream, as they do on the other routes: yt-dlp ranked the
+  tracks of a dubbed video by quality alone, so data saver could play a
+  dub, or an audio description (#621).
+- Searching the settings for "phone" no longer finds Remote control,
+  which phones can't use (#622).
+- Quitting MixMusic stops its plugins: the function a plugin returns to
+  run when it stops runs at every quit too, as it does when the plugin is
+  turned off, and what it keeps with `api.storage` then is saved. MixMusic
+  waits 3 seconds at most for all of them, so a plugin can't hold up the
+  quit (#623).
+- A small bright mark on a black or grey cover no longer sets the
+  accent: a colour has to cover more than 1% of the cover, and the
+  cover's own grey stays otherwise. Pure colours such as `#ff0000` now
+  count, where they used to be skipped as near white (#624).
+- A playlist says why its count is above its rows: once all of it is
+  read, a muted line under the header tells how many of its items can't
+  play here, as Spotify's local files, podcast episodes and removed
+  tracks, and how many explicit songs Hide explicit content leaves out,
+  so the count and the list agree. The Long playlists section of the
+  library page says what the line means (#625).
+- A YouTube Music playlist sorted by Top voted loads all its songs, up
+  to 20,000, rather than stopping at its first 100 or so under a header
+  that counted them all: Play, Shuffle, the download and a copy into a
+  mix take every one (#626).
+- A YouTube Music playlist that loads far fewer songs than its header
+  counts says so under the header, with Try again, rather than looking
+  complete: "Only 100 of this playlist's 1,527 tracks came from YouTube
+  Music." A small gap stays quiet (#627).
+- A downloaded song keeps its cover in the system's media controls,
+  notifications and Now playing for overlays when you are offline, even
+  after Clear covers emptied the artwork store: they read the cover the
+  download keeps (#628).
+- The hint of Settings › Accounts › YouTube Music no longer says your
+session never goes to yt-dlp: with Play audio as your account on, yt-dlp
+asks as your account first (#634).
+- The mini player opens at its size at the zoom: at 125% the first time,
+  it opened at its 100% size, and its cover became a narrow strip. With
+  the zoom changed while it was closed, it opens scaled to the new one
+  (#717).
+- A YouTube Music song that plays shows the same length in the player
+  bar and the mini player as in its row of the queue, 3:34 rather than
+  3:33. Lengths are now rounded up to the whole second, as YouTube Music
+  lists them (#718).
+- On macOS, a computer whose remote control started before you let
+  MixMusic use the local network is found by the others within a minute
+  of allowing it, rather than only after MixMusic restarted (#725).
+- While remote control is on, a computer on the network that isn't paired
+  can no longer make MixMusic hold a megabyte of memory for each
+  connection it opens. Until a computer is paired, its messages are held
+  to 4 KiB, and MixMusic keeps only a few of its connections at once;
+  pairing, and the computers paired, work as before (#736).
+- A Spotify song MixMusic plays itself stops as the next song starts, as
+  one picked from YouTube Music. It sometimes played on beside it: when
+  Spotify told of it under another name, when its play failed after
+  Spotify took it and MixMusic played it from YouTube Music instead, or
+  when Spotify went on by itself past MixMusic's queue (#745).
+- Covers are sharp on Retina and other high-density screens: they are
+  fetched at the display's pixels, not half of them, most visibly on the
+  full-screen lyrics. Music videos are asked for at the display's scale
+  too. The full-screen lyrics' background is the cover blurred, rather
+  than a small cover stretched to show its pixels (#759).
+- Share, recap and lyrics cards join letters as the window does: the
+  conjuncts of Hindi, Bengali, Tamil and the other scripts of India form,
+  Thai marks stack, and emoji show in colour from the system's emoji font.
+  On Linux, cards draw Chinese, Japanese and Korean from the variable Noto
+  Sans CJK too, where they were blank (#760).
+- More of the interface is ready for translations: Home's own shelves,
+  the tray's menu, the taskbar's buttons, the file dialogs, the player's
+  notices, the lyrics' notes and more were English in every language.
+  Stats' and Your year's headlines, a line of a room's activity and the
+  notes around a link are one sentence each, which a language can put in
+  its own order; dates and counts are written in the language's way, so
+  English shows "Nov 17" and "3:04 PM" where it showed "17 Nov" and
+  "15:04"; and macOS's menu bar follows a new language without a restart
+  (#775).
+- Why Spotify's or YouTube Music's profile couldn't be read, in Settings ›
+  Accounts, why an episode's details are missing, the notices of a
+  Spotify podcast that plays only from Spotify or needs a sign-in, and a
+  missing webview in the player's notice are in the interface's language
+  (#800).
+- Why an update couldn't be found or installed, why a song's tags or a
+  mix's cover didn't change, why a YouTube Music sign-in, a browser's
+  sign-in or a ListenBrainz token failed, a music folder that can't be
+  read or watched, why AI assistants can't connect, remote control's and
+  rooms' remaining errors, a partly read playlist, the library's and
+  collaborators' errors, and lyrics credited to YouTube's captions are in
+  the interface's language. Errors of the services met while signing in
+  are too (#800).
+- The downloads' statuses (why they wait, why a track failed, what a
+  Spotify track's download does and why a move didn't start), the ways
+  tried in the details of a track that couldn't play, the notes and
+  errors of the rooms and of remote control, and the toasts of what an
+  AI assistant did show in the interface's language. An error MixMusic
+  doesn't know keeps the service's or the system's own words, after a
+  lead in the language (#800).
+- Errors of the services and of the system that MixMusic knows, from
+  Spotify, YouTube Music, Last.fm, ListenBrainz, YouTube's streams,
+  yt-dlp, the sound, the firewall, the colour file, the music folders,
+  the tags and the add-ons, show in the interface's language, in toasts
+  and in the notice of a track that couldn't play. Another error keeps
+  the service's own words (#800).
+- The errors of signing in to YouTube Music, of a browser's cookies, of
+  Last.fm and ListenBrainz, of a missing WebView2 or WebKitGTK and of
+  starting at login, the notices of playing an artist, track info's
+  problems, the reason the desktop shows for running in the background,
+  the explicit badge, the units of sizes and of audio, and the page
+  Spotify's sign-in shows in the browser are in the interface's
+  language (#800).
+- Why a track couldn't play, from a cast device, the audio engine,
+  YouTube's audio servers or a file on this computer, why a Spotify track
+  plays from YouTube Music instead, why its 5.1 audio plays in stereo,
+  the note of another app taking the cast device, and why each step
+  failed in a failure's details and in Settings › About's recent
+  playback errors are in the interface's language. The details' Copy
+  and the logs keep the English (#800).
+- Covers and moving covers load once, at the window's real pixels, rather
+  than first at a guessed size and again at the real one; on a display of
+  another scale, the moving cover or music video that plays goes on, or
+  holds its last frame, while the stream for the new size loads, rather
+  than giving way to the cover (#764).
+
 ## [0.5.11] - 2026-11-13
 
 Control MixMusic on another computer of your network, and let AI
@@ -1731,7 +2563,8 @@ player, for macOS, Windows and Linux.
 - Apps for macOS 12 and later (Apple silicon and Intel), Windows 10 and 11,
   and Linux, on x64 and Arm64.
 
-[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.11...HEAD
+[Unreleased]: https://github.com/fzn0x/mixmusic/compare/v0.5.12...HEAD
+[0.5.12]: https://github.com/fzn0x/mixmusic/compare/v0.5.11...v0.5.12
 [0.5.11]: https://github.com/fzn0x/mixmusic/compare/v0.5.10...v0.5.11
 [0.5.10]: https://github.com/fzn0x/mixmusic/compare/v0.5.9...v0.5.10
 [0.5.9]: https://github.com/fzn0x/mixmusic/compare/v0.5.8...v0.5.9

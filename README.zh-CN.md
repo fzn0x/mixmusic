@@ -32,7 +32,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/banner.webp" alt="MixMusic 0.5.9 的默认外观（Blend 布局、Mix 主题），竖立在深色舞台上、正对着你：中间是正在播放 YOASOBI《アイドル》的页面，带粉色描边，每行歌词下方显示罗马音，前面是迷你播放器；左边是搜索，右边是音乐库里的混合歌单" />
+  <img src="docs/banner.webp" alt="MixMusic 的默认外观（Blend 布局、Mix 主题），竖立在深色舞台上、正对着你：中间是正在播放 YOASOBI《アイドル》的页面，带粉色描边，每行歌词下方显示罗马音，前面是迷你播放器；左边是搜索，右边是音乐库里的混合歌单" />
 </p>
 
 ## 为什么选择 MixMusic

@@ -121,45 +121,50 @@ func (s *shell) sleepMenu(c *ui.Context, anchor ui.Element, open *bool, m *sleep
 			TextColor(k.text).Font(k.body)
 		panel.Children(func() {
 			ui.Text(c, k.words(locales.SleepTimerTitle())).FontSize(k.captionSize()).TextColor(k.muted).Padding(4, 10, 6).SingleLine()
-			sl := s.st.Sleep
-			if line := s.st.SleepLine(time.Now()); line != "" {
-				ui.Text(c, line).FontSize(k.bodySize()).FontFeatures("tnum").TextColor(k.accent).Padding(2, 10, 6)
-				ui.Row(c).Gap(6).Padding(0, 6, 4).Wrap().Children(func() {
-					for _, add := range player.SleepAdds {
-						if s.sleepChip(c, "sleep-add-"+strconv.Itoa(add), locales.SleepAdd(add)) {
-							s.p.AddSleep(add, false)
+			// MyGo keeps the menu inside the window: in one too short for
+			// it, its rows scroll under the title, rather than run over the
+			// player bar.
+			ui.Scroll(c.Key("sleep-rows")).Shrink(1).MinHeight(0).Gap(2).Children(func() {
+				sl := s.st.Sleep
+				if line := s.st.SleepLine(time.Now()); line != "" {
+					ui.Text(c, line).FontSize(k.bodySize()).FontFeatures("tnum").TextColor(k.accent).Padding(2, 10, 6)
+					ui.Row(c).Gap(6).Padding(0, 6, 4).Wrap().Children(func() {
+						for _, add := range player.SleepAdds {
+							if s.sleepChip(c, "sleep-add-"+strconv.Itoa(add), locales.SleepAdd(add)) {
+								s.p.AddSleep(add, false)
+							}
 						}
+						if s.sleepChip(c, "sleep-cancel", locales.SleepCancel()) {
+							s.p.CancelSleep(false)
+							*open = false
+						}
+					})
+					s.sleepDivider(c)
+				}
+				for _, n := range player.SleepLengths {
+					if s.sleepItem(c, "sleep-"+strconv.Itoa(n), locales.SleepMinutes(n), false) {
+						s.startSleep(player.SleepTimer{Mode: player.SleepMinutes, N: n}, open)
 					}
-					if s.sleepChip(c, "sleep-cancel", locales.SleepCancel()) {
-						s.p.CancelSleep(false)
-						*open = false
+				}
+				s.sleepField(c, open, m)
+				if s.st.Live {
+					return
+				}
+				s.sleepDivider(c)
+				if s.sleepItem(c, "sleep-track", locales.SleepEndOfTrack(), sl != nil && sl.Mode == player.SleepTracks && sl.Tracks == 1) {
+					s.startSleep(player.SleepTimer{Mode: player.SleepTracks, N: 1}, open)
+				}
+				if s.sleepItem(c, "sleep-queue", locales.SleepEndOfQueue(), sl != nil && sl.Mode == player.SleepQueue) {
+					s.startSleep(player.SleepTimer{Mode: player.SleepQueue}, open)
+				}
+				s.sleepTracks(c, open, m, sl != nil && sl.Mode == player.SleepTracks && sl.Tracks > 1)
+				s.sleepDivider(c)
+				ui.Row(c).Gap(10).AlignItems(ui.Center).Padding(4, 10).Children(func() {
+					ui.Text(c, locales.SleepFinish()).FontSize(k.bodySize()).Grow(1).MinWidth(0)
+					if s.switchOf(c.Key("sleep-finish"), &s.set.SleepTimer.Finish).Label(locales.SleepFinish()).Changed() {
+						s.save()
 					}
 				})
-				s.sleepDivider(c)
-			}
-			for _, n := range player.SleepLengths {
-				if s.sleepItem(c, "sleep-"+strconv.Itoa(n), locales.SleepMinutes(n), false) {
-					s.startSleep(player.SleepTimer{Mode: player.SleepMinutes, N: n}, open)
-				}
-			}
-			s.sleepField(c, open, m)
-			if s.st.Live {
-				return
-			}
-			s.sleepDivider(c)
-			if s.sleepItem(c, "sleep-track", locales.SleepEndOfTrack(), sl != nil && sl.Mode == player.SleepTracks && sl.Tracks == 1) {
-				s.startSleep(player.SleepTimer{Mode: player.SleepTracks, N: 1}, open)
-			}
-			if s.sleepItem(c, "sleep-queue", locales.SleepEndOfQueue(), sl != nil && sl.Mode == player.SleepQueue) {
-				s.startSleep(player.SleepTimer{Mode: player.SleepQueue}, open)
-			}
-			s.sleepTracks(c, open, m, sl != nil && sl.Mode == player.SleepTracks && sl.Tracks > 1)
-			s.sleepDivider(c)
-			ui.Row(c).Gap(10).AlignItems(ui.Center).Padding(4, 10).Children(func() {
-				ui.Text(c, locales.SleepFinish()).FontSize(k.bodySize()).Grow(1).MinWidth(0)
-				if s.switchOf(c.Key("sleep-finish"), &s.set.SleepTimer.Finish).Label(locales.SleepFinish()).Changed() {
-					s.save()
-				}
 			})
 		})
 	})

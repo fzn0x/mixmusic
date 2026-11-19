@@ -112,6 +112,53 @@ func TestSleepMenu(t *testing.T) {
 	}
 }
 
+// TestSleepMenuScrolls opens the moon button's menu, while a timer runs,
+// in a window as short as MixMusic's main window can be. MyGo keeps the
+// menu inside the window since 0.10.0: its rows scroll inside it rather
+// than run over the player bar, and the last comes into view (#882).
+func TestSleepMenuScrolls(t *testing.T) {
+	s := playing(t)
+	tt := testerOf(t, s, 1440, 600)
+	openSleepMenu(t, s, tt)
+	click(t, s, tt, "30 minutes")
+	s.settle(t, func(st player.State) bool { return sleepMinutesLeft(st) > 29*time.Minute })
+	tt.Frame()
+	openSleepMenu(t, s, tt)
+	menuScrollsAbove(t, tt, "5 minutes", ui.RoleSwitch, "Let the track finish", sleepLabel(tt))
+}
+
+// menuScrollsAbove checks a menu that opens above the player bar's button
+// labelled button: first, its first row, shows above the button, and the
+// element of role and name, its last, does too, in full, once the menu is
+// scrolled to its end. A menu that doesn't scroll leaves its last row over
+// the player bar. (An element's box isn't clipped to the scroll it is in,
+// so the rows scrolled out of view can't be told apart from those that
+// run over the bar.)
+func menuScrollsAbove(t *testing.T, tt *ui.Tester, first string, role ui.Role, name, button string) {
+	t.Helper()
+	b, ok := tt.Access(button)
+	if !ok {
+		t.Fatalf("no %q button: %q", button, tt.Texts())
+	}
+	last := func() ui.Rect {
+		info, ok := tt.AccessByRole(role, name)
+		if !ok {
+			t.Fatalf("the menu has no %q: %q", name, tt.Texts())
+		}
+		return info.Bounds
+	}
+	top, ok := tt.Find(first)
+	if !ok || top.Y < 0 || top.Y+top.H > b.Bounds.Y {
+		t.Fatalf("the menu doesn't show %q above its button: %v, the button at %v; the window shows %q", first, top, b.Bounds, tt.Texts())
+	}
+	tt.Scroll(top.X+top.W/2, top.Y+top.H/2, 0, 2000)
+	tt.Frame()
+	if r := last(); r.H == 0 || r.Y+r.H > b.Bounds.Y {
+		t.Errorf("scrolled to its end, the menu doesn't show %q in full above the player bar: %v, its %q button at %v",
+			name, r, button, b.Bounds)
+	}
+}
+
 // TestSleepMenuEnds stops at the end of this track, of the queue or of a
 // few tracks, which the menu checks, and remembers Let the track finish.
 func TestSleepMenuEnds(t *testing.T) {

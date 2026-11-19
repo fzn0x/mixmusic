@@ -6,11 +6,15 @@ whose page switches between its versions (#345).
 
 - **Which albums are versions of one.** `media.GroupVersions`
   (`internal/media/versions.go`) groups a list. `VersionOf` sets apart
-  the marks of versions at the end of a title: a part in brackets, or
-  after a dash, made only of the words of versions (clean, explicit,
-  edited, deluxe, remastered, edition, anniversary and the like, with
-  years and ordinals), so that "(Live)" or "(Taylor's Version)" stay in
-  the title. Albums of one service, kind and artists, of the same title
+  the marks of versions at the end of a title: its last part in round,
+  square or full-width brackets, or after a dash with a space on each
+  side, or after a colon, full-width ones too (`cutVersionMark`). The
+  part is a mark when it is made only of the words of versions (clean,
+  explicit, edited, deluxe, remastered, edition, anniversary and the like,
+  with years and ordinals), or when it has words of its own beside a word
+  only an edition's name has, as ": Expanded Lantern Edition"
+  (`isVersionMark`). So "(Live)", "(Taylor's Version)" and ": A New Dawn"
+  stay in the title. Albums of one service, kind and artists, of the same title
   without those marks, are one album, but for two cases. Of one edition,
   the albums whose years, or numbers of tracks where both tell them,
   differ are other releases. And where more than one release has no

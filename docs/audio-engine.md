@@ -36,7 +36,12 @@ own. It uses no FFmpeg and no codec of the system.
 
 These decoders are Go packages anyone can import, documented on
 [pkg.go.dev](https://pkg.go.dev/github.com/fzn0x/mixmusic): `opus`, `aac`,
-`ac3`, `webm`, `mp4` and `resample`.
+`ac3`, `flac`, `ogg`, `webm`, `mp4` and `resample`. Among the module's
+other public packages are `lyrics`, which finds lyrics on Better Lyrics, Unison
+and LRCLIB and reads TTML and LRC, and `brand`, MixMusic's logo and the
+Discord status badges. They come under the same choice of licences as the
+rest, with those of the code they derive from.
+
 
 ### Files on this computer
 

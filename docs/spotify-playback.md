@@ -145,7 +145,12 @@ Spotify open.
   progress on each second between. Spotify's reports lag its commands by
   a few seconds, and may name the track by the ID of the copy Spotify
   plays in your country, so MixMusic waits for the device to settle, and
-  knows a track by more than its ID.
+  knows a track by more than its ID. While the device still reports the
+  track as loading, paused, right after a command, MixMusic takes that as
+  not settled yet, not as paused. A device that takes the track but sits
+  paused within 1.5 seconds of where the track was to start is told once
+  more to play, once for each track. After that MixMusic follows what the
+  device reports.
 - **The queue stays in MixMusic**, which tells the device to play the
   next track as one ends.
 - **The visualizer** hears the Spotify app on this computer, on Windows;

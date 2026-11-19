@@ -212,9 +212,15 @@ belongs to its main thread: what finishes elsewhere comes back through
   which draws no switches) and scroll (`lyricsState.stage`), each line
   drawn by `stageLine` in the style of `lyricsstyles.go`, a table that
   `settings.LyricStyles` and a test keep the same. Their ink is white, not
-  the theme's, over the track's cover stretched from a 64-pixel bitmap, as
-  the grounds of `groundLights` are: the GPU blends between its pixels, so
-  no blur of the window is drawn in a frame. A line away from the one sung
+  the theme's, over the track's cover (`stageGround`), read at 96 pixels
+  through `artworks.blurred`, which blurs it once as it loads, then
+  stretched over the window by `paintStageGround` under a dark layer of the
+  style's scrim and a gradient darkening the foot, so no blur of the window
+  is drawn in a frame. Without a cover, the accent at 40% stands in. Covers
+  in the windows are fetched at the window's device pixels, its size in
+  DIPs times the display's scale (`artAt`, `artPixels`), so they are sharp
+  on Retina and other high-density screens, and fetched again when the
+  window moves to a display of another scale (`notePixels`). A line away from the one sung
   fades (`Opacity`) and blurs (`Blur`) by its distance, in whole pixels
   (`blurAt`), and, as it stays so, keeps the layer it blurred (`Cache`),
   so that only the line sung, which asks for frames, is drawn again. Both

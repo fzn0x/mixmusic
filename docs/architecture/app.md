@@ -35,8 +35,11 @@
   MediaPlayer, and an MPRIS player on Linux, served by GIO's GDBus, both
   called with purego, and the SystemMediaTransportControls of a hidden
   window on Windows, reached through WinRT without cgo. It downloads
-  nothing: `internal/app` hands it each cover from the artwork store
-  (`controls_cover.go`), as its bytes on macOS and Windows, and on Linux
+  nothing: `internal/app` hands it each cover (`controls_cover.go`), read
+  by `coverBytes` from the music on this computer first, then from the
+  copy a download keeps, and only then from the artwork store, which
+  downloads it. So a downloaded track keeps its cover offline. The cover
+  goes as its bytes on macOS and Windows, and on Linux
   as a file in the cache folder's `now-playing/`, whose address MPRIS
   gives the desktop. The notification of a track that starts shows the
   same cover (`notecover.go`), its centre square at most 512 pixels

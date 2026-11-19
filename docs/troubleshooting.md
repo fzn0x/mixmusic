@@ -24,7 +24,7 @@ try failed, with the time:
 - a download or the offline cache, or a file on this computer.
 
 **copy** puts it all on the clipboard, as text ready for an issue, with
-MixMusic's version and your system. It leaves out the names of your
+MixMusic's version and your system. The details show in the language of the window, and **copy** keeps them in English, as the logs do, so that an issue can be read by anyone. It leaves out the names of your
 accounts, cookies and tokens, your computer's addresses, and the name of
 your home folder, which a path shows as `~`.
 
@@ -119,9 +119,11 @@ Settings › Playback; its details stay in Settings › About.
   the Indic scripts need a system font too.
 - **Linux does not start it.** Install GTK 3, as
   [Getting started](getting-started.md#the-first-launch) says.
+- **Linux x64 copy on 0.5.6 does not start, or does not update.** 0.5.6's x64 downloads, the `.deb`, the `.rpm`, the AppImage and the archive, asked for a program loader that only NixOS has, so they started only there. 0.5.7 and later ask for the system's. A copy that updated itself to 0.5.6 can't update on its own: install the newest version from the [release page](https://github.com/fzn0x/mixmusic/releases/latest), or run `install.sh` of the archive again. Your settings and library in `~/.config/MixMusic` are kept.
 - **macOS cannot check the app,** as it is not notarized yet: open it from
   System Settings › Privacy & Security › Open Anyway, as
   [Getting started](getting-started.md#the-first-launch) says.
+- **macOS asks again whether MixMusic may use your sign-ins.** The Keychain knows an update by the certificate it is signed with. Every official release is signed with the same one, so an update doesn't make it ask again for your sign-ins. The update to 0.5.12 from an older copy asks one last time, as earlier builds were signed another way. A build made without that certificate is signed another way and asks as before.
 
 ## Known issues
 

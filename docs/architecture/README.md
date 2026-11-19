@@ -30,3 +30,30 @@ this page, and the site shows each part after it, by name, with their
 headings in the page's contents.
 
 A new part gets a file of its own here, and needs a line nowhere else.
+
+## Packages anyone can import
+
+Some of the code is in Go packages at the module root,
+`github.com/fzn0x/mixmusic`, documented on
+[pkg.go.dev](https://pkg.go.dev/github.com/fzn0x/mixmusic). The decoders
+are `opus`, `aac`, `ac3`, `flac`, `ogg`, `webm`, `mp4` and `resample`, told
+in `codecs.md`; `lyrics` finds lyrics on Better Lyrics, Unison and LRCLIB
+and reads TTML and LRC; `brand` holds MixMusic's logo, the pink rings with
+a play button, and the Discord status badges. The logo isn't in
+`resources/`: `mygo build` ships every file there beside the app, and it
+holds only `darwin/` now.
+
+## Build from source
+
+The project's README has the steps for each system. With
+[Nix](https://nixos.org), `nix build` builds MixMusic for Linux from
+source into `result/` (x86_64 and aarch64, `nix/package.nix`),
+and `nix run github:fzn0x/mixmusic` runs it. `nix develop`, on Linux and
+macOS, gives Go 1.27, Bun, GoReleaser, jq, zip and Zola, and, on Linux,
+NSIS, osslsigncode and binutils, at the versions `flake.lock` pins.
+Releases are built in that shell, as are CI's builds and the website, and
+published with GoReleaser (`.goreleaser.yaml`). In the shell, build Linux
+downloads with `.github/scripts/build.sh linux/amd64,linux/arm64`: a plain
+`bun run build` there makes a program that asks for Nix's loader and starts
+only on NixOS. `go run ./tools/elfloader build/linux-amd64` checks a build.
+

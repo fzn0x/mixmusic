@@ -22,6 +22,14 @@ reads the folder and the folders in it, and keeps what it finds:
 - **Rescan** reads the folders again now. MixMusic also reads them as it
   starts, quietly, and when you add or remove one.
 
+A folder that is a link, a symbolic link or on Windows a directory
+junction, is read at the folder it points to, and keeps the path you added.
+Links inside a folder aren't followed, so a link to a parent folder makes
+no loop. A folder added twice, by its path and by a link to it, counts
+once. A link to a folder dropped on the window, or opened, plays its music
+as the folder would, and on Linux a folder that is a link is watched for
+changes where it points to.
+
 A scan reads only what changed: a file new to it, or one whose size or
 time of change differs from the last scan. A library of thousands of
 files is read whole once, then in moments.
@@ -81,7 +89,7 @@ of case and accents, and shows even without the network.
 
 | Kind | Files | Notes |
 |---|---|---|
-| MP3 | `.mp3` | MPEG-1, 2 and 2.5 Layer III; without the silence LAME's tag tells of at their start and end, so that an album's tracks follow each other without gaps; of a variable bitrate, as long as its Xing or VBRI header tells |
+| MP3 | `.mp3` | MPEG-1, 2 and 2.5 Layer III; without the silence LAME's tag tells of at their start and end, so that an album's tracks follow each other without gaps; of a variable bitrate, as long as its Xing or VBRI header tells, or, for one cut short whose header counts more frames than the file holds, as long as the frames it holds, counted up to 1,048,576 frames, some 7 hours at 44.1 kHz |
 | FLAC | `.flac` | up to 8 channels and 32 bits |
 | WAV | `.wav` | PCM of 8 to 32 bits, or floats of 32 or 64 |
 | AAC | `.m4a`, `.mp4` | AAC-LC; HE-AAC and Apple Lossless (ALAC) aren't played |

@@ -63,8 +63,10 @@ go to the services' pages, and cards are drawn on this computer.
   (Noto Color Emoji). COLR's second version, whose glyphs are gradients,
   is not drawn. A letter followed by U+FE0F comes from a font that has it
   in colour.
-- **The menu** (`share.go`) has a `Share` submenu, built by `shareItem`
-  beside Copy link in each menu: `songShare`, `albumShare` and
+- **The menu** (`share.go`) has a `Share` submenu, built by `shareItem`.
+  A song's menu has it after the Copy submenu (`copySongItems`), which
+  holds Copy link; an album's and a playlist's menu keep Copy link beside
+  it: `songShare`, `albumShare` and
   `playlistShare` say what a target is. A Spotify song's links include the
   page of its YouTube Music match (`Player.Matched`). `saveCard` asks for
   the path with the system's save dialog (`saveFileDialog`, which tests

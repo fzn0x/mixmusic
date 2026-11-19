@@ -8,7 +8,7 @@
 
 <p align="center"><strong>Satu pemutar untuk YouTube Music dan Spotify.</strong></p>
 
-<p align="center">Klien YouTube Music dan Spotify untuk macOS, Windows, dan Linux. YouTube Music bisa dipakai tanpa akun. Satu pencarian, satu antrean, playlist campuran, lirik tersinkron, tema, dan plugin.</p>
+<p align="center">Klien YouTube Music dan Spotify untuk macOS, Windows, dan Linux. YouTube Music bisa dipakai tanpa akun. Satu pencarian, satu antrean, playlist campuran, lirik tersinkron, podcast, file musik Anda sendiri, casting, tema, dan plugin.</p>
 
 <p align="center"><sub>Ini terjemahan dari <a href="README.md">README berbahasa Inggris</a>. Jika ada perbedaan, yang terbaru adalah versi bahasa Inggris.</sub></p>
 
@@ -25,9 +25,10 @@
 </p>
 
 <p align="center">
-  <a href="https://fzn0x.github.io/mixmusic/">Situs web</a> ·
+  <a href="https://mixmusic.functionx.dev/">Situs web</a> ·
   <a href="https://github.com/fzn0x/mixmusic/releases/latest">Unduh</a> ·
-  <a href="https://fzn0x.github.io/mixmusic/docs/">Dokumentasi</a> ·
+  <a href="https://mixmusic.functionx.dev/docs/">Dokumentasi</a> ·
+  <a href="docs/features.md">Semua fitur</a> ·
   <a href="CHANGELOG.md">Catatan perubahan</a>
 </p>
 
@@ -44,7 +45,8 @@ MixMusic menyatukan kedua layanan itu dalam satu pemutar:
 - **Satu pencarian.** MixMusic mencari di YouTube Music dan Spotify
   sekaligus, dan menandai setiap hasil dengan layanan asalnya.
 - **Satu antrean dan satu pustaka.** Lagu Spotify bisa diputar tepat setelah
-  lagu YouTube Music, dan satu playlist bisa berisi lagu dari keduanya.
+  lagu YouTube Music, dan satu playlist bisa berisi lagu dari keduanya, juga
+  dari file musik di komputer Anda.
 - **Tidak perlu akun.** YouTube Music langsung bisa diputar begitu aplikasi
   dibuka. Masuk ke akun hanya jika Anda ingin memakai pustaka Anda sendiri.
   Spotify bersifat opsional.
@@ -54,79 +56,191 @@ MixMusic menyatukan kedua layanan itu dalam satu pemutar:
 - **Bebas diubah.** Ada empat tata letak dan empat belas tema bawaan,
   komunitas menambahkan tema dan plugin lainnya, dan setiap perintah bisa
   diberi tombol pilihan Anda sendiri.
+- **Dalam bahasa Anda.** Jendelanya tersedia dalam 66 bahasa selain bahasa
+  Inggris, dengan tata letak kanan ke kiri untuk bahasa Arab, Ibrani, Persia,
+  dan Urdu.
 - **Privat.** MixMusic tidak punya akun, server, analitik, atau telemetri
   sendiri.
 - **Gratis dan open source,** di bawah lisensi MIT atau GPL 3.0.
 
 ## Fitur
 
+Apa yang bisa dilakukan MixMusic, bidang demi bidang, dan di mana
+menemukannya di aplikasi. **Built in** (Bawaan) berarti fitur itu berjalan
+sendiri. [Fitur](docs/features.md) mencantumkan 363 fitur dari 0.1.0 sampai
+0.5.12, satu baris untuk tiap fitur, beserta versi saat fitur itu hadir.
+
 ### Cari dan putar
 
 - **Satu pencarian untuk kedua layanan.** Hasil dari YouTube Music dan
-  Spotify tampil berdampingan, masing-masing ditandai dengan layanannya.
-  Hasil YouTube Music menunjukkan berapa kali setiap lagu diputar, sehingga
-  versi aslinya mudah dibedakan dari versi cover.
+  Spotify tampil berdampingan, masing-masing ditandai dengan layanannya,
+  bersama file musik Anda sendiri. Hasil YouTube Music menunjukkan berapa
+  kali setiap lagu diputar, sehingga versi aslinya mudah dibedakan dari
+  versi cover. *Bilah atas*
+- **Semua jenis hasil.** Lagu, video, album, artis, playlist, dan podcast,
+  diurutkan menurut kecocokan terbaik, paling sering diputar, atau terbaru,
+  serta YouTube sendiri untuk pertunjukan langsung dan unggahan yang tidak
+  ada di katalog musik. Tautan YouTube atau Spotify yang ditempelkan di
+  kotak pencarian langsung diputar. *Pencarian*
 - **Satu antrean.** Campur lagu dari kedua layanan, acak dan ulangi
-  semuanya sekaligus, dan biarkan radio melanjutkan saat antrean habis.
-- **Explore (Jelajahi).** Rilis baru, lagu yang sedang tren, tangga lagu,
-  mood dan genre, serta lagu yang terkait dengan lagu yang sedang diputar.
-- **Lirik tersinkron** yang mengikuti lagu, atau teks biasa jika Anda lebih
-  suka.
-- **Pemutar mini** yang tetap berada di atas jendela-jendela lain.
+  semuanya sekaligus, pindahkan lagu agar diputar berikutnya, dan biarkan
+  radio melanjutkan saat antrean habis. Antrean kembali seperti yang Anda
+  tinggalkan setelah aplikasi dimulai ulang. *Bilah pemutar, Antrean*
+- **Halaman untuk semuanya.** Album, artis, dan playlist dengan tombol Putar
+  dan Acak, semua lagu seorang artis, dan musik terkait dengan lagu yang
+  sedang diputar. *Pencarian, Beranda*
+- **Lewati yang tidak Anda mau.** Tandai lagu sebagai tidak disukai agar
+  dilewati radio, lewati lagu buatan AI dan bagian video yang ditandai
+  SponsorBlock, serta sembunyikan konten eksplisit atau pilih versi bersih.
+  *Bilah pemutar, Settings › Playback (Pengaturan › Pemutaran)*
+- **Sleep timer dan kecepatan.** Berhenti setelah sekian waktu, setelah satu
+  lagu, atau setelah antrean habis, dengan suara memudar, atau otomatis di
+  malam hari, dan putar lagu serta podcast lebih cepat atau lebih lambat
+  dengan nada yang tetap. *Bilah pemutar*
+- **Video musik dan sampul bergerak.** Video musik sebuah lagu sebagai
+  pengganti sampulnya, dan video pendek yang diulang-ulang oleh beberapa
+  album. *Sedang diputar, Settings › Playback*
+- **Pilih, bagikan, dan lihat lebih dekat.** Pilih beberapa lagu sekaligus
+  untuk dimasukkan ke antrean, ditambahkan, atau diunduh, bagikan lagu atau
+  album sebagai kartu gambar, dan lihat dari mana sebuah lagu berasal serta
+  mengapa lagu itu tidak bisa diputar. *Menu lagu*
+
+### Beranda dan Explore
+
+- **Beranda** dengan rak-rak Anda, Jump back in (Lanjutkan), dan rilis baru
+  dari artis yang Anda ikuti, disusun sesuai selera Anda. *Beranda*
+- **Explore (Jelajahi):** rilis baru, tangga lagu, mood, dan genre.
+  *Explore*
+
+### Lirik
+
+- **Lirik tersinkron** yang mengikuti lagu, kata demi kata jika sumbernya
+  mendukung, juga layar penuh, atau teks biasa jika Anda lebih suka. *Panel
+  lirik, Sedang diputar*
+- **Terjemahan dan huruf Latin:** terjemahan di bawah setiap baris, romaji
+  untuk bahasa Jepang, dan huruf Latin untuk bahasa Korea, Mandarin, Rusia,
+  Arab, dan banyak aksara lain. *Panel lirik*
+- **Sumber sesuai pilihan Anda:** Better Lyrics, Unison, LRCLIB, YouTube
+  Music, dan teks keterangan YouTube, dalam urutan yang Anda atur, dengan
+  sumber lain, pencarian, serta suntingan dan pengaturan waktu Anda sendiri
+  hanya sejauh satu klik. *Settings › Playback › Lyrics, Panel lirik*
+- **Cari di dalam lirik,** bagikan beberapa barisnya sebagai kartu, dan baca
+  lirik yang tersimpan di file lagu Anda sendiri. *Panel lirik*
+
+### Podcast
+
+- **Podcast YouTube Music dan Spotify.** Temukan dan ikuti acara, mulai
+  setiap episode dari tempat Anda berhenti, tandai episode sebagai sudah
+  diputar, baca bab dan transkripnya, dan atur kecepatan yang terpisah dari
+  kecepatan lagu. *Pencarian, Halaman acara, Library › Podcasts (Pustaka ›
+  Podcast)*
 
 ### Pustaka Anda
 
-- **Mix:** playlist yang berisi lagu dari semua layanan. Impor playlist dari
-  sebuah layanan ke dalam mix, lalu cari dan urutkan lagu di dalam mix mana
-  pun.
-- **Lagu yang disukai** dari kedua layanan dalam satu daftar.
-- **Riwayat dan statistik mendengarkan,** dari hari ke hari.
-- **Akun Anda.** Masuk ke YouTube Music lewat halaman milik Google sendiri
-  untuk mendapatkan feed beranda, lagu yang disukai, playlist, album, dan
-  artis Anda, baik sebagai akun Anda maupun salah satu channel brand milik
-  akun itu. Masuk ke Spotify untuk memakai pustaka Anda di sana. Lagu yang
-  Anda sukai, album dan playlist yang Anda simpan, serta artis yang Anda
-  ikuti juga tercatat di layanan tersebut. Lagu yang Anda putar masuk ke
-  riwayat YouTube Music Anda, yang menjadi dasar rekomendasinya.
+- **Mix:** playlist yang berisi lagu dari semua layanan, dalam urutan pilihan
+  Anda, bisa dicari dan diurutkan, dengan sampul buatan Anda sendiri.
+  *Library › Mixes, Sidebar (Pustaka › Mix, Bilah samping)*
+- **Lagu yang disukai** dari kedua layanan dalam satu daftar, serta playlist,
+  album, dan artis YouTube Music dan Spotify Anda, yang bisa Anda simpan,
+  buat, bagikan, dan kerjakan bersama. Lagu yang disukai dan yang disimpan
+  juga sampai ke layanannya. *Pustaka*
+- **Pin, folder, dan tag** menjaga pustaka yang besar tetap rapi, dan yang
+  tidak ingin Anda lihat di sana bisa disembunyikan. *Bilah samping, Menu
+  sebuah ubin*
+- **Ikuti artis,** dengan akun atau tanpa akun, dan lihat rilis baru mereka.
+  *Halaman artis, Library › Artists*
+- **Riwayat, Stats, dan Your year:** menit per hari, lagu dan artis teratas
+  Anda, serta kartu untuk dibagikan. *Library › History, Stats*
+- **Unduhan** untuk diputar tanpa jaringan, dan cache offline untuk lagu
+  yang pernah Anda putar. *Menu lagu, Library › Downloads*
 
-### Tiga cara memutar Spotify
+### Musik di komputer ini
+
+- **File musik Anda sendiri** di pustaka dan di pencarian, dari folder yang
+  dipantau MixMusic: MP3, FLAC, WAV, M4A, Opus, dan Vorbis, lengkap dengan
+  tag dan sampulnya. *Settings › Playback › Music on this computer*
+- **Sunting tag-nya,** kumpulkan salinan dari satu lagu, dan buka atau
+  jatuhkan file untuk memutarnya. *Menu lagu, Jatuhkan ke jendela*
+
+### Akun dan layanan
+
+- **YouTube Music.** Masuk lewat halaman milik Google sendiri, lewat browser
+  Anda atau dengan sesi sebuah browser, sebagai akun Anda atau salah satu
+  channel brand-nya, untuk mendapatkan feed beranda, lagu yang disukai,
+  playlist, album, dan artis Anda. Lagu yang Anda putar masuk ke riwayat
+  YouTube Music Anda, yang menjadi dasar rekomendasinya. *Settings ›
+  Accounts (Pengaturan › Akun)*
+- **Last.fm:** setiap lagu yang Anda putar sampai setengahnya, atau selama
+  empat menit, tercatat di profil Anda, dan scrobble yang dibuat saat offline
+  dikirim begitu Anda kembali online. *Settings › Accounts*
+- **ListenBrainz:** sama seperti itu, bersama Last.fm atau tanpanya, ke
+  ListenBrainz atau server Anda sendiri, seperti Maloja. Lagu yang Anda
+  sukai bisa dikirim ke salah satu atau keduanya sebagai love. *Settings ›
+  Accounts*
+- **Libre.fm:** sama seperti itu, ke Libre.fm atau server GNU FM lain, tanpa
+  perlu membuat akun API. *Settings › Accounts*
+- **Discord:** profil Anda menampilkan lagu yang sedang diputar, lengkap
+  dengan sampul dan sisa waktunya, sesuai pilihan Anda. *Settings › Desktop*
+
+### Spotify, tiga cara
 
 - **Langsung di MixMusic,** dengan kualitas Spotify, tanpa membuka aplikasi
   Spotify (Premium, di Windows dan macOS).
-- **Lewat Spotify Connect:** di aplikasi Spotify, ponsel, atau speaker Anda.
+- **Lewat Spotify Connect:** di aplikasi Spotify, ponsel, atau speaker Anda,
+  dalam kualitas lossless jika aplikasi Spotify mengaktifkannya.
 - **Dari YouTube Music:** MixMusic memutar rekaman lagu Spotify tersebut yang
   ada di YouTube Music, yang bisa diputar tanpa Premium.
 
+Pilih di Settings › Playback › Spotify tracks.
+
 ### Suara
 
-- Crossfade, kenyaringan yang setara antarlagu, dan perataan volume.
-- Equalizer sepuluh band dengan preset.
-- Visualizer.
-- Cache offline untuk lagu-lagu yang pernah Anda putar.
+- **Equalizer sepuluh band** dengan 23 preset dan preset buatan Anda sendiri,
+  mode sederhana berisi Bass, Mid, dan Treble, serta koreksi untuk lebih
+  dari 8.800 headphone dari AutoEq. *Settings › Playback › Equalizer*
+- **Crossfade, album tanpa jeda, kenyaringan yang setara, dan perataan
+  volume.** *Settings › Playback › Sound*
+- **Reverb, gema, crossfeed, balance, dan lebar stereo.** *Settings ›
+  Playback*
+- **Surround 5.1** jika sebuah lagu memilikinya, dan perangkat keluaran
+  suara pilihan Anda. *Bilah pemutar, Settings › Playback › Sound*
+- **Visualizer,** digambar dari mesin audio MixMusic sendiri. *Sedang
+  diputar*
+
+### Casting, teman, dan komputer lain
+
+- **Cast** ke Chromecast, speaker Google Home dan Nest beserta grupnya,
+  renderer DLNA dan UPnP, serta penerima FCast, termasuk file musik Anda
+  sendiri. *Bilah pemutar, Pemutar mini*
+- **Dengarkan bersama teman:** buat ruang yang memutar lagu serempak di
+  komputer teman-teman Anda, di jaringan Anda atau di mana saja lewat tautan
+  undangan. *Menu cast di bilah pemutar*
+- **Kendali jarak jauh:** kendalikan MixMusic di komputer lain di jaringan
+  Anda, dan pindahkan lagu yang diputar di antara keduanya. *Menu cast di
+  bilah pemutar, Settings › Desktop*
+- **Asisten AI** di komputer Anda bisa mengetahui lagu yang sedang diputar,
+  mencari, memutar, dan mengatur sleep timer, lewat Model Context Protocol.
+  *Settings › Desktop › AI assistants*
 
 ### Di desktop Anda
 
-- Tombol media dan kontrol media sistem di Windows, macOS, dan Linux.
-- Pintasan global pilihan Anda untuk memutar, menjeda, melewati lagu,
+- **Pemutar mini** yang tetap berada di atas jendela-jendela lain, dengan
+  antrean dan lirik di panelnya. *Bilah pemutar, <kbd>Ctrl</kbd> <kbd>M</kbd>*
+- **Tombol media** dan kontrol media sistem di Windows, macOS, dan Linux.
+  *Built in*
+- **Pintasan global** pilihan Anda untuk memutar, menjeda, melewati lagu,
   mengubah volume, membisukan, menyukai atau tidak menyukai lagu yang sedang
   diputar, atau menampilkan MixMusic, di jendela mana pun yang sedang di
-  depan.
-- Tombol pemutar di thumbnail taskbar Windows.
-- Kontrol di tray, notifikasi setiap kali lagu baru diputar, dan berjalan
-  otomatis saat login.
-- Tautan `mixmusic://`.
-- **Last.fm:** setiap lagu yang Anda dengar tercatat di profil Anda, dan
-  scrobble yang dibuat saat offline dikirim begitu Anda kembali online.
-- **ListenBrainz:** sama seperti itu, bersama Last.fm atau tanpanya, ke
-  ListenBrainz atau server Anda sendiri, seperti Maloja. Lagu yang Anda
-  sukai bisa dikirim ke salah satu atau keduanya sebagai love.
-- **Libre.fm:** sama seperti itu, ke Libre.fm atau server GNU FM lain, tanpa
-  perlu membuat akun API.
-- **Discord:** profil Anda menampilkan lagu yang sedang diputar, lengkap
-  dengan sampul dan sisa waktunya.
-- **Pembaruan:** MixMusic memeriksa rilis baru saat dibuka dan setiap
-  beberapa jam, memeriksa tanda tangan digitalnya, lalu memasangnya saat
-  Anda memintanya, atau secara otomatis jika Anda memilih opsi itu.
+  depan. *Settings › Shortcuts*
+- **Tombol pemutar** di thumbnail taskbar Windows, dan pemutar di sekitar
+  notch MacBook. *Built in, Settings › Desktop*
+- **Kontrol di tray,** notifikasi lagu baru, tetap di atas, dan berjalan
+  otomatis saat login. *Settings › Desktop*
+- **Tautan `mixmusic://`** dan flag seperti `--next`, untuk tombol Stream Deck
+  atau skrip. *Baris perintah*
+- **Sedang diputar untuk overlay:** kartu lagu yang sedang diputar untuk
+  sumber browser OBS, dan datanya untuk halaman buatan Anda sendiri.
+  *Settings › Desktop*
 
 ### Sesuaikan sesuka Anda
 
@@ -135,26 +249,48 @@ MixMusic menyatukan kedua layanan itu dalam satu pemutar:
   Expressive, terasa ceria, dengan isian warna tonal, tombol berbentuk pil,
   dan bilah pemutar yang melayang. Crate bersahaja, agar sampul-sampulnya
   yang berbicara, dan Tiles adalah tampilan pertama MixMusic, dengan ubin
-  datar dan kata-kata raksasa berhuruf kecil.
+  datar dan kata-kata raksasa berhuruf kecil. *Settings › Appearance
+  (Pengaturan › Tampilan)*
 - **Tema.** Empat belas tema bawaan, masing-masing bisa dipakai di tata
   letak mana pun, dengan efek yang bisa diatur, satu tema untuk mode terang
   dan satu untuk mode gelap, serta warna aksen pilihan Anda sendiri atau
   yang diambil dari sampul lagu yang sedang diputar. Material dan Material
-  Dark membuat setiap warnanya dari sampul lagu.
+  Dark membuat setiap warnanya dari sampul lagu. *Settings › Appearance*
 - **Tema dan plugin komunitas,** cukup sekali klik di marketplace.
+  *Marketplace*
 - **Plugin** menambahkan halaman, perintah, aksi lagu, dan widget lewat API
-  bertipe, dan semuanya tampil dengan tema Anda.
+  bertipe, dan semuanya tampil dengan tema Anda. *Settings › Plugins*
 - **Mengutamakan keyboard.** Pintasan untuk semua hal yang umum, tombol
   pilihan Anda sendiri untuk perintah apa pun (termasuk perintah dari
   plugin), tombol yang mengendalikan musik dari aplikasi mana pun, dan palet
   perintah (<kbd>Ctrl</kbd> <kbd>K</kbd>) untuk sisanya.
+- **Bahasa Anda.** 66 bahasa selain bahasa Inggris, kanan ke kiri untuk
+  bahasa yang memang dibaca begitu, dengan tanggal dan angka sesuai
+  penulisan di wilayah Anda. *Settings › Appearance › Language*
+- **Untuk pembaca layar dan keyboard.** Nama dan pengumuman untuk pembaca
+  layar, setiap kontrol bisa dijangkau dengan keyboard, ukuran teks, zoom,
+  dan pengurangan gerakan. *Built in, Settings › Appearance*
 - **File pengaturan.** Pengaturan Anda tersimpan sebagai `settings.json` di
   folder data Anda (`%AppData%\MixMusic` di Windows,
   `~/Library/Application Support/MixMusic` di macOS, `~/.config/MixMusic` di
   Linux), jadi bisa Anda simpan bersama dotfiles Anda. Simpan file itu saat
-  MixMusic berjalan, dan perubahannya langsung berlaku; file ini bisa dibuka
-  lewat Settings › Desktop › Settings file (Pengaturan › Desktop › File
-  pengaturan).
+  MixMusic berjalan, dan perubahannya langsung berlaku. *Settings › Desktop ›
+  Settings file*
+
+### Cadangan, impor, dan ekspor
+
+- **Cadangkan dan pulihkan** pustaka, pengaturan, dan add-on Anda, secara
+  manual atau otomatis, di komputer ini atau komputer lain. *Settings ›
+  Desktop › Backups*
+- **Impor playlist** dari file serta dari data Spotify dan Google Anda, dan
+  ekspor daftar serta pustaka Anda ke file yang bisa dibaca pemutar lain.
+  *Library › Mixes, Menu More di sebuah halaman*
+
+### Pembaruan
+
+- MixMusic memeriksa rilis baru saat dibuka dan setiap beberapa jam,
+  memeriksa tanda tangan digitalnya, lalu memasangnya saat Anda memintanya,
+  atau secara otomatis jika Anda memilih opsi itu. *Settings › About*
 
 ## Sekilas tampilan
 
@@ -169,6 +305,39 @@ MixMusic menyatukan kedua layanan itu dalam satu pemutar:
 </p>
 
 <p align="center"><sub><b>Sesuaikan sesuka Anda.</b> Di tengah, keempat tata letak: Blend, yang bawaan, Expressive, Crate, dan Tiles, di atas tema-temanya. Di kiri, tema Material yang mengambil warnanya dari sampul lagu yang diputar. Di kanan, tema komunitas di marketplace.</sub></p>
+
+## Dokumentasi
+
+Panduannya ada di situs web, di
+[mixmusic.functionx.dev/docs](https://mixmusic.functionx.dev/docs/), juga di
+[fzn0x.github.io/mixmusic/docs](https://fzn0x.github.io/mixmusic/docs/),
+tempat pencarian bisa menemukan panduan mana pun, dan di
+[`docs/`](docs) di sini.
+
+- **Memulai:** [Memulai](docs/getting-started.md),
+  [Fitur](docs/features.md), [Akun](docs/accounts.md),
+  [Spotify](docs/spotify.md), [Pemecahan masalah](docs/troubleshooting.md)
+- **Memakai MixMusic:** [Memutar musik](docs/playing-music.md),
+  [Beranda](docs/home.md), [Pustaka Anda](docs/library.md),
+  [Impor dan ekspor playlist](docs/import-export.md),
+  [Musik di komputer ini](docs/local-music.md), [Lirik](docs/lyrics.md),
+  [Podcast](docs/podcasts.md), [Tampilan dan nuansa](docs/look-and-feel.md),
+  [Di desktop](docs/desktop.md),
+  [Overlay untuk siaran langsung](docs/stream-overlay.md),
+  [Casting](docs/casting.md), [Kendali jarak jauh](docs/remote-control.md),
+  [Dengarkan bersama teman](docs/listen-with-friends.md),
+  [Asisten AI](docs/ai-assistants.md),
+  [Marketplace](docs/marketplace.md), [Pengaturan](docs/settings.md)
+- **Cara kerjanya:** [Cara kerja MixMusic](docs/how-it-works.md),
+  [Mesin audio](docs/audio-engine.md),
+  [Dari mana stream audio berasal](docs/streams.md),
+  [Cara lagu Spotify diputar](docs/spotify-playback.md),
+  [Data dan privasi Anda](docs/data-and-privacy.md)
+- **Buat sendiri:** [Tema](docs/themes.md), [Plugin](docs/plugins.md)
+- **Proyeknya:** [Kredit](docs/credits.md), [Lisensi](docs/license.md),
+  [Arsitektur](docs/architecture/README.md),
+  [Berkontribusi](CONTRIBUTING.md), [Kode etik](CODE_OF_CONDUCT.md),
+  [Keamanan](SECURITY.md)
 
 ## Pemasangan
 
@@ -189,8 +358,8 @@ Unduh file untuk sistem Anda dari
 
 `<arch>` adalah `amd64` untuk x64 dan `arm64` untuk Arm. Setiap rilis
 menyertakan `SHA256SUMS` untuk memeriksa file yang Anda unduh. Anda tidak
-perlu file bernama `update-…`, `….delta`, `mixmusic-<version>-macos-…`, atau
-`-windows-<arch>.tar.gz`: file-file itu dipakai aplikasi yang sudah
+perlu file bernama `update-…`, `….delta`, `mixmusic-<version>-darwin-universal.tar.gz`,
+atau `-windows-<arch>.tar.gz`: file-file itu dipakai aplikasi yang sudah
 terpasang untuk memperbarui dirinya.
 
 Installer, zip portabel, dan arsip Linux bisa memperbarui dirinya sendiri.
@@ -204,12 +373,15 @@ buka `MixMusic.exe`. Untuk AppImage, jadikan file itu bisa dijalankan
 `flatpak install ./mixmusic-<version>-linux-<arch>.flatpak`; saat pertama
 kali, Flatpak akan mengambil runtime GNOME dari Flathub.
 
-Di Mac, [Homebrew](https://brew.sh)
-memasang MixMusic, dan `brew upgrade` memperbaruinya.
+Di Mac, [Homebrew](https://brew.sh) juga bisa memasang MixMusic, dan
+`brew upgrade` memperbaruinya:
 
 ```sh
 brew install --cask fzn0x/tap/mixmusic
 ```
+
+[Memulai](docs/getting-started.md) memandu pemasangan dan peluncuran pertama
+di setiap sistem.
 
 ### Pertama kali dijalankan
 
@@ -231,7 +403,7 @@ brew install --cask fzn0x/tap/mixmusic
   menyediakannya) atau ALSA. Masuk ke YouTube Music memerlukan WebKitGTK
   4.1, ikon tray memerlukan `libayatana-appindicator3`, dan menyimpan data
   login Anda di keyring sistem memerlukan `libsecret`. `.deb` dan `.rpm`
-  sudah memasang semuanya, dan Flatpak membawanya sendiri; untuk AppImage
+  sudah memasangnya, dan Flatpak membawanya sendiri; untuk AppImage
   dan arsip:
 
   ```sh
@@ -239,6 +411,20 @@ brew install --cask fzn0x/tap/mixmusic
   sudo apt install libgtk-3-0 libpulse0 libwebkit2gtk-4.1-0 libayatana-appindicator3-1 libsecret-1-0
   # Fedora
   sudo dnf install gtk3 pulseaudio-libs webkit2gtk4.1 libayatana-appindicator-gtk3 libsecret
+  ```
+
+  MixMusic tidak menyertakan font untuk huruf Mandarin, Jepang, dan Korea,
+  dan di Linux huruf yang tidak dimiliki font mana pun yang terpasang tampil
+  sebagai ruang kosong. `.deb` dan `.rpm` memintanya; dengan yang lain,
+  pasang sendiri satu font lalu mulai ulang MixMusic:
+
+  ```sh
+  # Debian and Ubuntu
+  sudo apt install fonts-noto-cjk
+  # Fedora
+  sudo dnf install google-noto-sans-cjk-vf-fonts
+  # Arch
+  sudo pacman -S noto-fonts-cjk
   ```
 - **Semua sistem:** MixMusic menemukan sendiri audio sebagian besar lagu
   YouTube Music. Untuk sisanya, seperti lagu yang dibuat untuk anak-anak,
@@ -251,17 +437,27 @@ brew install --cask fzn0x/tap/mixmusic
 ### Flatpak
 
 Flatpak menjalankan MixMusic di dalam sandbox, yang bisa melihat jaringan,
-server suara, layar, dan GPU, tetapi sama sekali tidak bisa melihat folder
-home Anda. MixMusic menyimpan pengaturan dan pustakanya di
+server suara, layar, dan GPU, dan tidak bisa melihat folder home Anda,
+kecuali profil browser yang dipasang dari Flathub, hanya untuk dibaca, yang
+bisa dipakai untuk mengimpor sesi masuk YouTube Music. Flatpak tersedia untuk
+x64 dan Arm64, seperti Raspberry Pi 5, Asahi Linux, dan laptop Snapdragon.
+Untuk saat ini MixMusic belum ada di Flathub: pasang `.flatpak` dari rilis.
+
+Flatpak menyimpan pengaturan dan pustakanya di
 `~/.var/app/io.github.fzn0x.mixmusic`, terpisah dari instalasi `.deb`,
 `.rpm`, AppImage, atau arsip, dan keduanya bisa berjalan bersamaan. Untuk
-memindahkan pengaturan dan pustaka dari instalasi lain, tutup keduanya,
-salin `settings.json`, `library.json`, `queue.json`, `positions.json`, dan
-folder `addons` serta `mix-covers` dari `~/.config/MixMusic` ke
-`~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`. Tutup keduanya lebih
-dulu: MixMusic yang berjalan menyimpan `library.json` dan sebagian besar
-berkas lain di memori, lalu menimpa berkas salinan saat penyimpanan
-berikutnya. Setelah itu masuk lagi ke akun-akun Anda: data login tetap tersimpan di keyring instalasi yang lain.
+memindahkan pengaturan dan pustaka dari instalasi lain, cadangkan di
+Settings › Desktop › Backups lalu pulihkan file itu di Flatpak. Untuk
+menyalin file secara manual, tutup keduanya, lalu salin `settings.json`,
+`library.json`, `plays.jsonl`, `local-copies.json`, `queue.json`,
+`positions.json`, dan folder `addons` serta `mix-covers` dari
+`~/.config/MixMusic` ke `~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic`.
+Tutup keduanya lebih dulu: MixMusic yang berjalan menyimpan `library.json`
+dan sebagian besar berkas lain di memori, lalu menimpa berkas salinan saat
+penyimpanan berikutnya. Setelah itu masuk lagi ke akun-akun Anda: data login
+tetap tersimpan di keyring instalasi yang lain.
+[Halaman data dan privasi](docs/data-and-privacy.md#the-data-folder)
+menjelaskan isi setiap file.
 
 Di Flatpak, fitur berjalan otomatis saat login diatur lewat desktop Anda,
 yang mungkin akan meminta izin Anda terlebih dahulu, dan yt-dlp milik Anda
@@ -305,13 +501,27 @@ bagaimana Flatpak berjalan di desktop Anda.
   yang sedang Anda dengarkan. Matikan di Settings › Desktop (Pengaturan ›
   Desktop).
 
-Ada yang tidak berfungsi? [docs/troubleshooting.md](docs/troubleshooting.md)
+[Akun](docs/accounts.md) menjelaskan setiap langkah masuk satu per satu.
+
+### Batasan yang diketahui
+
+- **Windows di Arm** kurang diuji dibanding x64, dan zip portabel tidak
+  mendaftarkan tautan `mixmusic://`.
+- **Aplikasi Spotify dalam mode pengembangan,** seperti yang Anda pakai untuk
+  masuk, hanya memberi sepuluh hasil pencarian untuk tiap jenis, dan lagu
+  dalam playlist yang bukan milik Anda tetap tersembunyi.
+- **Di Linux,** Spotify diputar lewat Spotify Connect secara bawaan, karena
+  WebKitGTK tidak bisa memutar audio Spotify yang dilindungi.
+- **YouTube** bisa mengubah antarmukanya dan merusak pencarian, pemutaran,
+  atau proses masuk sampai MixMusic atau yt-dlp menyusul.
+
+Ada yang tidak berfungsi? [Pemecahan masalah](docs/troubleshooting.md)
 membahas masalah yang umum terjadi dan masalah yang sudah diketahui.
 
 ## Membangun dari kode sumber
 
 Anda memerlukan [Go](https://go.dev/dl/) 1.27.3 atau yang lebih baru,
-[Bun](https://bun.sh) 1.2 atau yang lebih baru, yang menjalankan CLI MyGo,
+[Bun](https://bun.sh) 1.4 atau yang lebih baru, yang menjalankan CLI MyGo,
 dan Git. MyGo tidak memerlukan compiler C, jadi sistem apa pun bisa
 membangun MixMusic untuk semua sistem.
 
@@ -375,8 +585,10 @@ bun run dev
 
 Dengan [Nix](https://nixos.org), `nix develop` menyediakan alat-alat yang
 dipakai untuk membangun rilis, pada versi yang dikunci oleh `flake.lock`:
-Go, Bun, NSIS, GoReleaser, dan Zola. `nix build` membangun MixMusic untuk
-Linux dari kode sumber, ke dalam `result/`.
+Go 1.27, Bun, GoReleaser, jq, zip, dan Zola, serta di Linux NSIS,
+osslsigncode, dan binutils. `nix build` membangun MixMusic untuk Linux dari
+kode sumber, ke dalam `result/`, dan `nix run github:fzn0x/mixmusic`
+menjalankannya.
 
 ### Pengembangan
 
@@ -399,14 +611,16 @@ rilis. `bun run build` biasa di sana menghasilkan program Linux yang meminta
 loader milik Nix sendiri, sehingga hanya bisa berjalan di NixOS.
 `go run ./tools/elfloader build/linux-amd64` memeriksa hasil build.
 
-[Situs web](https://fzn0x.github.io/mixmusic/) ada di `site/`, dibangun
+[Situs web](https://mixmusic.functionx.dev/) ada di `site/`, dibangun
 dengan [Zola](https://www.getzola.org), dan panduan di `docs/` menjadi
 halaman `/docs/` di situs itu. `go run ./tools/sitedocs && zola --root site serve`
 menampilkan pratinjaunya. Rilis dibangun di shell Nix dan diterbitkan oleh
 [GoReleaser](https://goreleaser.com) (`.goreleaser.yaml`).
 
-[docs/architecture](docs/architecture/README.md) menjelaskan bagaimana
-bagian-bagiannya saling terhubung.
+[CONTRIBUTING.md](CONTRIBUTING.md) berisi pemeriksaan yang perlu dijalankan
+sebelum pull request, dan [docs/architecture](docs/architecture/README.md)
+menjelaskan bagaimana bagian-bagiannya saling terhubung, satu halaman untuk
+tiap bagian.
 
 ### Struktur kode
 
@@ -418,25 +632,46 @@ didokumentasikan di [pkg.go.dev](https://pkg.go.dev/github.com/fzn0x/mixmusic).
 *.go                 the app and its windows: the pages, the player bar, the
                      mini player, the tray, media keys, deep links
 fonts/               the typefaces the windows draw with
+locales/             the app's words, in English and 66 other languages
 internal/app         the services the windows call, and the desktop integration
 internal/player      the queue, played by the audio engine or on Spotify's devices
 internal/audio       MixMusic's audio engine, and the system's audio output
-internal/plugins     plugins, each in a JavaScript engine of its own
+internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/youtube     YouTube Music's catalog, and your account there
 internal/spotify     the Spotify Web API, its sign-in and Spotify Connect
-internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/match       Spotify tracks matched to their YouTube Music recordings
-internal/romaji      Japanese lyrics in romaji, kanji read by kagome
 internal/library     liked and disliked songs, mixes, history and stats
-internal/lastfm      scrobbling to Last.fm
+internal/localfiles  the music on this computer; tags and tagwrite, its tags
+internal/romaji      Japanese lyrics in romaji, kanji read by kagome;
+                     romanize, the Latin letters of other scripts
+internal/cast        casting to Chromecasts; upnp, to DLNA renderers; fcast,
+                     to FCast receivers; dnssd finds them on the network
+internal/room        Listen with friends; remote, remote control; portmap,
+                     the router's forwarded port
+internal/mcp         AI assistants, over the Model Context Protocol
+internal/lastfm      scrobbling to Last.fm; listenbrainz and librefm, to
+                     theirs; scrobble, which plays count
 internal/discord     what plays, on your Discord profile
-internal/diag        the log, without secrets, and the reports of crashes
+internal/plugins     plugins, each in a JavaScript engine of its own
 internal/addons      themes and plugins, and the community registry
+internal/backup      backups and restores; playlistio and export, the files
+                     of lists and tracks in and out
+internal/diag        the log, without secrets, and the reports of crashes
+internal/settings    your preferences and their defaults
 builtin/themes       the themes MixMusic ships with
-public/              the page of Spotify's player, on Windows
+public/              the pages MyGo embeds: Spotify's player, on Windows and
+                     macOS, and the picture of music videos
 sdk/                 the types of the plugin API
 community/           community themes and plugins, and their registry
+docs/                the guides, the website's /docs/ pages
+site/                the website, built with Zola
+tools/               the commands that build and check the repository's parts
+packaging/, nix/     the Flatpak, Flathub, AUR and Homebrew packages, and Nix
+changelog.d/         the changelog entries of what isn't released yet
 ```
+
+[docs/architecture](docs/architecture/README.md) menjelaskan package lain di
+`internal/`, satu halaman untuk tiap bagian aplikasi.
 
 Package yang bisa Anda impor:
 
@@ -444,6 +679,8 @@ Package yang bisa Anda impor:
 opus/                an Opus decoder in pure Go, a port of libopus's
 aac/                 an AAC-LC decoder in pure Go
 ac3/                 an AC-3 and E-AC-3 decoder in pure Go, written from ATSC A/52
+flac/                a FLAC decoder in pure Go, as RFC 9639 has it
+ogg/                 the packets of Ogg files, as RFC 3533 has them
 webm/                the audio of WebM files: packets, times and seeking
 mp4/                 the audio of MP4 files: packets, times and seeking
 resample/            sample rate conversion, with Kaiser-windowed sincs
@@ -462,9 +699,8 @@ Tema adalah file `theme.json` yang mengatur warna, font, dan bentuk sudut,
 yang tampil dalam tata letak pilihan pengguna.
 [docs/themes.md](docs/themes.md) mencantumkan setiap token dan memberi
 contoh tema yang lengkap. Untuk mencoba tema Anda, letakkan foldernya di
-folder tema, yang bisa dibuka lewat Settings › Appearance › open themes
-folder (Pengaturan › Tampilan › buka folder tema), lalu pilih tema itu di
-Settings › Appearance.
+folder tema (Settings › Appearance › open themes folder, atau Pengaturan ›
+Tampilan › buka folder tema), lalu pilih tema itu di Settings › Appearance.
 
 ### Membuat plugin
 
@@ -479,12 +715,12 @@ berfungsi.
 ### Bagikan
 
 1. Fork repositori ini.
-2. Tambahkan satu folder: `community/themes/<id>/` untuk tema, atau
-   `community/plugins/<id>/` untuk plugin, lengkap dengan `plugin.json` dan
-   `index.ts`.
-3. Jalankan `bun run build:plugins`, `go run ./tools/registry`, dan
-   `go run ./tools/registry -check`.
-4. Buka pull request.
+2. Tambahkan satu folder: `community/themes/<id>/` dengan `theme.json` untuk
+   tema, atau `community/plugins/<id>/` dengan `plugin.json` dan `index.ts`
+   untuk plugin.
+3. Jalankan `bun install`, `bun run build:plugins`,
+   `go run ./tools/registry`, dan `go run ./tools/registry -check`.
+4. Buka pull request, beserta tangkapan layar.
 
 Setelah digabungkan, CI akan menerbitkannya ke
 [branch registry](https://github.com/fzn0x/mixmusic/tree/registry), dan
@@ -501,26 +737,33 @@ MixMusic berkomunikasi dengan:
   sampul; sebagian stream lewat yt-dlp. Jika Anda masuk: pustaka Anda di
   sana, dan lagu yang Anda putar, yang masuk ke riwayat YouTube Music Anda,
   kecuali Anda mematikannya di Settings › Accounts (Pengaturan › Akun).
+  YouTube sendiri, tanpa login dan tanpa cookie, untuk pilihan pencarian
+  YouTube, pemeriksaan lagu buatan AI, teks keterangan sebagai lirik dan
+  transkrip, serta lirik yang disesuaikan waktunya dengan video musik.
 - **Spotify,** setelah Anda masuk: pustaka Anda, perangkat Spotify Connect
   Anda, dan pemutar Spotify, yang dimuat dari `sdk.scdn.co` saat Spotify
   diputar di MixMusic.
+- **Better Lyrics:** judul, artis pertama, album, dan durasi lagu yang
+  sedang diputar, untuk mencari liriknya, setelah lagu itu punya album dan
+  durasi.
 - **Unison:** ID video lagu yang sedang diputar, atau, jika tidak ada,
   judul, artis, album, dan durasinya, untuk mencari liriknya. Hanya saat
-  Anda menyalakan terjemahan, atau romanisasi, di samping lirik: lirik
-  lagu yang sedang diputar, beserta ID videonya, yang oleh Unison
-  diterjemahkan lewat Google.
+  Anda menyalakan terjemahan, atau romanisasi huruf Arab, di samping lirik:
+  lirik lagu yang sedang diputar, beserta ID videonya, yang oleh Unison
+  diterjemahkan atau diromanisasi lewat Google.
 - **LRCLIB:** judul, artis, album, dan durasi lagu yang sedang diputar,
   untuk mencari liriknya.
-- **SponsorBlock:** hanya saat Anda menyalakan Skip the parts SponsorBlock
+- **SponsorBlock,** saat Anda menyalakan Skip the parts SponsorBlock
   marks (Lewati bagian yang ditandai SponsorBlock): 4 karakter pertama
   dari hash ID setiap video, tidak pernah ID-nya, untuk mencari bagian
   yang ditandainya.
 - **GitHub:** pemeriksaan versi baru saat aplikasi dibuka dan setiap
   beberapa jam, yang bisa Anda matikan di Settings › About (Pengaturan ›
   Tentang); registry komunitas saat Anda membuka marketplace; unduhan
-  yt-dlp; dan, saat pertama kali Anda menyalakan romaji di samping lirik
-  bahasa Jepang, kamus bacaan kanji (11,7 MB). Romaji dibuat di komputer
-  Anda: liriknya tidak dikirim.
+  yt-dlp; daftar headphone AutoEq beserta profil yang Anda pilih; dan, saat
+  pertama kali Anda menyalakan romaji di samping lirik bahasa Jepang, kamus
+  bacaan kanji (11,7 MB). Romaji, dan huruf Latin untuk aksara lain kecuali
+  Arab, dibuat di komputer Anda: liriknya tidak dikirim.
 - **Last.fm,** setelah Anda menghubungkannya: lagu yang Anda putar.
 - **ListenBrainz,** atau server Anda sendiri yang memakai API-nya, setelah
   Anda menghubungkannya: lagu yang Anda putar.
@@ -529,15 +772,35 @@ MixMusic berkomunikasi dengan:
 - **Discord,** kecuali Anda mematikannya: lagu yang sedang diputar, dikirim
   ke aplikasi Discord di komputer Anda, yang kemudian menampilkannya di
   profil Anda.
+- **Perangkat tujuan cast Anda,** di jaringan Anda: judul, artis, dan sampul
+  lagu yang sedang diputar. Perangkat itu mengambil audionya dari MixMusic.
+- **Komputer lain yang memakai MixMusic,** untuk kendali jarak jauh dan
+  Listen with friends (Dengarkan bersama teman), terenkripsi, di jaringan
+  Anda atau, saat Anda mengizinkan teman di luar jaringan itu bergabung,
+  lewat internet. Saat itu router Anda diminta meneruskan satu port, dan
+  tautan undangan Anda membawa alamat internet Anda.
+- **Asisten AI** di komputer Anda, selama Anda mengizinkannya: lagu yang
+  sedang diputar, antrean, hasil pencarian mereka, dan nama playlist Anda,
+  yang bisa diteruskan asisten itu ke model AI yang dipakainya.
+- **YouTube dan Spotify,** untuk mengetahui apakah jaringan menjawab:
+  permintaan lewat HTTPS yang dibalas dengan jawaban kosong.
+
+Plugin bisa mengirim apa saja yang mereka mau: izin sebuah plugin
+ditampilkan kepada Anda, tidak ditegakkan, itulah sebabnya MixMusic meminta
+Anda memercayai plugin sebelum mengaktifkannya.
+[Data dan privasi Anda](docs/data-and-privacy.md#what-each-feature-sends-where)
+memuat tabel tentang apa yang dikirim setiap fitur ke mana.
 
 Yang disimpan MixMusic di komputer Anda:
 
 - Pengaturan dan pustaka Anda (lagu yang disukai dan tidak disukai, mix,
-  riwayat, dan pencarian terakhir), di folder yang disebutkan di
-  Settings › About.
+  setiap pemutaran yang dihitung statistik Anda, artis dan acara yang
+  diikuti, pin, folder dan tag, riwayat, pencarian terakhir, dan indeks file
+  musik Anda), di folder yang disebutkan di Settings › About.
 - Lagu yang pernah Anda putar, di cache, sebanyak yang Anda izinkan di
   Settings › Playback (Pengaturan › Pemutaran), beserta tingkat
-  kenyaringannya menurut pengukuran YouTube.
+  kenyaringannya menurut pengukuran YouTube. Lagu yang Anda unduh, di folder
+  unduhan.
 - Sampul yang pernah Anda lihat, hingga 256 MB.
 - Terjemahan lirik yang Anda nyalakan, menurut lagu dan bahasa, serta kamus
   yang dipakai romaji untuk membaca kanji, setelah Anda menyalakannya.
@@ -551,6 +814,9 @@ Yang disimpan MixMusic di komputer Anda:
 Halaman riwayat di pustaka bisa menghapus daftar lagu yang pernah Anda
 putar, Settings › Playback bisa menghapus cache dan sampul, dan keluar dari
 sebuah layanan akan menghapus data login layanan tersebut.
+[Hapus, pindahkan, atau setel ulang](docs/data-and-privacy.md#clear-move-or-reset)
+menjelaskan cara memindahkan data Anda, menyimpan salinan portabel dengan
+`MIXMUSIC_DATA_DIR`, atau memulai dari awal.
 
 Di Windows, visualizer mendengarkan audio Spotify yang diputar di komputer
 ini, baik di MixMusic maupun di aplikasi Spotify, lewat process loopback
@@ -589,6 +855,12 @@ MixMusic dibangun di atas proyek-proyek berikut:
   AppImage.
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**, yang menemukan audio
   lagu-lagu yang tidak bisa ditemukan MixMusic sendiri.
+- **[SponsorBlock](https://sponsor.ajay.app)**, database terbuka hasil
+  urunan banyak orang tentang bagian-bagian video YouTube, oleh Ajay
+  Ramachandran dan para kontributornya, yang bagian-bagiannya dilewati
+  MixMusic saat Anda memintanya. Uses SponsorBlock data licensed under
+  [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+  from https://sponsor.ajay.app/.
 - **[Better Lyrics](https://betterlyrics.org)**, layanan yang menyimpan lirik dengan waktu per kata.
 - **[Unison](https://unison.betterlyrics.org)**, database lirik terbuka
   hasil urunan banyak orang, di bawah Unison Community License, dan
@@ -603,6 +875,17 @@ MixMusic dibangun di atas proyek-proyek berikut:
   port dari decodernya, dan **[SharpJaad](https://github.com/jimm98y/SharpJaad)**,
   port C# dari [JAAD](https://sourceforge.net/projects/jaadec/) yang
   menjadi dasar decoder AAC.
+- **[Chromium](https://www.chromium.org)**, yaitu Web Audio-nya, yang biquad,
+  DynamicsCompressor, dan AnalyserNode-nya menjadi sumber port untuk filter
+  equalizer, perataan volume, dan visualizer.
+- **[AutoEq](https://github.com/jaakkopasanen/AutoEq)**, oleh Jaakko Pasanen
+  dan para kontributornya, yang profilnya mengoreksi suara headphone, dalam
+  format [Equalizer APO](https://sourceforge.net/projects/equalizerapo/).
+- **[go-mp3](https://github.com/hajimehoshi/go-mp3)** dan
+  **[jfreymuth/vorbis](https://github.com/jfreymuth/vorbis)**, yang
+  mendekode file MP3 dan Vorbis di komputer Anda, serta
+  **[Xiph.Org](https://xiph.org)**, yang FLAC dan Ogg-nya dibaca oleh `flac`
+  dan `ogg`.
 - **[FFmpeg](https://ffmpeg.org)**, yang menjadi pembanding dalam pengujian
   decoder.
 - **[Selawik](https://github.com/microsoft/Selawik)**,
@@ -620,6 +903,9 @@ MixMusic dibangun di atas proyek-proyek berikut:
   lisensi [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/),
   diputar di situs web.
 
+[Kredit](docs/credits.md) menyebut setiap proyek, makalah, dan standar yang
+menjadi dasar MixMusic.
+
 ## Berkontribusi
 
 Perbaikan, fitur, tema, plugin, dan laporan bug, semuanya diterima dengan
@@ -634,7 +920,10 @@ senang hati.
   dijalankan, gaya commit, dan entri changelog yang diperlukan untuk
   perubahan yang akan disadari pengguna.
 - **Bagikan tema atau plugin:** lihat [Komunitas](#komunitas).
+- **Laporkan kerentanan** secara privat, seperti yang dijelaskan
+  [SECURITY.md](SECURITY.md).
 
+Semua yang ikut serta mengikuti [kode etik](CODE_OF_CONDUCT.md).
 [CONTRIBUTORS.md](CONTRIBUTORS.md) berterima kasih kepada orang-orang yang
 kode, ide, dan laporannya ikut membentuk MixMusic.
 
@@ -651,7 +940,10 @@ pilih. Kontribusi diterima di bawah kedua lisensi tersebut. Jenis huruf di
 libopus, di bawah [lisensi BSD-nya](opus/LICENSE.libopus), decoder AAC
 berasal dari SharpJaad, di bawah [lisensi MIT-nya](aac/LICENSE.sharpjaad),
 dan ilmu warna HCT adalah port dari Material Color Utilities, di bawah
-[lisensi Apache-nya](internal/hct/LICENSE.material-color-utilities).
+[lisensi Apache-nya](internal/hct/LICENSE.material-color-utilities). Bagian
+lain mengikuti lisensi dari sumber turunannya, seperti filter Web Audio
+Chromium, go-mp3, jfreymuth/vorbis, kagome, dan data Unihan:
+[Lisensi](docs/license.md) mencantumkan masing-masing.
 
 MixMusic tidak berafiliasi dengan, tidak didukung secara resmi oleh, dan
 tidak disponsori oleh Spotify maupun Google. MixMusic memutar apa yang

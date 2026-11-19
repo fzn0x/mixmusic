@@ -290,8 +290,20 @@
   // opening the drawer in a narrow window.
   const focusSearch = () => {
     if (narrow.matches && !d.documentElement.classList.contains("drawer-open")) d.querySelector("[data-drawer-open]")?.click();
-    input.focus();
-    input.select();
+    // The drawer that just opened may still be turning visible: with
+    // reduced motion, every element's visibility changes over a millisecond
+    // rather than at once, a frame later at each level down, and a field
+    // still hidden takes no focus. Focus once the field itself shows.
+    let frames = 0;
+    const put = () => {
+      if (getComputedStyle(input).visibility !== "visible" && frames++ < 60) {
+        requestAnimationFrame(put);
+        return;
+      }
+      input.focus();
+      input.select();
+    };
+    put();
   };
   d.querySelector("[data-search-open]")?.addEventListener("click", focusSearch);
   d.addEventListener("keydown", (e) => {

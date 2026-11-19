@@ -287,6 +287,38 @@ Choose in Settings › Playback › Spotify tracks.
 
 <p align="center"><sub><b>Make it yours.</b> In the middle, the four layouts: Blend, the default, Expressive, Crate and Tiles, under the themes. On the left, a Material theme that takes its colours from the cover that plays. On the right, community themes in the marketplace.</sub></p>
 
+## Docs
+
+The guides are on the website, at
+[mixmusic.functionx.dev/docs](https://mixmusic.functionx.dev/docs/), also
+at [fzn0x.github.io/mixmusic/docs](https://fzn0x.github.io/mixmusic/docs/),
+where a search finds any of them, and in [`docs/`](docs) here.
+
+- **Getting started:** [Getting started](docs/getting-started.md),
+  [Features](docs/features.md), [Accounts](docs/accounts.md),
+  [Spotify](docs/spotify.md), [Troubleshooting](docs/troubleshooting.md)
+- **Using MixMusic:** [Playing music](docs/playing-music.md),
+  [Home](docs/home.md), [Your library](docs/library.md),
+  [Import and export playlists](docs/import-export.md),
+  [Music on this computer](docs/local-music.md), [Lyrics](docs/lyrics.md),
+  [Podcasts](docs/podcasts.md), [Look and feel](docs/look-and-feel.md),
+  [On the desktop](docs/desktop.md),
+  [Overlays for streams](docs/stream-overlay.md),
+  [Casting](docs/casting.md), [Remote control](docs/remote-control.md),
+  [Listen with friends](docs/listen-with-friends.md),
+  [AI assistants](docs/ai-assistants.md),
+  [Marketplace](docs/marketplace.md), [Settings](docs/settings.md)
+- **How it works:** [How MixMusic works](docs/how-it-works.md),
+  [The audio engine](docs/audio-engine.md),
+  [Where the audio streams come from](docs/streams.md),
+  [How Spotify tracks play](docs/spotify-playback.md),
+  [Your data and privacy](docs/data-and-privacy.md)
+- **Make your own:** [Themes](docs/themes.md), [Plugins](docs/plugins.md)
+- **The project:** [Credits](docs/credits.md), [License](docs/license.md),
+  [Architecture](docs/architecture/README.md),
+  [Contributing](CONTRIBUTING.md), [Code of conduct](CODE_OF_CONDUCT.md),
+  [Security](SECURITY.md)
+
 ## Install
 
 Download the file for your system from the

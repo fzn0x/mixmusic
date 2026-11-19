@@ -120,6 +120,8 @@ MixMusic menyatukan kedua layanan itu dalam satu pemutar:
 - **ListenBrainz:** sama seperti itu, bersama Last.fm atau tanpanya, ke
   ListenBrainz atau server Anda sendiri, seperti Maloja. Lagu yang Anda
   sukai bisa dikirim ke salah satu atau keduanya sebagai love.
+- **Libre.fm:** sama seperti itu, ke Libre.fm atau server GNU FM lain, tanpa
+  perlu membuat akun API.
 - **Discord:** profil Anda menampilkan lagu yang sedang diputar, lengkap
   dengan sampul dan sisa waktunya.
 - **Pembaruan:** MixMusic memeriksa rilis baru saat dibuka dan setiap
@@ -297,6 +299,8 @@ bagaimana Flatpak berjalan di desktop Anda.
 - **ListenBrainz:** tempelkan user token dari
   [pengaturan ListenBrainz Anda](https://listenbrainz.org/settings/), atau
   dari server Anda sendiri, di Settings › Accounts.
+- **Libre.fm:** hubungkan di Settings › Accounts, lalu setujui MixMusic di
+  halaman Libre.fm di browser Anda, atau di halaman server GNU FM lain.
 - **Discord:** selama aplikasi Discord berjalan, profil Anda menampilkan apa
   yang sedang Anda dengarkan. Matikan di Settings › Desktop (Pengaturan ›
   Desktop).
@@ -520,6 +524,8 @@ MixMusic berkomunikasi dengan:
 - **Last.fm,** setelah Anda menghubungkannya: lagu yang Anda putar.
 - **ListenBrainz,** atau server Anda sendiri yang memakai API-nya, setelah
   Anda menghubungkannya: lagu yang Anda putar.
+- **Libre.fm,** atau server GNU FM lain, setelah Anda menghubungkannya: lagu
+  yang Anda putar.
 - **Discord,** kecuali Anda mematikannya: lagu yang sedang diputar, dikirim
   ke aplikasi Discord di komputer Anda, yang kemudian menampilkannya di
   profil Anda.
@@ -606,6 +612,10 @@ MixMusic dibangun di atas proyek-proyek berikut:
   dipakai di jendela aplikasi.
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**,
   yang ilmu warna HCT-nya diportkan menjadi warna-warna tema Material.
+- **[FCast](https://docs.fcast.org)**, protokol terbuka yang dipakai MixMusic
+  untuk memutar lagu di penerima FCast. MixMusic adalah implementasi
+  independennya, dan tidak berafiliasi dengan FUTO; FCast adalah merek dagang
+  terdaftar milik FUTO.
 - **[Kevin MacLeod](https://incompetech.com)**, yang musiknya, di bawah
   lisensi [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/),
   diputar di situs web.

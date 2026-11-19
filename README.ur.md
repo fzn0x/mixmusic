@@ -117,6 +117,8 @@
 - **ListenBrainz:** یہی، Last.fm کے ساتھ یا اس کے بغیر، ListenBrainz پر یا
   آپ کے اپنے کسی سرور پر، جیسے Maloja۔ لائک کیے گئے ٹریکس ان میں سے کسی پر بھی
   love کے طور پر جا سکتے ہیں۔
+- **Libre.fm:** یہی، Libre.fm پر یا کسی دوسرے GNU FM سرور پر، بغیر کوئی API
+  اکاؤنٹ بنائے۔
 - **Discord:** آپ کی پروفائل دکھاتی ہے کہ کیا چل رہا ہے، اس کے آرٹ ورک اور
   باقی وقت کے ساتھ۔
 - **اپڈیٹس:** MixMusic شروع ہونے پر اور ہر چند گھنٹوں بعد نئی ریلیز دیکھتا
@@ -298,6 +300,8 @@ Flatpak میں لاگ اِن پر شروع ہونا آپ کے ڈیسک ٹاپ ک
   میں MixMusic کو منظوری دیں۔
 - **ListenBrainz:** اپنی [ListenBrainz ترتیبات](https://listenbrainz.org/settings/)
   کا، یا اپنے سرور کا، user token Settings › Accounts میں پیسٹ کریں۔
+- **Libre.fm:** Settings › Accounts میں جوڑیں، اور اپنے براؤزر میں Libre.fm کے
+  صفحے پر، یا کسی دوسرے GNU FM سرور کے صفحے پر، MixMusic کو منظوری دیں۔
 - **Discord:** جب تک Discord ایپ چل رہی ہو، آپ کی پروفائل دکھاتی ہے کہ آپ کیا
   سن رہے ہیں۔ اسے Settings › Desktop (ترتیبات › ڈیسک ٹاپ) میں بند کریں۔
 
@@ -547,6 +551,7 @@ MixMusic کا اپنا کوئی اکاؤنٹ، سرور، analytics یا telemet
 - **Last.fm،** اسے جوڑنے کے بعد: جو آپ چلاتے ہیں۔
 - **ListenBrainz،** یا اس کی API والا آپ کا اپنا سرور، اسے جوڑنے کے بعد: جو
   آپ چلاتے ہیں۔
+- **Libre.fm،** یا کوئی دوسرا GNU FM سرور، اسے جوڑنے کے بعد: جو آپ چلاتے ہیں۔
 - **Discord،** جب تک آپ اسے بند نہ کریں: جو چل رہا ہے، آپ کے کمپیوٹر پر
   Discord ایپ کو بھیجا جاتا ہے، جو اسے آپ کی پروفائل پر دکھاتی ہے۔
 
@@ -623,6 +628,9 @@ MixMusic ان پروجیکٹس پر بنا ہے:
   **[Archivo](https://github.com/Omnibus-Type/Archivo)،** ونڈوز کے ٹائپ فیسز۔
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)،**
   جس کی HCT رنگ سائنس کا Material تھیمز کے رنگ پورٹ ہیں۔
+- **[FCast](https://docs.fcast.org)،** وہ کھلا پروٹوکول جس سے MixMusic FCast
+  ریسیورز پر چلاتا ہے۔ MixMusic اس کا ایک آزاد نفاذ ہے، اور FUTO سے وابستہ نہیں؛
+  FCast FUTO کا رجسٹرڈ ٹریڈ مارک ہے۔
 - **[Kevin MacLeod](https://incompetech.com)،** جن کی موسیقی،
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) کے تحت، ویب سائٹ
   پر چلتی ہے۔

@@ -112,6 +112,8 @@
 - **ListenBrainz፦** ያው ነገር፣ ከLast.fm ጋር ወይም ያለ እሱ፣ ወደ ListenBrainz
   ወይም ወደ የራስዎ ሰርቨር፣ ለምሳሌ Maloja። የወደዷቸው ትራኮች ወደ ማንኛቸውም
   እንደ love ሊላኩ ይችላሉ።
+- **Libre.fm፦** ያው ነገር፣ ወደ Libre.fm ወይም ወደ ሌላ GNU FM ሰርቨር፣ የAPI መለያ
+  መፍጠር ሳያስፈልግ።
 - **Discord፦** ፕሮፋይልዎ የሚጫወተውን ከሽፋን ምስሉና ከቀረው ጊዜ ጋር ያሳያል።
 - **ዝማኔዎች፦** MixMusic በሚጀምርበትና በየጥቂት ሰዓታት አዲስ ልቀት መኖሩን
   ይፈትሻል፣ ፊርማውን ያረጋግጣል፣ ሲነግሩት ይጭነዋል፣ ወይም ከመረጡ በራሱ።
@@ -270,6 +272,8 @@ Flatpak አዲስ ነው፦ በዴስክቶፕዎ ላይ እንዴት እንደ�
 - **ListenBrainz፦** ከ[ListenBrainz ቅንብሮችዎ](https://listenbrainz.org/settings/)
   ወይም ከራስዎ ሰርቨር የሚያገኙትን user token በSettings › Accounts ውስጥ
   ይለጥፉ።
+- **Libre.fm፦** በSettings › Accounts ውስጥ ያገናኙ፣ እና MixMusic ን በብሮውዘርዎ
+  በLibre.fm ገጽ ላይ፣ ወይም በሌላ GNU FM ሰርቨር ገጽ ላይ ያጽድቁ።
 - **Discord፦** የDiscord መተግበሪያ እየሠራ ሳለ ፕሮፋይልዎ የሚያዳምጡትን
   ያሳያል። በSettings › Desktop (ቅንብሮች › ዴስክቶፕ) ውስጥ ያጥፉት።
 
@@ -483,6 +487,7 @@ MixMusic የራሱ መለያ፣ ሰርቨር፣ ትንታኔ ወይም ቴሌሜ
 - **Last.fm፣** ሲያገናኙት፦ የሚያጫውቱት።
 - **ListenBrainz፣** ወይም የእሱን API የሚያቀርብ የራስዎ ሰርቨር፣ ሲያገናኙት፦
   የሚያጫውቱት።
+- **Libre.fm፣** ወይም ሌላ GNU FM ሰርቨር፣ ሲያገናኙት፦ የሚያጫውቱት።
 - **Discord፣** ካላጠፉት፦ የሚጫወተው፣ በኮምፒውተርዎ ላይ ወዳለው የDiscord
   መተግበሪያ ይላካል፣ እሱም በፕሮፋይልዎ ላይ ያሳየዋል።
 
@@ -558,6 +563,9 @@ MixMusic የተገነባው በእነዚህ ፕሮጀክቶች ላይ ነው፦
   **[Archivo](https://github.com/Omnibus-Type/Archivo)**፣ የመስኮቶቹ ፊደል ቅርጾች።
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**፣
   የMaterial ገጽታዎች ቀለሞች ፖርት የሆኑበት የHCT የቀለም ሳይንስ ባለቤት።
+- **[FCast](https://docs.fcast.org)**፣ MixMusic በFCast ተቀባዮች ላይ የሚጫወትበት ክፍት
+  ፕሮቶኮል። MixMusic የራሱ ገለልተኛ አተገባበር ነው፣ ከFUTO ጋር ግንኙነት የለውም፤ FCast የFUTO የተመዘገበ
+  የንግድ ምልክት ነው።
 - **[Kevin MacLeod](https://incompetech.com)**፣ በ
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) ስር ያለው ሙዚቃው
   በድረ-ገጹ ላይ የሚጫወት።

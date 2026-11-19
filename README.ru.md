@@ -122,6 +122,8 @@
 - **ListenBrainz:** то же самое, вместе с Last.fm или без него, в
   ListenBrainz или на ваш собственный сервер, например Maloja. Лайки могут
   уходить в любой из них как loves.
+- **Libre.fm:** то же самое, в Libre.fm или на другой сервер GNU FM, без
+  создания учётной записи API.
 - **Discord:** в вашем профиле видно, что играет, с обложкой и временем,
   которое осталось.
 - **Обновления:** MixMusic проверяет, нет ли нового релиза, при запуске и
@@ -287,6 +289,8 @@ Flatpak запускает MixMusic в песочнице, которая вид
 - **ListenBrainz:** вставьте user token из ваших
   [настроек ListenBrainz](https://listenbrainz.org/settings/) или с вашего
   собственного сервера в Settings › Accounts.
+- **Libre.fm:** подключите в Settings › Accounts и подтвердите MixMusic в
+  браузере, на странице Libre.fm или другого сервера GNU FM.
 - **Discord:** пока работает приложение Discord, в вашем профиле видно, что
   вы слушаете. Отключается в Settings › Desktop (Настройки › Рабочий стол).
 
@@ -507,6 +511,8 @@ brand/               MixMusic's logo, for code that draws it
 - **Last.fm,** после подключения: то, что вы слушаете.
 - **ListenBrainz,** или ваш собственный сервер с его API, после
   подключения: то, что вы слушаете.
+- **Libre.fm,** или другой сервер GNU FM, после подключения: то, что вы
+  слушаете.
 - **Discord,** если вы не отключите: то, что играет, уходит в приложение
   Discord на вашем компьютере, которое показывает это в вашем профиле.
 
@@ -588,6 +594,9 @@ MixMusic построен на этих проектах:
   **[Archivo](https://github.com/Omnibus-Type/Archivo)**, шрифты окон.
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**,
   портом чьей цветовой науки HCT являются цвета тем Material.
+- **[FCast](https://docs.fcast.org)**, открытый протокол, по которому MixMusic
+  играет на приёмниках FCast. MixMusic является его независимой реализацией и не
+  связан с FUTO; FCast является зарегистрированным товарным знаком FUTO.
 - **[Kevin MacLeod](https://incompetech.com)**, чья музыка под лицензией
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) играет на
   сайте.

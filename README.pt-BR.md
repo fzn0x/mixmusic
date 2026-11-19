@@ -119,6 +119,8 @@ bibliotecas. O MixMusic reúne os dois serviços em um só player:
 - **ListenBrainz:** o mesmo, junto com o Last.fm ou sem ele, para o
   ListenBrainz ou um servidor seu, como o Maloja. As curtidas podem ir para
   qualquer um dos dois como loves.
+- **Libre.fm:** o mesmo, para o Libre.fm ou outro servidor GNU FM, sem precisar
+  criar uma conta de API.
 - **Discord:** seu perfil mostra o que está tocando, com a capa e o tempo
   restante.
 - **Atualizações:** o MixMusic procura uma nova versão ao iniciar e a cada
@@ -286,6 +288,8 @@ desktop.
 - **ListenBrainz:** cole o token de usuário das suas
   [configurações do ListenBrainz](https://listenbrainz.org/settings/), ou do
   seu próprio servidor, em Settings › Accounts.
+- **Libre.fm:** conecte em Settings › Accounts e aprove o MixMusic na página do
+  Libre.fm, no seu navegador, ou na de outro servidor GNU FM.
 - **Discord:** enquanto o app do Discord roda, seu perfil mostra o que você
   ouve. Desative em Settings › Desktop (Configurações › Desktop).
 
@@ -507,6 +511,8 @@ Ele se comunica com:
 - **Last.fm,** depois que você o conecta: o que você toca.
 - **ListenBrainz,** ou um servidor seu com a API dele, depois que você o
   conecta: o que você toca.
+- **Libre.fm,** ou outro servidor GNU FM, depois que você o conecta: o que você
+  toca.
 - **Discord,** a menos que você desative: o que está tocando, enviado ao app
   do Discord no seu computador, que o mostra no seu perfil.
 
@@ -587,6 +593,9 @@ O MixMusic é construído sobre estes projetos:
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)**,
   de quem a ciência de cor HCT, da qual vêm as cores dos temas Material, é um
   port.
+- **[FCast](https://docs.fcast.org)**, o protocolo aberto com que o MixMusic
+  toca em receptores FCast. O MixMusic é uma implementação independente dele e
+  não é afiliado à FUTO; FCast é marca registrada da FUTO.
 - **[Kevin MacLeod](https://incompetech.com)**, cuja música, sob
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), toca no site.
 

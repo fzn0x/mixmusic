@@ -27,9 +27,12 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
+      # The pull request merged into the base, as GitHub merges it: the
+      # workflow comes from that merge, so the tool it runs comes from it
+      # too, and knows the flags the workflow passes. The pull request's
+      # own head can be older than both (#874).
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - uses: actions/setup-go@v6
         with:

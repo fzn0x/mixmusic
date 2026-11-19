@@ -677,12 +677,12 @@ pages, commands, track actions and widgets.
 ### Share it
 
 1. Fork this repository.
-2. Add one folder: `community/themes/<id>/` for a theme, or
-   `community/plugins/<id>/` for a plugin, with its `plugin.json` and its
-   `index.ts`.
-3. Run `bun run build:plugins`, `go run ./tools/registry` and
-   `go run ./tools/registry -check`.
-4. Open a pull request.
+2. Add one folder: `community/themes/<id>/` with its `theme.json` for a
+   theme, or `community/plugins/<id>/` with its `plugin.json` and its
+   `index.ts` for a plugin.
+3. Run `bun install`, `bun run build:plugins`, `go run ./tools/registry`
+   and `go run ./tools/registry -check`.
+4. Open a pull request, with a screenshot.
 
 Once it is merged, CI publishes it to the
 [registry branch](https://github.com/fzn0x/mixmusic/tree/registry), and it

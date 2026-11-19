@@ -11,6 +11,19 @@ import (
 	"github.com/fzn0x/mixmusic/internal/settings"
 )
 
+// TestSpeedMenuScrolls opens the speed button's menu in a window too short
+// for it, as a zoomed one is: its steps scroll inside it rather than run
+// over the player bar, and its slider comes into view (#882).
+func TestSpeedMenuScrolls(t *testing.T) {
+	s := playing(t)
+	tt := testerOf(t, s, 1440, 380)
+	click(t, s, tt, "Speed")
+	if !showsExactly(tt, "0.75×") {
+		t.Fatalf("the speed button's menu doesn't show: %q", tt.Texts())
+	}
+	menuScrollsAbove(t, tt, "0.75×", ui.RoleSlider, "Speed of songs", "Speed")
+}
+
 // TestSpeedSettings sets the speed of songs with its slider, by steps, and
 // puts back their own with normal.
 func TestSpeedSettings(t *testing.T) {

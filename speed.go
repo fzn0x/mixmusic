@@ -136,43 +136,47 @@ func (s *shell) speedMenu(c *ui.Context, anchor ui.Element, open *bool, speed *f
 			TextColor(k.text).Font(k.body)
 		panel.Children(func() {
 			ui.Text(c, k.words(title)).FontSize(k.captionSize()).TextColor(k.muted).Padding(4, 10, 6).SingleLine()
-			for _, step := range speedSteps {
-				on := step == *speed
-				label := speedLabel(step)
-				b := s.buttonBase(c.Key("speed-step-" + label)).Height(32).PaddingX(10).Gap(10).Radius(k.radiusSm).
-					Justify(ui.Start).AlignItems(ui.Center).Label(label).Role(ui.RoleMenuItemRadio).Checked(on).
-					Cursor(ui.CursorPointer)
-				if b.Pressed() {
-					b.Background(k.press)
-				} else if b.Hovered() {
-					b.Background(k.hover)
-				}
-				if b.Clicked() {
-					s.setSpeed(step)
-					*open = false
-				}
-				b.Children(func() {
-					ui.Box(c).Size(16, 16).Shrink(0).Children(func() {
-						if on {
-							ui.Icon(c, icon("check")).FontSize(16).TextColor(k.accent)
+			// In a window too short for the menu, as a zoomed one can be,
+			// its rows scroll under the title, as the sleep timer's do.
+			ui.Scroll(c.Key("speed-rows")).Shrink(1).MinHeight(0).Gap(2).Children(func() {
+				for _, step := range speedSteps {
+					on := step == *speed
+					label := speedLabel(step)
+					b := s.buttonBase(c.Key("speed-step-" + label)).Height(32).PaddingX(10).Gap(10).Radius(k.radiusSm).
+						Justify(ui.Start).AlignItems(ui.Center).Label(label).Role(ui.RoleMenuItemRadio).Checked(on).
+						Cursor(ui.CursorPointer)
+					if b.Pressed() {
+						b.Background(k.press)
+					} else if b.Hovered() {
+						b.Background(k.hover)
+					}
+					if b.Clicked() {
+						s.setSpeed(step)
+						*open = false
+					}
+					b.Children(func() {
+						ui.Box(c).Size(16, 16).Shrink(0).Children(func() {
+							if on {
+								ui.Icon(c, icon("check")).FontSize(16).TextColor(k.accent)
+							}
+						})
+						ui.Text(c, label).FontSize(k.bodySize()).FontFeatures("tnum").SingleLine()
+						if step == 1 {
+							ui.Text(c, k.sentence(locales.SpeedNormal())).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
 						}
 					})
-					ui.Text(c, label).FontSize(k.bodySize()).FontFeatures("tnum").SingleLine()
-					if step == 1 {
-						ui.Text(c, k.sentence(locales.SpeedNormal())).FontSize(k.smallSize()).TextColor(k.muted).SingleLine()
-					}
-				})
-			}
-			ui.Box(c).Height(1).Margin(4, 6).Background(k.border)
-			ui.Row(c).Gap(10).AlignItems(ui.Center).Padding(4, 10).Children(func() {
-				// The window's arrows keep seeking and setting the volume.
-				x := *speed
-				slider := ui.Slider(c.Key("speed-slider"), &x, settings.MinSpeed, settings.MaxSpeed).KeepFocus()
-				if slider.Step(settings.SpeedStep).Grow(1).MinWidth(0).Label(title).Changed() {
-					s.setSpeed(x)
 				}
-				ui.Text(c, speedLabel(*speed)).FontSize(k.smallSize()).FontFeatures("tnum").TextColor(k.muted).
-					Width(40).TextAlign(ui.End).SingleLine()
+				ui.Box(c).Height(1).Margin(4, 6).Background(k.border)
+				ui.Row(c).Gap(10).AlignItems(ui.Center).Padding(4, 10).Children(func() {
+					// The window's arrows keep seeking and setting the volume.
+					x := *speed
+					slider := ui.Slider(c.Key("speed-slider"), &x, settings.MinSpeed, settings.MaxSpeed).KeepFocus()
+					if slider.Step(settings.SpeedStep).Grow(1).MinWidth(0).Label(title).Changed() {
+						s.setSpeed(x)
+					}
+					ui.Text(c, speedLabel(*speed)).FontSize(k.smallSize()).FontFeatures("tnum").TextColor(k.muted).
+						Width(40).TextAlign(ui.End).SingleLine()
+				})
 			})
 		})
 	})

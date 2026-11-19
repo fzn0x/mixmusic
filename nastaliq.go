@@ -2,8 +2,8 @@ package main
 
 // Urdu in Nastaliq (#564): Urdu is read in Nastaliq, the sloping hand its
 // books and papers are set in, and the upright Naskh of Arabic reads as
-// another language's. MixMusic's faces have Latin letters alone, so Urdu's
-// letters come from the system's fonts. A card lays out its own lines, as
+// another language's. MixMusic's faces have none of Urdu's letters, so they
+// come from the system's fonts. A card lays out its own lines, as
 // tall as their face, so a card in Urdu sets them in a Nastaliq face the
 // system has. The window keeps the system's choice for now: a Nastaliq
 // line is 2.5 em high, about twice Selawik's, which MyGo's rows and fields

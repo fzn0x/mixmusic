@@ -76,8 +76,11 @@ func newAssistantApp(t *testing.T, cat assistantCatalog) (*App, *toasts) {
 	t.Helper()
 	a := newQuietApp(t, nil)
 	a.assistants.catalog = cat
-	// The tests call faster than an assistant may.
-	a.assistantServer().Every = time.Microsecond
+	// The tests call faster than an assistant may. Windows' clock moves in
+	// steps of up to 15.6 ms, so a pace of a microsecond alone still turns
+	// down the 11th call in one step: the burst has no end either.
+	srv := a.assistantServer()
+	srv.Every, srv.Burst = time.Microsecond, math.MaxInt32
 	n := &toasts{}
 	t.Cleanup(a.GoPlayer().Notices(func(note player.Notice) {
 		n.mu.Lock()

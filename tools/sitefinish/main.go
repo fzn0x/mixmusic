@@ -8,7 +8,9 @@
 //     the language menus;
 //   - the sitemap, with those pages and their alternates;
 //   - llms.txt and llms-full.txt, for AI agents: what MixMusic is, and its
-//     docs.
+//     docs;
+//   - docs/search.json, which the docs' search field reads: each section
+//     of each docs page, under its heading (search.go).
 //
 // A piece of the page without a translation shows in English, and the
 // command says how many each language lacks. With -extract, it writes
@@ -161,7 +163,12 @@ func run(site string, extractOnly bool) error {
 	if err := os.WriteFile(filepath.Join(public, "llms-full.txt"), []byte(full), 0o644); err != nil {
 		return err
 	}
-	fmt.Printf("sitefinish: %d languages, %d docs pages in llms.txt\n", len(languages), len(pages))
+	searched, sections, err := writeSearch(public)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("sitefinish: %d languages, %d docs pages in llms.txt, %d sections of %d pages in docs/search.json\n",
+		len(languages), len(pages), sections, searched)
 	return nil
 }
 

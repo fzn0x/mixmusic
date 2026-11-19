@@ -42,15 +42,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           THIS: ${{ github.event.pull_request.number }}
         run: |
-          # Again if GitHub doesn't answer. The checkout is the pull
-          # request's: one from before retry.sh asks once.
-          retry() {
-            if [ -f .github/scripts/retry.sh ]; then
-              bash .github/scripts/retry.sh 45 "$@"
-            else
-              "$@"
-            fi
-          }
+          # Again if GitHub doesn't answer.
+          retry() { bash .github/scripts/retry.sh 45 "$@"; }
           retry gh pr list --repo "$GITHUB_REPOSITORY" --state open --limit 1000 --json number,isDraft \
             --jq ".[] | select(.isDraft | not) | select(.number != $THIS) | .number" > "$RUNNER_TEMP/others"
           while read -r n; do

@@ -8,7 +8,7 @@
 
 <p align="center" dir="rtl"><strong>YouTube Music اور Spotify کے لیے ایک ہی پلیئر۔</strong></p>
 
-<p align="center" dir="rtl">macOS، Windows اور Linux کے لیے YouTube Music اور Spotify کا کلائنٹ۔ YouTube Music بغیر اکاؤنٹ کے چلتا ہے۔ ایک سرچ، ایک قطار (queue)، ملے جلے پلے لسٹس، ہم وقت بول (lyrics)، تھیمز اور پلگ اِنز۔</p>
+<p align="center" dir="rtl">macOS، Windows اور Linux کے لیے YouTube Music اور Spotify کا کلائنٹ۔ YouTube Music بغیر اکاؤنٹ کے چلتا ہے۔ ایک سرچ، ایک قطار (queue)، ملے جلے پلے لسٹس، ہم وقت بول (lyrics)، پوڈ کاسٹس، آپ کی اپنی موسیقی کی فائلیں، کاسٹنگ، تھیمز اور پلگ اِنز۔</p>
 
 <p align="center" dir="rtl"><sub>یہ <a href="README.md">انگریزی README</a> کا ترجمہ ہے۔ کسی فرق کی صورت میں انگریزی نسخہ ہی تازہ ترین مانا جائے۔</sub></p>
 
@@ -25,9 +25,10 @@
 </p>
 
 <p align="center">
-  <a href="https://fzn0x.github.io/mixmusic/">ویب سائٹ</a> ·
+  <a href="https://mixmusic.functionx.dev/">ویب سائٹ</a> ·
   <a href="https://github.com/fzn0x/mixmusic/releases/latest">ڈاؤن لوڈ</a> ·
-  <a href="https://fzn0x.github.io/mixmusic/docs/">دستاویزات</a> ·
+  <a href="https://mixmusic.functionx.dev/docs/">دستاویزات</a> ·
+  <a href="docs/features.md">ہر خصوصیت</a> ·
   <a href="CHANGELOG.md">تبدیلیوں کی فہرست</a>
 </p>
 
@@ -46,7 +47,8 @@
 - **ایک سرچ۔** یہ YouTube Music اور Spotify میں ایک ساتھ تلاش کرتا ہے، اور
   ہر نتیجے پر اس سروس کا نشان لگاتا ہے جس سے وہ آیا ہے۔
 - **ایک قطار اور ایک لائبریری۔** Spotify کا ٹریک YouTube Music کے ٹریک کے
-  فوراً بعد چل سکتا ہے، اور ایک پلے لسٹ میں دونوں کے ٹریکس ہو سکتے ہیں۔
+  فوراً بعد چل سکتا ہے، اور ایک پلے لسٹ میں دونوں کے ٹریکس ہو سکتے ہیں، اور
+  آپ کے کمپیوٹر پر موجود موسیقی کی فائلیں بھی۔
 - **اکاؤنٹ کی ضرورت نہیں۔** ایپ کھولتے ہی YouTube Music چلنے لگتا ہے۔
   سائن اِن صرف تب کریں جب آپ اپنی لائبریری چاہتے ہوں۔ Spotify اختیاری ہے۔
 - **ایک چھوٹا پروگرام۔** MixMusic ایک Go پروگرام ہے جو اپنی ونڈوز GPU پر خود
@@ -55,75 +57,179 @@
 - **آپ کے بدلنے کے لیے۔** چار لے آؤٹس اور چودہ تھیمز ساتھ آتے ہیں، کمیونٹی
   مزید تھیمز اور پلگ اِنز شامل کرتی ہے، اور ہر کمانڈ کے لیے آپ اپنی کلید
   مقرر کر سکتے ہیں۔
+- **آپ کی زبان میں۔** ونڈو انگریزی کے علاوہ 66 زبانوں میں آتی ہے، اور عربی،
+  عبرانی، فارسی اور اردو کے لیے دائیں سے بائیں ترتیب میں۔
 - **نجی۔** MixMusic کا اپنا کوئی اکاؤنٹ، سرور، analytics یا telemetry نہیں ہے۔
 - **مفت اور اوپن سورس،** MIT لائسنس یا GPL 3.0 کے تحت۔
 
 ## خصوصیات
 
+MixMusic کیا کرتا ہے، حصہ بہ حصہ، اور ایپ میں آپ اسے کہاں پائیں گے۔
+**پہلے سے شامل** کا مطلب ہے کہ یہ خود بخود کام کرتا ہے۔
+[خصوصیات](docs/features.md) 0.1.0 سے 0.5.12 تک کی تمام 363 خصوصیات ایک ایک
+سطر میں گنواتی ہے، ساتھ اس ورژن کے جس میں ہر ایک آئی۔
+
 ### سرچ اور پلے
 
 - **دونوں سروسز کے لیے ایک سرچ۔** YouTube Music اور Spotify کے نتائج
-  پہلو بہ پہلو، ہر ایک پر اس کی سروس کا نشان۔ YouTube Music کے نتائج میں
-  دکھایا جاتا ہے کہ ہر ٹریک کتنی بار چلایا گیا، تاکہ اصل ٹریک کورز سے
-  الگ نظر آئے۔
+  پہلو بہ پہلو، ہر ایک پر اس کی سروس کا نشان، اور ان کے ساتھ آپ کی اپنی
+  موسیقی کی فائلیں۔ YouTube Music کے نتائج میں دکھایا جاتا ہے کہ ہر ٹریک
+  کتنی بار چلایا گیا، تاکہ اصل ٹریک کورز سے الگ نظر آئے۔ *اوپر کی بار*
+- **ہر قسم کا نتیجہ۔** گانے، ویڈیوز، البمز، فنکار، پلے لسٹس اور پوڈ کاسٹس،
+  بہترین مطابقت، سب سے زیادہ چلائے گئے یا سب سے نئے کی ترتیب میں، اور خود
+  YouTube بھی، ان لائیو سیٹس اور اپ لوڈز کے لیے جو میوزک کیٹلاگ میں نہیں
+  ہیں۔ سرچ باکس میں چسپاں کیا گیا YouTube یا Spotify کا لنک فوراً چلنے لگتا
+  ہے۔ *سرچ*
 - **ایک قطار (queue)۔** دونوں سروسز کے ٹریکس ملائیں، ان میں شفل اور ریپیٹ
-  کریں، اور قطار ختم ہونے پر ریڈیو کو آگے چلانے دیں۔
-- **Explore۔** نئی ریلیزز، ٹرینڈنگ گانے، چارٹس، موڈز اور جانرز، اور جو چل رہا
-  ہے اس سے ملتے جلتے گانے۔
-- **ہم وقت بول (synced lyrics)** جو گانے کے ساتھ ساتھ چلتے ہیں، یا سادہ متن
-  اگر آپ چاہیں۔
-- **ایک منی پلیئر** جو آپ کی دوسری ونڈوز کے اوپر رہتا ہے۔
+  کریں، کسی ٹریک کو اگلا چلنے کے لیے آگے لے آئیں، اور قطار ختم ہونے پر
+  ریڈیو کو آگے چلانے دیں۔ ری اسٹارٹ کے بعد یہ ویسی ہی لوٹ آتی ہے جیسی آپ نے
+  چھوڑی تھی۔ *پلیئر بار، قطار*
+- **ہر چیز کے لیے ایک صفحہ۔** البمز، فنکار اور پلے لسٹس، Play اور Shuffle
+  کے ساتھ، کسی فنکار کے تمام گانے، اور جو چل رہا ہے اس سے ملتی جلتی موسیقی۔
+  *سرچ، ہوم*
+- **جو نہ چاہیں اسے چھوڑ دیں۔** گانوں کو ڈس لائک کریں تاکہ ریڈیو انھیں چھوڑ
+  دیں، AI سے بنے گانے اور ویڈیوز کے وہ حصے چھوڑ دیں جنھیں SponsorBlock
+  نشان زد کرتا ہے، اور explicit مواد چھپائیں یا صاف ورژنز کو ترجیح دیں۔
+  *پلیئر بار، Settings › Playback*
+- **سلیپ ٹائمر اور رفتار۔** کچھ وقت، ایک ٹریک یا پوری قطار کے بعد رک جائیں،
+  آہستہ آہستہ آواز کم کرتے ہوئے، یا رات کو خود بخود، اور گانے اور پوڈ کاسٹس
+  اپنی اصل پچ پر تیز یا آہستہ چلائیں۔ *پلیئر بار*
+- **میوزک ویڈیوز اور حرکت کرتے کورز۔** گانے کے کور کی جگہ اس کی میوزک ویڈیو،
+  اور وہ چھوٹی ویڈیوز جو کچھ البمز بار بار چلاتے ہیں۔ *اب چل رہا ہے،
+  Settings › Playback*
+- **چنیں، شیئر کریں اور قریب سے دیکھیں۔** کئی ٹریکس چن کر ایک ساتھ قطار میں
+  لگائیں، شامل کریں یا ڈاؤن لوڈ کریں، کسی گانے یا البم کو تصویری کارڈ کے طور
+  پر شیئر کریں، اور دیکھیں کہ ٹریک کہاں سے آتا ہے اور کیوں نہیں چل سکا۔
+  *ٹریک کا مینو*
+
+### ہوم اور Explore
+
+- **ہوم** آپ کی شیلفوں کے ساتھ، Jump back in، اور جن فنکاروں کو آپ فالو کرتے
+  ہیں ان کی نئی ریلیزز، اس ترتیب میں جو آپ چاہیں۔ *ہوم*
+- **Explore:** نئی ریلیزز، چارٹس، موڈز اور جانرز۔ *Explore*
+
+### بول (Lyrics)
+
+- **ہم وقت بول** جو گانے کے ساتھ ساتھ چلتے ہیں، لفظ بہ لفظ جہاں ماخذ میں یہ
+  موجود ہو، پوری اسکرین پر بھی، یا سادہ متن اگر آپ چاہیں۔ *بولوں کا پینل،
+  اب چل رہا ہے*
+- **ترجمہ اور لاطینی حروف:** ہر سطر کے نیچے ترجمہ، جاپانی کے لیے romaji، اور
+  کورین، چینی، روسی، عربی اور بہت سی دوسری رسم الخطوں کے لیے لاطینی حروف۔
+  *بولوں کا پینل*
+- **ماخذ کا آپ کا انتخاب:** Better Lyrics، Unison، LRCLIB، YouTube Music اور
+  YouTube کے کیپشنز، اس ترتیب میں جو آپ طے کریں، اور کوئی دوسرا ماخذ، سرچ،
+  آپ کی اپنی ترامیم اور ٹائمنگ ایک کلک کی دوری پر۔ *Settings › Playback ›
+  Lyrics، بولوں کا پینل*
+- **بولوں میں تلاش کریں،** ان کی سطریں کارڈ کے طور پر شیئر کریں، اور وہ بول
+  پڑھیں جو آپ کی اپنی گانوں کی فائلوں میں موجود ہیں۔ *بولوں کا پینل*
+
+### پوڈ کاسٹس
+
+- **YouTube Music اور Spotify کے پوڈ کاسٹس۔** شوز ڈھونڈیں اور فالو کریں،
+  ہر قسط وہیں سے شروع کریں جہاں آپ نے چھوڑی تھی، اقساط کو سنا ہوا نشان زد
+  کریں، ان کے ابواب اور ٹرانسکرپٹس پڑھیں، اور انھیں گانوں سے الگ رفتار دیں۔
+  *سرچ، شو کا صفحہ، لائبریری › پوڈ کاسٹس*
 
 ### آپ کی لائبریری
 
-- **مکسز (Mixes):** ایسے پلے لسٹس جن میں ہر سروس کے ٹریکس ہوں۔ کسی سروس کے
-  پلے لسٹ کو مکس میں امپورٹ کریں، اور ان میں سے کسی کے اندر سرچ اور ترتیب
-  (sort) کریں۔
-- **پسندیدہ گانے** دونوں سروسز کے، ایک ہی فہرست میں۔
-- **ہسٹری اور سننے کے اعداد و شمار،** دن بہ دن۔
-- **آپ کے اکاؤنٹس۔** اپنے ہوم فیڈ، پسندیدہ گانوں، پلے لسٹس، البمز اور
-  فنکاروں کے لیے Google کے اپنے صفحے پر YouTube Music میں سائن اِن کریں، اپنے
-  اکاؤنٹ کے طور پر یا اس کے کسی برانڈ چینل کے طور پر۔ وہاں کی لائبریری کے لیے
-  Spotify میں سائن اِن کریں۔ پسندیدہ ٹریکس، محفوظ کیے گئے البمز اور پلے لسٹس،
-  اور فالو کیے گئے فنکار سروس تک بھی پہنچتے ہیں۔ جو آپ چلاتے ہیں وہ آپ کی
-  YouTube Music ہسٹری میں شامل ہو جاتا ہے، جس سے اس کی سفارشات بنتی ہیں۔
+- **مکسز (Mixes):** ایسے پلے لسٹس جن میں ہر سروس کے ٹریکس ہوں، آپ کی اپنی
+  ترتیب میں، سرچ اور ترتیب (sort) کے ساتھ، اور آپ کے اپنے کورز کے ساتھ۔
+  *لائبریری › مکسز، سائڈ بار*
+- **پسندیدہ گانے** دونوں سروسز کے، ایک ہی فہرست میں، اور آپ کے YouTube Music
+  اور Spotify کے پلے لسٹس، البمز اور فنکار، جنھیں آپ محفوظ کر سکتے ہیں، بنا
+  سکتے ہیں، شیئر کر سکتے ہیں اور جن پر مل کر کام کر سکتے ہیں۔ لائکس اور سیوز
+  سروس تک بھی پہنچتے ہیں۔ *لائبریری*
+- **پنز، فولڈرز اور ٹیگز** بڑی لائبریری کو ترتیب میں رکھتے ہیں، اور جو آپ
+  وہاں نہیں چاہتے وہ چھپایا جا سکتا ہے۔ *سائڈ بار، ٹائل کا مینو*
+- **فنکاروں کو فالو کریں،** اکاؤنٹ کے ساتھ یا اس کے بغیر، اور ان کی نئی
+  ریلیزز دیکھیں۔ *فنکار کا صفحہ، لائبریری › فنکار*
+- **ہسٹری، اعداد و شمار اور آپ کا سال:** روزانہ منٹ، آپ کے سب سے زیادہ سنے
+  گئے گانے اور فنکار، اور شیئر کرنے کے لیے ان کے کارڈ۔ *لائبریری › ہسٹری،
+  اعداد و شمار*
+- **ڈاؤن لوڈز** نیٹ ورک کے بغیر چلانے کے لیے، اور آپ کے چلائے ہوئے ٹریکس کا
+  آف لائن کیش۔ *ٹریک کا مینو، لائبریری › ڈاؤن لوڈز*
+
+### اس کمپیوٹر پر موسیقی
+
+- **آپ کی اپنی موسیقی کی فائلیں** لائبریری اور سرچ میں، ان فولڈرز سے جن پر
+  MixMusic نظر رکھتا ہے: MP3، FLAC، WAV، M4A، Opus اور Vorbis، ان کے ٹیگز اور
+  کورز کے ساتھ۔ *Settings › Playback › Music on this computer*
+- **ان کے ٹیگز میں ترمیم کریں،** ایک ہی گانے کی کاپیاں اکٹھی کریں، اور فائلیں
+  کھول کر یا ونڈو پر گرا کر چلائیں۔ *ٹریک کا مینو، ونڈو پر ڈراپ کریں*
+
+### اکاؤنٹس اور سروسز
+
+- **YouTube Music۔** Google کے اپنے صفحے پر سائن اِن کریں، اپنے براؤزر کے
+  ذریعے یا کسی براؤزر کے سیشن سے، اپنے اکاؤنٹ کے طور پر یا اس کے کسی برانڈ
+  چینل کے طور پر، اپنے ہوم فیڈ، پسندیدہ گانوں، پلے لسٹس، البمز اور فنکاروں
+  کے لیے۔ جو آپ چلاتے ہیں وہ آپ کی YouTube Music ہسٹری میں شامل ہو جاتا ہے،
+  جس سے اس کی سفارشات بنتی ہیں۔ *Settings › Accounts*
+- **Last.fm:** آپ کا سنا ہوا ہر ٹریک، آدھا چلنے پر یا چار منٹ بعد، آپ کی
+  پروفائل میں شامل ہو جاتا ہے، اور آف لائن ہوئے اسکروبلز آپ کے آن لائن ہوتے
+  ہی بھیج دیے جاتے ہیں۔ *Settings › Accounts*
+- **ListenBrainz:** یہی، Last.fm کے ساتھ یا اس کے بغیر، ListenBrainz پر یا
+  آپ کے اپنے کسی سرور پر، جیسے Maloja۔ لائک کیے گئے ٹریکس ان میں سے کسی پر بھی
+  love کے طور پر جا سکتے ہیں۔ *Settings › Accounts*
+- **Libre.fm:** یہی، Libre.fm پر یا کسی دوسرے GNU FM سرور پر، بغیر کوئی API
+  اکاؤنٹ بنائے۔ *Settings › Accounts*
+- **Discord:** آپ کی پروفائل دکھاتی ہے کہ کیا چل رہا ہے، اس کے آرٹ ورک اور
+  باقی وقت کے ساتھ، جیسا آپ طے کریں۔ *Settings › Desktop*
 
 ### Spotify، تین طریقوں سے
 
 - **خود MixMusic میں،** Spotify کے معیار پر، بغیر کسی Spotify ایپ کے کھلے
   (Premium درکار، Windows اور macOS پر)۔
-- **Spotify Connect پر:** آپ کی Spotify ایپ، آپ کا فون یا کوئی اسپیکر۔
+- **Spotify Connect پر:** آپ کی Spotify ایپ، آپ کا فون یا کوئی اسپیکر، لاس لیس
+  معیار میں جب Spotify ایپ میں وہ آن ہو۔
 - **YouTube Music سے:** MixMusic Spotify ٹریک کی وہ ریکارڈنگ YouTube Music پر
   چلاتا ہے، جس کے لیے Premium کی ضرورت نہیں۔
 
+Settings › Playback › Spotify tracks میں چنیں۔
+
 ### آواز
 
-- کراس فیڈ، یکساں بلندی اور والیوم لیولنگ۔
-- پری سیٹس کے ساتھ دس بینڈ کا ایکولائزر۔
-- ایک ویژولائزر۔
-- آپ کے چلائے ہوئے ٹریکس کا آف لائن کیش۔
+- **دس بینڈ کا ایکولائزر** 23 پری سیٹس اور آپ کے اپنے کے ساتھ، Bass، Mid اور
+  Treble کا ایک سادہ موڈ، اور AutoEq کے 8,800 سے زیادہ ہیڈ فونز کی اصلاح۔
+  *Settings › Playback › Equalizer*
+- **کراس فیڈ، بغیر وقفے کے البمز، یکساں بلندی اور والیوم لیولنگ۔**
+  *Settings › Playback › Sound*
+- **ریورب، ایکو، کراس فیڈ، بیلنس اور اسٹیریو چوڑائی۔** *Settings › Playback*
+- **5.1 سراؤنڈ** جہاں ٹریک میں موجود ہو، اور آپ کی چنی ہوئی آؤٹ پٹ ڈیوائس۔
+  *پلیئر بار، Settings › Playback › Sound*
+- **ایک ویژولائزر،** جو MixMusic کے اپنے آڈیو انجن سے بنتا ہے۔ *اب چل رہا ہے*
+
+### کاسٹنگ، دوست اور دوسرے کمپیوٹر
+
+- **کاسٹ کریں** Chromecasts، Google Home اور Nest اسپیکرز اور ان کے گروپس،
+  DLNA اور UPnP رینڈررز اور FCast ریسیورز پر، آپ کی اپنی موسیقی کی فائلیں بھی۔
+  *پلیئر بار، منی پلیئر*
+- **دوستوں کے ساتھ سنیں:** ایک روم چلائیں جو آپ کے دوستوں کے کمپیوٹرز پر
+  ایک ساتھ چلتا ہے، آپ کے نیٹ ورک پر یا دعوتی لنک کے ذریعے کہیں سے بھی۔
+  *پلیئر بار کا کاسٹ مینو*
+- **ریموٹ کنٹرول:** اپنے نیٹ ورک کے کسی دوسرے کمپیوٹر پر MixMusic کو کنٹرول
+  کریں، اور جو چل رہا ہے اسے ان کے درمیان منتقل کریں۔ *پلیئر بار کا کاسٹ
+  مینو، Settings › Desktop*
+- **AI اسسٹنٹس** آپ کے کمپیوٹر پر بتا سکتے ہیں کہ کیا چل رہا ہے، سرچ کر
+  سکتے ہیں، چلا سکتے ہیں اور سلیپ ٹائمر لگا سکتے ہیں، Model Context Protocol
+  کے ذریعے۔ *Settings › Desktop › AI assistants*
 
 ### آپ کے ڈیسک ٹاپ پر
 
-- Windows، macOS اور Linux پر میڈیا کیز اور سسٹم کے میڈیا کنٹرولز۔
-- اپنے گلوبل شارٹ کٹس: چلانے، روکنے، اسکِپ کرنے، والیوم بدلنے، خاموش کرنے،
+- **ایک منی پلیئر** جو آپ کی دوسری ونڈوز کے اوپر رہتا ہے، اپنے پینل میں قطار
+  اور بولوں کے ساتھ۔ *پلیئر بار، <kbd>Ctrl</kbd> <kbd>M</kbd>*
+- **میڈیا کیز** اور Windows، macOS اور Linux پر سسٹم کے میڈیا کنٹرولز۔
+  *پہلے سے شامل*
+- **اپنے گلوبل شارٹ کٹس:** چلانے، روکنے، اسکِپ کرنے، والیوم بدلنے، خاموش کرنے،
   جو چل رہا ہے اسے لائک یا ڈس لائک کرنے، یا MixMusic دکھانے کے لیے، چاہے
-  کوئی بھی ونڈو سامنے ہو۔
-- Windows پر ٹاسک بار کے تھمب نیل میں پلیئر کے بٹن۔
-- ٹرے کنٹرولز، نئے ٹریکس کی اطلاعات، اور لاگ اِن پر شروع ہونا۔
-- `mixmusic://` لنکس۔
-- **Last.fm:** آپ کا سنا ہوا ہر ٹریک آپ کی پروفائل میں شامل ہو جاتا ہے، اور
-  آف لائن ہوئے اسکروبلز آپ کے آن لائن ہوتے ہی بھیج دیے جاتے ہیں۔
-- **ListenBrainz:** یہی، Last.fm کے ساتھ یا اس کے بغیر، ListenBrainz پر یا
-  آپ کے اپنے کسی سرور پر، جیسے Maloja۔ لائک کیے گئے ٹریکس ان میں سے کسی پر بھی
-  love کے طور پر جا سکتے ہیں۔
-- **Libre.fm:** یہی، Libre.fm پر یا کسی دوسرے GNU FM سرور پر، بغیر کوئی API
-  اکاؤنٹ بنائے۔
-- **Discord:** آپ کی پروفائل دکھاتی ہے کہ کیا چل رہا ہے، اس کے آرٹ ورک اور
-  باقی وقت کے ساتھ۔
-- **اپڈیٹس:** MixMusic شروع ہونے پر اور ہر چند گھنٹوں بعد نئی ریلیز دیکھتا
-  ہے، اس کے دستخط جانچتا ہے، اور آپ کے کہنے پر اسے انسٹال کرتا ہے، یا اگر آپ
-  یہ چنیں تو خود ہی۔
+  کوئی بھی ونڈو سامنے ہو۔ *Settings › Shortcuts*
+- **پلیئر کے بٹن** Windows پر ٹاسک بار کے تھمب نیل میں، اور MacBook کے نوچ کے
+  گرد ایک پلیئر۔ *پہلے سے شامل، Settings › Desktop*
+- **ٹرے کنٹرولز،** نئے ٹریکس کی اطلاعات، ونڈو کو اوپر رکھنا اور لاگ اِن پر
+  شروع ہونا۔ *Settings › Desktop*
+- **`mixmusic://` لنکس** اور `--next` جیسے فلیگز، Stream Deck کی کسی کلید یا
+  اسکرپٹ کے لیے۔ *کمانڈ لائن*
+- **اوورلیز کے لیے اب چل رہا ہے:** OBS کے براؤزر سورس کے لیے جو چل رہا ہے اس کا
+  کارڈ، اور آپ کے اپنے صفحے کے لیے اس کا ڈیٹا۔ *Settings › Desktop*
 
 ### اسے اپنا بنائیں
 
@@ -131,23 +237,44 @@
   لچکدار حرکت رکھتا ہے۔ Expressive، جو Material 3 Expressive کے طرز پر ہے،
   شوخ ہے، ٹونل فلز، پِل بٹنز اور تیرتے پلیئر بار کے ساتھ۔ Crate سادہ ہے، تاکہ
   کورز ہی کام کریں، اور Tiles MixMusic کی پہلی شکل ہے، سپاٹ ٹائلز اور بڑے
-  چھوٹے حروف (lowercase) کے الفاظ کے ساتھ۔
+  چھوٹے حروف (lowercase) کے الفاظ کے ساتھ۔ *Settings › Appearance*
 - **تھیمز۔** چودہ پہلے سے شامل ہیں، ہر ایک کسی بھی لے آؤٹ میں، ایسے ایفیکٹس
   کے ساتھ جنھیں آپ ٹیون کر سکتے ہیں، لائٹ موڈ کے لیے ایک تھیم اور ڈارک موڈ
   کے لیے ایک، اور اپنی پسند کا یا چلتے ٹریک کے آرٹ ورک سے لیا گیا ایکسنٹ
   رنگ۔ Material اور Material Dark ہر رنگ کور سے لیتے ہیں۔
+  *Settings › Appearance*
 - **کمیونٹی تھیمز اور پلگ اِنز،** مارکیٹ پلیس میں ایک کلک کی دوری پر۔
+  *مارکیٹ پلیس*
 - **پلگ اِنز** ایک ٹائپڈ API کے ذریعے صفحات، کمانڈز، ٹریک ایکشنز اور ویجٹس
-  شامل کرتے ہیں، جو آپ کے تھیم میں بنتے ہیں۔
+  شامل کرتے ہیں، جو آپ کے تھیم میں بنتے ہیں۔ *Settings › Plugins*
 - **کی بورڈ پہلے۔** ہر عام کام کے لیے شارٹ کٹس، ہر کمانڈ کے لیے آپ کی اپنی
   کلید، پلگ اِنز کی کمانڈز سمیت، ایسی کیز جو کسی بھی ایپ سے موسیقی کو
   کنٹرول کریں، اور باقی کے لیے ایک کمانڈ پیلیٹ (<kbd>Ctrl</kbd> <kbd>K</kbd>)۔
+- **آپ کی زبان۔** انگریزی کے علاوہ 66 زبانیں، دائیں سے بائیں جہاں زبان اسی
+  طرح پڑھی جاتی ہو، اور تاریخیں اور اعداد ویسے جیسے آپ کا علاقہ لکھتا ہے۔
+  *Settings › Appearance › Language*
+- **اسکرین ریڈرز اور کی بورڈ کے لیے۔** اسکرین ریڈرز کے لیے نام اور اعلانات،
+  ہر کنٹرول کی بورڈ کی پہنچ میں، متن کا سائز، زوم اور کم حرکت۔
+  *پہلے سے شامل، Settings › Appearance*
 - **ایک سیٹنگز فائل۔** آپ کی سیٹنگز آپ کے ڈیٹا فولڈر میں `settings.json` ہیں
   (Windows پر `%AppData%\MixMusic`، macOS پر
   `~/Library/Application Support/MixMusic`، Linux پر `~/.config/MixMusic`)،
   جسے آپ اپنی dotfiles کے ساتھ رکھ سکتے ہیں۔ MixMusic کے چلتے ہوئے اسے محفوظ
-  کریں تو وہ فوراً لاگو ہو جاتی ہے؛ Settings › Desktop › Settings file
-  (ترتیبات › ڈیسک ٹاپ › سیٹنگز فائل) اسے کھولتا ہے۔
+  کریں تو وہ فوراً لاگو ہو جاتی ہے۔ *Settings › Desktop › Settings file*
+
+### بیک اپ، امپورٹ اور ایکسپورٹ
+
+- **بیک اپ اور بحالی** اپنی لائبریری، سیٹنگز اور ایڈ آنز کی، ہاتھ سے یا خود
+  بخود، اس کمپیوٹر پر یا کسی دوسرے پر۔ *Settings › Desktop › Backups*
+- **پلے لسٹس امپورٹ کریں** فائلوں سے اور اپنے Spotify اور Google ڈیٹا سے، اور
+  فہرستیں اور اپنی لائبریری ایسی فائلوں میں ایکسپورٹ کریں جو دوسرے پلیئرز
+  پڑھتے ہیں۔ *لائبریری › مکسز، صفحے کا More مینو*
+
+### اپڈیٹس
+
+- MixMusic شروع ہونے پر اور ہر چند گھنٹوں بعد نئی ریلیز دیکھتا ہے، اس کے
+  دستخط جانچتا ہے، اور آپ کے کہنے پر اسے انسٹال کرتا ہے، یا اگر آپ یہ چنیں
+  تو خود ہی۔ *Settings › About*
 
 ## ایک جھلک
 
@@ -166,6 +293,38 @@
 <p align="center" dir="rtl"><sub><b>اسے اپنا بنائیں۔</b> بیچ میں چاروں لے آؤٹس: Blend، جو ڈیفالٹ ہے، Expressive، Crate اور Tiles، تھیمز کے نیچے۔ بائیں طرف ایک Material تھیم جو اپنے رنگ چلتے کور سے لیتا ہے۔ دائیں طرف مارکیٹ پلیس کے کمیونٹی تھیمز۔</sub></p>
 
 <div dir="rtl">
+
+## دستاویزات
+
+گائیڈز ویب سائٹ پر ہیں،
+[mixmusic.functionx.dev/docs](https://mixmusic.functionx.dev/docs/) پر، اور
+[fzn0x.github.io/mixmusic/docs](https://fzn0x.github.io/mixmusic/docs/) پر بھی،
+جہاں سرچ ان میں سے کوئی بھی ڈھونڈ دیتی ہے، اور یہاں [`docs/`](docs) میں بھی۔
+
+- **شروعات:** [شروعات](docs/getting-started.md)،
+  [خصوصیات](docs/features.md)، [اکاؤنٹس](docs/accounts.md)،
+  [Spotify](docs/spotify.md)، [مسائل کا حل](docs/troubleshooting.md)
+- **MixMusic کا استعمال:** [موسیقی چلانا](docs/playing-music.md)،
+  [ہوم](docs/home.md)، [آپ کی لائبریری](docs/library.md)،
+  [پلے لسٹس امپورٹ اور ایکسپورٹ](docs/import-export.md)،
+  [اس کمپیوٹر پر موسیقی](docs/local-music.md)، [بول](docs/lyrics.md)،
+  [پوڈ کاسٹس](docs/podcasts.md)، [شکل و صورت](docs/look-and-feel.md)،
+  [ڈیسک ٹاپ پر](docs/desktop.md)،
+  [اسٹریمز کے لیے اوورلیز](docs/stream-overlay.md)،
+  [کاسٹنگ](docs/casting.md)، [ریموٹ کنٹرول](docs/remote-control.md)،
+  [دوستوں کے ساتھ سنیں](docs/listen-with-friends.md)،
+  [AI اسسٹنٹس](docs/ai-assistants.md)،
+  [مارکیٹ پلیس](docs/marketplace.md)، [سیٹنگز](docs/settings.md)
+- **یہ کیسے کام کرتا ہے:** [MixMusic کیسے کام کرتا ہے](docs/how-it-works.md)،
+  [آڈیو انجن](docs/audio-engine.md)،
+  [آڈیو اسٹریمز کہاں سے آتی ہیں](docs/streams.md)،
+  [Spotify کے ٹریکس کیسے چلتے ہیں](docs/spotify-playback.md)،
+  [آپ کا ڈیٹا اور پرائیویسی](docs/data-and-privacy.md)
+- **اپنا بنائیں:** [تھیمز](docs/themes.md)، [پلگ اِنز](docs/plugins.md)
+- **پروجیکٹ:** [کریڈٹس](docs/credits.md)، [لائسنس](docs/license.md)،
+  [ڈھانچہ](docs/architecture/README.md)،
+  [تعاون](CONTRIBUTING.md)، [ضابطہ اخلاق](CODE_OF_CONDUCT.md)،
+  [سیکیورٹی](SECURITY.md)
 
 ## انسٹال کریں
 
@@ -187,8 +346,9 @@
 
 `<arch>` x64 کے لیے `amd64` اور Arm کے لیے `arm64` ہے۔ ہر ریلیز میں
 `SHA256SUMS` درج ہوتا ہے جس سے آپ ڈاؤن لوڈز جانچ سکتے ہیں۔ آپ کو `update-…`،
-`….delta`، `mixmusic-<version>-macos-…` یا `-windows-<arch>.tar.gz` نام کی
-فائلوں کی ضرورت نہیں: انسٹال شدہ ایپس انھی سے اپڈیٹ ہوتی ہیں۔
+`….delta`، `mixmusic-<version>-darwin-universal.tar.gz` یا
+`-windows-<arch>.tar.gz` نام کی فائلوں کی ضرورت نہیں: انسٹال شدہ ایپس انھی
+سے اپڈیٹ ہوتی ہیں۔
 
 انسٹالرز، پورٹیبل zip اور Linux آرکائیو خود کو اپڈیٹ کر لیتے ہیں۔ `.deb`،
 `.rpm`، AppImage اور Flatpak اپنی فائلیں خود نہیں بدل سکتے، اس لیے نیا ورژن
@@ -200,7 +360,7 @@
 Flatpak، Flathub سے GNOME runtime لاتا ہے۔
 
 Mac پر [Homebrew](https://brew.sh)
-MixMusic انسٹال کرتا ہے، اور `brew upgrade` اسے اپڈیٹ کرتا ہے۔
+بھی MixMusic انسٹال کرتا ہے، اور `brew upgrade` اسے اپڈیٹ کرتا ہے:
 
 </div>
 
@@ -209,6 +369,9 @@ brew install --cask fzn0x/tap/mixmusic
 ```
 
 <div dir="rtl">
+
+[شروعات](docs/getting-started.md) ہر سسٹم پر انسٹال اور پہلی بار چلانے کا
+طریقہ بتاتی ہے۔
 
 ### پہلی بار چلانا
 
@@ -246,6 +409,24 @@ brew install --cask fzn0x/tap/mixmusic
 
   </div>
 
+  MixMusic کے ساتھ چینی، جاپانی اور کورین حروف کا کوئی فونٹ نہیں آتا، اور
+  Linux پر جس حرف کا فونٹ انسٹال نہ ہو وہ خالی جگہ کی طرح نظر آتا ہے۔ `.deb`
+  اور `.rpm` ایک فونٹ مانگ لیتے ہیں؛ باقی کے ساتھ، خود ایک انسٹال کریں اور
+  MixMusic دوبارہ شروع کریں:
+
+  <div dir="ltr">
+
+  ```sh
+  # Debian and Ubuntu
+  sudo apt install fonts-noto-cjk
+  # Fedora
+  sudo dnf install google-noto-sans-cjk-vf-fonts
+  # Arch
+  sudo pacman -S noto-fonts-cjk
+  ```
+
+  </div>
+
 - **ہر سسٹم:** MixMusic YouTube Music کے زیادہ تر ٹریکس کی آواز خود ڈھونڈ لیتا
   ہے۔ باقی کے لیے، جیسے بچوں کے لیے بنے ٹریکس، یہ
   [yt-dlp](https://github.com/yt-dlp/yt-dlp) استعمال کرتا ہے، جسے وہ آپ کے لیے
@@ -256,12 +437,20 @@ brew install --cask fzn0x/tap/mixmusic
 ### Flatpak
 
 Flatpak، MixMusic کو ایک سینڈ باکس میں چلاتا ہے، جسے نیٹ ورک، ساؤنڈ سرور،
-ڈسپلے اور GPU نظر آتے ہیں، اور آپ کا ہوم فولڈر بالکل نہیں۔ MixMusic اپنی
-سیٹنگز اور لائبریری `~/.var/app/io.github.fzn0x.mixmusic` میں رکھتا ہے، جو
-`.deb`، `.rpm`، AppImage یا آرکائیو والی کاپی سے الگ ہے، اور دونوں ایک ساتھ
-چل سکتی ہیں۔ کسی کاپی کی سیٹنگز اور لائبریری ساتھ لانے کے لیے دونوں بند
-کریں، پھر `settings.json`، `library.json`، `queue.json`، `positions.json`
-اور `addons` و `mix-covers` فولڈرز کو `~/.config/MixMusic` سے
+ڈسپلے اور GPU نظر آتے ہیں، اور آپ کے ہوم فولڈر میں سے کچھ نہیں، سوائے ان
+براؤزرز کی پروفائلز کے جو Flathub سے انسٹال ہوں، صرف پڑھنے کے لیے، جن سے
+YouTube Music کا سائن اِن امپورٹ کیا جا سکتا ہے۔ یہ x64 اور Arm64 دونوں کے
+لیے آتا ہے، جیسے Raspberry Pi 5، Asahi Linux اور Snapdragon لیپ ٹاپس۔ MixMusic
+فی الحال Flathub پر نہیں ہے: ریلیز کا `.flatpak` انسٹال کریں۔
+
+Flatpak اپنی سیٹنگز اور لائبریری `~/.var/app/io.github.fzn0x.mixmusic` میں
+رکھتا ہے، جو `.deb`، `.rpm`، AppImage یا آرکائیو والی کاپی سے الگ ہے، اور
+دونوں ایک ساتھ چل سکتی ہیں۔ کسی کاپی کی سیٹنگز اور لائبریری ساتھ لانے کے لیے
+اس کا Settings › Desktop › Backups میں بیک اپ لیں اور وہ فائل Flatpak میں بحال
+کریں۔ فائلیں ہاتھ سے کاپی کرنی ہوں تو دونوں بند کریں، پھر
+`settings.json`، `library.json`، `plays.jsonl`، `local-copies.json`،
+`queue.json`، `positions.json` اور `addons` و `mix-covers` فولڈرز کو
+`~/.config/MixMusic` سے
 `~/.var/app/io.github.fzn0x.mixmusic/config/MixMusic` میں کاپی کریں۔ پہلے
 دونوں بند کریں: چلتا ہوا MixMusic `library.json` اور زیادہ تر دوسری فائلیں
 میموری میں رکھتا ہے اور اگلی بار محفوظ کرتے وقت کاپی کی گئی فائل کی جگہ
@@ -287,7 +476,7 @@ Flatpak میں لاگ اِن پر شروع ہونا آپ کے ڈیسک ٹاپ ک
   ہے، جہاں ہو وہاں آپ کے سسٹم کی keyring میں رکھی کلید کے ساتھ۔ جہاں وہ ونڈو
   کھل نہ سکے، یا Google اسے رد کر دے، وہاں اپنے براؤزر سے سائن اِن کریں، جسے
   MixMusic ایک نئی اپنی پروفائل کے ساتھ کھولتا ہے اور آپ کے سائن اِن ہوتے ہی
-  مٹا دیتا ہے؛ یا اس براؤزر کا سیشن امپورٹ کریں جس میں آپ سائن اِن ہیں
+  مٹا دیتا ہے؛ اس براؤزر کا سیشن امپورٹ کریں جس میں آپ سائن اِن ہیں
   (MixMusic اسے اپنے yt-dlp سے پڑھتا ہے، اور صرف YouTube کی کوکیز رکھتا ہے)؛ یا
   music.youtube.com کے سائن اِن شدہ ٹیب کا Cookie header پیسٹ کریں۔
 - **Spotify:** Spotify ایک ایپ کو زیادہ سے زیادہ پانچ صارفین کی خدمت کرنے دیتا
@@ -305,12 +494,26 @@ Flatpak میں لاگ اِن پر شروع ہونا آپ کے ڈیسک ٹاپ ک
 - **Discord:** جب تک Discord ایپ چل رہی ہو، آپ کی پروفائل دکھاتی ہے کہ آپ کیا
   سن رہے ہیں۔ اسے Settings › Desktop (ترتیبات › ڈیسک ٹاپ) میں بند کریں۔
 
-کچھ کام نہیں کر رہا؟ [docs/troubleshooting.md](docs/troubleshooting.md) عام
-مسائل اور معلوم خامیوں کا احاطہ کرتا ہے۔
+[اکاؤنٹس](docs/accounts.md) ہر سائن اِن قدم بہ قدم بتاتا ہے۔
+
+### معلوم حدود
+
+- **Arm پر Windows** کی جانچ x64 سے کم ہوئی ہے، اور پورٹیبل zip
+  `mixmusic://` لنکس رجسٹر نہیں کرتا۔
+- **ڈیولپمنٹ موڈ میں Spotify ایپس،** جیسی وہ جس سے آپ سائن اِن کرتے ہیں، ہر
+  قسم کے دس سرچ نتائج دیتی ہیں، اور وہ پلے لسٹس جو آپ کی نہیں ہیں ان کے
+  ٹریکس چھپے رہتے ہیں۔
+- **Linux پر،** Spotify بطور ڈیفالٹ Spotify Connect کے ذریعے چلتا ہے، کیونکہ
+  WebKitGTK، Spotify کی محفوظ آڈیو نہیں چلا سکتا۔
+- **YouTube** اپنے انٹرفیسز بدل سکتا ہے اور سرچ، پلے بیک یا سائن اِن کو توڑ
+  سکتا ہے، جب تک MixMusic یا yt-dlp اس کا ساتھ نہ پکڑ لے۔
+
+کچھ کام نہیں کر رہا؟ [مسائل کا حل](docs/troubleshooting.md) عام مسائل اور
+معلوم خامیوں کا احاطہ کرتا ہے۔
 
 ## سورس سے بنائیں
 
-آپ کو [Go](https://go.dev/dl/) 1.27.3 یا اس سے نیا، [Bun](https://bun.sh) 1.2
+آپ کو [Go](https://go.dev/dl/) 1.27.3 یا اس سے نیا، [Bun](https://bun.sh) 1.4
 یا اس سے نیا، جو MyGo کی کمانڈ لائن چلاتا ہے، اور Git چاہیے۔ MyGo کو کسی C
 کمپائلر کی ضرورت نہیں، اس لیے کوئی بھی سسٹم MixMusic کو ہر سسٹم کے لیے بنا
 سکتا ہے۔
@@ -395,9 +598,10 @@ bun run dev
 ### Nix
 
 [Nix](https://nixos.org) کے ساتھ، `nix develop` آپ کو وہ ٹولز دیتا ہے جن سے
-ریلیزز بنتی ہیں، انھی ورژنز پر جو `flake.lock` طے کرتا ہے: Go، Bun، NSIS،
-GoReleaser اور Zola۔ `nix build` MixMusic کو Linux کے لیے سورس سے `result/` میں
-بناتا ہے۔
+ریلیزز بنتی ہیں، انھی ورژنز پر جو `flake.lock` طے کرتا ہے: Go 1.27، Bun،
+GoReleaser، jq، zip اور Zola، اور Linux پر NSIS، osslsigncode اور binutils۔
+`nix build` MixMusic کو Linux کے لیے سورس سے `result/` میں بناتا ہے، اور
+`nix run github:fzn0x/mixmusic` اسے چلاتا ہے۔
 
 ### ڈیولپ کریں
 
@@ -424,14 +628,15 @@ Nix شیل میں Linux ڈاؤن لوڈز
 loader مانگتا ہے، اور وہ صرف NixOS پر چلتا ہے۔
 `go run ./tools/elfloader build/linux-amd64` کسی بلڈ کو جانچتا ہے۔
 
-[ویب سائٹ](https://fzn0x.github.io/mixmusic/) `site/` میں ہے، جو
+[ویب سائٹ](https://mixmusic.functionx.dev/) `site/` میں ہے، جو
 [Zola](https://www.getzola.org) سے بنتی ہے، اور `docs/` کی گائیڈز اس کے `/docs/`
 صفحات ہیں۔ `go run ./tools/sitedocs && zola --root site serve` اس کا پیش نظارہ
 دکھاتا ہے۔ ریلیزز Nix شیل میں بنتی ہیں اور
 [GoReleaser](https://goreleaser.com) (`.goreleaser.yaml`) سے شائع ہوتی ہیں۔
 
-[docs/architecture](docs/architecture/README.md) بتاتا ہے کہ حصے آپس میں کیسے
-جڑتے ہیں۔
+[CONTRIBUTING.md](CONTRIBUTING.md) میں وہ جانچیں ہیں جو pull request سے پہلے
+چلانی ہیں، اور [docs/architecture](docs/architecture/README.md) بتاتا ہے کہ
+حصے آپس میں کیسے جڑتے ہیں، ہر حصے کے لیے ایک صفحہ۔
 
 ### ساخت
 
@@ -445,27 +650,48 @@ loader مانگتا ہے، اور وہ صرف NixOS پر چلتا ہے۔
 *.go                 the app and its windows: the pages, the player bar, the
                      mini player, the tray, media keys, deep links
 fonts/               the typefaces the windows draw with
+locales/             the app's words, in English and 66 other languages
 internal/app         the services the windows call, and the desktop integration
 internal/player      the queue, played by the audio engine or on Spotify's devices
 internal/audio       MixMusic's audio engine, and the system's audio output
-internal/plugins     plugins, each in a JavaScript engine of its own
+internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/youtube     YouTube Music's catalog, and your account there
 internal/spotify     the Spotify Web API, its sign-in and Spotify Connect
-internal/stream      audio streams, from YouTube or yt-dlp, opened for the engine
 internal/match       Spotify tracks matched to their YouTube Music recordings
-internal/romaji      Japanese lyrics in romaji, kanji read by kagome
 internal/library     liked and disliked songs, mixes, history and stats
-internal/lastfm      scrobbling to Last.fm
+internal/localfiles  the music on this computer; tags and tagwrite, its tags
+internal/romaji      Japanese lyrics in romaji, kanji read by kagome;
+                     romanize, the Latin letters of other scripts
+internal/cast        casting to Chromecasts; upnp, to DLNA renderers; fcast,
+                     to FCast receivers; dnssd finds them on the network
+internal/room        Listen with friends; remote, remote control; portmap,
+                     the router's forwarded port
+internal/mcp         AI assistants, over the Model Context Protocol
+internal/lastfm      scrobbling to Last.fm; listenbrainz and librefm, to
+                     theirs; scrobble, which plays count
 internal/discord     what plays, on your Discord profile
-internal/diag        the log, without secrets, and the reports of crashes
+internal/plugins     plugins, each in a JavaScript engine of its own
 internal/addons      themes and plugins, and the community registry
+internal/backup      backups and restores; playlistio and export, the files
+                     of lists and tracks in and out
+internal/diag        the log, without secrets, and the reports of crashes
+internal/settings    your preferences and their defaults
 builtin/themes       the themes MixMusic ships with
-public/              the page of Spotify's player, on Windows
+public/              the pages MyGo embeds: Spotify's player, on Windows and
+                     macOS, and the picture of music videos
 sdk/                 the types of the plugin API
 community/           community themes and plugins, and their registry
+docs/                the guides, the website's /docs/ pages
+site/                the website, built with Zola
+tools/               the commands that build and check the repository's parts
+packaging/, nix/     the Flatpak, Flathub, AUR and Homebrew packages, and Nix
+changelog.d/         the changelog entries of what isn't released yet
 ```
 
 <div dir="rtl">
+
+[docs/architecture](docs/architecture/README.md) `internal/` کے باقی پیکیجز کے
+بارے میں بتاتا ہے، ایپ کے ہر حصے کے لیے ایک صفحہ۔
 
 جو پیکیجز آپ امپورٹ کر سکتے ہیں:
 
@@ -475,6 +701,8 @@ community/           community themes and plugins, and their registry
 opus/                an Opus decoder in pure Go, a port of libopus's
 aac/                 an AAC-LC decoder in pure Go
 ac3/                 an AC-3 and E-AC-3 decoder in pure Go, written from ATSC A/52
+flac/                a FLAC decoder in pure Go, as RFC 9639 has it
+ogg/                 the packets of Ogg files, as RFC 3533 has them
 webm/                the audio of WebM files: packets, times and seeking
 mp4/                 the audio of MP4 files: packets, times and seeking
 resample/            sample rate conversion, with Kaiser-windowed sincs
@@ -510,12 +738,12 @@ brand/               MixMusic's logo, for code that draws it
 ### شیئر کریں
 
 1. اس repository کو fork کریں۔
-2. ایک فولڈر شامل کریں: تھیم کے لیے `community/themes/<id>/`، یا پلگ اِن کے
-   لیے `community/plugins/<id>/`، اس کی `plugin.json` اور اس کی `index.ts` کے
-   ساتھ۔
-3. `bun run build:plugins`، `go run ./tools/registry` اور
+2. ایک فولڈر شامل کریں: تھیم کے لیے `community/themes/<id>/` اس کی
+   `theme.json` کے ساتھ، یا پلگ اِن کے لیے `community/plugins/<id>/` اس کی
+   `plugin.json` اور اس کی `index.ts` کے ساتھ۔
+3. `bun install`، `bun run build:plugins`، `go run ./tools/registry` اور
    `go run ./tools/registry -check` چلائیں۔
-4. ایک pull request کھولیں۔
+4. ایک pull request کھولیں، ایک اسکرین شاٹ کے ساتھ۔
 
 جب یہ merge ہو جاتا ہے تو CI اسے
 [registry branch](https://github.com/fzn0x/mixmusic/tree/registry) پر شائع کر
@@ -531,37 +759,62 @@ MixMusic کا اپنا کوئی اکاؤنٹ، سرور، analytics یا telemet
   کتنا بلند ہے، سائن آؤٹ حالت میں مانگی گئی، اور آرٹ ورک؛ کچھ اسٹریمز
   yt-dlp کے ذریعے۔ سائن اِن ہونے پر، وہاں کی آپ کی لائبریری، اور، جب تک آپ اسے
   Settings › Accounts (ترتیبات › اکاؤنٹس) میں بند نہ کریں، وہ ٹریکس جو آپ
-  چلاتے ہیں، جو آپ کی YouTube Music ہسٹری میں شامل ہوتے ہیں۔
+  چلاتے ہیں، جو آپ کی YouTube Music ہسٹری میں شامل ہوتے ہیں۔ خود YouTube،
+  سائن آؤٹ حالت میں اور بغیر کوکیز کے، سرچ کے YouTube والے انتخاب، AI سے بنے
+  گانوں کی جانچ، بولوں اور ٹرانسکرپٹس کے طور پر کیپشنز، اور میوزک ویڈیوز سے
+  ہم وقت بولوں کے لیے۔
 - **Spotify،** سائن اِن کرنے کے بعد: آپ کی لائبریری، آپ کے Spotify Connect
   ڈیوائسز، اور Spotify کا پلیئر، جو `sdk.scdn.co` سے لوڈ ہوتا ہے، جب MixMusic
   میں Spotify چلتا ہے۔
+- **Better Lyrics:** چلتے ٹریک کا عنوان، پہلا فنکار، البم اور دورانیہ، تاکہ
+  اس کے بول ملیں، جب اس کا البم اور دورانیہ ہو۔
 - **Unison:** چلتے ٹریک کی video ID، یا، اس کے بغیر، اس کا عنوان، فنکار،
   البم اور دورانیہ، تاکہ اس کے بول ملیں۔ صرف تب جب آپ بولوں کے ساتھ ترجمہ
-  (translate) یا رومن (romanize) آن کریں: چلتے ٹریک کے بول، اس کی video ID کے
-  ساتھ، جنھیں Unison، Google سے ترجمہ کرواتا ہے۔
+  (translate) یا عربی کو رومن (romanize) آن کریں: چلتے ٹریک کے بول، اس کی
+  video ID کے ساتھ، جنھیں Unison، Google سے ترجمہ یا رومن کرواتا ہے۔
 - **LRCLIB:** چلتے ٹریک کا عنوان، فنکار، البم اور دورانیہ، تاکہ اس کے بول ملیں۔
 - **SponsorBlock:** صرف تب جب آپ Skip the parts SponsorBlock marks
   (SponsorBlock کے نشان زدہ حصے چھوڑیں) آن کریں: ہر video ID کے hash کے پہلے
   4 حروف، ID کبھی نہیں، تاکہ اس کے نشان زدہ حصے ملیں۔
 - **GitHub:** شروع ہونے پر اور ہر چند گھنٹوں بعد نئے ورژن کی جانچ، جسے آپ
   Settings › About (ترتیبات › تعارف) میں بند کر سکتے ہیں؛ مارکیٹ پلیس کھولنے پر
-  کمیونٹی registry؛ yt-dlp کے ڈاؤن لوڈز؛ اور، جاپانی بولوں کے ساتھ romaji پہلی
-  بار آن کرنے پر، kanji کی ریڈنگز کی ڈکشنری (11.7 MB)۔ Romaji آپ کے کمپیوٹر پر
-  بنتا ہے: بول بھیجے نہیں جاتے۔
+  کمیونٹی registry؛ yt-dlp کے ڈاؤن لوڈز؛ AutoEq کی ہیڈ فونز کی فہرست اور وہ
+  پروفائل جو آپ چنیں؛ اور، جاپانی بولوں کے ساتھ romaji پہلی بار آن کرنے پر،
+  kanji کی ریڈنگز کی ڈکشنری (11.7 MB)۔ Romaji، اور عربی کے سوا دوسری رسم
+  الخطوں کے لاطینی حروف، آپ کے کمپیوٹر پر بنتے ہیں: بول بھیجے نہیں جاتے۔
 - **Last.fm،** اسے جوڑنے کے بعد: جو آپ چلاتے ہیں۔
 - **ListenBrainz،** یا اس کی API والا آپ کا اپنا سرور، اسے جوڑنے کے بعد: جو
   آپ چلاتے ہیں۔
 - **Libre.fm،** یا کوئی دوسرا GNU FM سرور، اسے جوڑنے کے بعد: جو آپ چلاتے ہیں۔
 - **Discord،** جب تک آپ اسے بند نہ کریں: جو چل رہا ہے، آپ کے کمپیوٹر پر
   Discord ایپ کو بھیجا جاتا ہے، جو اسے آپ کی پروفائل پر دکھاتی ہے۔
+- **وہ ڈیوائسز جن پر آپ کاسٹ کرتے ہیں،** آپ کے نیٹ ورک پر: جو چل رہا ہے اس کا
+  عنوان، فنکار اور کور۔ وہ آڈیو MixMusic سے لیتی ہیں۔
+- **MixMusic والے دوسرے کمپیوٹرز،** ریموٹ کنٹرول اور دوستوں کے ساتھ سننے کے
+  لیے، انکرپٹڈ، آپ کے نیٹ ورک پر یا، جب آپ باہر کے دوستوں کو شامل ہونے دیں،
+  انٹرنیٹ پر۔ تب آپ کے راؤٹر سے ایک پورٹ فارورڈ کرنے کو کہا جاتا ہے، اور
+  آپ کے دعوتی لنک میں آپ کا انٹرنیٹ ایڈریس ہوتا ہے۔
+- **AI اسسٹنٹس** آپ کے کمپیوٹر پر، جب تک آپ انھیں اجازت دیں: جو چل رہا ہے،
+  قطار، ان کی سرچز کے نتائج اور آپ کے پلے لسٹس کے نام، جنھیں اسسٹنٹ اپنے
+  استعمال کیے گئے AI ماڈل کو آگے بھیج سکتا ہے۔
+- **YouTube اور Spotify،** یہ جاننے کے لیے کہ نیٹ ورک جواب دیتا ہے یا نہیں:
+  HTTPS پر ایک ایسی درخواست جس کا جواب خالی ہوتا ہے۔
+
+پلگ اِنز جو چاہیں بھیج سکتے ہیں: پلگ اِن کی اجازتیں آپ کو دکھائی جاتی ہیں،
+نافذ نہیں کی جاتیں، اسی لیے MixMusic پلگ اِن کو فعال کرنے سے پہلے آپ سے اس پر
+بھروسا کرنے کو کہتا ہے۔
+[آپ کا ڈیٹا اور پرائیویسی](docs/data-and-privacy.md#what-each-feature-sends-where)
+میں ایک جدول ہے کہ ہر خصوصیت کیا کہاں بھیجتی ہے۔
 
 جو کچھ یہ آپ کے کمپیوٹر پر رکھتا ہے:
 
-- آپ کی سیٹنگز اور لائبریری (پسندیدہ اور ناپسندیدہ گانے، مکسز، ہسٹری اور
-  حالیہ سرچز)، اس فولڈر میں جس کا نام Settings › About بتاتا ہے۔
+- آپ کی سیٹنگز اور لائبریری (پسندیدہ اور ناپسندیدہ گانے، مکسز، ہر وہ پلے جو
+  آپ کے اعداد و شمار گنتے ہیں، فالو کیے گئے فنکار اور شوز، پنز، فولڈرز اور
+  ٹیگز، ہسٹری، حالیہ سرچز، اور آپ کی موسیقی کی فائلوں کا انڈیکس)، اس فولڈر
+  میں جس کا نام Settings › About بتاتا ہے۔
 - آپ کے چلائے ہوئے ٹریکس، کیش میں، اتنے جتنے آپ Settings › Playback
   (ترتیبات › پلے بیک) میں اجازت دیں، اور یہ کہ YouTube نے انھیں کتنا بلند
-  ناپا۔
+  ناپا۔ آپ کے ڈاؤن لوڈ کیے ہوئے گانے، ڈاؤن لوڈز فولڈر میں۔
 - آپ کے دیکھے ہوئے کورز، 256 MB تک۔
 - بولوں کے وہ ترجمے جو آپ نے آن کیے، ٹریک اور زبان کے حساب سے، اور وہ
   ڈکشنری جس سے romaji، kanji پڑھتا ہے، جب آپ اسے آن کر لیں۔
@@ -573,7 +826,9 @@ MixMusic کا اپنا کوئی اکاؤنٹ، سرور، analytics یا telemet
 
 لائبریری کا ہسٹری صفحہ آپ کا چلایا ہوا صاف کرتا ہے، Settings › Playback کیش
 اور کورز صاف کرتا ہے، اور کسی سروس سے سائن آؤٹ کرنا اس کا سائن اِن مٹا دیتا
-ہے۔
+ہے۔ [صاف کریں، منتقل کریں یا ری سیٹ کریں](docs/data-and-privacy.md#clear-move-or-reset)
+بتاتا ہے کہ اپنا ڈیٹا کیسے منتقل کریں، `MIXMUSIC_DATA_DIR` سے پورٹیبل کاپی کیسے
+رکھیں، یا نئے سرے سے کیسے شروع کریں۔
 
 Windows پر، ویژولائزر اس کمپیوٹر پر چلتے Spotify کی آواز سنتا ہے، چاہے
 MixMusic میں ہو یا Spotify ایپ میں، Windows کے process loopback کے ذریعے، جو
@@ -609,6 +864,12 @@ MixMusic ان پروجیکٹس پر بنا ہے:
   [appimagetool](https://github.com/AppImage/appimagetool)، AppImages۔
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)،** جو ان ٹریکس کی آواز ڈھونڈتا
   ہے جو MixMusic خود نہیں ڈھونڈ پاتا۔
+- **[SponsorBlock](https://sponsor.ajay.app)،** YouTube ویڈیوز کے حصوں کا کھلا،
+  عوامی تعاون سے بنا ڈیٹا بیس، Ajay Ramachandran اور اس کے شراکت داروں کی طرف
+  سے، جس کے حصے MixMusic اس وقت چھوڑتا ہے جب آپ اسے کہیں۔ Uses
+  SponsorBlock data licensed under
+  [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+  from https://sponsor.ajay.app/.
 - **[Better Lyrics](https://betterlyrics.org)،** ایک سروس جو بول لفظ بہ لفظ ہم وقت رکھتی ہے۔
 - **[Unison](https://unison.betterlyrics.org)،** بولوں کا کھلا، عوامی تعاون سے
   بنا ڈیٹا بیس، Unison Community License کے تحت، اور **[LRCLIB](https://lrclib.net)،** ہم وقت
@@ -621,6 +882,18 @@ MixMusic ان پروجیکٹس پر بنا ہے:
 - **[libopus](https://opus-codec.org)،** جس کے ڈیکوڈر کا Opus ڈیکوڈر پورٹ ہے،
   اور **[SharpJaad](https://github.com/jimm98y/SharpJaad)،** [JAAD](https://sourceforge.net/projects/jaadec/)
   کا C# پورٹ جس سے AAC ڈیکوڈر اخذ کیا گیا ہے۔
+- **[Chromium](https://www.chromium.org)** کا Web Audio، جس کے biquad،
+  DynamicsCompressor اور AnalyserNode کے ایکولائزر کے فلٹرز، والیوم لیولنگ اور
+  ویژولائزر پورٹ ہیں۔
+- **[AutoEq](https://github.com/jaakkopasanen/AutoEq)،** Jaakko Pasanen اور اس
+  کے شراکت داروں کی طرف سے، جس کے پروفائلز ہیڈ فونز کی آواز درست کرتے ہیں،
+  [Equalizer APO](https://sourceforge.net/projects/equalizerapo/) کے فارمیٹ
+  میں۔
+- **[go-mp3](https://github.com/hajimehoshi/go-mp3)** اور
+  **[jfreymuth/vorbis](https://github.com/jfreymuth/vorbis)،** جو آپ کے
+  کمپیوٹر پر MP3 اور Vorbis فائلیں ڈیکوڈ کرتے ہیں، اور
+  **[Xiph.Org](https://xiph.org)،** جس کے FLAC اور Ogg کو `flac` اور `ogg`
+  پڑھتے ہیں۔
 - **[FFmpeg](https://ffmpeg.org)،** جس سے ڈیکوڈرز کے ٹیسٹ موازنہ کرتے ہیں۔
 - **[Selawik](https://github.com/microsoft/Selawik)،**
   **[Quicksand](https://github.com/andrew-paglinawan/QuicksandFamily)،**
@@ -635,6 +908,9 @@ MixMusic ان پروجیکٹس پر بنا ہے:
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) کے تحت، ویب سائٹ
   پر چلتی ہے۔
 
+[کریڈٹس](docs/credits.md) ہر اس پروجیکٹ، مقالے اور معیار کا نام لیتا ہے جن پر
+MixMusic بنا ہے۔
+
 ## تعاون
 
 اصلاحات، نئی خصوصیات، تھیمز، پلگ اِنز اور بگ رپورٹس سب کا خیر مقدم ہے۔
@@ -647,7 +923,10 @@ MixMusic ان پروجیکٹس پر بنا ہے:
   بتاتی ہے کہ کون سی جانچیں چلانی ہیں، commit کا انداز کیا ہے، اور وہ changelog
   اندراج کیا ہے جو لوگوں کو نظر آنے والی تبدیلی کے لیے چاہیے۔
 - **تھیم یا پلگ اِن شیئر کریں:** دیکھیں [کمیونٹی](#کمیونٹی)۔
+- **سیکیورٹی کی کمزوری کی اطلاع** نجی طور پر دیں، جیسا کہ
+  [SECURITY.md](SECURITY.md) بتاتی ہے۔
 
+حصہ لینے والا ہر شخص [ضابطہ اخلاق](CODE_OF_CONDUCT.md) کی پابندی کرتا ہے۔
 [CONTRIBUTORS.md](CONTRIBUTORS.md) ان لوگوں کا شکریہ ادا کرتی ہے جن کے کوڈ،
 خیالات اور رپورٹس نے MixMusic کو شکل دی۔
 
@@ -664,6 +943,9 @@ Open Font License کے تحت ہیں: [Selawik کا](fonts/OFL.txt)،
 اخذ کیا گیا ہے، [اس کے MIT لائسنس](aac/LICENSE.sharpjaad) کے تحت، اور HCT رنگ
 سائنس Material Color Utilities کا پورٹ ہے،
 [اس کے Apache لائسنس](internal/hct/LICENSE.material-color-utilities) کے تحت۔
+دوسرے حصے ان کے لائسنس رکھتے ہیں جن سے وہ اخذ کیے گئے ہیں، جیسے Chromium کے
+Web Audio کے فلٹرز، go-mp3، jfreymuth/vorbis، kagome اور Unihan کا ڈیٹا:
+[لائسنس](docs/license.md) ہر ایک کی فہرست دیتا ہے۔
 
 MixMusic کا Spotify یا Google سے کوئی الحاق نہیں، نہ انھوں نے اسے تصدیق کیا ہے
 اور نہ ہی یہ ان کا اسپانسر کردہ ہے۔ یہ وہ چلاتا ہے جو یہ سروسز اپنے صارفین کو

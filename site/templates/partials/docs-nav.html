@@ -1,15 +1,17 @@
-{# The docs' navigation drawer: the overview, then each group of docs
-    with its pages, in the order tools/sitedocs gives them, and the
-    sections of the page shown under it. A wide window shows it beside the
-    page; a narrow one opens it over the page from the top app bar's menu
-    button, or, without script, shows it above the page. It needs docs, the
-    docs section, current, the address of the page shown, and toc, its
-    sections. #}
-<nav class="drawer" id="docs-drawer" aria-label="Docs" data-drawer>
+{# The docs' drawer: their search, then their navigation, the overview
+    and each group of docs with its pages, in the order tools/sitedocs
+    gives them, and the sections of the page shown under it. A wide window
+    shows it beside the page; a narrow one opens it over the page, as a
+    dialog, from the top app bar's menu button, or, without script, shows
+    it above the page. It needs docs, the docs section, current, the
+    address of the page shown, and toc, its sections. #}
+<div class="drawer" id="docs-drawer" data-drawer>
       <div class="drawer-head">
         <span class="drawer-title">MixMusic docs</span>
         <button class="icon-btn" type="button" aria-label="Close the docs menu" data-drawer-close><svg class="icon" width="24" height="24" aria-hidden="true"><use href="#i-close" /></svg></button>
       </div>
+      {% include "partials/docs-search.html" %}
+      <nav aria-label="Docs">
       <ul class="drawer-list">
         <li><a class="drawer-item" href="{{ docs.permalink }}"{% if current == docs.permalink %} aria-current="page"{% endif %}>Overview</a></li>
       </ul>
@@ -35,4 +37,5 @@
       </ul>
       {%- endif %}
       {%- endfor %}
-    </nav>
+      </nav>
+    </div>

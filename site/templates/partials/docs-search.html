@@ -1,0 +1,21 @@
+{# The docs' search, at the top of their drawer: a field whose results, the
+    sections of the docs that hold every word typed, show under it as one
+    types. static/docs-search.js reads docs/search.json, which
+    tools/sitefinish makes from the built pages, once one searches. It
+    needs script, so a page without it shows no field. The panel of results
+    takes the focus of Tab, to scroll it from the keyboard when it holds
+    more than it shows. It needs docs, the docs section. #}
+<div class="search" role="search" data-search data-search-root="{{ docs.permalink }}">
+        <label class="search-label" for="docs-search">Search the docs</label>
+        <div class="search-field">
+          <svg class="icon" width="20" height="20" aria-hidden="true"><use href="#i-search" /></svg>
+          <input id="docs-search" type="search" placeholder="Search the docs" autocomplete="off" spellcheck="false" enterkeyhint="go"
+            role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="docs-search-results" />
+          <kbd class="search-key" aria-hidden="true">/</kbd>
+        </div>
+        <div class="search-panel" role="group" aria-label="Search results" hidden tabindex="0" data-search-panel>
+          <ul class="search-results" id="docs-search-results" role="listbox" aria-label="Results"></ul>
+          <p class="search-note" aria-hidden="true" data-search-note></p>
+        </div>
+        <p class="search-status" role="status" data-search-status></p>
+      </div>

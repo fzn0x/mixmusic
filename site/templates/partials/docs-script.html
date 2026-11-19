@@ -1,9 +1,10 @@
 <script src="{{ get_url(path='copy.js') }}" defer></script>
+  <script src="{{ get_url(path='docs-search.js') }}" defer></script>
   <script>
     // The docs' drawer, which a narrow window opens over the page as a
     // modal, and the section of the page in view, lit in "On this page".
     // copy.js, the home page's too, gives each block of code its copy
-    // button.
+    // button, and docs-search.js runs the search at the top of the drawer.
     (() => {
       const d = document;
       const root = d.documentElement;
@@ -20,10 +21,12 @@
           back = d.activeElement;
           drawer.setAttribute("role", "dialog");
           drawer.setAttribute("aria-modal", "true");
+          drawer.setAttribute("aria-label", "Docs menu");
           (drawer.querySelector("[aria-current=page]") || drawer.querySelector("a")).focus();
         } else {
           drawer.removeAttribute("role");
           drawer.removeAttribute("aria-modal");
+          drawer.removeAttribute("aria-label");
           back?.focus();
           back = null;
         }

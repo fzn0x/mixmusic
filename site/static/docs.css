@@ -381,6 +381,106 @@ html:not(.js) .theme-toggle { display: none; }
 .docs:not(.has-toc) .drawer-toc { display: block; }
 .scrim { display: none; }
 
+/* The docs' search (partials/docs-search.html, docs-search.js): a field at
+   the top of the drawer, and its results in a panel that the script puts
+   under it, wider than the drawer, in a wide window. It needs script. */
+
+html:not(.js) .search,
+.topbar-search { display: none; }
+.search { margin: 0 0 12px; }
+.search-label,
+.search-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 12px 0 16px;
+  border-radius: 999px;
+  background: var(--surface-high);
+  color: var(--on-surface-variant);
+  transition: background-color var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+}
+.search-field:hover { background: var(--surface-highest); }
+.search-field:focus-within { background: var(--surface-highest); box-shadow: 0 0 0 2px var(--primary); }
+.search-field .icon { flex: none; }
+.search-field input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--on-surface);
+  font: 500 0.9375rem/1 var(--font);
+  outline: none;
+}
+.search-field input::placeholder { color: var(--on-surface-variant); opacity: 1; }
+.search-key {
+  flex: none;
+  min-width: 22px;
+  padding: 2px 6px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 6px;
+  color: var(--on-surface-variant);
+  font: 600 0.75rem/1.2 var(--mono);
+  text-align: center;
+}
+.search-field:focus-within .search-key { display: none; }
+.search-panel {
+  position: fixed;
+  z-index: 25;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px;
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-m);
+  background: var(--surface-container);
+  box-shadow: 0 8px 32px var(--shadow);
+  scrollbar-width: thin;
+}
+.search-panel[hidden] { display: none; }
+.search-panel:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.search-results { list-style: none; margin: 0; padding: 0; }
+.search-result {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.search-result + .search-result { margin-top: 2px; }
+.search-result:hover { background: color-mix(in srgb, var(--on-surface) 8%, transparent); }
+.search-result[aria-selected="true"] { background: var(--secondary-container); color: var(--on-secondary-container); }
+.search-where { display: flex; flex-direction: column; gap: 1px; }
+.search-page { color: var(--on-surface-variant); font-size: 0.8125rem; font-weight: 600; }
+.search-heading,
+.search-page:only-child { color: var(--on-surface); font-size: 0.9375rem; font-weight: 700; }
+.search-result[aria-selected="true"] .search-page,
+.search-result[aria-selected="true"] .search-heading,
+.search-result[aria-selected="true"] .search-snippet { color: inherit; }
+.search-snippet {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--prose);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+.search-result mark { padding: 0 1px; border-radius: 3px; background: color-mix(in srgb, var(--primary) 30%, transparent); color: inherit; }
+.search-note { margin: 0; padding: 10px 12px; color: var(--on-surface-variant); font-size: 0.875rem; }
+.search-note[hidden] { display: none; }
+
 /* The way here: Docs › its group › the page. */
 
 .crumbs ol { list-style: none; margin: 0 0 20px; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; color: var(--on-surface-variant); font-size: 0.875rem; font-weight: 600; }
@@ -699,6 +799,11 @@ html:not(.js) .theme-toggle { display: none; }
   .topbar-github,
   .theme-toggle { margin-left: auto; }
   html.js .theme-toggle + .topbar-github { margin-left: 0; }
+  /* The search button, which opens the drawer at its field; the results
+     show in the drawer, under the field. */
+  html.js .topbar-search { display: inline-flex; margin-left: auto; }
+  html.js .topbar-search + .theme-toggle { margin-left: 0; }
+  .search-panel { position: static; margin-top: 8px; padding: 0; border: 0; background: none; box-shadow: none; }
   html:not(.js) .drawer { position: static; max-height: none; overflow: visible; padding: 8px 0 0; border-bottom: 1px solid var(--outline-variant); }
   html.js .topbar-menu { display: inline-flex; }
   html.js .drawer {
@@ -744,6 +849,37 @@ html:not(.js) .theme-toggle { display: none; }
   }
   .topbar-github { width: 40px; padding: 0; }
   .topbar-github:has(.icon) { padding: 0; }
+}
+
+/* The docs' bar holds a search button too: there the GitHub button gives
+   up its words sooner, its icon buttons are smaller on a phone, and on a
+   small one the brand is its mark alone. The words hidden are read out
+   still. */
+@media (max-width: 559.98px) {
+  .topbar:has(.topbar-search) .topbar-github span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .topbar:has(.topbar-search) .topbar-github,
+  .topbar:has(.topbar-search) .topbar-github:has(.icon) { width: 40px; padding: 0; }
+}
+@media (max-width: 480px) {
+  .topbar:has(.topbar-search) .icon-btn { width: 40px; height: 40px; }
+  .topbar:has(.topbar-search) .topbar-menu { margin-left: -4px; }
+}
+@media (max-width: 399.98px) {
+  .topbar:has(.topbar-search) .brand span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

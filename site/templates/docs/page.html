@@ -50,6 +50,9 @@
 {%- block menu %}
     <button class="icon-btn topbar-menu" type="button" aria-label="Open the docs menu" aria-controls="docs-drawer" aria-expanded="false" data-drawer-open><svg class="icon" width="24" height="24" aria-hidden="true"><use href="#i-menu" /></svg></button>
 {%- endblock menu %}
+{%- block search %}
+    <button class="icon-btn topbar-search" type="button" aria-label="Search the docs" aria-controls="docs-drawer" data-search-open><svg class="icon" width="24" height="24" aria-hidden="true"><use href="#i-search" /></svg></button>
+{%- endblock search %}
 
 {%- block body %}
   {%- set docs = get_section(path="docs/_index.md") %}

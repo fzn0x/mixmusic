@@ -28,6 +28,7 @@
     <symbol id="i-prev" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5" /></symbol>
     <symbol id="i-next" viewBox="0 0 24 24"><path d="M9.5 5.5 16 12l-6.5 6.5" /></symbol>
     <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4.5 19.5h4l10-10a2.8 2.8 0 0 0-4-4l-10 10zM13 7l4 4" /></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><path d="M10.5 17.5a7 7 0 1 0 0-14 7 7 0 0 0 0 14ZM15.6 15.6 20.5 20.5" /></symbol>
   </svg>
 
   {%- set home = config.base_url | trim_end(pat='/') ~ '/' %}
@@ -42,6 +43,7 @@
       <a href="{{ home }}#features">Features</a>
       <a href="{{ home }}#download">Download</a>
     </nav>
+    {%- block search %}{% endblock search %}
     <button class="icon-btn theme-toggle" type="button" aria-label="Theme: as the system" data-theme-toggle><svg class="icon" width="22" height="22" aria-hidden="true"><use href="#i-theme-system" /></svg></button>
     <a class="btn btn-tonal btn-small topbar-github" href="https://github.com/fzn0x/mixmusic">
       <svg class="icon" width="18" height="18" aria-hidden="true"><use href="#i-star" /></svg>

@@ -440,6 +440,38 @@ func TestAnchor(t *testing.T) {
 	}
 }
 
+// TestHeadingAnchors gives a link to another doc's heading, named as
+// GitHub makes its anchor, the anchor Zola makes of it, and leaves those
+// both make alike, a heading's own id and what names no heading as they
+// are.
+func TestHeadingAnchors(t *testing.T) {
+	root := repo(t, map[string]string{
+		"docs/a.md": "# A\n<!-- docs: group=start -->\n\nText.\n\n" +
+			"[1](b.md#all-of-an-artists-songs) [2](b.md#lastfm) [3](b.md#what-059-changed) [4](b.md#library--on-this-computer) " +
+			"[5](b.md#plain-heading) [6](b.md#own) [7](b.md#intro-1) [8](b.md#settingsjson) [9](b.md#glósóli) [10](b.md#nowhere)\n",
+		"docs/b.md": "# B\n<!-- docs: group=start -->\n\nText.\n\n" +
+			"## All of an artist's songs\n\n## Last.fm\n\n### What 0.5.9 changed\n\n## Library › On this computer\n\n" +
+			"## Plain heading\n\n## Mine {#own}\n\n## Intro\n\n## Intro\n\n## [`settings.json`](a.md)\n\n## Glósóli\n\n" +
+			"```\n## Code, not a heading\n```\n",
+	})
+	if _, err := run(opts(root)); err != nil {
+		t.Fatal(err)
+	}
+	page, err := os.ReadFile(filepath.Join(root, "site", "content", "docs", "a", "index.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{
+		"(@/docs/b/index.md#all-of-an-artist-s-songs)", "(@/docs/b/index.md#last-fm)", "(@/docs/b/index.md#what-0-5-9-changed)",
+		"(@/docs/b/index.md#library-on-this-computer)", "(@/docs/b/index.md#plain-heading)", "(@/docs/b/index.md#own)",
+		"(@/docs/b/index.md#intro-1)", "(@/docs/b/index.md#settings-json)", "(@/docs/b/index.md#glosoli)", "(@/docs/b/index.md#nowhere)",
+	} {
+		if !strings.Contains(string(page), want) {
+			t.Errorf("the page lacks %s:\n%s", want, page)
+		}
+	}
+}
+
 func TestBrokenLinks(t *testing.T) {
 	root := repo(t, map[string]string{
 		"docs/a.md": "# A\n<!-- docs: group=start -->\n\nText.\n\n[gone](gone.md) and ![gone](shots/gone.png)\n\n[out](../../elsewhere.md)\n",

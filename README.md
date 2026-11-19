@@ -806,6 +806,12 @@ MixMusic is built on these projects:
   the AppImages.
 - **[yt-dlp](https://github.com/yt-dlp/yt-dlp)**, which finds the audio of
   the tracks MixMusic can't find itself.
+- **[SponsorBlock](https://sponsor.ajay.app)**, the open, crowdsourced
+  database of the parts of YouTube videos, by Ajay Ramachandran and its
+  contributors, whose parts MixMusic skips while you ask it to. Uses
+  SponsorBlock data licensed under
+  [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+  from https://sponsor.ajay.app/.
 - **[Better Lyrics](https://betterlyrics.org)**, whose service keeps lyrics
   timed word by word.
 - **[Unison](https://unison.betterlyrics.org)**, the open, crowdsourced database of
@@ -821,6 +827,17 @@ MixMusic is built on these projects:
   port of, and **[SharpJaad](https://github.com/jimm98y/SharpJaad)**, the C#
   port of [JAAD](https://sourceforge.net/projects/jaadec/) the AAC decoder
   derives from.
+- **[Chromium](https://www.chromium.org)**'s Web Audio, whose biquad,
+  DynamicsCompressor and AnalyserNode the equalizer's filters, volume
+  levelling and the visualizer are ports of.
+- **[AutoEq](https://github.com/jaakkopasanen/AutoEq)**, by Jaakko Pasanen
+  and its contributors, whose profiles correct the sound of headphones, in
+  the format of [Equalizer APO](https://sourceforge.net/projects/equalizerapo/).
+- **[go-mp3](https://github.com/hajimehoshi/go-mp3)** and
+  **[jfreymuth/vorbis](https://github.com/jfreymuth/vorbis)**, which decode
+  the MP3 and Vorbis files on your computer, and
+  **[Xiph.Org](https://xiph.org)**, whose FLAC and Ogg `flac` and `ogg`
+  read.
 - **[FFmpeg](https://ffmpeg.org)**, which the decoders' tests compare with.
 - **[Selawik](https://github.com/microsoft/Selawik)**,
   **[Quicksand](https://github.com/andrew-paglinawan/QuicksandFamily)**,
@@ -836,6 +853,9 @@ MixMusic is built on these projects:
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), plays on the
   website.
 
+[Credits](docs/credits.md) names every project, paper and standard
+MixMusic builds on.
+
 ## Contributing
 
 Fixes, features, themes, plugins and bug reports are all welcome.
@@ -847,7 +867,10 @@ Fixes, features, themes, plugins and bug reports are all welcome.
   explains the checks to run, the commit style, and the changelog entry
   that a change people will notice needs.
 - **Share a theme or a plugin:** see [Community](#community).
+- **Report a vulnerability** privately, as [SECURITY.md](SECURITY.md)
+  says.
 
+Everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md).
 [CONTRIBUTORS.md](CONTRIBUTORS.md) thanks the people whose code, ideas and
 reports shaped MixMusic.
 
@@ -863,7 +886,10 @@ under the SIL Open Font License: [Selawik's](fonts/OFL.txt),
 libopus, under [its BSD license](opus/LICENSE.libopus), the AAC decoder
 derives from SharpJaad, under [its MIT license](aac/LICENSE.sharpjaad), and
 the HCT color science is a port of Material Color Utilities, under
-[its Apache license](internal/hct/LICENSE.material-color-utilities).
+[its Apache license](internal/hct/LICENSE.material-color-utilities). Other
+parts keep the licenses of what they derive from, such as the filters of
+Chromium's Web Audio, go-mp3, jfreymuth/vorbis, kagome and the Unihan
+data: [License](docs/license.md) lists each.
 
 MixMusic is not affiliated with, endorsed by or sponsored by Spotify or
 Google. It plays what these services offer their users, through the

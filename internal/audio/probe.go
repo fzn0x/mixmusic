@@ -113,7 +113,7 @@ func probeMP3(src io.ReadSeeker) (time.Duration, error) {
 	return mp3Length(src), nil
 }
 
-// mp3MaxFrames bounds the frames mp3Frames counts: some 12 hours of
+// mp3MaxFrames bounds the frames mp3Frames counts: some 7½ hours of
 // MPEG-1 at 44.1 kHz.
 const mp3MaxFrames = 1 << 20
 

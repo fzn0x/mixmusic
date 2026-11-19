@@ -74,7 +74,7 @@ func TestOverlap(t *testing.T) {
 	branch(t, dir, "own.go", 0, "package main\n\nfunc own() {}\n")
 	r, err := check(dir, "main", "this", []other{
 		{"#1", "next"}, {"#2", "same"}, {"#3", "far"}, {"#4", "own.go"}, {"#5", "this"},
-	})
+	}, options{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -106,7 +106,7 @@ func TestOverlapWithTheBase(t *testing.T) {
 	branch(t, dir, "this", 5, "this pull request's line")
 	write(t, dir, "lines.txt", 5, "main's line")
 	run(t, dir, "commit", "-q", "-am", "main moved")
-	r, err := check(dir, "main", "this", []other{{"#1", "this"}})
+	r, err := check(dir, "main", "this", []other{{"#1", "this"}}, options{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,7 +134,7 @@ func TestOverlapWithoutRerere(t *testing.T) {
 	write(t, dir, "lines.txt", 4, "both")
 	gitRaw(t, append(cmd, "commit", "-q", "-am", "resolved")...)
 	gitRaw(t, append(cmd, "checkout", "-q", "main")...)
-	r, err := check(dir, "main", "this", []other{{"#1", "other"}})
+	r, err := check(dir, "main", "this", []other{{"#1", "other"}}, options{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -158,7 +158,7 @@ func TestOverlapHeadIsTheCheckout(t *testing.T) {
 	branch(t, dir, "this", 2, "this pull request's line")
 	branch(t, dir, "same", 2, "another line in its place")
 	run(t, dir, "checkout", "-q", "this")
-	r, err := check(dir, "main", "HEAD", []other{{"#1", "same"}})
+	r, err := check(dir, "main", "HEAD", []other{{"#1", "same"}}, options{})
 	if err != nil {
 		t.Fatal(err)
 	}

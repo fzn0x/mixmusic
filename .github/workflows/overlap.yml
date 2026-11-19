@@ -1,9 +1,11 @@
 name: Overlap
 
 # A pull request that conflicts with another open one conflicts with main
-# once the other merges. This check merges the pull request with each of
-# the other open ones, while both are open, so that the one pushed last
-# makes room before either merges. tools/overlap tells how.
+# once the other merges, and two that pass alone can fail together. This
+# check merges the pull request with each of the other open ones, while
+# both are open, and where both change Go code, vets the packages either
+# changes and runs the tests of those both change, so that the one pushed
+# last makes room before either merges. tools/overlap tells how.
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -51,6 +53,10 @@ jobs:
           while read -r n; do
             retry git fetch -q origin "+refs/pull/$n/head:refs/overlap/$n"
           done < "$RUNNER_TEMP/others"
+      # Go's modules, again if a download breaks off. setup-go's cache has
+      # them, unless go.sum changed.
+      - name: Go's modules
+        run: bash .github/scripts/retry.sh 45 go mod download
       - name: Merge with each of them
         # bash itself, not the default bash -e: with pipefail, the step
         # fails when the tool does, not only when tee does.
@@ -60,4 +66,6 @@ jobs:
         run: |
           args=()
           while read -r n; do args+=("#$n=refs/overlap/$n"); done < "$RUNNER_TEMP/others"
-          go run ./tools/overlap -base "$BASE" -head HEAD "${args[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
+          # A test that fails now and then runs again, as in CI's Go jobs.
+          go run ./tools/overlap -build -test "go run ./tools/gotest" -base "$BASE" -head HEAD "${args[@]}" |
+            tee -a "$GITHUB_STEP_SUMMARY"

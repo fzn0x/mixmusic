@@ -49,11 +49,9 @@ func (d *deck) played(r *ring) bool {
 // endsAtPart reports whether the deck holds still at the part that ends
 // its track (skip.go), which ends it there: on the audio thread.
 func (d *deck) endsAtPart() bool {
-	if d.cut.Load() {
-		return true
-	}
+	// jump before cut, as holdsStill reads them.
 	s := d.jump.Load()
-	return s != nil && s.ends
+	return s != nil && s.ends || d.cut.Load()
 }
 
 // follow has the deck armed to follow d, the active deck, whose track

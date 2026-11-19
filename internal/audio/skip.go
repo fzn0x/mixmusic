@@ -220,7 +220,11 @@ func (d *deck) passStart(start time.Duration) time.Duration {
 // past (passOver), or as it reached the one that ends its track. On the
 // audio thread.
 func (d *deck) holdsStill() bool {
-	if d.cut.Load() || d.jump.Load() != nil {
+	// jump before cut: passOver, on the loop, cuts the deck and then
+	// clears jump, so a jump found clear comes with its cut. Read the other
+	// way, a passOver between the two reads would show neither, and the
+	// deck would play a quantum of the part.
+	if d.jump.Load() != nil || d.cut.Load() {
 		return true
 	}
 	p := d.plan.Load()
@@ -251,7 +255,8 @@ func (d *deck) passOver() {
 	d.mu.Lock()
 	d.passes = append(d.passes, Skip{From: duration(s.from), To: duration(s.to)})
 	d.mu.Unlock()
-	// The deck holds until it is cut, or the seek's ring is there.
+	// The deck holds until it is cut, or the seek's ring is there: the cut
+	// comes before jump clears, as holdsStill reads jump first.
 	if s.ends {
 		d.cut.Store(true)
 		d.jump.CompareAndSwap(s, nil)

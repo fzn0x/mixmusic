@@ -1,12 +1,13 @@
-// The docs' search (#932): a field at the top of the docs' drawer, whose
+// The docs' search (#932, #938): a field in the docs' top app bar, whose
 // results show under it as one types. A result is a section of a docs
 // page that holds every word typed: its page, its heading and the words
 // around the first one found. The index, docs/search.json, which
 // tools/sitefinish makes from the built pages, comes once one starts to
-// search. `/` puts the cursor in the field from anywhere on a docs page,
-// and so does the top bar's search button, which a narrow window shows,
-// opening the drawer. The arrows go through the results, Enter opens one
-// at its heading, and Escape closes them, then empties the field.
+// search. `/` puts the cursor in the field from anywhere on a docs page.
+// A narrow window has no room for the field: the bar's search button, and
+// `/`, open it over the bar, and its back button closes it. The arrows go
+// through the results, Enter opens one at its heading, and Escape closes
+// them, then empties the field, then, over a narrow bar, closes it.
 (() => {
   const d = document;
   const box = d.querySelector("[data-search]");
@@ -135,9 +136,9 @@
   let results = [];
   let active = -1;
 
-  // In a wide window, the panel sits under the field, wider than the
-  // drawer, whose scrolling would clip it; in a narrow one, in the
-  // drawer, under the field (docs.css).
+  // In a wide window, the panel sits under the field, wider than it, and
+  // moves left as far as it must to stay in the window; in a narrow one,
+  // it takes the window's width under the bar (docs.css).
   const field = box.querySelector(".search-field");
   const place = () => {
     if (panel.hidden) return;
@@ -146,14 +147,27 @@
       return;
     }
     const r = field.getBoundingClientRect();
-    panel.style.left = `${r.left}px`;
-    panel.style.top = `${r.bottom + 6}px`;
-    panel.style.width = `${Math.max(r.width, Math.min(560, innerWidth - r.left - 16))}px`;
-    panel.style.maxHeight = `${Math.max(160, innerHeight - r.bottom - 22)}px`;
+    const width = Math.min(Math.max(r.width, 560), innerWidth - 32);
+    panel.style.left = `${Math.max(16, Math.min(r.left, innerWidth - 16 - width))}px`;
+    panel.style.top = `${r.bottom + 8}px`;
+    panel.style.width = `${width}px`;
+    panel.style.maxHeight = `${Math.max(160, innerHeight - r.bottom - 24)}px`;
   };
   addEventListener("resize", place);
-  addEventListener("scroll", place, { passive: true });
-  d.querySelector("[data-drawer]")?.addEventListener("scroll", place, { passive: true });
+
+  // A narrow window shows the field over the bar while one searches.
+  const bar = box.closest("[data-topbar]");
+  const opener = d.querySelector("[data-search-open]");
+  const searching = (on) => {
+    bar?.classList.toggle("is-searching", on);
+    opener?.setAttribute("aria-expanded", String(on));
+  };
+  const isSearching = () => bar?.classList.contains("is-searching");
+  const leave = () => {
+    close();
+    searching(false);
+    opener?.focus();
+  };
 
   const open = () => {
     panel.hidden = false;
@@ -234,8 +248,8 @@
     else say(`Nothing in the docs holds “${query}”.`, true);
   };
 
-  // go opens a result at its heading. On the page shown, the drawer
-  // closes, if it covers it, and the heading comes into view.
+  // go opens a result at its heading. On the page shown, a narrow bar
+  // closes its search, and the heading comes into view.
   const go = (s) => {
     const url = new URL(root + s.page.u + (s.a ? `#${s.a}` : ""), location.href);
     close();
@@ -243,7 +257,7 @@
       location.href = url.href;
       return;
     }
-    if (d.documentElement.classList.contains("drawer-open")) d.querySelector(".scrim[data-drawer-close]")?.click();
+    searching(false);
     if (s.a) location.hash = s.a;
     else scrollTo(0, 0);
   };
@@ -267,7 +281,6 @@
         go(s);
       }
     } else if (e.key === "Escape") {
-      // The drawer stays open: Escape there closes it only from elsewhere.
       if (!panel.hidden) {
         e.preventDefault();
         e.stopPropagation();
@@ -277,35 +290,41 @@
         e.stopPropagation();
         input.value = "";
         show();
+      } else if (isSearching()) {
+        e.preventDefault();
+        e.stopPropagation();
+        leave();
       }
     }
   });
   // A click on a result keeps the cursor in the field until it goes.
   list.addEventListener("mousedown", (e) => e.preventDefault());
+  // Leaving the field closes the results, and a narrow bar's search once
+  // the focus goes to something else on the page, or a tap lands off it.
   box.addEventListener("focusout", (e) => {
-    if (!box.contains(e.relatedTarget)) close();
+    if (box.contains(e.relatedTarget)) return;
+    close();
+    if (e.relatedTarget) searching(false);
+  });
+  d.addEventListener("pointerdown", (e) => {
+    if (isSearching() && !box.contains(e.target)) searching(false);
+  });
+  box.querySelector("[data-search-close]")?.addEventListener("click", leave);
+  narrow.addEventListener("change", () => {
+    searching(false);
+    place();
   });
 
   // `/`, and the top bar's search button, put the cursor in the field,
-  // opening the drawer in a narrow window.
+  // over the bar in a narrow window. The drawer open over one makes the
+  // bar inert, so it closes first.
   const focusSearch = () => {
-    if (narrow.matches && !d.documentElement.classList.contains("drawer-open")) d.querySelector("[data-drawer-open]")?.click();
-    // The drawer that just opened may still be turning visible: with
-    // reduced motion, every element's visibility changes over a millisecond
-    // rather than at once, a frame later at each level down, and a field
-    // still hidden takes no focus. Focus once the field itself shows.
-    let frames = 0;
-    const put = () => {
-      if (getComputedStyle(input).visibility !== "visible" && frames++ < 60) {
-        requestAnimationFrame(put);
-        return;
-      }
-      input.focus();
-      input.select();
-    };
-    put();
+    if (d.documentElement.classList.contains("drawer-open")) d.querySelector(".scrim[data-drawer-close]")?.click();
+    if (narrow.matches) searching(true);
+    input.focus();
+    input.select();
   };
-  d.querySelector("[data-search-open]")?.addEventListener("click", focusSearch);
+  opener?.addEventListener("click", focusSearch);
   d.addEventListener("keydown", (e) => {
     if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
     const t = e.target;

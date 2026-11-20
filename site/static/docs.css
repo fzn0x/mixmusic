@@ -381,13 +381,15 @@ html:not(.js) .theme-toggle { display: none; }
 .docs:not(.has-toc) .drawer-toc { display: block; }
 .scrim { display: none; }
 
-/* The docs' search (partials/docs-search.html, docs-search.js): a field at
-   the top of the drawer, and its results in a panel that the script puts
-   under it, wider than the drawer, in a wide window. It needs script. */
+/* The docs' search (partials/docs-search.html, docs-search.js): a field in
+   the top app bar, after "Docs", and its results in a panel that the
+   script puts under it. A narrow window opens the field over the bar from
+   its search button. It needs script. */
 
 html:not(.js) .search,
-.topbar-search { display: none; }
-.search { margin: 0 0 12px; }
+.topbar-search,
+.search-back { display: none; }
+.search { flex: 0 1 320px; min-width: 200px; margin-left: 16px; }
 .search-label,
 .search-status {
   position: absolute;
@@ -401,8 +403,8 @@ html:not(.js) .search,
   display: flex;
   align-items: center;
   gap: 10px;
-  height: 48px;
-  padding: 0 12px 0 16px;
+  height: 40px;
+  padding: 0 10px 0 14px;
   border-radius: 999px;
   background: var(--surface-high);
   color: var(--on-surface-variant);
@@ -799,11 +801,33 @@ html:not(.js) .search,
   .topbar-github,
   .theme-toggle { margin-left: auto; }
   html.js .theme-toggle + .topbar-github { margin-left: 0; }
-  /* The search button, which opens the drawer at its field; the results
-     show in the drawer, under the field. */
+  /* The search button, which opens the field over the bar, with a button
+     back; the results take the window's width under the bar. */
   html.js .topbar-search { display: inline-flex; margin-left: auto; }
-  html.js .topbar-search + .theme-toggle { margin-left: 0; }
-  .search-panel { position: static; margin-top: 8px; padding: 0; border: 0; background: none; box-shadow: none; }
+  html.js .topbar:has(.topbar-search) .theme-toggle { margin-left: 0; }
+  .search { display: none; }
+  html.js .topbar.is-searching .search {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    margin: 0;
+    padding: 0 12px 0 4px;
+    background: inherit;
+  }
+  html.js .is-searching .search-back { display: inline-flex; flex: none; }
+  .is-searching .search-field { flex: 1; min-width: 0; }
+  .search-key { display: none; }
+  .search-panel {
+    top: calc(var(--bar) + 4px);
+    left: 8px;
+    right: 8px;
+    max-height: calc(100vh - var(--bar) - 16px);
+    max-height: calc(100dvh - var(--bar) - 16px);
+  }
   html:not(.js) .drawer { position: static; max-height: none; overflow: visible; padding: 8px 0 0; border-bottom: 1px solid var(--outline-variant); }
   html.js .topbar-menu { display: inline-flex; }
   html.js .drawer {

@@ -1,13 +1,12 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, load, test } from "./page.js";
 
-// The docs' search (#932): a field at the top of the docs' drawer, which a
-// narrow window opens from the top bar's search button. Its results are
-// the docs' sections that hold the words typed, and one opens at its
-// heading.
+// The docs' search (#932, #938): a field in the top bar, which a narrow
+// window opens over the bar from its search button. Its results are the
+// docs' sections that hold the words typed, and one opens at its heading.
 
-// field puts the cursor in the search, from the top bar's button where the
-// drawer is closed, and returns it.
+// field puts the cursor in the search, from the top bar's button in a
+// narrow window, and returns it.
 const field = async (page) => {
   const opener = page.getByRole("button", { name: "Search the docs" });
   if (await opener.isVisible()) await opener.click();
@@ -63,4 +62,36 @@ test("the docs' search has no accessibility violations with its results open", a
   const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"]).analyze();
   const found = result.violations.map((v) => `${v.id} (${v.impact}): ${v.help}\n    ${v.nodes.slice(0, 4).map((n) => n.target.join(" ")).join("\n    ")}`);
   expect(found, "axe violations").toEqual([]);
+});
+
+test("the docs' search sits in the top bar, and over it in a narrow window", async ({ page }) => {
+  await load(page, "/docs/settings/");
+  const bar = page.getByRole("banner");
+  const input = bar.getByRole("combobox", { name: "Search the docs" });
+  const opener = bar.getByRole("button", { name: "Search the docs" });
+  if (page.viewportSize().width >= 900) {
+    await expect(input).toBeVisible();
+    await expect(opener).toBeHidden();
+    return;
+  }
+  await expect(input).toBeHidden();
+  await opener.click();
+  await expect(opener).toHaveAttribute("aria-expanded", "true");
+  await expect(input).toBeFocused();
+  // Its button back closes it, and the focus goes back to the search button.
+  await bar.getByRole("button", { name: "Close the search" }).click();
+  await expect(input).toBeHidden();
+  await expect(opener).toBeFocused();
+  await expect(opener).toHaveAttribute("aria-expanded", "false");
+  // So does Escape, once the results are closed and the field is empty.
+  await opener.click();
+  await input.fill("lyrics");
+  await expect(page.getByRole("option").first()).toBeVisible();
+  await input.press("Escape");
+  await expect(input).toHaveAttribute("aria-expanded", "false");
+  await input.press("Escape");
+  await expect(input).toHaveValue("");
+  await input.press("Escape");
+  await expect(input).toBeHidden();
+  await expect(opener).toBeFocused();
 });

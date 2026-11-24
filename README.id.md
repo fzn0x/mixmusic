@@ -25,6 +25,10 @@
 </p>
 
 <p align="center">
+  <a href="https://trendshift.io/repositories/313095?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-313095" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/313095/daily?language=Go" alt="fzn0x%2Fmixmusic | Trendshift" width="250" height="55"/></a>
+</p>
+
+<p align="center">
   <a href="https://mixmusic.functionx.dev/">Situs web</a> ·
   <a href="https://github.com/fzn0x/mixmusic/releases/latest">Unduh</a> ·
   <a href="https://mixmusic.functionx.dev/docs/">Dokumentasi</a> ·

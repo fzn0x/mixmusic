@@ -40,7 +40,7 @@ Linux.
 What the maintainer does, by hand:
 
 1. Release a version that has this folder and Flathub's install kind
-   (0.6.0 or later).
+   (0.5.10 or later).
 2. Write the manifest for Flathub. What it needs is listed under
    [What the build needs](#what-the-build-needs). Run it through
    `flatpak run --command=flathub-build org.flatpak.Builder --install <manifest>`

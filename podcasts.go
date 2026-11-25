@@ -131,10 +131,10 @@ func (s *shell) podcastPage(c *ui.Context, id string) {
 			menu:   s.collectionMenu(p.Title, nil, p.URL, p.Source, ""),
 		}
 		if len(episodes) > 0 {
-			h.play = func() { s.p.PlayTracks(episodes, 0) }
+			h.play = func() { s.p.PlayTracks(episodeQueue(episodes, 0, s.episodePlayed), 0) }
 			if i := s.resumeIndex(pages); i >= 0 {
 				h.playLabel = locales.PodcastsResume()
-				h.play = func() { s.p.PlayTracks(episodes, i) }
+				h.play = func() { s.p.PlayTracks(episodeQueue(episodes, i, s.episodePlayed), 0) }
 			}
 		}
 		s.collectionHead(c, h)
@@ -164,6 +164,73 @@ func (s *shell) resumable(episodes []media.Track) int {
 		}
 	}
 	return -1
+}
+
+// episodeQueue is what starting the episode at at of episodes queues: the
+// show's episodes from that one forward in time, so that the next newer
+// episode follows it, whatever order the page shows, and none of those the
+// user heard, but the one they chose (#589).
+func episodeQueue(episodes []media.Track, at int, played func(media.Track) bool) []media.Track {
+	if at < 0 || at >= len(episodes) {
+		return episodes
+	}
+	chosen := episodes[at]
+	ordered := slices.Clone(episodes)
+	if anyReleased(ordered) {
+		slices.SortStableFunc(ordered, func(a, b media.Track) int {
+			ra, rb := episodeReleased(a), episodeReleased(b)
+			if ra == "" || rb == "" {
+				// An episode whose day the service doesn't tell keeps the
+				// page's order around the ones it does.
+				return 0
+			}
+			return strings.Compare(ra, rb)
+		})
+	} else {
+		// The page lists its episodes newest first: forward in time is
+		// its order turned round.
+		slices.Reverse(ordered)
+	}
+	start := slices.IndexFunc(ordered, func(t media.Track) bool { return t.ID == chosen.ID })
+	if start < 0 {
+		return []media.Track{chosen}
+	}
+	out := make([]media.Track, 0, len(ordered)-start)
+	for _, t := range ordered[start:] {
+		if t.ID != chosen.ID && played(t) {
+			continue
+		}
+		out = append(out, t)
+	}
+	return out
+}
+
+// episodeReleased is the day an episode came out, as its service told it:
+// a day, else a month, else a year.
+func episodeReleased(t media.Track) string {
+	if t.Episode == nil {
+		return ""
+	}
+	return t.Episode.Released
+}
+
+// anyReleased reports whether any of episodes tells the day it came out.
+func anyReleased(episodes []media.Track) bool {
+	for _, t := range episodes {
+		if episodeReleased(t) != "" {
+			return true
+		}
+	}
+	return false
+}
+
+// episodePlayed reports whether the user heard an episode to its end: as
+// MixMusic noted where they left it, else as its service told.
+func (s *shell) episodePlayed(t media.Track) bool {
+	if pos, ok := s.svc.Collection.Position(t.ID); ok {
+		return pos.Played
+	}
+	return t.Episode != nil && t.Episode.Played
 }
 
 // followsPodcast reports whether the user follows the podcast p: in
@@ -291,7 +358,7 @@ func (s *shell) episodeRow(c *ui.Context, key string, i int, episodes []media.Tr
 		if current {
 			s.p.Toggle()
 		} else {
-			s.p.PlayTracks(episodes, i)
+			s.p.PlayTracks(episodeQueue(episodes, i, s.episodePlayed), 0)
 		}
 	}
 	if row.DoubleClicked() {
@@ -451,7 +518,8 @@ func (s *shell) playPodcast(id string) {
 			case len(p.Episodes) == 0:
 				s.notes = append(s.notes, notice(locales.PodcastsNothingToPlay()))
 			default:
-				s.p.PlayTracks(p.Episodes, max(s.resumable(p.Episodes), 0))
+				at := max(s.resumable(p.Episodes), 0)
+				s.p.PlayTracks(episodeQueue(p.Episodes, at, s.episodePlayed), 0)
 			}
 		})
 	}()

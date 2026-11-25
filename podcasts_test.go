@@ -71,8 +71,10 @@ func TestPodcastPage(t *testing.T) {
 	}
 	click(t, s, tt, "resume")
 	s.settle(t, func(st player.State) bool { cur, ok := st.Current(); return ok && cur.Track.ID == "yt:ep2" })
-	if st := s.p.State(); len(st.Queue) != 3 {
-		t.Errorf("queued %d episodes", len(st.Queue))
+	// Resume plays ep2, and the show goes on forward in time: ep1 came out
+	// after it, and ep3 before it, so it doesn't follow (#589).
+	if st := s.p.State(); len(st.Queue) != 2 || st.Queue[0].Track.ID != "yt:ep2" || st.Queue[1].Track.ID != "yt:ep1" {
+		t.Errorf("queued %d episodes: %s, %s", len(st.Queue), st.Queue[0].Track.ID, st.Queue[len(st.Queue)-1].Track.ID)
 	}
 	click(t, s, tt, "follow")
 	deadline := time.Now().Add(5 * time.Second)

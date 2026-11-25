@@ -10,7 +10,7 @@ YouTube Music's podcasts play with no account. Spotify's play [from Spotify itse
 [Search](playing-music.md#search) for a show or an episode, then choose the Podcasts pivot of the results. It shows the shows found as tiles, then the episodes found, each with its show's name. The services choice above the results keeps both services with All music, only Spotify's or only YouTube Music's. MixMusic asks the services for podcasts only once you open the pivot.
 
 - **A show's tile** opens its page. Its play button plays the episode you left partway, or else the newest one. Its menu has Open, Play and Copy link.
-- **An episode's row** plays it, with the episodes after it in the list: double-click the row, or click its cover.
+- **An episode's row** plays it, with the episodes that came out after it: double-click the row, or click its cover.
 
 ## A show's page
 
@@ -19,6 +19,7 @@ YouTube Music's podcasts play with no account. Spotify's play [from Spotify itse
   - **Follow,** or **Following** once you follow the show: see [Following shows](#following-shows);
   - **More,** with Open on its service and Copy link.
 - **The episodes,** the newest first, each with its cover, its title, the day it came out (as "Oct 26", with the year when it isn't this one), its length, and how much of it is left ("12 min left"), or "played".
+- **What plays after an episode** is the show's next newer one, not the next row: the page lists the newest first, so playing an episode from it queues the show forward in time, leaving out those you heard, but the one you chose. Play queues the newest alone, since nothing came out after it.
 - **Load more episodes,** at the foot, reads the next page of them.
 
 ![The page of the Lex Fridman Podcast, a YouTube Music show: its cover, its authors and description, the Play and Following buttons and the More button, then its episodes, newest first, each with the day it came out and its length](shots/show.webp)
@@ -54,7 +55,7 @@ MixMusic keeps where you left each episode, so that it starts there the next tim
 - **Moving within an episode,** as Previous does after its first seconds, starts it again; it never jumps back to where you left it.
 - **Mark as played** and **Mark as unplayed,** in an episode's menu, change what MixMusic keeps.
 
-Episodes play one after another without a [crossfade](playing-music.md#crossfade-and-gapless-playback), and the next one's audio isn't fetched ahead. A queue that ends on an episode stops, rather than start a [radio](playing-music.md#autoplay-and-radios).
+Episodes play one after another without a [crossfade](playing-music.md#crossfade-and-gapless-playback), and the next one's audio isn't fetched ahead. A queue that ends on an episode never starts a [radio](playing-music.md#autoplay-and-radios): with **Autoplay** on, it adds the show's next newer episode you haven't heard, reading up to 20 pages of the show to find it, and plays it; with Autoplay off, or nothing newer to hear, it stops there. A show whose episodes can't be read says so and stops.
 
 ### With YouTube Music
 

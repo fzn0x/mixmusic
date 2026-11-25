@@ -299,6 +299,10 @@ type Services interface {
 	RecordPlay(track media.Track)
 	// Radio returns tracks like track.
 	Radio(ctx context.Context, track media.Track) ([]media.Track, error)
+	// NextEpisode returns the episode of track's show that came out next
+	// after it, and that the user hasn't heard: false when the show has
+	// none. Autoplay plays it when the queue ends on an episode (#589).
+	NextEpisode(ctx context.Context, track media.Track) (media.Track, bool, error)
 	// Skip tells why the queue passes over track as it moves on, as the
 	// settings ask: SkipDisliked for a track the user disliked while they
 	// skip those, or "" for one that plays.

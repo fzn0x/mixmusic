@@ -29,6 +29,10 @@ func (Services) RecordPlay(media.Track) {}
 
 func (Services) Radio(context.Context, media.Track) ([]media.Track, error) { return nil, nil }
 
+func (Services) NextEpisode(context.Context, media.Track) (media.Track, bool, error) {
+	return media.Track{}, false, nil
+}
+
 func (Services) Skip(media.Track) string { return "" }
 
 func (Services) Settings() settings.Settings { return settings.Default() }

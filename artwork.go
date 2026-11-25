@@ -35,6 +35,9 @@ type artKey struct {
 	px       int
 	phosphor bool
 	blur     bool
+	// large asks for the largest still the host keeps of the image, for a
+	// cover shown on its own rather than in a list.
+	large bool
 }
 
 type artEntry struct {
@@ -56,6 +59,12 @@ type artEntry struct {
 // artwork.Store, which both windows share.
 type artSource interface {
 	Image(ctx context.Context, rawURL string) (image.Image, error)
+}
+
+// largeSource is an artSource that can answer with the largest still a
+// host keeps of an image, which the app's store does.
+type largeSource interface {
+	LargeImage(ctx context.Context, rawURL string) (image.Image, error)
 }
 
 // artworks fetches the artwork the interface shows, scaled down to the
@@ -99,14 +108,25 @@ func (a *artworks) get(c *ui.Context, rawURL string, px int) *ui.Bitmap {
 	if px <= 0 {
 		return nil
 	}
-	return a.lookup(c, artKey{rawURL, bucket(px), a.phosphor, false})
+	return a.lookup(c, artKey{rawURL, bucket(px), a.phosphor, false, false})
+}
+
+// getLarge is get for a cover shown on its own, as the now playing page
+// shows one: at the largest still the host keeps of it, where it keeps
+// more than one. Lists, tiles and the sidebar ask get, so scrolling asks
+// no still of its own.
+func (a *artworks) getLarge(c *ui.Context, rawURL string, px int) *ui.Bitmap {
+	if px <= 0 {
+		return nil
+	}
+	return a.lookup(c, artKey{rawURL, bucket(px), a.phosphor, false, true})
 }
 
 // blurred is get's image blurred once as it loads, by artBlur of its pixels,
 // for a ground that stretches it over a window: the GPU then only stretches
 // it, as blurring it each frame at the window's pixels costs (#764).
 func (a *artworks) blurred(c *ui.Context, rawURL string, px int) *ui.Bitmap {
-	return a.lookup(c, artKey{rawURL, bucket(px), a.phosphor, true})
+	return a.lookup(c, artKey{rawURL, bucket(px), a.phosphor, true, false})
 }
 
 func (a *artworks) lookup(c *ui.Context, k artKey) *ui.Bitmap {
@@ -219,7 +239,19 @@ func artColorWait(err error) time.Duration {
 
 // load gets an image and scales it down to k's size.
 func (a *artworks) load(k artKey) (image.Image, error) {
-	src, err := a.src.Image(context.Background(), k.url)
+	var (
+		src image.Image
+		err error
+	)
+	if k.large {
+		if l, ok := a.src.(largeSource); ok {
+			src, err = l.LargeImage(context.Background(), k.url)
+		} else {
+			src, err = a.src.Image(context.Background(), k.url)
+		}
+	} else {
+		src, err = a.src.Image(context.Background(), k.url)
+	}
 	if err != nil {
 		return nil, err
 	}

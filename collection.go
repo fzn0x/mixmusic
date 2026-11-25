@@ -72,9 +72,9 @@ func (s *shell) collectionHead(c *ui.Context, h headProps) {
 	}
 	head.Children(func() {
 		if h.moving {
-			s.movingCover(c, "head-cover", h.art, size, true, locales.CollectionMovingCover(h.title))
+			s.movingCoverLarge(c, "head-cover", h.art, size, true, locales.CollectionMovingCover(h.title))
 		} else {
-			s.cover(c, "head-cover", h.art, size, h.round)
+			s.coverLarge(c, "head-cover", h.art, size, h.round)
 		}
 		ui.Column(c).Grow(1).MinWidth(0).Gap(12).Children(func() {
 			ui.Row(c).Gap(6).Wrap().Children(func() {

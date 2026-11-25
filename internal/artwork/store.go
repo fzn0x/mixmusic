@@ -84,6 +84,9 @@ type Store struct {
 	calls   map[string]*call
 	checks  map[string]bool
 	checked map[string]time.Time
+	// stills is, per video, the address of the still of it that answered
+	// when the larger ones were asked for, so that they are asked once.
+	stills map[string]string
 	// bytes and images are what the folder holds, once counted.
 	bytes  int64
 	images int
@@ -124,6 +127,7 @@ func NewStore(dir string, limit int64) *Store {
 		calls:   map[string]*call{},
 		checks:  map[string]bool{},
 		checked: map[string]time.Time{},
+		stills:  map[string]string{},
 		hosts:   map[string]*hostLog{},
 	}
 	s.idle = sync.NewCond(&s.busyMu)
@@ -179,6 +183,72 @@ func (s *Store) Bytes(ctx context.Context, rawURL string) ([]byte, error) {
 		}
 	}
 	return s.download(ctx, rawURL)
+}
+
+// Large returns the image at rawURL as its host sent it, at the largest
+// still YouTube keeps of the same video when rawURL is one of its stills:
+// a music video's or an upload's cover, which lists show small. The first
+// still that answers is kept for the video, so that the others aren't
+// asked again. A URL that isn't a still loads as Bytes does.
+func (s *Store) Large(ctx context.Context, rawURL string) ([]byte, error) {
+	id, _, _, ok := stillOf(rawURL)
+	if !ok {
+		return s.Bytes(ctx, rawURL)
+	}
+	s.mu.Lock()
+	kept := s.stills[id]
+	s.mu.Unlock()
+	if kept != "" {
+		if data, err := s.Bytes(ctx, kept); err == nil {
+			return data, nil
+		}
+	}
+	var first error
+	width := StillsWidth(rawURL)
+	for _, candidate := range Stills(rawURL) {
+		data, err := s.Bytes(ctx, candidate)
+		if err != nil {
+			if first == nil {
+				first = err
+			}
+			continue
+		}
+		// YouTube answers some stills it doesn't keep with a small grey
+		// placeholder instead of a 404, so a larger still that comes back
+		// smaller than the one the answer listed is no still of the video.
+		// The listed one is shown whatever it holds.
+		if cfg, _, err := image.DecodeConfig(bytes.NewReader(data)); err == nil && candidate != rawURL && cfg.Width < width {
+			if first == nil {
+				first = fmt.Errorf("artwork: %s answers with a %d by %d picture, smaller than %s's", candidate, cfg.Width, cfg.Height, rawURL)
+			}
+			continue
+		}
+		s.mu.Lock()
+		if len(s.stills) >= stillsKept {
+			s.stills = map[string]string{}
+		}
+		s.stills[id] = candidate
+		s.mu.Unlock()
+		return data, nil
+	}
+	if first == nil {
+		first = errors.New("artwork: no still of the video")
+	}
+	return nil, first
+}
+
+// LargeImage returns Large's image, decoded.
+func (s *Store) LargeImage(ctx context.Context, rawURL string) (image.Image, error) {
+	data, err := s.Large(ctx, rawURL)
+	if err != nil {
+		return nil, err
+	}
+	img, _, err := image.Decode(bytes.NewReader(data))
+	if err != nil {
+		s.remove(rawURL)
+		return nil, &Error{Host: hostOf(rawURL), Err: fmt.Errorf("not an image: %w", err)}
+	}
+	return img, nil
 }
 
 // Usage returns what the store keeps: its bytes, and its images.

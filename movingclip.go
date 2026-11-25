@@ -58,7 +58,7 @@ func (s *shell) clipSleeve(c *ui.Context, t media.Track, size float32) bool {
 	shown := v.status.Src == src.Src && v.status.Shown
 	ui.Box(c.Key("sleeve-clip")).Size(size, size).Shrink(0).Radius(k.radiusSm).Clip().Children(func() {
 		// A GIF cover holds still under the clip that shows.
-		s.movingCover(c, "sleeve", t.Artwork, size, playing && !shown, locales.CollectionMovingCover(t.Title))
+		s.movingCoverLarge(c, "sleeve", t.Artwork, size, playing && !shown, locales.CollectionMovingCover(t.Title))
 		switch {
 		case !asked:
 			b := s.buttonBase(c.Key("sleeve-clip-play")).Size(42, 42).Radius(21).Background(k.accent).Absolute().

@@ -527,6 +527,16 @@ func (s *shell) sourceMark(c *ui.Context, source media.Source, on bool) {
 // interface's lazy images do: a frame new to the window asks for one more
 // frame, which tells whether it shows.
 func (s *shell) cover(c *ui.Context, key string, images []media.Image, size float32, round bool) ui.Element {
+	return s.coverAt(c, key, images, size, round, false)
+}
+
+// coverLarge is cover for a cover shown on its own, as the now playing
+// page shows one: at the largest still its host keeps of it.
+func (s *shell) coverLarge(c *ui.Context, key string, images []media.Image, size float32, round bool) ui.Element {
+	return s.coverAt(c, key, images, size, round, true)
+}
+
+func (s *shell) coverAt(c *ui.Context, key string, images []media.Image, size float32, round, large bool) ui.Element {
 	k := &s.lk
 	r := k.radiusSm
 	if round {
@@ -535,7 +545,11 @@ func (s *shell) cover(c *ui.Context, key string, images []media.Image, size floa
 	frame := ui.Box(c.Key(key)).Size(size, size).Radius(r).Shrink(0).Clip()
 	var b *ui.Bitmap
 	if s.inView(c, frame) {
-		b = s.art.get(c, s.artAt(images, size), s.artPixels(size))
+		if large {
+			b = s.art.getLarge(c, s.artAt(images, size), s.artPixels(size))
+		} else {
+			b = s.art.get(c, s.artAt(images, size), s.artPixels(size))
+		}
 	}
 	if b == nil {
 		frame.Background(k.surface3)

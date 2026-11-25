@@ -174,7 +174,8 @@ func controlsArtwork(images []media.Image) string {
 // coverBytes returns the cover at an address, for the system's media
 // controls: one the index of the music on the computer or the downloads
 // keep from its file, else the artwork store's, which downloads it unless
-// it has it.
+// it has it, at the largest still YouTube keeps of a video where it keeps
+// more than one.
 func (a *App) coverBytes(ctx context.Context, rawURL string) ([]byte, error) {
 	if path, ok := a.localFiles.ArtFile(rawURL); ok {
 		return os.ReadFile(path)
@@ -186,7 +187,7 @@ func (a *App) coverBytes(ctx context.Context, rawURL string) ([]byte, error) {
 			return data, nil
 		}
 	}
-	return a.artStore.Bytes(ctx, rawURL)
+	return a.artStore.Large(ctx, rawURL)
 }
 
 // ChooseFolder asks for a folder of music to add to the library.

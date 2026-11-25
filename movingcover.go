@@ -255,16 +255,30 @@ func (g *gifCover) next() {
 // movingCover is the cover images at size, as cover draws it, which plays
 // while playing when it is a GIF that moves: label names it then.
 func (s *shell) movingCover(c *ui.Context, key string, images []media.Image, size float32, playing bool, label string) {
+	s.movingCoverAt(c, key, images, size, playing, label, false)
+}
+
+// movingCoverLarge is movingCover for the cover of what plays, shown on its
+// own: at the largest still its host keeps of it.
+func (s *shell) movingCoverLarge(c *ui.Context, key string, images []media.Image, size float32, playing bool, label string) {
+	s.movingCoverAt(c, key, images, size, playing, label, true)
+}
+
+func (s *shell) movingCoverAt(c *ui.Context, key string, images []media.Image, size float32, playing bool, label string, large bool) {
+	draw := s.cover
+	if large {
+		draw = s.coverLarge
+	}
 	var g *gifCover
 	if s.movingOn(c) {
 		g = s.gifOf(s.artAt(images, size))
 	}
 	if g == nil {
-		s.cover(c, key, images, size, false)
+		draw(c, key, images, size, false)
 		return
 	}
 	ui.Box(c.Key(key+"-moving")).Size(size, size).Radius(s.lk.radiusSm).Shrink(0).Clip().Children(func() {
-		s.cover(c, key, images, size, false)
+		draw(c, key, images, size, false)
 		ui.Box(c.Key(key+"-frames")).Absolute().Left(0).Top(0).Size(size, size).PassThrough().Label(label).
 			Draw(func(p *ui.Painter, r ui.Rect) { g.paint(p, r, playing) })
 	})

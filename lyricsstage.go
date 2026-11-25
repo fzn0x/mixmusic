@@ -192,7 +192,7 @@ func (s *shell) stageCover(c *ui.Context, t media.Track, size float32, st lyricS
 	frame := ui.Box(c.Key("stage-cover")).Size(size, size).Shrink(0).Radius(st.cover).Clip().Shadow(0, 14, 44, 0, ui.Color{A: 140})
 	var b *ui.Bitmap
 	if len(t.Artwork) > 0 {
-		b = s.art.get(c, s.artAt(t.Artwork, size), s.artPixels(size))
+		b = s.art.getLarge(c, s.artAt(t.Artwork, size), s.artPixels(size))
 	}
 	if b == nil {
 		frame.Background(stageInk.Alpha(0.12))

@@ -70,7 +70,7 @@ func (t *testArt) settle(tb testing.TB) {
 }
 
 func (t *testArt) entry(rawURL string) *artEntry {
-	return t.m[artKey{rawURL, bucket(64), false, false}]
+	return t.m[artKey{url: rawURL, px: bucket(64)}]
 }
 
 var errOffline = &artwork.Error{Host: "i.ytimg.com", Temporary: true, Err: errors.New("dial tcp: i/o timeout")}
@@ -270,5 +270,52 @@ func TestArtworkWaitsForTheWindowsPixels(t *testing.T) {
 		if e.used <= first {
 			t.Errorf("%s loaded at %d px for the first frame only", k.url, k.px)
 		}
+	}
+}
+
+// stillArt is a source that answers the stills of a video at a size, and
+// counts what it is asked for the large one.
+type stillArt struct {
+	mu     sync.Mutex
+	large  int
+	listed int
+}
+
+func (s *stillArt) Image(_ context.Context, _ string) (image.Image, error) {
+	s.mu.Lock()
+	s.large += 0
+	s.listed++
+	s.mu.Unlock()
+	return image.NewRGBA(image.Rect(0, 0, 480, 360)), nil
+}
+
+func (s *stillArt) LargeImage(_ context.Context, _ string) (image.Image, error) {
+	s.mu.Lock()
+	s.large++
+	s.mu.Unlock()
+	return image.NewRGBA(image.Rect(0, 0, 1280, 720)), nil
+}
+
+// TestArtworkAsksTheLargeStillOnItsOwn shows a cover shown on its own
+// asking the largest still of a video, and a cover in a list asking the
+// one the answer listed, so scrolling asks YouTube for nothing more.
+func TestArtworkAsksTheLargeStillOnItsOwn(t *testing.T) {
+	src := &stillArt{}
+	a := newTestArt(src)
+	a.get(nil, "https://i.ytimg.com/vi/a/hqdefault.jpg", 40)
+	a.getLarge(nil, "https://i.ytimg.com/vi/a/hqdefault.jpg", 512)
+	deadline := time.After(5 * time.Second)
+	for range 2 {
+		select {
+		case fn := <-a.updates:
+			fn()
+		case <-deadline:
+			t.Fatal("no fetch ended")
+		}
+	}
+	src.mu.Lock()
+	defer src.mu.Unlock()
+	if src.large != 1 || src.listed != 1 {
+		t.Errorf("the large still was asked %d times and the listed one %d, want 1 each", src.large, src.listed)
 	}
 }

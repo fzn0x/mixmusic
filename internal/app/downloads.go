@@ -26,7 +26,7 @@ func (a *App) openDownloads(folder string) {
 	if !chosen {
 		folder = a.defaultDownloads()
 	}
-	o := downloads.Options{Fetcher: a.proxy, Matcher: a.matcher, Cache: a.cache, Network: a.online, Art: a.artStore.Bytes,
+	o := downloads.Options{Fetcher: a.proxy, Matcher: a.matcher, Cache: a.cache, Network: a.online, Art: a.artStore.Large,
 		Avoid: []string{filepath.Join(a.opts.CacheDir, "audio"), filepath.Join(a.opts.CacheDir, "artwork")}, Exists: chosen,
 		Hides: a.hidesExplicit}
 	a.downloads = downloads.Open(folder, o)

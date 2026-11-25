@@ -346,7 +346,7 @@ func (s *shell) sleeve(c *ui.Context, t media.Track, size float32) {
 		return
 	}
 	ui.Box(c).Size(size, size).Shrink(0).Children(func() {
-		s.movingCover(c, "sleeve", t.Artwork, size, s.st.Playing && !s.st.Buffering, locales.CollectionMovingCover(t.Title))
+		s.movingCoverLarge(c, "sleeve", t.Artwork, size, s.st.Playing && !s.st.Buffering, locales.CollectionMovingCover(t.Title))
 		if s.st.Playing && !c.Preferences().ReduceMotion {
 			s.visualizer(c, size)
 		}
@@ -468,7 +468,7 @@ func (s *shell) videoCover(c *ui.Context, images []media.Image, w, h float32) {
 	frame := ui.Box(c.Key("sleeve")).Size(w, h).Shrink(0)
 	var b *ui.Bitmap
 	if s.inView(c, frame) {
-		b = s.art.get(c, s.artAt(images, w), s.artPixels(w))
+		b = s.art.getLarge(c, s.artAt(images, w), s.artPixels(w))
 	}
 	if b == nil {
 		frame.Background(s.lk.surface3)

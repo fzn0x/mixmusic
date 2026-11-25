@@ -128,7 +128,7 @@ func (s *shell) miniArtwork(c *ui.Context, side, h float32) {
 	art := ui.Box(c.Key("mini-art")).Size(side, h).Shrink(0).Clip()
 	var b *ui.Bitmap
 	if cur, ok := s.st.Current(); ok {
-		b = s.art.get(c, s.artAt(cur.Track.Artwork, miniArt), s.artPixels(miniArt))
+		b = s.art.getLarge(c, s.artAt(cur.Track.Artwork, miniArt), s.artPixels(miniArt))
 	}
 	if b == nil {
 		art.Background(s.lk.surface3)

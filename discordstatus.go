@@ -206,7 +206,7 @@ func (s *shell) discordPicture(c *ui.Context, a *discord.Activity) {
 				discordBadgeBox(c, "discord-large-badge", badge, a.LargeText, size, false)
 				return
 			}
-			if b := s.art.get(c, a.LargeImage, s.artPixels(size)); b != nil {
+			if b := s.art.getLarge(c, a.LargeImage, s.artPixels(size)); b != nil {
 				ui.Image(c, b).Size(size, size).Fit(ui.Cover)
 			}
 		})

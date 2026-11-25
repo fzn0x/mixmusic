@@ -404,7 +404,7 @@ func (n *notch) cover(c *ui.Context, key string, side float32) ui.Element {
 		// Asked for once a track, not each frame: artworkURL sorts.
 		n.artOf, n.artURL = cur.Track.ID, artworkURL(cur.Track.Artwork, notchArtPixels)
 	}
-	b := s.art.get(c, n.artURL, notchArtPixels)
+	b := s.art.getLarge(c, n.artURL, notchArtPixels)
 	box := ui.Box(c.Key(key)).Size(side, side).Shrink(0).Clip()
 	if b == nil {
 		return box.Background(ui.RGB(40, 40, 40))

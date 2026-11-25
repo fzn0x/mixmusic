@@ -253,7 +253,7 @@ func TestDownloadSettingsFound(t *testing.T) {
 		{"downloads", []string{"Downloads", "Folder", "Download on metered connections"}, []string{"Crossfade"}},
 		{"metered", []string{"Download on metered connections"}, []string{"Folder", "2 tracks in "}},
 		{"hotspot", []string{"Download on metered connections"}, []string{"Folder"}},
-		{"offline", []string{"2 tracks in ", "Tracks kept"}, []string{"Folder", "Download on metered connections"}},
+		{"offline", []string{"2 tracks in ", "Tracks kept"}, []string{dir, "Download on metered connections"}},
 		{named, []string{"Folder", dir}, []string{"2 tracks in ", "Download on metered connections"}},
 	} {
 		show(s, tt, settingsPath("", c.q))

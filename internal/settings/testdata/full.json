@@ -270,6 +270,8 @@
   "volumeCurve": "linear",
   "volume": 0.5,
   "cacheSizeMb": 4096,
+  "cacheFolder": "/home/me/MixMusic cache",
+  "cacheWithDownloads": true,
   "movingCoversMb": 512,
   "lyricsTranslateTo": "ja",
   "downloadsFolder": "/home/me/Music",

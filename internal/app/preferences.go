@@ -76,6 +76,7 @@ func (p *Preferences) Reset() (settings.Settings, error) {
 	d.SpotifyClientID = cur.SpotifyClientID
 	d.YouTubeChannel = cur.YouTubeChannel
 	d.YTDLPPath, d.JSRuntime = cur.YTDLPPath, cur.JSRuntime
+	d.CacheFolder, d.CacheWithDownloads = cur.CacheFolder, cur.CacheWithDownloads
 	d.DownloadsFolder = cur.DownloadsFolder
 	d = d.Clean()
 	if err := a.settings.Replace(d); err != nil {

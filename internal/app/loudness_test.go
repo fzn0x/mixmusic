@@ -160,7 +160,7 @@ func TestPrepareStreamLearnsTheLoudness(t *testing.T) {
 		return []byte(`{"url": "https://example.com/a", "ext": "webm", "acodec": "opus", "filesize": 1000}`), nil
 	}
 	cache := stream.NewCache(t.TempDir(), 1<<20)
-	if err := os.WriteFile(filepath.Join(cache.Dir, "CHIWNDAwTqQ.webm"), []byte("audio"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(cache.Folder(), "CHIWNDAwTqQ.webm"), []byte("audio"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	a := &App{resolver: r, cache: cache, matcher: match.New(nil, nil), settings: testSettings(t)}

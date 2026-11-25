@@ -4578,6 +4578,254 @@ func (msgs Messages) BackupUndone() string {
 	return Catalog.Format(msgs.locale, "backupUndone", nil)
 }
 
+// CacheFolderDialog says "Choose where MixMusic keeps the offline cache"
+// in the language the app shows.
+func CacheFolderDialog() string { return In(i18n.Locale()).CacheFolderDialog() }
+
+// CacheFolderDialog says "Choose where MixMusic keeps the offline cache"
+// in the language of msgs.
+func (msgs Messages) CacheFolderDialog() string {
+	return Catalog.Format(msgs.locale, "cacheFolderDialog", nil)
+}
+
+// CacheHoldUnreachable says "The folder of the offline cache can't be reached: {folder}"
+// in the language the app shows.
+//
+// Why the offline cache cannot save new tracks, in Settings › Playback.
+// {folder} is the folder's path.
+func CacheHoldUnreachable(folder string) string {
+	return In(i18n.Locale()).CacheHoldUnreachable(folder)
+}
+
+// CacheHoldUnreachable says "The folder of the offline cache can't be reached: {folder}"
+// in the language of msgs.
+//
+// Why the offline cache cannot save new tracks, in Settings › Playback.
+// {folder} is the folder's path.
+func (msgs Messages) CacheHoldUnreachable(folder string) string {
+	return Catalog.Format(msgs.locale, "cacheHoldUnreachable", map[string]any{"folder": folder})
+}
+
+// CacheMergeDownloads says "Merge with downloads"
+// in the language the app shows.
+func CacheMergeDownloads() string { return In(i18n.Locale()).CacheMergeDownloads() }
+
+// CacheMergeDownloads says "Merge with downloads"
+// in the language of msgs.
+func (msgs Messages) CacheMergeDownloads() string {
+	return Catalog.Format(msgs.locale, "cacheMergeDownloads", nil)
+}
+
+// CacheMergeDownloadsDesc says "Keep cached tracks in the downloads folder alongside downloads. Downloading a cached track promotes it without re-dow…"
+// in the language the app shows.
+func CacheMergeDownloadsDesc() string { return In(i18n.Locale()).CacheMergeDownloadsDesc() }
+
+// CacheMergeDownloadsDesc says "Keep cached tracks in the downloads folder alongside downloads. Downloading a cached track promotes it without re-dow…"
+// in the language of msgs.
+func (msgs Messages) CacheMergeDownloadsDesc() string {
+	return Catalog.Format(msgs.locale, "cacheMergeDownloadsDesc", nil)
+}
+
+// CacheMergeQuestion says "Move {count, plural, one {# cached track} other {# cached tracks}}, {size}, into the downloads folder {folder}?"
+// in the language the app shows.
+func CacheMergeQuestion(count int, size string, folder string) string {
+	return In(i18n.Locale()).CacheMergeQuestion(count, size, folder)
+}
+
+// CacheMergeQuestion says "Move {count, plural, one {# cached track} other {# cached tracks}}, {size}, into the downloads folder {folder}?"
+// in the language of msgs.
+func (msgs Messages) CacheMergeQuestion(count int, size string, folder string) string {
+	return Catalog.Format(msgs.locale, "cacheMergeQuestion", map[string]any{"count": count, "size": size, "folder": folder})
+}
+
+// CacheMergedTo says "The offline cache is kept with your downloads in {folder} now"
+// in the language the app shows.
+func CacheMergedTo(folder string) string { return In(i18n.Locale()).CacheMergedTo(folder) }
+
+// CacheMergedTo says "The offline cache is kept with your downloads in {folder} now"
+// in the language of msgs.
+func (msgs Messages) CacheMergedTo(folder string) string {
+	return Catalog.Format(msgs.locale, "cacheMergedTo", map[string]any{"folder": folder})
+}
+
+// CacheMove says "move"
+// in the language the app shows.
+//
+// Confirm button of moving the offline cache. Lowercase.
+func CacheMove() string { return In(i18n.Locale()).CacheMove() }
+
+// CacheMove says "move"
+// in the language of msgs.
+//
+// Confirm button of moving the offline cache. Lowercase.
+func (msgs Messages) CacheMove() string {
+	return Catalog.Format(msgs.locale, "cacheMove", nil)
+}
+
+// CacheMoveCantWrite says "MixMusic can't write to {folder}: {error}"
+// in the language the app shows.
+//
+// Why the offline cache didn't move: it goes in the {error} of
+// cacheMoveFailed. {folder} is a path; {error} is the system's own words,
+// often in English.
+func CacheMoveCantWrite(folder string, error string) string {
+	return In(i18n.Locale()).CacheMoveCantWrite(folder, error)
+}
+
+// CacheMoveCantWrite says "MixMusic can't write to {folder}: {error}"
+// in the language of msgs.
+//
+// Why the offline cache didn't move: it goes in the {error} of
+// cacheMoveFailed. {folder} is a path; {error} is the system's own words,
+// often in English.
+func (msgs Messages) CacheMoveCantWrite(folder string, error string) string {
+	return Catalog.Format(msgs.locale, "cacheMoveCantWrite", map[string]any{"folder": folder, "error": error})
+}
+
+// CacheMoveConflict says "the offline cache can't share that folder"
+// in the language the app shows.
+//
+// Why the offline cache didn't move: it goes in the {error} of
+// cacheMoveFailed.
+func CacheMoveConflict() string { return In(i18n.Locale()).CacheMoveConflict() }
+
+// CacheMoveConflict says "the offline cache can't share that folder"
+// in the language of msgs.
+//
+// Why the offline cache didn't move: it goes in the {error} of
+// cacheMoveFailed.
+func (msgs Messages) CacheMoveConflict() string {
+	return Catalog.Format(msgs.locale, "cacheMoveConflict", nil)
+}
+
+// CacheMoveFailed says "couldn't move the offline cache: {error}"
+// in the language the app shows.
+func CacheMoveFailed(error string) string { return In(i18n.Locale()).CacheMoveFailed(error) }
+
+// CacheMoveFailed says "couldn't move the offline cache: {error}"
+// in the language of msgs.
+func (msgs Messages) CacheMoveFailed(error string) string {
+	return Catalog.Format(msgs.locale, "cacheMoveFailed", map[string]any{"error": error})
+}
+
+// CacheMoveIntoTheirs says "the offline cache can't move into a folder of its own"
+// in the language the app shows.
+//
+// Why the offline cache didn't move: the folder chosen is inside its own.
+// It goes in the {error} of cacheMoveFailed.
+func CacheMoveIntoTheirs() string { return In(i18n.Locale()).CacheMoveIntoTheirs() }
+
+// CacheMoveIntoTheirs says "the offline cache can't move into a folder of its own"
+// in the language of msgs.
+//
+// Why the offline cache didn't move: the folder chosen is inside its own.
+// It goes in the {error} of cacheMoveFailed.
+func (msgs Messages) CacheMoveIntoTheirs() string {
+	return Catalog.Format(msgs.locale, "cacheMoveIntoTheirs", nil)
+}
+
+// CacheMoveMovingAlready says "the offline cache is moving already"
+// in the language the app shows.
+//
+// Why the offline cache didn't move: it goes in the {error} of
+// cacheMoveFailed.
+func CacheMoveMovingAlready() string { return In(i18n.Locale()).CacheMoveMovingAlready() }
+
+// CacheMoveMovingAlready says "the offline cache is moving already"
+// in the language of msgs.
+//
+// Why the offline cache didn't move: it goes in the {error} of
+// cacheMoveFailed.
+func (msgs Messages) CacheMoveMovingAlready() string {
+	return Catalog.Format(msgs.locale, "cacheMoveMovingAlready", nil)
+}
+
+// CacheMoveQuestion says "Move {count, plural, one {# cached track} other {# cached tracks}}, {size}, to {folder}?"
+// in the language the app shows.
+func CacheMoveQuestion(count int, size string, folder string) string {
+	return In(i18n.Locale()).CacheMoveQuestion(count, size, folder)
+}
+
+// CacheMoveQuestion says "Move {count, plural, one {# cached track} other {# cached tracks}}, {size}, to {folder}?"
+// in the language of msgs.
+func (msgs Messages) CacheMoveQuestion(count int, size string, folder string) string {
+	return Catalog.Format(msgs.locale, "cacheMoveQuestion", map[string]any{"count": count, "size": size, "folder": folder})
+}
+
+// CacheMoveSameFolder says "the offline cache is in that folder already"
+// in the language the app shows.
+//
+// Why the offline cache didn't move: it goes in the {error} of
+// cacheMoveFailed.
+func CacheMoveSameFolder() string { return In(i18n.Locale()).CacheMoveSameFolder() }
+
+// CacheMoveSameFolder says "the offline cache is in that folder already"
+// in the language of msgs.
+//
+// Why the offline cache didn't move: it goes in the {error} of
+// cacheMoveFailed.
+func (msgs Messages) CacheMoveSameFolder() string {
+	return Catalog.Format(msgs.locale, "cacheMoveSameFolder", nil)
+}
+
+// CacheMoveTitle says "move offline cache"
+// in the language the app shows.
+//
+// Title of the question before the offline cache moves. Lowercase.
+func CacheMoveTitle() string { return In(i18n.Locale()).CacheMoveTitle() }
+
+// CacheMoveTitle says "move offline cache"
+// in the language of msgs.
+//
+// Title of the question before the offline cache moves. Lowercase.
+func (msgs Messages) CacheMoveTitle() string {
+	return Catalog.Format(msgs.locale, "cacheMoveTitle", nil)
+}
+
+// CacheMovedTo says "The offline cache is in {folder} now"
+// in the language the app shows.
+func CacheMovedTo(folder string) string { return In(i18n.Locale()).CacheMovedTo(folder) }
+
+// CacheMovedTo says "The offline cache is in {folder} now"
+// in the language of msgs.
+func (msgs Messages) CacheMovedTo(folder string) string {
+	return Catalog.Format(msgs.locale, "cacheMovedTo", map[string]any{"folder": folder})
+}
+
+// CacheNoFolder says "MixMusic keeps no offline cache here"
+// in the language the app shows.
+//
+// Why the offline cache's folder didn't open, as a toast.
+func CacheNoFolder() string { return In(i18n.Locale()).CacheNoFolder() }
+
+// CacheNoFolder says "MixMusic keeps no offline cache here"
+// in the language of msgs.
+//
+// Why the offline cache's folder didn't open, as a toast.
+func (msgs Messages) CacheNoFolder() string {
+	return Catalog.Format(msgs.locale, "cacheNoFolder", nil)
+}
+
+// CacheSettingsChange says "change"
+// in the language the app shows.
+func CacheSettingsChange() string { return In(i18n.Locale()).CacheSettingsChange() }
+
+// CacheSettingsChange says "change"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsChange() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsChange", nil)
+}
+
+// CacheSettingsChangeLabel says "Change the folder of the offline cache"
+// in the language the app shows.
+func CacheSettingsChangeLabel() string { return In(i18n.Locale()).CacheSettingsChangeLabel() }
+
+// CacheSettingsChangeLabel says "Change the folder of the offline cache"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsChangeLabel() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsChangeLabel", nil)
+}
+
 // CacheSettingsClear says "clear"
 // in the language the app shows.
 func CacheSettingsClear() string { return In(i18n.Locale()).CacheSettingsClear() }
@@ -4650,6 +4898,58 @@ func (msgs Messages) CacheSettingsCoversLine(count int, size string) string {
 	return Catalog.Format(msgs.locale, "cacheSettingsCoversLine", map[string]any{"count": count, "size": size})
 }
 
+// CacheSettingsCustomHint says "Type a size in MB, GB, or TB, such as 2500 MB, 2.5 GB, or 1 TB."
+// in the language the app shows.
+func CacheSettingsCustomHint() string { return In(i18n.Locale()).CacheSettingsCustomHint() }
+
+// CacheSettingsCustomHint says "Type a size in MB, GB, or TB, such as 2500 MB, 2.5 GB, or 1 TB."
+// in the language of msgs.
+func (msgs Messages) CacheSettingsCustomHint() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsCustomHint", nil)
+}
+
+// CacheSettingsCustomPlaceholder says "e.g. 2.5 GB or 2500 MB"
+// in the language the app shows.
+func CacheSettingsCustomPlaceholder() string {
+	return In(i18n.Locale()).CacheSettingsCustomPlaceholder()
+}
+
+// CacheSettingsCustomPlaceholder says "e.g. 2.5 GB or 2500 MB"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsCustomPlaceholder() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsCustomPlaceholder", nil)
+}
+
+// CacheSettingsCustomRange says "Enter a cache size between 1 MB and 1 TB"
+// in the language the app shows.
+func CacheSettingsCustomRange() string { return In(i18n.Locale()).CacheSettingsCustomRange() }
+
+// CacheSettingsCustomRange says "Enter a cache size between 1 MB and 1 TB"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsCustomRange() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsCustomRange", nil)
+}
+
+// CacheSettingsCustomTitle says "Custom cache size"
+// in the language the app shows.
+func CacheSettingsCustomTitle() string { return In(i18n.Locale()).CacheSettingsCustomTitle() }
+
+// CacheSettingsCustomTitle says "Custom cache size"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsCustomTitle() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsCustomTitle", nil)
+}
+
+// CacheSettingsFolder says "Folder"
+// in the language the app shows.
+func CacheSettingsFolder() string { return In(i18n.Locale()).CacheSettingsFolder() }
+
+// CacheSettingsFolder says "Folder"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsFolder() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsFolder", nil)
+}
+
 // CacheSettingsGroup says "Offline cache"
 // in the language the app shows.
 func CacheSettingsGroup() string { return In(i18n.Locale()).CacheSettingsGroup() }
@@ -4680,6 +4980,26 @@ func (msgs Messages) CacheSettingsLimit(size string) string {
 	return Catalog.Format(msgs.locale, "cacheSettingsLimit", map[string]any{"size": size})
 }
 
+// CacheSettingsMoving says "Moving the offline cache"
+// in the language the app shows.
+func CacheSettingsMoving() string { return In(i18n.Locale()).CacheSettingsMoving() }
+
+// CacheSettingsMoving says "Moving the offline cache"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsMoving() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsMoving", nil)
+}
+
+// CacheSettingsMovingNow says "moving…"
+// in the language the app shows.
+func CacheSettingsMovingNow() string { return In(i18n.Locale()).CacheSettingsMovingNow() }
+
+// CacheSettingsMovingNow says "moving…"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsMovingNow() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsMovingNow", nil)
+}
+
 // CacheSettingsOff says "Off: MixMusic keeps no tracks."
 // in the language the app shows.
 func CacheSettingsOff() string { return In(i18n.Locale()).CacheSettingsOff() }
@@ -4690,6 +5010,38 @@ func (msgs Messages) CacheSettingsOff() string {
 	return Catalog.Format(msgs.locale, "cacheSettingsOff", nil)
 }
 
+// CacheSettingsOpen says "open"
+// in the language the app shows.
+func CacheSettingsOpen() string { return In(i18n.Locale()).CacheSettingsOpen() }
+
+// CacheSettingsOpen says "open"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsOpen() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsOpen", nil)
+}
+
+// CacheSettingsOpenLabel says "Open the folder of the offline cache"
+// in the language the app shows.
+func CacheSettingsOpenLabel() string { return In(i18n.Locale()).CacheSettingsOpenLabel() }
+
+// CacheSettingsOpenLabel says "Open the folder of the offline cache"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsOpenLabel() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsOpenLabel", nil)
+}
+
+// CacheSettingsProblem says ". {problem}"
+// in the language the app shows.
+func CacheSettingsProblem(problem string) string {
+	return In(i18n.Locale()).CacheSettingsProblem(problem)
+}
+
+// CacheSettingsProblem says ". {problem}"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsProblem(problem string) string {
+	return Catalog.Format(msgs.locale, "cacheSettingsProblem", map[string]any{"problem": problem})
+}
+
 // CacheSettingsSize says "Size"
 // in the language the app shows.
 func CacheSettingsSize() string { return In(i18n.Locale()).CacheSettingsSize() }
@@ -4698,6 +5050,16 @@ func CacheSettingsSize() string { return In(i18n.Locale()).CacheSettingsSize() }
 // in the language of msgs.
 func (msgs Messages) CacheSettingsSize() string {
 	return Catalog.Format(msgs.locale, "cacheSettingsSize", nil)
+}
+
+// CacheSettingsSizeCustom says "Custom"
+// in the language the app shows.
+func CacheSettingsSizeCustom() string { return In(i18n.Locale()).CacheSettingsSizeCustom() }
+
+// CacheSettingsSizeCustom says "Custom"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsSizeCustom() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsSizeCustom", nil)
 }
 
 // CacheSettingsSizeLabel says "Cache size"
@@ -4718,6 +5080,16 @@ func CacheSettingsSizeOff() string { return In(i18n.Locale()).CacheSettingsSizeO
 // in the language of msgs.
 func (msgs Messages) CacheSettingsSizeOff() string {
 	return Catalog.Format(msgs.locale, "cacheSettingsSizeOff", nil)
+}
+
+// CacheSettingsSizeUnlimited says "Unlimited"
+// in the language the app shows.
+func CacheSettingsSizeUnlimited() string { return In(i18n.Locale()).CacheSettingsSizeUnlimited() }
+
+// CacheSettingsSizeUnlimited says "Unlimited"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsSizeUnlimited() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsSizeUnlimited", nil)
 }
 
 // CacheSettingsTracks says "Tracks kept"
@@ -4742,6 +5114,38 @@ func (msgs Messages) CacheSettingsTracksLine(count int, size string) string {
 	return Catalog.Format(msgs.locale, "cacheSettingsTracksLine", map[string]any{"count": count, "size": size})
 }
 
+// CacheSettingsTracksMergedLine says "{count, plural, one {# track} other {# tracks}} in {size}. Kept in the downloads folder; clearing the cache leaves yo…"
+// in the language the app shows.
+func CacheSettingsTracksMergedLine(count int, size string) string {
+	return In(i18n.Locale()).CacheSettingsTracksMergedLine(count, size)
+}
+
+// CacheSettingsTracksMergedLine says "{count, plural, one {# track} other {# tracks}} in {size}. Kept in the downloads folder; clearing the cache leaves yo…"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsTracksMergedLine(count int, size string) string {
+	return Catalog.Format(msgs.locale, "cacheSettingsTracksMergedLine", map[string]any{"count": count, "size": size})
+}
+
+// CacheSettingsUnlimited says "Unlimited: every track that played stays."
+// in the language the app shows.
+func CacheSettingsUnlimited() string { return In(i18n.Locale()).CacheSettingsUnlimited() }
+
+// CacheSettingsUnlimited says "Unlimited: every track that played stays."
+// in the language of msgs.
+func (msgs Messages) CacheSettingsUnlimited() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsUnlimited", nil)
+}
+
+// CacheSettingsUseDefault says "use the default"
+// in the language the app shows.
+func CacheSettingsUseDefault() string { return In(i18n.Locale()).CacheSettingsUseDefault() }
+
+// CacheSettingsUseDefault says "use the default"
+// in the language of msgs.
+func (msgs Messages) CacheSettingsUseDefault() string {
+	return Catalog.Format(msgs.locale, "cacheSettingsUseDefault", nil)
+}
+
 // CacheSizeGB says "{gb, number, ::group-off} GB"
 // in the language the app shows.
 func CacheSizeGB(gb int) string { return In(i18n.Locale()).CacheSizeGB(gb) }
@@ -4760,6 +5164,28 @@ func CacheSizeMB(mb int) string { return In(i18n.Locale()).CacheSizeMB(mb) }
 // in the language of msgs.
 func (msgs Messages) CacheSizeMB(mb int) string {
 	return Catalog.Format(msgs.locale, "cacheSizeMB", map[string]any{"mb": mb})
+}
+
+// CacheUnmergeQuestion says "Move {count, plural, one {# cached track} other {# cached tracks}}, {size}, out of the downloads folder to {folder}?"
+// in the language the app shows.
+func CacheUnmergeQuestion(count int, size string, folder string) string {
+	return In(i18n.Locale()).CacheUnmergeQuestion(count, size, folder)
+}
+
+// CacheUnmergeQuestion says "Move {count, plural, one {# cached track} other {# cached tracks}}, {size}, out of the downloads folder to {folder}?"
+// in the language of msgs.
+func (msgs Messages) CacheUnmergeQuestion(count int, size string, folder string) string {
+	return Catalog.Format(msgs.locale, "cacheUnmergeQuestion", map[string]any{"count": count, "size": size, "folder": folder})
+}
+
+// CacheUnmergedTo says "The offline cache is in {folder} now"
+// in the language the app shows.
+func CacheUnmergedTo(folder string) string { return In(i18n.Locale()).CacheUnmergedTo(folder) }
+
+// CacheUnmergedTo says "The offline cache is in {folder} now"
+// in the language of msgs.
+func (msgs Messages) CacheUnmergedTo(folder string) string {
+	return Catalog.Format(msgs.locale, "cacheUnmergedTo", map[string]any{"folder": folder})
 }
 
 // CastAlreadyConnecting says "MixMusic is connecting to a cast device already"

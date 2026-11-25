@@ -415,7 +415,7 @@ func New(opts Options) (*App, error) {
 		log.Print("mixmusic: yt-dlp alone finds the streams (MIXMUSIC_YTDLP_ONLY)")
 	}
 	a.loudness = newLoudnessBook(direct.Loudness, loudness)
-	a.cache = stream.NewCache(filepath.Join(opts.CacheDir, "audio"), 0)
+	a.cache = stream.NewCache(a.defaultCacheDir(), 0)
 	a.proxy = stream.NewProxy(a.resolver)
 	// The player asks whether the network answers, which audio coming
 	// tells too.
@@ -452,6 +452,7 @@ func New(opts Options) (*App, error) {
 	a.addons = addons.NewManager(filepath.Join(opts.DataDir, "addons"), opts.Builtin)
 	a.storage = addons.NewStorage(filepath.Join(opts.DataDir, "addons", ".storage"))
 	a.openDownloads(s.DownloadsFolder)
+	a.cache.SetProtected(a.cacheProtected)
 	if err := a.openLocalFiles(); err != nil {
 		return nil, fmt.Errorf("opening the index of the music on this computer: %w", err)
 	}
@@ -466,7 +467,7 @@ func (a *App) apply(s settings.Settings) {
 	a.resolver.SetQuality(stream.Quality(s.Quality))
 	a.resolver.SetAsAccount(s.AudioAsAccount)
 	a.resolver.SetSurround(s.Surround)
-	a.cache.SetLimit(int64(s.CacheSizeMB) << 20)
+	a.applyCache(s)
 	a.clips.SetLimit(clipLimit(s.MovingCoversMB))
 	a.downloads.SetMetered(a.metered.Load(), s.DownloadOnMetered)
 	a.followLocalFiles(s)

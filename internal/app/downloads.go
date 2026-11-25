@@ -27,7 +27,7 @@ func (a *App) openDownloads(folder string) {
 		folder = a.defaultDownloads()
 	}
 	o := downloads.Options{Fetcher: a.proxy, Matcher: a.matcher, Cache: a.cache, Network: a.online, Art: a.artStore.Large,
-		Avoid: []string{filepath.Join(a.opts.CacheDir, "audio"), filepath.Join(a.opts.CacheDir, "artwork")}, Exists: chosen,
+		Avoid: []string{filepath.Join(a.opts.CacheDir, "audio"), filepath.Join(a.opts.CacheDir, "artwork")}, AvoidFunc: a.downloadsAvoid, Exists: chosen,
 		Hides: a.hidesExplicit}
 	a.downloads = downloads.Open(folder, o)
 	a.proxy.Kept = a.downloads
@@ -145,7 +145,18 @@ func (d *Downloads) ChooseFolder(parent *mygo.Window) (string, error) {
 func (d *Downloads) Move(ctx context.Context, dir string, progress func(done, total int64)) (string, error) {
 	def := d.Default()
 	exact := filepath.Clean(dir) == filepath.Clean(def)
+	merged := d.a.settings.Get().Clean().CacheWithDownloads
+	if merged && !d.a.cache.BeginExternalMove() {
+		return "", downloads.ErrMoving
+	}
 	got, err := d.a.downloads.Move(ctx, dir, exact, progress)
+	if merged {
+		if err != nil {
+			d.a.cache.EndExternalMove("", "", false)
+		} else {
+			d.a.cache.EndExternalMove(filepath.Join(got, "audio"), got, !exact)
+		}
+	}
 	if err != nil {
 		return "", err
 	}

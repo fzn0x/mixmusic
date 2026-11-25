@@ -666,10 +666,10 @@ func (s *shell) downloadSettings(c *ui.Context) {
 			if s.button(c, "downloads-folder-open", locales.DownloadSettingsOpen(), false).Label(locales.DownloadSettingsOpenLabel()).Clicked() {
 				s.openDownloads()
 			}
-			if s.button(c, "downloads-folder-change", locales.DownloadSettingsChange(), false).Label(locales.DownloadSettingsChangeLabel()).Clicked() {
+			if s.button(c, "downloads-folder-change", locales.DownloadSettingsChange(), false).Label(locales.DownloadSettingsChangeLabel()).Disabled(s.cache.moving).Clicked() {
 				s.chooseDownloadsFolder(st)
 			}
-			if !samePath(folder, def) && s.link(c, "downloads-folder-default", locales.DownloadSettingsUseDefault()) {
+			if !samePath(folder, def) && !s.cache.moving && s.link(c, "downloads-folder-default", locales.DownloadSettingsUseDefault()) {
 				s.askMoveDownloads(def, st)
 			}
 		}, folder, st.Problem)
@@ -714,11 +714,17 @@ func (s *shell) chooseDownloadsFolder(st downloads.Status) {
 // askMoveDownloads asks before moving the downloads to dir, when there are
 // some to move.
 func (s *shell) askMoveDownloads(dir string, st downloads.Status) {
-	if st.Tracks == 0 && st.Waiting == 0 {
+	tracks, size := st.Tracks, st.Bytes
+	if s.set.CacheWithDownloads {
+		use := s.svc.System.CacheUsage()
+		tracks += use.Tracks
+		size += use.Bytes
+	}
+	if tracks == 0 && st.Waiting == 0 {
 		s.moveDownloads(dir)
 		return
 	}
-	s.ask(locales.DownloadsMoveTitle(), locales.DownloadsMoveQuestion(st.Tracks, byteSize(st.Bytes), dir),
+	s.ask(locales.DownloadsMoveTitle(), locales.DownloadsMoveQuestion(tracks, byteSize(size), dir),
 		locales.DownloadsMove(), func() { s.moveDownloads(dir) })
 }
 

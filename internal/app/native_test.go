@@ -67,7 +67,7 @@ func TestOpenNativeMeasures(t *testing.T) {
 	}
 	cache := stream.NewCache(t.TempDir(), 1<<20)
 	for _, id := range []string{"w3XzgjlKFjc", "3IUqoyTxEU8"} {
-		if err := os.WriteFile(filepath.Join(cache.Dir, id+".webm"), webm, 0o644); err != nil {
+		if err := os.WriteFile(filepath.Join(cache.Folder(), id+".webm"), webm, 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}

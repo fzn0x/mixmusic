@@ -18,9 +18,10 @@
   replacement characters, and name no file. `store.EncodePath` keeps such
   a path in base64, after `base64:`, which no absolute path starts with;
   one that is UTF-8 stays as it is. `Settings.MarshalJSON` writes
-  `colorFile`, `downloadsFolder`, `musicFolders` and `ytdlpPath` so, and
-  `UnmarshalJSON` reads them back, which the store's copies through JSON
-  go through too; `local-files.json` keeps its paths the same way.
+  `cacheFolder`, `colorFile`, `downloadsFolder`, `musicFolders` and
+  `ytdlpPath` so, and `UnmarshalJSON` reads them back, which the store's
+  copies through JSON go through too; `local-files.json` keeps its paths the
+  same way.
 - **The settings page** builds each tab from the parts that registered for
   it with `addSettings`, from their features' files, in the order they
   asked for.

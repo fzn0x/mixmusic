@@ -25656,6 +25656,24 @@ func (msgs Messages) PlayerNext() string {
 	return Catalog.Format(msgs.locale, "playerNext", nil)
 }
 
+// PlayerNextEpisodeUnread says "Autoplay stopped: the show's next episode couldn't be read. {error}"
+// in the language the app shows.
+//
+// A notice, as autoplay asks a podcast for the episode after the one that
+// played and can't read it. {error} says why, as the service says it.
+func PlayerNextEpisodeUnread(error string) string {
+	return In(i18n.Locale()).PlayerNextEpisodeUnread(error)
+}
+
+// PlayerNextEpisodeUnread says "Autoplay stopped: the show's next episode couldn't be read. {error}"
+// in the language of msgs.
+//
+// A notice, as autoplay asks a podcast for the episode after the one that
+// played and can't read it. {error} says why, as the service says it.
+func (msgs Messages) PlayerNextEpisodeUnread(error string) string {
+	return Catalog.Format(msgs.locale, "playerNextEpisodeUnread", map[string]any{"error": error})
+}
+
 // PlayerNoDevices says "Open Spotify on a device to see it here"
 // in the language the app shows.
 func PlayerNoDevices() string { return In(i18n.Locale()).PlayerNoDevices() }

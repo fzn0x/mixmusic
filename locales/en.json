@@ -8054,6 +8054,15 @@
   "playerLooking": "Looking for devices…",
   "playerMiniPlayer": "Open the mini player",
   "playerNext": "Next",
+  "playerNextEpisodeUnread": "Autoplay stopped: the show's next episode couldn't be read. {error}",
+  "@playerNextEpisodeUnread": {
+    "description": "A notice, as autoplay asks a podcast for the episode after the one that played and can't read it. {error} says why, as the service says it.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "playerNoDevices": "Open Spotify on a device to see it here",
   "playerNoEngine": "MixMusic's audio engine isn't available on this system",
   "@playerNoEngine": {

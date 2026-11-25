@@ -182,3 +182,72 @@ func (a *App) keepPosition(np NowPlaying) {
 
 // ResumeAt is where an episode plays from as it becomes current.
 func (s playerServices) ResumeAt(t media.Track) time.Duration { return s.a.positions.ResumeAt(t) }
+
+// episodePages is how many pages of a show NextEpisode reads at most to
+// find the episode after one, as #589 asks.
+const episodePages = 20
+
+// NextEpisode returns the episode of track's show that came out next after
+// it, and that the user hasn't heard, reading up to episodePages of the
+// show to find it (#589). ok is false when the show has no such episode,
+// as when the one that played is the newest.
+func (c *Catalog) NextEpisode(ctx context.Context, track media.Track) (media.Track, bool, error) {
+	if track.Episode == nil || track.Episode.Show.ID == "" {
+		return media.Track{}, false, nil
+	}
+	show := track.Episode.Show
+	p, err := c.Podcast(ctx, show.ID)
+	if err != nil {
+		return media.Track{}, false, err
+	}
+	episodes, more := p.Episodes, p.More
+	for page := 1; page < episodePages; page++ {
+		if indexOfEpisode(episodes, track.ID) >= 0 || more == "" {
+			break
+		}
+		next, err := c.MoreEpisodes(ctx, show, more)
+		if err != nil {
+			return media.Track{}, false, err
+		}
+		episodes = append(episodes, next.Episodes...)
+		more = next.More
+	}
+	after, ok := nextNewer(episodes, track.ID, c.heard)
+	return after, ok, nil
+}
+
+// heard reports whether the user heard an episode to its end: as the
+// service told, or as MixMusic noted where they left it.
+func (c *Catalog) heard(t media.Track) bool {
+	if pos, ok := c.a.positions.Get(t.ID); ok && pos.Played {
+		return true
+	}
+	return t.Episode != nil && t.Episode.Played
+}
+
+// indexOfEpisode is where the episode id is in episodes, or -1.
+func indexOfEpisode(episodes []media.Track, id string) int {
+	for i, t := range episodes {
+		if t.ID == id {
+			return i
+		}
+	}
+	return -1
+}
+
+// nextNewer returns the episode that came out next after the one at id in
+// episodes, which a show's page lists newest first, and that heard doesn't
+// report: the nearest one newer that the user hasn't heard. ok is false
+// when there is none, or when the page's lists don't hold the episode.
+func nextNewer(episodes []media.Track, id string, heard func(media.Track) bool) (media.Track, bool) {
+	at := indexOfEpisode(episodes, id)
+	if at <= 0 {
+		return media.Track{}, false
+	}
+	for i := at - 1; i >= 0; i-- {
+		if !heard(episodes[i]) {
+			return episodes[i], true
+		}
+	}
+	return media.Track{}, false
+}

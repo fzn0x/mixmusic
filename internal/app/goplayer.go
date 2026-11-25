@@ -165,6 +165,13 @@ func (s playerServices) Radio(ctx context.Context, t media.Track) ([]media.Track
 	return tracks, s.a.offlineErr(ctx, err)
 }
 
+// NextEpisode is the episode after t, which autoplay plays when the queue
+// ends on a show's episode (#589).
+func (s playerServices) NextEpisode(ctx context.Context, t media.Track) (media.Track, bool, error) {
+	next, ok, err := (&Catalog{s.a}).NextEpisode(ctx, t)
+	return next, ok, s.a.offlineErr(ctx, err)
+}
+
 // Skip passes over the tracks the user disliked, while the settings skip
 // those.
 func (s playerServices) Skip(t media.Track) string {

@@ -41,11 +41,16 @@ type fakeServices struct {
 	failure   string
 	radio     []media.Track
 	radioErr  error
-	played    []string
-	reports   []Now
-	volumes   []float64
-	saved     []Saved
-	prepared  []string
+	// nextEpisode is what NextEpisode answers, and nextEpisodeErr its
+	// failure; nextEpisodeNone answers that the show has no newer one.
+	nextEpisode     media.Track
+	nextEpisodeNone bool
+	nextEpisodeErr  error
+	played          []string
+	reports         []Now
+	volumes         []float64
+	saved           []Saved
+	prepared        []string
 	// reportHook, when set, runs in Report, outside the lock, as the app's
 	// waits on the main thread; saveHook runs in SaveQueue before it keeps
 	// the queue, as a slow disk.
@@ -98,6 +103,12 @@ func (f *fakeServices) RecordPlay(t media.Track) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.played = append(f.played, t.ID)
+}
+
+func (f *fakeServices) NextEpisode(_ context.Context, _ media.Track) (media.Track, bool, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return f.nextEpisode, f.nextEpisode.ID != "" && !f.nextEpisodeNone, f.nextEpisodeErr
 }
 
 func (f *fakeServices) Radio(context.Context, media.Track) ([]media.Track, error) {

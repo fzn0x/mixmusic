@@ -92,7 +92,7 @@ AppImage or archive copy's.
   Disconnecting deletes it.
 - `control.json`: the token and the port of
   [the programs that control MixMusic](control-api.md), which only you may
-  read. [A backup](data-and-privacy.md#backups) leaves it out, so that a
+  read. [A backup](#back-up-and-restore) leaves it out, so that a
   token never travels in one.
 - `updater.json`: your choices of updates.
 - `window-state.json`: the size and place of the window and of the mini

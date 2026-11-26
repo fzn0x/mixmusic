@@ -269,14 +269,68 @@
     }
   },
   "accountSettingsSignedInSpotify": "Signed in to Spotify",
+  "accountSettingsSpotifyBadSPDC": "That isn't a Spotify sp_dc cookie: paste the sp_dc value or a Cookie header from open.spotify.com.",
+  "accountSettingsSpotifyBrowserAbout": "MixMusic opens the browser with a new, empty profile of its own, at Spotify's sign-in. Sign in there as in any browser: MixMusic then takes the sp_dc session cookie, closes the browser and deletes the profile. Your own profiles stay as they are.",
+  "accountSettingsSpotifyBrowserClosed": "{browser} closed before you signed in to Spotify.",
+  "@accountSettingsSpotifyBrowserClosed": {
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsSpotifyBrowserForm": "Sign in to Spotify in a browser with a profile of its own. sp_dc cookie web session.",
+  "accountSettingsSpotifyBrowserNotice": "Finish signing in to Spotify in {browser}",
+  "@accountSettingsSpotifyBrowserNotice": {
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsSpotifyBrowserTitle": "Sign in in a browser",
+  "accountSettingsSpotifyBrowserWith": "sign in to Spotify with {browser}",
+  "@accountSettingsSpotifyBrowserWith": {
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsSpotifyCookieForm": "Import a Spotify session from a browser, or paste an sp_dc cookie. sp_dc web session.",
+  "accountSettingsSpotifyCookieTitle": "Import or paste sp_dc cookie",
   "accountSettingsSpotifyDashboard": "Spotify developer dashboard",
   "accountSettingsSpotifyDesc": "Search, your library and playback of Spotify.",
+  "accountSettingsSpotifyDidntSignIn": "MixMusic didn't sign in to Spotify",
   "accountSettingsSpotifyForm": "Create an app in the Spotify developer dashboard, with the Web API, signed in with a Spotify account that has Premium. Add this redirect URI to it. In its settings, under Users Management, add your name and the email of the Spotify account you sign in with. Paste the app's Client ID here, and sign in to Spotify. Log in. Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.",
   "@accountSettingsSpotifyForm": {
     "description": "Never shown: what Settings' search finds the Spotify sign-in form by, its steps and labels, then words people search for, as \"Sign in, log in.\". Translate it, and give the words and synonyms people search for in your language."
   },
   "accountSettingsSpotifyHint": "Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.",
+  "accountSettingsSpotifyImportButton": "import Spotify session",
+  "accountSettingsSpotifyImportDesc": "Read your signed-in Spotify session (sp_dc) from a browser.",
+  "accountSettingsSpotifyImportHint": "Sign in to open.spotify.com in your browser first. Some browsers lock their cookies while open: close the browser before importing.",
+  "accountSettingsSpotifyImportTitle": "Import from a browser",
+  "accountSettingsSpotifyInvalidSPDC": "Spotify rejected that sp_dc token: sign in to open.spotify.com again and copy a fresh sp_dc cookie.",
+  "accountSettingsSpotifyMethodClientID": "Client ID (Developer API)",
+  "accountSettingsSpotifyMethodClientIDDesc": "Uses your own Spotify Developer app Client ID (requires Premium owner, up to 5 users). Supports direct Spotify playback and Spotify Connect.",
+  "accountSettingsSpotifyMethodTitle": "Sign-in method",
+  "accountSettingsSpotifyMethodWeb": "Web session (sp_dc)",
+  "accountSettingsSpotifyMethodWebDesc": "No developer app or Premium needed. Full search, Spotify Home shelves and all playlists; audio plays through YouTube Music.",
+  "accountSettingsSpotifyMethodWords": "sp_dc web session cookie client id developer api oauth",
+  "accountSettingsSpotifyNoBrowserSession": "{browser} has no signed-in Spotify session: sign in to open.spotify.com in it, close it, then import again.",
+  "@accountSettingsSpotifyNoBrowserSession": {
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
   "accountSettingsSpotifyPaste": "Paste the app's Client ID here, and sign in.",
+  "accountSettingsSpotifyPasteSPDCButton": "use sp_dc cookie",
+  "accountSettingsSpotifyPasteSPDCDesc": "In your browser's developer tools on open.spotify.com, copy your sp_dc cookie value (or a Cookie header containing sp_dc=…) and paste it here.",
+  "accountSettingsSpotifyPasteSPDCLabel": "Spotify sp_dc cookie",
+  "accountSettingsSpotifyPasteSPDCTitle": "Paste your sp_dc cookie",
   "accountSettingsSpotifyRedirect": "Add this redirect URI to it: {uri} {copy}",
   "@accountSettingsSpotifyRedirect": {
     "description": "The second step of signing in to Spotify. {uri} is the address, in a monospace face, and {copy} accountSettingsCopy, a link that copies it.",
@@ -305,7 +359,23 @@
       }
     }
   },
+  "accountSettingsSpotifyTooLong": "Signing in to Spotify took too long; try again.",
   "accountSettingsSpotifyUsers": "In its settings, under Users Management, add your name and the email of the Spotify account you sign in with.",
+  "accountSettingsSpotifyWebButton": "open Spotify sign-in",
+  "accountSettingsSpotifyWebForm": "Sign in with your Spotify web session (sp_dc). No developer app, Client ID, or Premium subscription required. Full catalog search, home shelves, and all playlists, played through YouTube Music.",
+  "accountSettingsSpotifyWebHint": "Opens Spotify's sign-in page inside MixMusic and captures your sp_dc cookie automatically.",
+  "accountSettingsSpotifyWebNotAccepted": "Spotify could not verify the web session: {error}",
+  "@accountSettingsSpotifyWebNotAccepted": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsSpotifyWebSignInTitle": "Sign in in a window",
+  "accountSettingsSpotifyWebSignedInDesc": "Web session (sp_dc): full search, Spotify Home shelves and playlists, played via YouTube Music.",
+  "accountSettingsSpotifyWindowClosed": "The Spotify sign-in window closed before signing in.",
+  "accountSettingsSpotifyWindowTitle": "Sign in to Spotify",
   "accountSettingsWaitingBrowser": "waiting for the browser…",
   "accountSettingsWaitingLastfm": "waiting for Last.fm…",
   "accountSettingsWaitingListens": "{count, plural, one {# listen waits} other {# listens wait}} to be sent, and will go once {service} answers.",
@@ -4241,6 +4311,10 @@
   "@errorLocalFilesWatchLimit": {
     "description": "Why a folder of music isn't watched for changes, inside a message that leads it."
   },
+  "errorSpotifyInvalidSPDC": "invalid or expired Spotify sp_dc session cookie",
+  "@errorSpotifyInvalidSPDC": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it: the sp_dc web cookie is missing, invalid or expired."
+  },
   "errorSpotifyNoClientID": "Set your Client ID in Settings › Accounts first",
   "@errorSpotifyNoClientID": {
     "description": "An error of Spotify, as a toast or inside a message that leads it: MixMusic needs the Client ID of the user's Spotify app."
@@ -7936,6 +8010,7 @@
   "playbackSpotifyHere": "MixMusic plays them itself, at Spotify's own quality, and shows among your Spotify devices. Needs Spotify Premium, and no Spotify app.",
   "playbackSpotifyNoWebKit": "This computer's webview, WebKitGTK, can't play Spotify's protected audio, so MixMusic can't play Spotify itself.",
   "playbackSpotifyTracks": "Spotify tracks",
+  "playbackSpotifyWebSessionHint": "Signed in with a Spotify web session (sp_dc): Spotify tracks play from YouTube Music.",
   "playbackWaitingBrowser": "waiting for the browser…",
   "playerAllDisliked": "You dislike every song here",
   "@playerAllDisliked": {

@@ -378,7 +378,7 @@ func (s *shell) playlistTileOf(c *ui.Context, key string, p media.Playlist, more
 	if p.TrackCount > 0 {
 		parts = append(parts, locales.TilesTracks(p.TrackCount))
 	}
-	hidden := tracksHidden(p)
+	hidden := s.tracksHidden(p)
 	open, play := s.artTileOf(c, key, p.Artwork, p.Title, strings.Join(parts, " · "), p.Source, false, false, !hidden, "play", locales.TilesPlay(p.Title), func(m *ui.Menu) {
 		if m.Item(locales.TilesOpen()).Chosen() {
 			s.navigate(playlistPath(p.ID))

@@ -315,7 +315,7 @@ func (s *shell) addShelfMenu(m *ui.Menu, full []settings.HomeShelf) {
 			}
 			hidden := 0
 			for _, p := range l.value {
-				if tracksHidden(p) {
+				if s.tracksHidden(p) {
 					hidden++
 					continue
 				}

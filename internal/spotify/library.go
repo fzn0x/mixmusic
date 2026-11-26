@@ -11,17 +11,26 @@ import (
 // Save adds items to the user's library, by their Spotify URIs: tracks to
 // their liked songs, albums to their albums, artists to those they follow.
 func (c *Client) Save(ctx context.Context, uris ...string) error {
+	if c.IsWebSession() {
+		return c.gqlSave(ctx, true, uris...)
+	}
 	return c.do(ctx, http.MethodPut, "/me/library", url.Values{"uris": {joinURIs(uris)}}, nil, nil)
 }
 
 // Remove takes items out of the user's library, by their Spotify URIs.
 func (c *Client) Remove(ctx context.Context, uris ...string) error {
+	if c.IsWebSession() {
+		return c.gqlSave(ctx, false, uris...)
+	}
 	return c.do(ctx, http.MethodDelete, "/me/library", url.Values{"uris": {joinURIs(uris)}}, nil, nil)
 }
 
 // Contains reports, for each URI, whether the item is in the user's
 // library.
 func (c *Client) Contains(ctx context.Context, uris ...string) ([]bool, error) {
+	if c.IsWebSession() {
+		return c.gqlContains(ctx, uris...)
+	}
 	var out []bool
 	err := c.get(ctx, "/me/library/contains", url.Values{"uris": {joinURIs(uris)}}, &out)
 	return out, err
@@ -29,6 +38,9 @@ func (c *Client) Contains(ctx context.Context, uris ...string) ([]bool, error) {
 
 // AddToPlaylist appends tracks to a playlist the user may edit.
 func (c *Client) AddToPlaylist(ctx context.Context, playlistID string, uris ...string) error {
+	if c.IsWebSession() {
+		return c.gqlAddToPlaylist(ctx, playlistID, uris...)
+	}
 	return refusedChange(c.do(ctx, http.MethodPost, "/playlists/"+url.PathEscape(playlistID)+"/items", nil, map[string]any{"uris": uris}, nil))
 }
 
@@ -38,6 +50,9 @@ func (c *Client) AddToPlaylist(ctx context.Context, playlistID string, uris ...s
 // February 2026, which a Client ID made before then still answers, when
 // the new one answers 403 or 404.
 func (c *Client) FollowPlaylist(ctx context.Context, playlistID string, on bool) error {
+	if c.IsWebSession() {
+		return c.gqlFollowPlaylist(ctx, playlistID, on)
+	}
 	_, err := c.followPlaylist(ctx, playlistID, on)
 	return err
 }

@@ -167,6 +167,16 @@
   and falls back to `/playlists/{id}/followers` when the new route
   answers 403 or 404; both failing is one error naming both answers.
   `LiveCollaboration` logs which route answered.
+  `internal/spotify` also supports web-session (`sp_dc`) authentication via
+  `spdc.go` (RFC 6238 SHA-1 TOTP synced with `open.spotify.com/api/server-time`
+  and cached `nuances.json` secrets with cache-busting on rotated versions)
+  and Spotify's internal Pathfinder GraphQL API (`gql.go`, `gql_catalog.go`,
+  using persisted-query hashes with verified remote sync and
+  `PersistedQueryNotFound` retries) for full catalog search, Home shelves,
+  artist pages, library, podcasts, and collaborative playlists.
+  `internal/app/spotify_spdc.go` captures `sp_dc` from an in-app webview,
+  an isolated Firefox/Zen profile, `yt-dlp` browser cookie import, or pasted
+  cookie text, and switches playback to `SpotifyPlaybackMatch`.
   A 429 waits for its Retry-After once, if it is 5 seconds or less. A
   background read of a long list (`media.WithPageWait`, as the playlist
   page does) waits up to `media.MaxPageWait`, 60 seconds, once for each

@@ -117,6 +117,9 @@ func toEpisodePage(p *paging[*episodeEntry], of media.Ref, offset int) media.Epi
 // SearchPodcasts returns the shows and the episodes Spotify finds for
 // query: at most 10 of each, as Spotify answers apps in development mode.
 func (c *Client) SearchPodcasts(ctx context.Context, query string) (media.PodcastResults, error) {
+	if c.IsWebSession() {
+		return c.gqlSearchPodcasts(ctx, query)
+	}
 	var res struct {
 		Shows    paging[*show]         `json:"shows"`
 		Episodes paging[*episodeEntry] `json:"episodes"`
@@ -142,6 +145,9 @@ func (c *Client) SearchPodcasts(ctx context.Context, query string) (media.Podcas
 // Show returns a show with its newest episodes, and what reads the
 // episodes after them.
 func (c *Client) Show(ctx context.Context, id string) (media.Podcast, error) {
+	if c.IsWebSession() {
+		return c.gqlShow(ctx, id)
+	}
 	var s show
 	if err := c.get(ctx, "/shows/"+url.PathEscape(id), nil, &s); err != nil {
 		return media.Podcast{}, err
@@ -153,6 +159,9 @@ func (c *Client) Show(ctx context.Context, id string) (media.Podcast, error) {
 // podcast's More, reads, and what reads the page after it. of is the
 // show, which the episodes name.
 func (c *Client) ShowEpisodes(ctx context.Context, of media.Ref, more string) (media.EpisodePage, error) {
+	if c.IsWebSession() {
+		return c.gqlShowEpisodes(ctx, of, more)
+	}
 	_, id, err := media.ParseID(of.ID)
 	if err != nil {
 		return media.EpisodePage{}, err
@@ -170,6 +179,9 @@ func (c *Client) ShowEpisodes(ctx context.Context, of media.Ref, more string) (m
 // of them: those of a list that stopped short come with a
 // media.ShortList.
 func (c *Client) SavedShows(ctx context.Context) ([]media.Podcast, error) {
+	if c.IsWebSession() {
+		return c.gqlSavedShows(ctx)
+	}
 	type saved struct {
 		Show *show `json:"show"`
 	}

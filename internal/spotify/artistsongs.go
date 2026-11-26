@@ -23,6 +23,9 @@ const releasesAtOnce = 3
 // as the page counts them, and err is the first error. The first page
 // failing is an error alone.
 func (c *Client) artistReleases(ctx context.Context, id string) (releases []*album, missed int, err error) {
+	if c.IsWebSession() {
+		return c.gqlArtistReleasesForSongs(ctx, id)
+	}
 	var first []*album
 	var total int
 	if err := media.TryPage(ctx, func(ctx context.Context) (err error) {

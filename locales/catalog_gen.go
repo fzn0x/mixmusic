@@ -1048,6 +1048,112 @@ func (msgs Messages) AccountSettingsSignedInSpotify() string {
 	return Catalog.Format(msgs.locale, "accountSettingsSignedInSpotify", nil)
 }
 
+// AccountSettingsSpotifyBadSPDC says "That isn't a Spotify sp_dc cookie: paste the sp_dc value or a Cookie header from open.spotify.com."
+// in the language the app shows.
+func AccountSettingsSpotifyBadSPDC() string { return In(i18n.Locale()).AccountSettingsSpotifyBadSPDC() }
+
+// AccountSettingsSpotifyBadSPDC says "That isn't a Spotify sp_dc cookie: paste the sp_dc value or a Cookie header from open.spotify.com."
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyBadSPDC() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyBadSPDC", nil)
+}
+
+// AccountSettingsSpotifyBrowserAbout says "MixMusic opens the browser with a new, empty profile of its own, at Spotify's sign-in. Sign in there as in any browse…"
+// in the language the app shows.
+func AccountSettingsSpotifyBrowserAbout() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyBrowserAbout()
+}
+
+// AccountSettingsSpotifyBrowserAbout says "MixMusic opens the browser with a new, empty profile of its own, at Spotify's sign-in. Sign in there as in any browse…"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyBrowserAbout() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyBrowserAbout", nil)
+}
+
+// AccountSettingsSpotifyBrowserClosed says "{browser} closed before you signed in to Spotify."
+// in the language the app shows.
+func AccountSettingsSpotifyBrowserClosed(browser string) string {
+	return In(i18n.Locale()).AccountSettingsSpotifyBrowserClosed(browser)
+}
+
+// AccountSettingsSpotifyBrowserClosed says "{browser} closed before you signed in to Spotify."
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyBrowserClosed(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyBrowserClosed", map[string]any{"browser": browser})
+}
+
+// AccountSettingsSpotifyBrowserForm says "Sign in to Spotify in a browser with a profile of its own. sp_dc cookie web session."
+// in the language the app shows.
+func AccountSettingsSpotifyBrowserForm() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyBrowserForm()
+}
+
+// AccountSettingsSpotifyBrowserForm says "Sign in to Spotify in a browser with a profile of its own. sp_dc cookie web session."
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyBrowserForm() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyBrowserForm", nil)
+}
+
+// AccountSettingsSpotifyBrowserNotice says "Finish signing in to Spotify in {browser}"
+// in the language the app shows.
+func AccountSettingsSpotifyBrowserNotice(browser string) string {
+	return In(i18n.Locale()).AccountSettingsSpotifyBrowserNotice(browser)
+}
+
+// AccountSettingsSpotifyBrowserNotice says "Finish signing in to Spotify in {browser}"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyBrowserNotice(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyBrowserNotice", map[string]any{"browser": browser})
+}
+
+// AccountSettingsSpotifyBrowserTitle says "Sign in in a browser"
+// in the language the app shows.
+func AccountSettingsSpotifyBrowserTitle() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyBrowserTitle()
+}
+
+// AccountSettingsSpotifyBrowserTitle says "Sign in in a browser"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyBrowserTitle() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyBrowserTitle", nil)
+}
+
+// AccountSettingsSpotifyBrowserWith says "sign in to Spotify with {browser}"
+// in the language the app shows.
+func AccountSettingsSpotifyBrowserWith(browser string) string {
+	return In(i18n.Locale()).AccountSettingsSpotifyBrowserWith(browser)
+}
+
+// AccountSettingsSpotifyBrowserWith says "sign in to Spotify with {browser}"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyBrowserWith(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyBrowserWith", map[string]any{"browser": browser})
+}
+
+// AccountSettingsSpotifyCookieForm says "Import a Spotify session from a browser, or paste an sp_dc cookie. sp_dc web session."
+// in the language the app shows.
+func AccountSettingsSpotifyCookieForm() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyCookieForm()
+}
+
+// AccountSettingsSpotifyCookieForm says "Import a Spotify session from a browser, or paste an sp_dc cookie. sp_dc web session."
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyCookieForm() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyCookieForm", nil)
+}
+
+// AccountSettingsSpotifyCookieTitle says "Import or paste sp_dc cookie"
+// in the language the app shows.
+func AccountSettingsSpotifyCookieTitle() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyCookieTitle()
+}
+
+// AccountSettingsSpotifyCookieTitle says "Import or paste sp_dc cookie"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyCookieTitle() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyCookieTitle", nil)
+}
+
 // AccountSettingsSpotifyDashboard says "Spotify developer dashboard"
 // in the language the app shows.
 func AccountSettingsSpotifyDashboard() string {
@@ -1068,6 +1174,18 @@ func AccountSettingsSpotifyDesc() string { return In(i18n.Locale()).AccountSetti
 // in the language of msgs.
 func (msgs Messages) AccountSettingsSpotifyDesc() string {
 	return Catalog.Format(msgs.locale, "accountSettingsSpotifyDesc", nil)
+}
+
+// AccountSettingsSpotifyDidntSignIn says "MixMusic didn't sign in to Spotify"
+// in the language the app shows.
+func AccountSettingsSpotifyDidntSignIn() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyDidntSignIn()
+}
+
+// AccountSettingsSpotifyDidntSignIn says "MixMusic didn't sign in to Spotify"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyDidntSignIn() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyDidntSignIn", nil)
 }
 
 // AccountSettingsSpotifyForm says "Create an app in the Spotify developer dashboard, with the Web API, signed in with a Spotify account that has Premium…"
@@ -1100,6 +1218,150 @@ func (msgs Messages) AccountSettingsSpotifyHint() string {
 	return Catalog.Format(msgs.locale, "accountSettingsSpotifyHint", nil)
 }
 
+// AccountSettingsSpotifyImportButton says "import Spotify session"
+// in the language the app shows.
+func AccountSettingsSpotifyImportButton() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyImportButton()
+}
+
+// AccountSettingsSpotifyImportButton says "import Spotify session"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyImportButton() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyImportButton", nil)
+}
+
+// AccountSettingsSpotifyImportDesc says "Read your signed-in Spotify session (sp_dc) from a browser."
+// in the language the app shows.
+func AccountSettingsSpotifyImportDesc() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyImportDesc()
+}
+
+// AccountSettingsSpotifyImportDesc says "Read your signed-in Spotify session (sp_dc) from a browser."
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyImportDesc() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyImportDesc", nil)
+}
+
+// AccountSettingsSpotifyImportHint says "Sign in to open.spotify.com in your browser first. Some browsers lock their cookies while open: close the browser bef…"
+// in the language the app shows.
+func AccountSettingsSpotifyImportHint() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyImportHint()
+}
+
+// AccountSettingsSpotifyImportHint says "Sign in to open.spotify.com in your browser first. Some browsers lock their cookies while open: close the browser bef…"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyImportHint() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyImportHint", nil)
+}
+
+// AccountSettingsSpotifyImportTitle says "Import from a browser"
+// in the language the app shows.
+func AccountSettingsSpotifyImportTitle() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyImportTitle()
+}
+
+// AccountSettingsSpotifyImportTitle says "Import from a browser"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyImportTitle() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyImportTitle", nil)
+}
+
+// AccountSettingsSpotifyInvalidSPDC says "Spotify rejected that sp_dc token: sign in to open.spotify.com again and copy a fresh sp_dc cookie."
+// in the language the app shows.
+func AccountSettingsSpotifyInvalidSPDC() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyInvalidSPDC()
+}
+
+// AccountSettingsSpotifyInvalidSPDC says "Spotify rejected that sp_dc token: sign in to open.spotify.com again and copy a fresh sp_dc cookie."
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyInvalidSPDC() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyInvalidSPDC", nil)
+}
+
+// AccountSettingsSpotifyMethodClientID says "Client ID (Developer API)"
+// in the language the app shows.
+func AccountSettingsSpotifyMethodClientID() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyMethodClientID()
+}
+
+// AccountSettingsSpotifyMethodClientID says "Client ID (Developer API)"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyMethodClientID() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyMethodClientID", nil)
+}
+
+// AccountSettingsSpotifyMethodClientIDDesc says "Uses your own Spotify Developer app Client ID (requires Premium owner, up to 5 users). Supports direct Spotify playba…"
+// in the language the app shows.
+func AccountSettingsSpotifyMethodClientIDDesc() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyMethodClientIDDesc()
+}
+
+// AccountSettingsSpotifyMethodClientIDDesc says "Uses your own Spotify Developer app Client ID (requires Premium owner, up to 5 users). Supports direct Spotify playba…"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyMethodClientIDDesc() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyMethodClientIDDesc", nil)
+}
+
+// AccountSettingsSpotifyMethodTitle says "Sign-in method"
+// in the language the app shows.
+func AccountSettingsSpotifyMethodTitle() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyMethodTitle()
+}
+
+// AccountSettingsSpotifyMethodTitle says "Sign-in method"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyMethodTitle() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyMethodTitle", nil)
+}
+
+// AccountSettingsSpotifyMethodWeb says "Web session (sp_dc)"
+// in the language the app shows.
+func AccountSettingsSpotifyMethodWeb() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyMethodWeb()
+}
+
+// AccountSettingsSpotifyMethodWeb says "Web session (sp_dc)"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyMethodWeb() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyMethodWeb", nil)
+}
+
+// AccountSettingsSpotifyMethodWebDesc says "No developer app or Premium needed. Full search, Spotify Home shelves and all playlists; audio plays through YouTube …"
+// in the language the app shows.
+func AccountSettingsSpotifyMethodWebDesc() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyMethodWebDesc()
+}
+
+// AccountSettingsSpotifyMethodWebDesc says "No developer app or Premium needed. Full search, Spotify Home shelves and all playlists; audio plays through YouTube …"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyMethodWebDesc() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyMethodWebDesc", nil)
+}
+
+// AccountSettingsSpotifyMethodWords says "sp_dc web session cookie client id developer api oauth"
+// in the language the app shows.
+func AccountSettingsSpotifyMethodWords() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyMethodWords()
+}
+
+// AccountSettingsSpotifyMethodWords says "sp_dc web session cookie client id developer api oauth"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyMethodWords() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyMethodWords", nil)
+}
+
+// AccountSettingsSpotifyNoBrowserSession says "{browser} has no signed-in Spotify session: sign in to open.spotify.com in it, close it, then import again."
+// in the language the app shows.
+func AccountSettingsSpotifyNoBrowserSession(browser string) string {
+	return In(i18n.Locale()).AccountSettingsSpotifyNoBrowserSession(browser)
+}
+
+// AccountSettingsSpotifyNoBrowserSession says "{browser} has no signed-in Spotify session: sign in to open.spotify.com in it, close it, then import again."
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyNoBrowserSession(browser string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyNoBrowserSession", map[string]any{"browser": browser})
+}
+
 // AccountSettingsSpotifyPaste says "Paste the app's Client ID here, and sign in."
 // in the language the app shows.
 func AccountSettingsSpotifyPaste() string { return In(i18n.Locale()).AccountSettingsSpotifyPaste() }
@@ -1108,6 +1370,54 @@ func AccountSettingsSpotifyPaste() string { return In(i18n.Locale()).AccountSett
 // in the language of msgs.
 func (msgs Messages) AccountSettingsSpotifyPaste() string {
 	return Catalog.Format(msgs.locale, "accountSettingsSpotifyPaste", nil)
+}
+
+// AccountSettingsSpotifyPasteSPDCButton says "use sp_dc cookie"
+// in the language the app shows.
+func AccountSettingsSpotifyPasteSPDCButton() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyPasteSPDCButton()
+}
+
+// AccountSettingsSpotifyPasteSPDCButton says "use sp_dc cookie"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyPasteSPDCButton() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyPasteSPDCButton", nil)
+}
+
+// AccountSettingsSpotifyPasteSPDCDesc says "In your browser's developer tools on open.spotify.com, copy your sp_dc cookie value (or a Cookie header containing sp…"
+// in the language the app shows.
+func AccountSettingsSpotifyPasteSPDCDesc() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyPasteSPDCDesc()
+}
+
+// AccountSettingsSpotifyPasteSPDCDesc says "In your browser's developer tools on open.spotify.com, copy your sp_dc cookie value (or a Cookie header containing sp…"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyPasteSPDCDesc() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyPasteSPDCDesc", nil)
+}
+
+// AccountSettingsSpotifyPasteSPDCLabel says "Spotify sp_dc cookie"
+// in the language the app shows.
+func AccountSettingsSpotifyPasteSPDCLabel() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyPasteSPDCLabel()
+}
+
+// AccountSettingsSpotifyPasteSPDCLabel says "Spotify sp_dc cookie"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyPasteSPDCLabel() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyPasteSPDCLabel", nil)
+}
+
+// AccountSettingsSpotifyPasteSPDCTitle says "Paste your sp_dc cookie"
+// in the language the app shows.
+func AccountSettingsSpotifyPasteSPDCTitle() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyPasteSPDCTitle()
+}
+
+// AccountSettingsSpotifyPasteSPDCTitle says "Paste your sp_dc cookie"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyPasteSPDCTitle() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyPasteSPDCTitle", nil)
 }
 
 // AccountSettingsSpotifyRedirect says "Add this redirect URI to it: {uri} {copy}"
@@ -1190,6 +1500,16 @@ func (msgs Messages) AccountSettingsSpotifyStep1(link string) string {
 	return Catalog.Format(msgs.locale, "accountSettingsSpotifyStep1", map[string]any{"link": link})
 }
 
+// AccountSettingsSpotifyTooLong says "Signing in to Spotify took too long; try again."
+// in the language the app shows.
+func AccountSettingsSpotifyTooLong() string { return In(i18n.Locale()).AccountSettingsSpotifyTooLong() }
+
+// AccountSettingsSpotifyTooLong says "Signing in to Spotify took too long; try again."
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyTooLong() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyTooLong", nil)
+}
+
 // AccountSettingsSpotifyUsers says "In its settings, under Users Management, add your name and the email of the Spotify account you sign in with."
 // in the language the app shows.
 func AccountSettingsSpotifyUsers() string { return In(i18n.Locale()).AccountSettingsSpotifyUsers() }
@@ -1198,6 +1518,98 @@ func AccountSettingsSpotifyUsers() string { return In(i18n.Locale()).AccountSett
 // in the language of msgs.
 func (msgs Messages) AccountSettingsSpotifyUsers() string {
 	return Catalog.Format(msgs.locale, "accountSettingsSpotifyUsers", nil)
+}
+
+// AccountSettingsSpotifyWebButton says "open Spotify sign-in"
+// in the language the app shows.
+func AccountSettingsSpotifyWebButton() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyWebButton()
+}
+
+// AccountSettingsSpotifyWebButton says "open Spotify sign-in"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyWebButton() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyWebButton", nil)
+}
+
+// AccountSettingsSpotifyWebForm says "Sign in with your Spotify web session (sp_dc). No developer app, Client ID, or Premium subscription required. Full ca…"
+// in the language the app shows.
+func AccountSettingsSpotifyWebForm() string { return In(i18n.Locale()).AccountSettingsSpotifyWebForm() }
+
+// AccountSettingsSpotifyWebForm says "Sign in with your Spotify web session (sp_dc). No developer app, Client ID, or Premium subscription required. Full ca…"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyWebForm() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyWebForm", nil)
+}
+
+// AccountSettingsSpotifyWebHint says "Opens Spotify's sign-in page inside MixMusic and captures your sp_dc cookie automatically."
+// in the language the app shows.
+func AccountSettingsSpotifyWebHint() string { return In(i18n.Locale()).AccountSettingsSpotifyWebHint() }
+
+// AccountSettingsSpotifyWebHint says "Opens Spotify's sign-in page inside MixMusic and captures your sp_dc cookie automatically."
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyWebHint() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyWebHint", nil)
+}
+
+// AccountSettingsSpotifyWebNotAccepted says "Spotify could not verify the web session: {error}"
+// in the language the app shows.
+func AccountSettingsSpotifyWebNotAccepted(error string) string {
+	return In(i18n.Locale()).AccountSettingsSpotifyWebNotAccepted(error)
+}
+
+// AccountSettingsSpotifyWebNotAccepted says "Spotify could not verify the web session: {error}"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyWebNotAccepted(error string) string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyWebNotAccepted", map[string]any{"error": error})
+}
+
+// AccountSettingsSpotifyWebSignInTitle says "Sign in in a window"
+// in the language the app shows.
+func AccountSettingsSpotifyWebSignInTitle() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyWebSignInTitle()
+}
+
+// AccountSettingsSpotifyWebSignInTitle says "Sign in in a window"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyWebSignInTitle() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyWebSignInTitle", nil)
+}
+
+// AccountSettingsSpotifyWebSignedInDesc says "Web session (sp_dc): full search, Spotify Home shelves and playlists, played via YouTube Music."
+// in the language the app shows.
+func AccountSettingsSpotifyWebSignedInDesc() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyWebSignedInDesc()
+}
+
+// AccountSettingsSpotifyWebSignedInDesc says "Web session (sp_dc): full search, Spotify Home shelves and playlists, played via YouTube Music."
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyWebSignedInDesc() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyWebSignedInDesc", nil)
+}
+
+// AccountSettingsSpotifyWindowClosed says "The Spotify sign-in window closed before signing in."
+// in the language the app shows.
+func AccountSettingsSpotifyWindowClosed() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyWindowClosed()
+}
+
+// AccountSettingsSpotifyWindowClosed says "The Spotify sign-in window closed before signing in."
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyWindowClosed() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyWindowClosed", nil)
+}
+
+// AccountSettingsSpotifyWindowTitle says "Sign in to Spotify"
+// in the language the app shows.
+func AccountSettingsSpotifyWindowTitle() string {
+	return In(i18n.Locale()).AccountSettingsSpotifyWindowTitle()
+}
+
+// AccountSettingsSpotifyWindowTitle says "Sign in to Spotify"
+// in the language of msgs.
+func (msgs Messages) AccountSettingsSpotifyWindowTitle() string {
+	return Catalog.Format(msgs.locale, "accountSettingsSpotifyWindowTitle", nil)
 }
 
 // AccountSettingsWaitingBrowser says "waiting for the browser…"
@@ -13248,6 +13660,22 @@ func ErrorLocalFilesWatchLimit() string { return In(i18n.Locale()).ErrorLocalFil
 // leads it.
 func (msgs Messages) ErrorLocalFilesWatchLimit() string {
 	return Catalog.Format(msgs.locale, "errorLocalFilesWatchLimit", nil)
+}
+
+// ErrorSpotifyInvalidSPDC says "invalid or expired Spotify sp_dc session cookie"
+// in the language the app shows.
+//
+// An error of Spotify, as a toast or inside a message that leads it: the
+// sp_dc web cookie is missing, invalid or expired.
+func ErrorSpotifyInvalidSPDC() string { return In(i18n.Locale()).ErrorSpotifyInvalidSPDC() }
+
+// ErrorSpotifyInvalidSPDC says "invalid or expired Spotify sp_dc session cookie"
+// in the language of msgs.
+//
+// An error of Spotify, as a toast or inside a message that leads it: the
+// sp_dc web cookie is missing, invalid or expired.
+func (msgs Messages) ErrorSpotifyInvalidSPDC() string {
+	return Catalog.Format(msgs.locale, "errorSpotifyInvalidSPDC", nil)
 }
 
 // ErrorSpotifyNoClientID says "Set your Client ID in Settings › Accounts first"
@@ -25318,6 +25746,16 @@ func PlaybackSpotifyTracks() string { return In(i18n.Locale()).PlaybackSpotifyTr
 // in the language of msgs.
 func (msgs Messages) PlaybackSpotifyTracks() string {
 	return Catalog.Format(msgs.locale, "playbackSpotifyTracks", nil)
+}
+
+// PlaybackSpotifyWebSessionHint says "Signed in with a Spotify web session (sp_dc): Spotify tracks play from YouTube Music."
+// in the language the app shows.
+func PlaybackSpotifyWebSessionHint() string { return In(i18n.Locale()).PlaybackSpotifyWebSessionHint() }
+
+// PlaybackSpotifyWebSessionHint says "Signed in with a Spotify web session (sp_dc): Spotify tracks play from YouTube Music."
+// in the language of msgs.
+func (msgs Messages) PlaybackSpotifyWebSessionHint() string {
+	return Catalog.Format(msgs.locale, "playbackSpotifyWebSessionHint", nil)
 }
 
 // PlaybackWaitingBrowser says "waiting for the browser…"

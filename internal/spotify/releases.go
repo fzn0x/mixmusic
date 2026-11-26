@@ -24,6 +24,9 @@ type release struct {
 // singles and EPs, each with the day it came out, or its month or its year
 // where Spotify tells no more.
 func (c *Client) ArtistReleases(ctx context.Context, id string) ([]media.Release, error) {
+	if c.IsWebSession() {
+		return c.gqlArtistReleasesList(ctx, id)
+	}
 	out := []media.Release{}
 	for _, group := range []string{"album", "single"} {
 		var page paging[*release]

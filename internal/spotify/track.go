@@ -16,6 +16,9 @@ var errNotATrack = errors.New("spotify: not a track")
 // album, length, cover and whether it's explicit. A room's host reads a
 // guest's song so, rather than trust what the guest says of it (#734).
 func (c *Client) Track(ctx context.Context, id string) (media.Track, error) {
+	if c.IsWebSession() {
+		return c.gqlTrack(ctx, id)
+	}
 	var t track
 	if err := c.get(ctx, "/tracks/"+url.PathEscape(id), nil, &t); err != nil {
 		return media.Track{}, err

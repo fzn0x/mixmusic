@@ -88,14 +88,21 @@ func TestAccountFaultsInTheLanguage(t *testing.T) {
 	}
 }
 
-// TestSpotifySteps asks, before signing in, for what Spotify asks of an
-// app in development mode: an owner with Premium, and the account that
-// signs in under Users Management.
+// TestSpotifySteps starts in Web session (sp_dc) mode and switches to Client ID
+// (Developer API) mode to show what Spotify asks of an app in development mode:
+// an owner with Premium, and the account that signs in under Users Management.
 func TestSpotifySteps(t *testing.T) {
 	s := newTestShell(t)
 	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true}
 	tt := testerOf(t, s, 1280, 1800)
 	show(s, tt, "/settings/accounts")
+	if tt.HasText("Client ID here") {
+		t.Fatalf("sp_dc mode showed Client ID steps: %q", tt.Texts())
+	}
+	click(t, s, tt, s.lk.sentence(s.lk.words(locales.AccountSettingsSpotifyMethodClientID())))
+	if tt.HasText("Paste your sp_dc cookie") {
+		t.Errorf("Client ID mode still showed sp_dc form: %q", tt.Texts())
+	}
 	texts := strings.Join(tt.Texts(), " ")
 	for _, want := range []string{"a Spotify account that has Premium", "under Users Management, add your name", "Client ID here"} {
 		if !strings.Contains(texts, want) {

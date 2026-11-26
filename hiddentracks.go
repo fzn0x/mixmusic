@@ -26,6 +26,10 @@ func tracksHidden(p media.Playlist) bool {
 	return p.Source == media.SourceSpotify && !p.Editable
 }
 
+func (s *shell) tracksHidden(p media.Playlist) bool {
+	return !s.accounts().Spotify.WebSession && tracksHidden(p)
+}
+
 // hiddenTracksPage is the page of a Spotify playlist whose tracks Spotify
 // shows apps none of: what it tells of the playlist, or for one of its
 // own, which it tells nothing of, what the user's library does, with a way

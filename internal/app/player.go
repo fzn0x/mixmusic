@@ -71,6 +71,9 @@ func (p *Player) Prepare(ctx context.Context, track media.Track) (PlaybackSource
 	}
 	if track.Source == media.SourceSpotify {
 		mode := p.a.settings.Get().SpotifyPlayback
+		if mode == settings.SpotifyPlaybackHere && p.a.spotify.IsWebSession() && !p.a.spotify.Granted("streaming") {
+			return p.PrepareStream(ctx, track)
+		}
 		if mode == settings.SpotifyPlaybackConnect || mode == settings.SpotifyPlaybackHere {
 			if p.a.offline() {
 				if p.a.playsOffline(track) {

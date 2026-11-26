@@ -43,6 +43,11 @@ type Profile struct {
 
 // Me returns the signed-in user.
 func (c *Client) Me(ctx context.Context) (Profile, error) {
+	if c.IsWebSession() {
+		if p, err := c.gqlMe(ctx); err == nil || errors.Is(err, ErrSignInExpired) || errors.Is(err, ErrInvalidSPDC) {
+			return p, err
+		}
+	}
 	var me struct {
 		ID          string  `json:"id"`
 		DisplayName string  `json:"display_name"`
@@ -63,6 +68,9 @@ func (c *Client) Me(ctx context.Context) (Profile, error) {
 // signed-in user: those they own or collaborate on, not the others, of
 // which Spotify shows apps no track (ErrPlaylistUnavailable).
 func (c *Client) Search(ctx context.Context, query, userID string) (media.SearchResults, error) {
+	if c.IsWebSession() {
+		return c.gqlSearch(ctx, query, userID)
+	}
 	var res struct {
 		Tracks    paging[*track]    `json:"tracks"`
 		Albums    paging[*album]    `json:"albums"`
@@ -105,6 +113,9 @@ func (c *Client) Search(ctx context.Context, query, userID string) (media.Search
 // them that fails is asked for again a few times, and then fails the
 // album.
 func (c *Client) Album(ctx context.Context, id string) (media.Album, error) {
+	if c.IsWebSession() {
+		return c.gqlAlbum(ctx, id)
+	}
 	var a album
 	if err := c.get(ctx, "/albums/"+url.PathEscape(id), nil, &a); err != nil {
 		return media.Album{}, err
@@ -138,6 +149,9 @@ func (c *Client) Album(ctx context.Context, id string) (media.Album, error) {
 // Artist returns an artist with their albums and singles, and their most
 // popular tracks as search finds them.
 func (c *Client) Artist(ctx context.Context, id string) (media.Artist, error) {
+	if c.IsWebSession() {
+		return c.gqlArtist(ctx, id)
+	}
 	var a artist
 	if err := c.get(ctx, "/artists/"+url.PathEscape(id), nil, &a); err != nil {
 		return media.Artist{}, err
@@ -208,6 +222,9 @@ func (c *Client) artistAlbums(ctx context.Context, id string, offset int) ([]*al
 // has more, More is the address of their next page, which PlaylistPage
 // reads.
 func (c *Client) Playlist(ctx context.Context, id, userID string) (media.Playlist, error) {
+	if c.IsWebSession() {
+		return c.gqlPlaylist(ctx, id, userID)
+	}
 	var p playlist
 	if err := c.get(ctx, "/playlists/"+url.PathEscape(id), nil, &p); err != nil {
 		var api *APIError
@@ -248,6 +265,9 @@ func (c *Client) PlaylistPage(ctx context.Context, next string) ([]media.Track, 
 // PlaylistPageCounting is PlaylistPage that also counts the items of the
 // page it leaves out, by kind.
 func (c *Client) PlaylistPageCounting(ctx context.Context, next string) ([]media.Track, string, media.Unplayable, error) {
+	if id, offset, ok := parseGQLPlaylistCursor(next); ok {
+		return c.gqlPlaylistPage(ctx, id, offset)
+	}
 	if !strings.HasPrefix(next, strings.TrimRight(c.BaseURL, "/")+"/") {
 		return nil, "", media.Unplayable{}, errors.New("spotify: the next page of the playlist is not the API's")
 	}
@@ -262,6 +282,9 @@ func (c *Client) PlaylistPageCounting(ctx context.Context, next string) ([]media
 // MyPlaylists returns the playlists the user made or follows, all of
 // them: those of a list that stopped short come with a media.ShortList.
 func (c *Client) MyPlaylists(ctx context.Context, userID string) ([]media.Playlist, error) {
+	if c.IsWebSession() {
+		return c.gqlMyPlaylists(ctx, userID)
+	}
 	items, err := readList(ctx, c, "/me/playlists", func(p *playlist) string {
 		if p == nil {
 			return ""
@@ -281,6 +304,9 @@ func (c *Client) MyPlaylists(ctx context.Context, userID string) ([]media.Playli
 // SavedTracks returns a page of the user's liked songs, from offset, and
 // how many they have.
 func (c *Client) SavedTracks(ctx context.Context, offset int) ([]media.Track, int, error) {
+	if c.IsWebSession() {
+		return c.gqlSavedTracks(ctx, offset)
+	}
 	var res paging[struct {
 		Track *track `json:"track"`
 	}]
@@ -298,6 +324,9 @@ func (c *Client) SavedTracks(ctx context.Context, offset int) ([]media.Track, in
 // SavedAlbums returns the albums the user saved, all of them: those of a
 // list that stopped short come with a media.ShortList.
 func (c *Client) SavedAlbums(ctx context.Context) ([]media.Album, error) {
+	if c.IsWebSession() {
+		return c.gqlSavedAlbums(ctx)
+	}
 	items, err := readList(ctx, c, "/me/albums", func(it savedAlbum) string {
 		if it.Album == nil {
 			return ""
@@ -316,6 +345,9 @@ func (c *Client) SavedAlbums(ctx context.Context) ([]media.Album, error) {
 // a page that fails, a page of nothing or of nothing new, or a cursor
 // that doesn't move, come with a media.ShortList.
 func (c *Client) FollowedArtists(ctx context.Context) ([]media.Artist, error) {
+	if c.IsWebSession() {
+		return c.gqlFollowedArtists(ctx)
+	}
 	l := &listReading[*artist]{id: func(a *artist) string {
 		if a == nil {
 			return ""
@@ -397,6 +429,9 @@ func (c *Client) TopTracks(ctx context.Context) ([]media.Track, error) {
 // whose requests fail are left out; once all of them failed, the error
 // tells why.
 func (c *Client) Home(ctx context.Context, userID string) ([]media.Shelf, error) {
+	if c.IsWebSession() {
+		return c.gqlHome(ctx, userID)
+	}
 	var (
 		playlists   []media.Playlist
 		recent, top []media.Track

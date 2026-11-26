@@ -319,7 +319,7 @@ func (a *App) settingsChanged(prev, s settings.Settings, outside bool) {
 	if s.CloseToTray && !prev.CloseToTray {
 		runInBackground()
 	}
-	if prev.SpotifyClientID != s.SpotifyClientID && a.spotify.SignedIn() {
+	if prev.SpotifyClientID != s.SpotifyClientID && a.spotify.SignedIn() && !a.spotify.IsWebSession() {
 		// The token belongs to the former app.
 		a.signOutSpotify()
 	}

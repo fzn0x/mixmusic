@@ -32,6 +32,9 @@ func (c *Client) SetCollaborative(ctx context.Context, playlistID string, on boo
 // MoveInPlaylist moves the item at from of a playlist the user may change
 // to the place to, both counted from 0 as the playlist holds its items.
 func (c *Client) MoveInPlaylist(ctx context.Context, playlistID string, from, to int) error {
+	if c.IsWebSession() {
+		return c.gqlMoveInPlaylist(ctx, playlistID, from, to)
+	}
 	if from < 0 || to < 0 {
 		return errors.New("spotify: no such place in the playlist")
 	}

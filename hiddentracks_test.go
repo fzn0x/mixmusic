@@ -107,3 +107,34 @@ func TestNotShownPage(t *testing.T) {
 		}
 	}
 }
+
+// TestWebSessionUnlocksFollowedPlaylists verifies that when signed in with an
+// sp_dc web session, third-party Spotify playlists offer Play, Download, and
+// Home-shelf pinning just like owned playlists.
+func TestWebSessionUnlocksFollowedPlaylists(t *testing.T) {
+	s := newTestShell(t)
+	s.loads["accounts"] = &loaded[app.AccountsStatus]{done: true, value: app.AccountsStatus{
+		Spotify: app.SpotifyAccount{SignedIn: true, WebSession: true},
+	}}
+	s.loads["spotify:playlists"] = &loaded[[]media.Playlist]{done: true, value: []media.Playlist{roadList, followedList}}
+	s.loads["spotify:albums"] = &loaded[[]media.Album]{done: true}
+	s.loads["spotify:artists"] = &loaded[[]media.Artist]{done: true}
+	s.loads["spotify:liked"] = &loaded[app.TrackPage]{done: true}
+	tt := testerOf(t, s, 1280, 1400)
+	show(s, tt, "/library/spotify")
+	if err := tt.RightClick(followedList.Title); err != nil {
+		t.Fatal(err)
+	}
+	menu := tt.Menu()
+	tt.CloseMenu()
+	if !slices.Contains(menu, "Play") || !slices.Contains(menu, "Download") {
+		t.Errorf("followed playlist menu with web session = %q, want Play and Download", menu)
+	}
+
+	tt = homeWindow(t, s, nil)
+	click(t, s, tt, "edit home")
+	click(t, s, tt, "add a shelf")
+	if err := tt.ChooseMenuItem("A Spotify playlist", followedList.Title); err != nil {
+		t.Errorf("Home doesn't offer %s with web session: %v", followedList.Title, err)
+	}
+}

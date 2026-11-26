@@ -67,7 +67,14 @@ type Token struct {
 	RefreshToken string    `json:"refreshToken"`
 	Expiry       time.Time `json:"expiry"`
 	Scope        string    `json:"scope,omitempty"`
+	SPDC         string    `json:"spDc,omitempty"`
+	SPKey        string    `json:"spKey,omitempty"`
+	SPT          string    `json:"spT,omitempty"`
 }
+
+// IsWebSession reports whether the token represents a Spotify web session
+// authenticated via the sp_dc cookie rather than an OAuth Developer app.
+func (t Token) IsWebSession() bool { return t.SPDC != "" }
 
 // Valid reports whether the access token can still be used for a while.
 func (t Token) Valid() bool {
@@ -75,19 +82,36 @@ func (t Token) Valid() bool {
 }
 
 // Auth signs users in with the authorization code flow and PKCE, which
-// needs no client secret.
+// needs no client secret, or exchanges a Spotify web session's sp_dc cookie.
 type Auth struct {
 	HTTP *http.Client
 	// TokenURL is the token endpoint, replaced in tests.
 	TokenURL string
+	// WebTokenURL, ServerTimeURL, NuancesURL and NuancesFallbackURL are the
+	// endpoints used to exchange an sp_dc web session cookie for an access token.
+	WebTokenURL        string
+	ServerTimeURL      string
+	NuancesURL         string
+	NuancesFallbackURL string
 
 	mu       sync.Mutex
 	clientID string
+
+	nuanceMu sync.Mutex
+	nuance   totpNuance
+	nuanceAt time.Time
 }
 
 // NewAuth returns an Auth for the app of clientID.
 func NewAuth(clientID string) *Auth {
-	a := &Auth{HTTP: &http.Client{Timeout: 30 * time.Second}, TokenURL: tokenURL}
+	a := &Auth{
+		HTTP:               &http.Client{Timeout: 30 * time.Second},
+		TokenURL:           tokenURL,
+		WebTokenURL:        webTokenURL,
+		ServerTimeURL:      serverTimeURL,
+		NuancesURL:         nuancesURL,
+		NuancesFallbackURL: nuancesFallbackURL,
+	}
 	a.SetClientID(clientID)
 	return a
 }

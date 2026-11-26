@@ -2788,7 +2788,6 @@
       }
     }
   },
-  "controlNotRunning": "MixMusic isn't running",
   "controlAbout": "Lets the programs on this computer control what plays: a script, a Stream Deck key, or an overlay of your own. They send a token that only you can read, kept in control.json beside the port. It listens on this computer only.",
   "@controlAbout": {
     "description": "What the switch of Settings › Desktop › Programs on this computer does, under its title."
@@ -2813,21 +2812,10 @@
   "@controlLabel": {
     "description": "The switch of Settings › Desktop that lets the programs on this computer control what plays."
   },
+  "controlNotRunning": "MixMusic isn't running",
   "controlTitle": "Programs on this computer",
   "@controlTitle": {
     "description": "The title of Settings › Desktop › Programs on this computer."
-  },
-  "controlTokenDescription": "A script sends it as the Authorization header, as Bearer followed by the token. A new token cuts off the programs that had the old one at once; the server stays on.",
-  "@controlTokenDescription": {
-    "description": "What the token of the programs' control is, and what a new one does."
-  },
-  "controlTokenNew": "new token",
-  "@controlTokenNew": {
-    "description": "The button that makes another token for the programs' control."
-  },
-  "controlTokenTitle": "Token",
-  "@controlTokenTitle": {
-    "description": "The row of Settings › Desktop that shows the token of the programs' control."
   },
   "controlToastDisliked": "A program on this computer disliked {what}",
   "@controlToastDisliked": {
@@ -2864,6 +2852,18 @@
         "type": "String"
       }
     }
+  },
+  "controlTokenDescription": "A script sends it as the Authorization header, as Bearer followed by the token. A new token cuts off the programs that had the old one at once; the server stays on.",
+  "@controlTokenDescription": {
+    "description": "What the token of the programs' control is, and what a new one does."
+  },
+  "controlTokenNew": "new token",
+  "@controlTokenNew": {
+    "description": "The button that makes another token for the programs' control."
+  },
+  "controlTokenTitle": "Token",
+  "@controlTokenTitle": {
+    "description": "The row of Settings › Desktop that shows the token of the programs' control."
   },
   "copiesAbout": "Copies of one song show once, and play the best: lossless before lossy, then the higher bitrate and sample rate. What you play, like and mix of them follows the song, and stays when a copy goes.",
   "copiesAboutBitrate": "about {bitrate, number, ::group-off} kbit/s",

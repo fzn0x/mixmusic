@@ -1,7 +1,8 @@
 // Package overlay serves what plays to the programs on the same computer,
 // for the overlays of streams (#344): JSON, the cover, a stream of events
-// and a page for a browser source. It listens on 127.0.0.1 only, and takes
-// no command: every route reads.
+// and a page for a browser source. It listens on 127.0.0.1 only. Its
+// routes read, but for /control, which takes commands from the programs
+// the user lets control MixMusic (#591), guarded by a token.
 package overlay
 
 import (
@@ -12,6 +13,7 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -71,6 +73,10 @@ type Status struct {
 	Addr string
 	// Err is why it can't listen, as a port that another program holds.
 	Err string
+	// Serving is set while the reads answer: /now-playing and the rest.
+	Serving bool
+	// Control is set while /control takes commands.
+	Control bool
 }
 
 // Server serves what plays. The zero value isn't ready: use New.
@@ -80,6 +86,9 @@ type Server struct {
 	Cover func(ctx context.Context, url string) ([]byte, error)
 	// Listen opens the listener: net.Listen when nil. Tests give their own.
 	Listen func(network, addr string) (net.Listener, error)
+	// Control is the player that /control runs commands on and tells of.
+	// Without it, /control says the player isn't here.
+	Control Control
 
 	mu     sync.Mutex
 	info   Info
@@ -91,6 +100,16 @@ type Server struct {
 	port   int
 	status Status
 	done   chan struct{} // closed as the server stops listening
+	// serve and controlling are what answers: the reads, and /control.
+	serve, controlling bool
+	// ctlDone is closed as control goes off, which ends its streams.
+	ctlDone chan struct{}
+	// watchStop ends the watch of the player that control keeps.
+	watchStop func()
+	// token is what /control's requests must carry.
+	token string
+	// pace is how many commands may come.
+	pace pace
 }
 
 // subscriber is a client of the event stream, which holds the latest event
@@ -112,19 +131,28 @@ func (s *Server) Status() Status {
 	return s.status
 }
 
-// Apply has the server listen on 127.0.0.1 at port while on, or stop. It
-// changes nothing while the server already listens as asked. A port that
-// another program holds is returned, and is the status's Err, until Apply
-// finds it free.
-func (s *Server) Apply(on bool, port int) error {
+// Apply has the server listen on 127.0.0.1 at port while serve or
+// control is on, or stop. The reads answer while serve is on, and
+// /control while control is. It changes nothing while the server already
+// listens as asked. A port that another program holds is returned, and is
+// the status's Err, until Apply finds it free.
+func (s *Server) Apply(serve, control bool, port int) error {
 	s.mu.Lock()
-	if !on {
+	if !serve && !control {
 		s.stopLocked()
 		s.status = Status{}
 		s.mu.Unlock()
 		return nil
 	}
+	if s.ln != nil && s.port == port && s.serve == serve && s.controlling == control {
+		s.mu.Unlock()
+		return nil
+	}
 	if s.ln != nil && s.port == port {
+		// The same listener, with the other switch: nothing to reopen.
+		s.serve, s.controlling = serve, control
+		s.watchLocked()
+		s.status = Status{On: true, Addr: s.ln.Addr().String(), Serving: serve, Control: control}
 		s.mu.Unlock()
 		return nil
 	}
@@ -140,12 +168,48 @@ func (s *Server) Apply(on bool, port int) error {
 		return errors.New(s.status.Err)
 	}
 	s.ln, s.port = ln, port
+	s.serve, s.controlling = serve, control
 	s.done = make(chan struct{})
-	s.srv = &http.Server{Handler: s.mux(), ReadHeaderTimeout: 10 * time.Second}
-	s.status = Status{On: true, Addr: ln.Addr().String()}
+	s.ctlDone = nil
+	s.watchLocked()
+	s.srv = &http.Server{Handler: s.mux(), ReadHeaderTimeout: 2 * time.Second}
+	s.status = Status{On: true, Addr: ln.Addr().String(), Serving: serve, Control: control}
 	go s.srv.Serve(ln)
 	s.mu.Unlock()
 	return nil
+}
+
+// watchLocked starts or ends the watch of the player that control keeps,
+// as control comes and goes. s.mu is held.
+func (s *Server) watchLocked() {
+	if s.controlling {
+		s.ctlDone = make(chan struct{})
+		s.pace = pace{}
+		if s.watchStop == nil && s.Control != nil {
+			s.watchStop = s.Control.Watch(s.wake)
+		}
+		return
+	}
+	if s.ctlDone != nil {
+		close(s.ctlDone)
+		s.ctlDone = nil
+	}
+	if s.watchStop != nil {
+		s.watchStop()
+		s.watchStop = nil
+	}
+}
+
+// wake tells the clients of the streams that what they read changed.
+func (s *Server) wake() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for sub := range s.subs {
+		select {
+		case sub.wake <- struct{}{}:
+		default: // it will read the latest when it wakes
+		}
+	}
 }
 
 // listenProblem says why port can't be used.
@@ -158,6 +222,8 @@ func (s *Server) stopLocked() {
 	if s.ln == nil {
 		return
 	}
+	s.controlling = false
+	s.watchLocked()
 	close(s.done)
 	_ = s.srv.Close()
 	s.ln, s.srv = nil, nil
@@ -203,6 +269,12 @@ func (s *Server) Update(next Info) {
 		return
 	}
 	s.info, s.at = next, now
+	s.wakeLocked()
+}
+
+// wakeLocked tells the clients of the streams that what they read
+// changed. s.mu is held.
+func (s *Server) wakeLocked() {
 	for sub := range s.subs {
 		select {
 		case sub.wake <- struct{}{}:
@@ -265,22 +337,37 @@ func (s *Server) snapshot(host string) payload {
 	return p
 }
 
-// mux has the routes, which only read.
+// mux has the routes: the reads, and the commands of /control.
 func (s *Server) mux() http.Handler {
 	m := http.NewServeMux()
 	m.HandleFunc("/now-playing", s.nowPlaying)
 	m.HandleFunc("/cover", s.coverImage)
 	m.HandleFunc("/events", s.events)
 	m.HandleFunc("/overlay", s.page)
+	m.HandleFunc("/control/state", s.controlStateRoute)
+	m.HandleFunc("/control/events", s.controlEvents)
+	m.HandleFunc("/control/", s.controlCommand)
 	return s.guard(m)
 }
 
-// guard lets only reads through, and only to the names of this computer: a
-// web page can't reach the server through a name of its own that points
-// at 127.0.0.1.
+// guard lets through only what may come: the names of this computer, so
+// that a web page can't reach the server through a name of its own that
+// points at 127.0.0.1; the reads alone while nothing asks for control; and
+// on /control, the token and the pace.
 func (s *Server) guard(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !localHost(r.Host) {
+			http.Error(w, "not found", http.StatusNotFound)
+			return
+		}
+		if strings.HasPrefix(r.URL.Path, "/control/") {
+			if !s.controlGuard(w, r) {
+				return
+			}
+			next.ServeHTTP(w, r)
+			return
+		}
+		if !s.serving() {
 			http.Error(w, "not found", http.StatusNotFound)
 			return
 		}

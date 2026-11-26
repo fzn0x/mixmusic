@@ -2789,6 +2789,82 @@
     }
   },
   "controlNotRunning": "MixMusic isn't running",
+  "controlAbout": "Lets the programs on this computer control what plays: a script, a Stream Deck key, or an overlay of your own. They send a token that only you can read, kept in control.json beside the port. It listens on this computer only.",
+  "@controlAbout": {
+    "description": "What the switch of Settings › Desktop › Programs on this computer does, under its title."
+  },
+  "controlAddressNote": ". A program sends its token here: /control/state reads what plays, and /control/events streams each change.",
+  "@controlAddressNote": {
+    "description": "What follows the control address of Settings › Desktop, which the programs send their token to."
+  },
+  "controlAddressTitle": "Control address",
+  "@controlAddressTitle": {
+    "description": "The address and the routes of the programs' control, in Settings › Desktop."
+  },
+  "controlCopyCurl": "Copy a curl example",
+  "@controlCopyCurl": {
+    "description": "The button that copies a curl command that sends a token to MixMusic."
+  },
+  "controlCopyPowerShell": "Copy a PowerShell example",
+  "@controlCopyPowerShell": {
+    "description": "The button that copies a PowerShell command that sends a token to MixMusic."
+  },
+  "controlLabel": "Let programs on this computer control MixMusic",
+  "@controlLabel": {
+    "description": "The switch of Settings › Desktop that lets the programs on this computer control what plays."
+  },
+  "controlTitle": "Programs on this computer",
+  "@controlTitle": {
+    "description": "The title of Settings › Desktop › Programs on this computer."
+  },
+  "controlTokenDescription": "A script sends it as the Authorization header, as Bearer followed by the token. A new token cuts off the programs that had the old one at once; the server stays on.",
+  "@controlTokenDescription": {
+    "description": "What the token of the programs' control is, and what a new one does."
+  },
+  "controlTokenNew": "new token",
+  "@controlTokenNew": {
+    "description": "The button that makes another token for the programs' control."
+  },
+  "controlTokenTitle": "Token",
+  "@controlTokenTitle": {
+    "description": "The row of Settings › Desktop that shows the token of the programs' control."
+  },
+  "controlToastDisliked": "A program on this computer disliked {what}",
+  "@controlToastDisliked": {
+    "description": "The toast when a program on this computer disliked the track that plays. {what} is the track's title and artists.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "controlToastLiked": "A program on this computer liked {what}",
+  "@controlToastLiked": {
+    "description": "The toast when a program on this computer liked the track that plays. {what} is the track's title and artists.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "controlToastUndisliked": "A program on this computer took back its dislike of {what}",
+  "@controlToastUndisliked": {
+    "description": "The toast when a program on this computer took back its dislike of the track that plays. {what} is the track's title and artists.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "controlToastUnliked": "A program on this computer took back its like of {what}",
+  "@controlToastUnliked": {
+    "description": "The toast when a program on this computer took back its like of the track that plays. {what} is the track's title and artists.",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
   "copiesAbout": "Copies of one song show once, and play the best: lossless before lossy, then the higher bitrate and sample rate. What you play, like and mix of them follows the song, and stays when a copy goes.",
   "copiesAboutBitrate": "about {bitrate, number, ::group-off} kbit/s",
   "@copiesAboutBitrate": {
@@ -8143,7 +8219,7 @@
   "@outputNoOutputs": {
     "description": "In the menu of output devices, where the system has none MixMusic can play on."
   },
-  "overlayAbout": "Tells what plays, as a page for the browser source of OBS or another streaming program, and as data for an overlay of your own. It listens on this computer only, and takes no commands.",
+  "overlayAbout": "Tells what plays, as a page for the browser source of OBS or another streaming program, and as data for an overlay of your own. It listens on this computer only.",
   "overlayAddressProblem": "{error} Choose another port above.",
   "@overlayAddressProblem": {
     "placeholders": {

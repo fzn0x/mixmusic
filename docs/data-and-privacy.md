@@ -90,6 +90,10 @@ AppImage or archive copy's.
   Disconnecting deletes both.
 - `librefm-queue.json`: the same for Libre.fm, or another GNU FM server.
   Disconnecting deletes it.
+- `control.json`: the token and the port of
+  [the programs that control MixMusic](control-api.md), which only you may
+  read. [A backup](data-and-privacy.md#backups) leaves it out, so that a
+  token never travels in one.
 - `updater.json`: your choices of updates.
 - `window-state.json`: the size and place of the window and of the mini
   player, and whether the window was maximized or full screen, so that

@@ -344,6 +344,7 @@ How MixMusic sits in your system.
 - **[mixmusic:// links](desktop.md#mixmusic-links).** Opens a page of MixMusic, a search or a track from a browser or another app. *A mixmusic:// link* · since 0.1.0
 - **[Now playing for overlays](stream-overlay.md#show-it-in-obs).** Serves what plays to a stream overlay, as a card with the cover, title and progress bar for an OBS browser source. *Settings › Desktop › Now playing for overlays* · since 0.5.11
 - **[Overlay data for your own page](stream-overlay.md#make-your-own-overlay).** Tells what plays as JSON, the cover and Server-Sent Events on this computer, for an overlay of your own. *Settings › Desktop › Now playing for overlays* · since 0.5.11
+- **[Control from another program](control-api.md).** Plays, pauses, skips, seeks, sets the volume, shuffles, repeats, likes and plays a track of the queue from a Stream Deck plugin, a macro or a script, over HTTP on `127.0.0.1`, each request with a token, and streams the whole state as it changes. *Settings › Desktop › Programs on this computer* · since 0.5.14
 - **[Windows proxy](streams.md#proxies).** Connects through the proxy set in Windows' settings, as browsers do, and follows it as VPN and proxy apps turn it on and off. *Built in* · Windows only · since 0.5.9
 
 ## Look and feel

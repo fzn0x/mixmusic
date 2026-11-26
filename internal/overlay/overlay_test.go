@@ -27,7 +27,7 @@ func start(t *testing.T) (*Server, string) {
 		return nil, errors.New("no such cover")
 	}
 	t.Cleanup(s.Close)
-	if err := s.Apply(true, 0); err != nil {
+	if err := s.Apply(true, false, 0); err != nil {
 		t.Fatal(err)
 	}
 	st := s.Status()
@@ -355,7 +355,7 @@ func TestPortInUse(t *testing.T) {
 	port := held.Addr().(*net.TCPAddr).Port
 	s := New()
 	defer s.Close()
-	if err := s.Apply(true, port); err == nil {
+	if err := s.Apply(true, false, port); err == nil {
 		t.Fatal("a port in use was taken")
 	}
 	if st := s.Status(); st.On || !strings.Contains(st.Err, "can't be used") {
@@ -363,7 +363,7 @@ func TestPortInUse(t *testing.T) {
 	}
 	// Once the port is free, Apply takes it.
 	held.Close()
-	if err := s.Apply(true, port); err != nil {
+	if err := s.Apply(true, false, port); err != nil {
 		t.Fatalf("the port went free, and %v", err)
 	}
 	if st := s.Status(); !st.On || st.Err != "" {
@@ -376,7 +376,7 @@ func TestOffOnAndPortChange(t *testing.T) {
 	s.Update(song)
 	addr := strings.TrimPrefix(base, "http://")
 	// Applying the same again changes nothing.
-	if err := s.Apply(true, 0); err != nil {
+	if err := s.Apply(true, false, 0); err != nil {
 		t.Fatal(err)
 	}
 	if s.Status().Addr != addr {
@@ -386,7 +386,7 @@ func TestOffOnAndPortChange(t *testing.T) {
 	defer stop()
 	next(t, ch)
 	// Off: nothing listens, and the stream ends.
-	if err := s.Apply(false, 0); err != nil {
+	if err := s.Apply(false, false, 0); err != nil {
 		t.Fatal(err)
 	}
 	if s.Status().On {
@@ -397,7 +397,7 @@ func TestOffOnAndPortChange(t *testing.T) {
 	}
 	until(t, "the stream to end", func() bool { return s.Streams() == 0 })
 	// On again: it knows what plays.
-	if err := s.Apply(true, 0); err != nil {
+	if err := s.Apply(true, false, 0); err != nil {
 		t.Fatal(err)
 	}
 	base = "http://" + s.Status().Addr
@@ -413,7 +413,7 @@ func TestOffOnAndPortChange(t *testing.T) {
 	}
 	p := other.Addr().(*net.TCPAddr).Port
 	other.Close()
-	if err := s.Apply(true, p); err != nil {
+	if err := s.Apply(true, false, p); err != nil {
 		t.Fatal(err)
 	}
 	if got := s.Status().Addr; got != net.JoinHostPort("127.0.0.1", strconv.Itoa(p)) {
@@ -435,7 +435,7 @@ func TestListensOnLoopbackOnly(t *testing.T) {
 		return net.Listen(network, "127.0.0.1:0")
 	}
 	defer s.Close()
-	if err := s.Apply(true, 8284); err != nil {
+	if err := s.Apply(true, false, 8284); err != nil {
 		t.Fatal(err)
 	}
 	if asked != "127.0.0.1:8284" {

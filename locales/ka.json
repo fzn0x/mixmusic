@@ -2157,6 +2157,7 @@
   "playerLooking": "მოწყობილობების ძიება…",
   "playerMiniPlayer": "მინი-ფლეერის გახსნა",
   "playerNext": "შემდეგი",
+  "playerNextEpisodeUnread": "ავტოდაკვრა შეწყდა: პოდკასტის შემდეგი ეპიზოდის წაკითხვა ვერ მოხერხდა. {error}",
   "playerNoDevices": "გახსენით Spotify მოწყობილობაზე, რომ აქ ნახოთ",
   "playerNoEngine": "MixMusic-ის აუდიოძრავა ამ სისტემაზე ხელმისაწვდომი არ არის",
   "playerNoHighlight": "ამ ტრეკს კულმინაცია არ აქვს",

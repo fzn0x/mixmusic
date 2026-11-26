@@ -2156,6 +2156,7 @@
   "playerLooking": "ડિવાઇસ શોધી રહ્યાં છીએ…",
   "playerMiniPlayer": "મિની પ્લેયર ખોલો",
   "playerNext": "આગલું",
+  "playerNextEpisodeUnread": "ઑટોપ્લે બંધ થયું: પૉડકાસ્ટનો આગલો એપિસોડ વાંચી શકાયો નહીં. {error}",
   "playerNoDevices": "ડિવાઇસ અહીં જોવા માટે તેના પર Spotify ખોલો",
   "playerNoEngine": "MixMusic નું ઑડિયો એન્જિન આ સિસ્ટમ પર ઉપલબ્ધ નથી",
   "playerNoHighlight": "આ ગીતમાં કોઈ હાઇલાઇટ નથી",

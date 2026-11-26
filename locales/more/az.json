@@ -2156,6 +2156,7 @@
   "playerLooking": "Cihazlar axtarılır…",
   "playerMiniPlayer": "Mini pleyeri aç",
   "playerNext": "Sonrakı",
+  "playerNextEpisodeUnread": "Avtomatik oxutma dayandı: podkastın növbəti epizodu oxuna bilmədi. {error}",
   "playerNoDevices": "Cihazın burada görünməsi üçün onda Spotify'ı açın",
   "playerNoEngine": "MixMusic'in səs mühərriki bu sistemdə əlçatan deyil",
   "playerNoHighlight": "Bu mahnının vurğusu yoxdur",

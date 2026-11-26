@@ -2156,6 +2156,7 @@
   "playerLooking": "መሣሪያዎችን በመፈለግ ላይ…",
   "playerMiniPlayer": "ሚኒ ማጫወቻውን ክፈት",
   "playerNext": "ቀጣይ",
+  "playerNextEpisodeUnread": "ራስ-አጫውት ቆሟል፦ የፖድካስቱ ቀጣይ ኢፒሶድ ሊነበብ አልቻለም። {error}",
   "playerNoDevices": "እዚህ ለማየት በመሣሪያ ላይ Spotify ን ይክፈቱ",
   "playerNoEngine": "የMixMusic የድምፅ ሞተር በዚህ ሲስተም ላይ አይገኝም",
   "playerNoHighlight": "ይህ ትራክ ዋና ክፍል የለውም",

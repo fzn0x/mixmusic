@@ -2157,6 +2157,7 @@
   "playerLooking": "Hľadajú sa zariadenia…",
   "playerMiniPlayer": "Otvoriť miniprehrávač",
   "playerNext": "Ďalšia",
+  "playerNextEpisodeUnread": "Automatické prehrávanie sa zastavilo: ďalšiu epizódu podcastu sa nepodarilo načítať. {error}",
   "playerNoDevices": "Otvorte Spotify na zariadení, aby sa tu zobrazilo",
   "playerNoEngine": "zvukový nástroj MixMusic nie je v tomto systéme dostupný",
   "playerNoHighlight": "Táto skladba nemá zvýraznenie",

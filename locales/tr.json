@@ -2157,6 +2157,7 @@
   "playerLooking": "Cihazlar aranıyor…",
   "playerMiniPlayer": "Mini oynatıcıyı aç",
   "playerNext": "Sonraki",
+  "playerNextEpisodeUnread": "Otomatik oynatma durdu: podcast'in sonraki bölümü okunamadı. {error}",
   "playerNoDevices": "Burada görmek için bir cihazda Spotify'ı açın",
   "playerNoEngine": "MixMusic'in ses motoru bu sistemde kullanılamıyor",
   "playerNoHighlight": "Bu parçanın vurgusu yok",

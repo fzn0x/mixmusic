@@ -2157,6 +2157,7 @@
   "playerLooking": "Leder efter enheder…",
   "playerMiniPlayer": "Åbn miniafspilleren",
   "playerNext": "Næste",
+  "playerNextEpisodeUnread": "Automatisk afspilning stoppede: podcastens næste afsnit kunne ikke læses. {error}",
   "playerNoDevices": "Åbn Spotify på en enhed for at se den her",
   "playerNoEngine": "MixMusics lydmotor er ikke tilgængelig på dette system",
   "playerNoHighlight": "Dette nummer har ingen fremhævelse",

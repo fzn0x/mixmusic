@@ -2157,6 +2157,7 @@
   "playerLooking": "デバイスを探しています…",
   "playerMiniPlayer": "ミニプレーヤーを開く",
   "playerNext": "次へ",
+  "playerNextEpisodeUnread": "自動再生を停止しました: ポッドキャストの次のエピソードを読み込めませんでした。{error}",
   "playerNoDevices": "デバイスでSpotifyを開くと、ここに表示されます",
   "playerNoEngine": "このシステムではMixMusicのオーディオエンジンを利用できません",
   "playerNoHighlight": "この曲にはハイライトがありません",

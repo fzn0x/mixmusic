@@ -2157,6 +2157,7 @@
   "playerLooking": "Ricerca dei dispositivi…",
   "playerMiniPlayer": "Apri il mini player",
   "playerNext": "Successivo",
+  "playerNextEpisodeUnread": "Riproduzione automatica interrotta: impossibile leggere l’episodio successivo del podcast. {error}",
   "playerNoDevices": "Apri Spotify su un dispositivo per vederlo qui",
   "playerNoEngine": "il motore audio di MixMusic non è disponibile su questo sistema",
   "playerNoHighlight": "Questo brano non ha un passaggio evidenziato",

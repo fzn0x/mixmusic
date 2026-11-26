@@ -2157,6 +2157,7 @@
   "playerLooking": "Се бараат уреди…",
   "playerMiniPlayer": "Отвори го мини плеерот",
   "playerNext": "Следна",
+  "playerNextEpisodeUnread": "Автоматското пуштање запре: следната епизода од подкастот не можеше да се прочита. {error}",
   "playerNoDevices": "Отворете го Spotify на уред за да се прикаже овде",
   "playerNoEngine": "Аудио-моторот на MixMusic не е достапен на овој систем",
   "playerNoHighlight": "Оваа песна нема означен најдобар дел",

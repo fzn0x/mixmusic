@@ -2157,6 +2157,7 @@
   "playerLooking": "Po kërkohen pajisje…",
   "playerMiniPlayer": "Hap luajtësin e vogël",
   "playerNext": "Tjetra",
+  "playerNextEpisodeUnread": "Luajtja automatike u ndal: episodi i radhës i podkastit nuk u lexua dot. {error}",
   "playerNoDevices": "Hapni Spotify në një pajisje për ta parë këtu",
   "playerNoEngine": "Motori i audios së MixMusic nuk është i disponueshëm në këtë sistem",
   "playerNoHighlight": "Kjo këngë nuk ka pjesë kryesore",

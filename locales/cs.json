@@ -2157,6 +2157,7 @@
   "playerLooking": "Hledání zařízení…",
   "playerMiniPlayer": "Otevřít mini přehrávač",
   "playerNext": "Další",
+  "playerNextEpisodeUnread": "Automatické přehrávání se zastavilo: další epizodu podcastu se nepodařilo načíst. {error}",
   "playerNoDevices": "Otevřete Spotify na zařízení, aby se tu zobrazilo",
   "playerNoEngine": "zvukové jádro MixMusic není v tomto systému dostupné",
   "playerNoHighlight": "Tato skladba nemá nejlepší moment",

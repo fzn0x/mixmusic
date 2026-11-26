@@ -2157,6 +2157,7 @@
   "playerLooking": "Geräte werden gesucht…",
   "playerMiniPlayer": "Mini-Player öffnen",
   "playerNext": "Weiter",
+  "playerNextEpisodeUnread": "Autoplay beendet: Die nächste Folge des Podcasts konnte nicht gelesen werden. {error}",
   "playerNoDevices": "Öffne Spotify auf einem Gerät, um es hier zu sehen",
   "playerNoEngine": "Die Audio-Engine von MixMusic ist auf diesem System nicht verfügbar",
   "playerNoHighlight": "Dieser Titel hat keinen Höhepunkt",

@@ -2157,6 +2157,7 @@
   "playerLooking": "Zoeken naar apparaten…",
   "playerMiniPlayer": "De miniplayer openen",
   "playerNext": "Volgende",
+  "playerNextEpisodeUnread": "Automatisch afspelen gestopt: de volgende aflevering van de podcast kon niet worden gelezen. {error}",
   "playerNoDevices": "Open Spotify op een apparaat om het hier te zien",
   "playerNoEngine": "De audio-engine van MixMusic is niet beschikbaar op dit systeem",
   "playerNoHighlight": "Dit nummer heeft geen hoogtepunt",

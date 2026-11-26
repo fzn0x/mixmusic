@@ -2157,6 +2157,7 @@
   "playerLooking": "Otsin seadmeid…",
   "playerMiniPlayer": "Ava minipleier",
   "playerNext": "Järgmine",
+  "playerNextEpisodeUnread": "Automaatesitus peatus: podcasti järgmist episoodi ei õnnestunud lugeda. {error}",
   "playerNoDevices": "Ava Spotify mõnes seadmes, et see siin ilmuks",
   "playerNoEngine": "MixMusicu helimootor pole selles süsteemis saadaval",
   "playerNoHighlight": "Sellel lool pole esiletõstetud kohta",

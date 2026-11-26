@@ -2157,6 +2157,7 @@
   "playerLooking": "Szukanie urządzeń…",
   "playerMiniPlayer": "Otwórz mini odtwarzacz",
   "playerNext": "Następny",
+  "playerNextEpisodeUnread": "Autoodtwarzanie zatrzymane: nie udało się odczytać następnego odcinka podcastu. {error}",
   "playerNoDevices": "Otwórz Spotify na urządzeniu, aby je tu zobaczyć",
   "playerNoEngine": "silnik audio MixMusic nie jest dostępny w tym systemie",
   "playerNoHighlight": "Ten utwór nie ma wyróżnionej części",

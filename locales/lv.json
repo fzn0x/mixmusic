@@ -2157,6 +2157,7 @@
   "playerLooking": "Meklē ierīces…",
   "playerMiniPlayer": "Atvērt mini atskaņotāju",
   "playerNext": "Nākamā",
+  "playerNextEpisodeUnread": "Automātiskā atskaņošana apturēta: aplādes nākamo epizodi neizdevās nolasīt. {error}",
   "playerNoDevices": "Atver Spotify ierīcē, lai to redzētu šeit",
   "playerNoEngine": "MixMusic audio dzinējs šajā sistēmā nav pieejams",
   "playerNoHighlight": "Šai dziesmai nav izceltā fragmenta",

@@ -2157,6 +2157,7 @@
   "playerLooking": "Söker efter enheter…",
   "playerMiniPlayer": "Öppna minispelaren",
   "playerNext": "Nästa",
+  "playerNextEpisodeUnread": "Autouppspelningen stoppades: poddens nästa avsnitt kunde inte läsas in. {error}",
   "playerNoDevices": "Öppna Spotify på en enhet för att se den här",
   "playerNoEngine": "MixMusics ljudmotor är inte tillgänglig på det här systemet",
   "playerNoHighlight": "Den här låten har ingen höjdpunkt",

@@ -2157,6 +2157,7 @@
   "playerLooking": "מחפש התקנים…",
   "playerMiniPlayer": "פתיחת הנגן המיני",
   "playerNext": "הבא",
+  "playerNextEpisodeUnread": "ההשמעה האוטומטית נעצרה: לא ניתן לקרוא את הפרק הבא של הפודקאסט. {error}",
   "playerNoDevices": "יש לפתוח את Spotify בהתקן כדי לראות אותו כאן",
   "playerNoEngine": "מנוע השמע של MixMusic לא זמין במערכת הזו",
   "playerNoHighlight": "לרצועה הזו אין קטע נבחר",

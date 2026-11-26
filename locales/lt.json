@@ -2157,6 +2157,7 @@
   "playerLooking": "Ieškoma įrenginių…",
   "playerMiniPlayer": "Atidaryti mini grotuvą",
   "playerNext": "Kitas",
+  "playerNextEpisodeUnread": "Automatinis grojimas sustabdytas: nepavyko nuskaityti kito tinklalaidės epizodo. {error}",
   "playerNoDevices": "Atidarykite Spotify įrenginyje, kad jį matytumėte čia",
   "playerNoEngine": "MixMusic garso variklis šioje sistemoje nepasiekiamas",
   "playerNoHighlight": "Šis takelis neturi akcento",

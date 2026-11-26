@@ -2157,6 +2157,7 @@
   "playerLooking": "기기를 찾는 중…",
   "playerMiniPlayer": "미니 플레이어 열기",
   "playerNext": "다음",
+  "playerNextEpisodeUnread": "자동 재생이 중지되었습니다: 팟캐스트의 다음 에피소드를 읽을 수 없습니다. {error}",
   "playerNoDevices": "기기에서 Spotify를 열면 여기에 표시됩니다",
   "playerNoEngine": "이 시스템에서는 MixMusic의 오디오 엔진을 사용할 수 없습니다",
   "playerNoHighlight": "이 곡에는 하이라이트가 없습니다",

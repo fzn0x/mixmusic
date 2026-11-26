@@ -2156,6 +2156,7 @@
   "playerLooking": "កំពុងរកឧបករណ៍…",
   "playerMiniPlayer": "បើកកម្មវិធីចាក់តូច",
   "playerNext": "បន្ទាប់",
+  "playerNextEpisodeUnread": "ការចាក់ស្វ័យប្រវត្តិបានឈប់៖ មិនអាចអានវគ្គបន្ទាប់របស់ផតខាសបានទេ។ {error}",
   "playerNoDevices": "បើក Spotify នៅលើឧបករណ៍មួយដើម្បីមើលវានៅទីនេះ",
   "playerNoEngine": "ម៉ាស៊ីនសំឡេងរបស់ MixMusic មិនមាននៅលើប្រព័ន្ធនេះទេ",
   "playerNoHighlight": "បទនេះគ្មានផ្នែកលេចធ្លោទេ",

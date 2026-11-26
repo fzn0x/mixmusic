@@ -2156,6 +2156,7 @@
   "playerLooking": "डिभाइसहरू खोजिँदैछ…",
   "playerMiniPlayer": "मिनी प्लेयर खोल्नुहोस्",
   "playerNext": "अर्को",
+  "playerNextEpisodeUnread": "अटोप्ले रोकियो: पडकास्टको अर्को एपिसोड पढ्न सकिएन। {error}",
   "playerNoDevices": "डिभाइसलाई यहाँ हेर्न त्यसमा Spotify खोल्नुहोस्",
   "playerNoEngine": "MixMusic को अडियो इन्जिन यो प्रणालीमा उपलब्ध छैन",
   "playerNoHighlight": "यो ट्र्याकमा कुनै हाइलाइट छैन",

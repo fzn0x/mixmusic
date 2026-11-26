@@ -2157,6 +2157,7 @@
   "playerLooking": "Cercant dispositius…",
   "playerMiniPlayer": "Obre el minireproductor",
   "playerNext": "Següent",
+  "playerNextEpisodeUnread": "La reproducció automàtica s’ha aturat: no s’ha pogut llegir el següent episodi del pòdcast. {error}",
   "playerNoDevices": "Obre Spotify en un dispositiu per veure’l aquí",
   "playerNoEngine": "el motor d’àudio de MixMusic no està disponible en aquest sistema",
   "playerNoHighlight": "Aquesta cançó no té cap fragment destacat",

@@ -2157,6 +2157,7 @@
   "playerLooking": "Se caută dispozitive…",
   "playerMiniPlayer": "Deschide mini playerul",
   "playerNext": "Următoarea",
+  "playerNextEpisodeUnread": "Redarea automată s-a oprit: următorul episod al podcastului nu a putut fi citit. {error}",
   "playerNoDevices": "Deschide Spotify pe un dispozitiv ca să apară aici",
   "playerNoEngine": "Motorul audio al MixMusic nu este disponibil pe acest sistem",
   "playerNoHighlight": "Această piesă nu are un moment culminant",

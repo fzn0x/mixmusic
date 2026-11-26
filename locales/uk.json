@@ -2157,6 +2157,7 @@
   "playerLooking": "Пошук пристроїв…",
   "playerMiniPlayer": "Відкрити міні-плеєр",
   "playerNext": "Наступний",
+  "playerNextEpisodeUnread": "Автовідтворення зупинено: не вдалося прочитати наступний епізод подкасту. {error}",
   "playerNoDevices": "Відкрийте Spotify на пристрої, щоб побачити його тут",
   "playerNoEngine": "Звуковий рушій MixMusic недоступний у цій системі",
   "playerNoHighlight": "Цей трек не має найкращого моменту",

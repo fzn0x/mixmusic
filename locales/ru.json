@@ -2157,6 +2157,7 @@
   "playerLooking": "Поиск устройств…",
   "playerMiniPlayer": "Открыть мини-плеер",
   "playerNext": "Далее",
+  "playerNextEpisodeUnread": "Автовоспроизведение остановлено: не удалось прочитать следующий выпуск подкаста. {error}",
   "playerNoDevices": "Откройте Spotify на устройстве, чтобы увидеть его здесь",
   "playerNoEngine": "Звуковой движок MixMusic недоступен в этой системе",
   "playerNoHighlight": "У этого трека нет главного момента",

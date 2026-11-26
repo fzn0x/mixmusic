@@ -2156,6 +2156,7 @@
   "playerLooking": "Ana neman naʼurori…",
   "playerMiniPlayer": "Buɗe ƙaramin mai kunnawa",
   "playerNext": "Na gaba",
+  "playerNextEpisodeUnread": "Kunnawa ta atomatik ta tsaya: ba a iya karanta kashi na gaba na podcast ɗin ba. {error}",
   "playerNoDevices": "Buɗe Spotify a naʼura don ganinta a nan",
   "playerNoEngine": "Injin sauti na MixMusic ba ya samuwa a wannan tsarin",
   "playerNoHighlight": "Wannan waƙa ba ta da ɓangaren da ya fi daɗi",

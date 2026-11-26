@@ -2157,6 +2157,7 @@
   "playerLooking": "Սարքերը փնտրվում են…",
   "playerMiniPlayer": "Բացել մինի նվագարկիչը",
   "playerNext": "Հաջորդը",
+  "playerNextEpisodeUnread": "Ավտոնվագարկումը դադարեց. փոդքասթի հաջորդ դրվագը հնարավոր չեղավ կարդալ։ {error}",
   "playerNoDevices": "Բացեք Spotify-ը սարքի վրա՝ այն այստեղ տեսնելու համար",
   "playerNoEngine": "MixMusic-ի ձայնային շարժիչը հասանելի չէ այս համակարգում",
   "playerNoHighlight": "Այս երգը գագաթնակետ չունի",

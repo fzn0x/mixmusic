@@ -2159,6 +2159,7 @@
   "playerLooking": "正在查找设备…",
   "playerMiniPlayer": "打开迷你播放器",
   "playerNext": "下一首",
+  "playerNextEpisodeUnread": "自动播放已停止：无法读取该播客的下一集。{error}",
   "playerNoDevices": "在设备上打开 Spotify，即可在此看到它",
   "playerNoEngine": "MixMusic 的音频引擎在此系统上不可用",
   "playerNoHighlight": "这首歌曲没有精彩片段",

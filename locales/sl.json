@@ -2157,6 +2157,7 @@
   "playerLooking": "Iskanje naprav …",
   "playerMiniPlayer": "Odpri mini predvajalnik",
   "playerNext": "Naprej",
+  "playerNextEpisodeUnread": "Samodejno predvajanje se je ustavilo: naslednje epizode podkasta ni bilo mogoče prebrati. {error}",
   "playerNoDevices": "Odprite Spotify v napravi, da se prikaže tukaj",
   "playerNoEngine": "zvočni pogon MixMusic v tem sistemu ni na voljo",
   "playerNoHighlight": "Ta skladba nima poudarka",

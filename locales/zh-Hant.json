@@ -2157,6 +2157,7 @@
   "playerLooking": "正在尋找裝置…",
   "playerMiniPlayer": "開啟迷你播放器",
   "playerNext": "下一首",
+  "playerNextEpisodeUnread": "自動播放已停止：無法讀取這個 Podcast 的下一集。{error}",
   "playerNoDevices": "在裝置上開啟 Spotify，它就會顯示在這裡",
   "playerNoEngine": "這個系統上無法使用 MixMusic 的音訊引擎",
   "playerNoHighlight": "這首曲目沒有精華片段",

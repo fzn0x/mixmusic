@@ -2157,6 +2157,7 @@
   "playerLooking": "Mencari peranti…",
   "playerMiniPlayer": "Buka pemain mini",
   "playerNext": "Seterusnya",
+  "playerNextEpisodeUnread": "Main automatik berhenti: episod seterusnya bagi podcast ini tidak dapat dibaca. {error}",
   "playerNoDevices": "Buka Spotify pada peranti untuk melihatnya di sini",
   "playerNoEngine": "Enjin audio MixMusic tidak tersedia pada sistem ini",
   "playerNoHighlight": "Lagu ini tiada sorotan",

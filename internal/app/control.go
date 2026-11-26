@@ -148,7 +148,11 @@ func (a *App) keepControlFile(s settings.Settings) error {
 	if err != nil {
 		return err
 	}
-	if err := writeControlFile(a.opts.DataDir, controlFile{Port: s.OverlayPort, Token: token}); err != nil {
+	want := controlFile{Port: s.OverlayPort, Token: token}
+	if have, err := readControlFile(a.opts.DataDir); err == nil && have == want {
+		return nil
+	}
+	if err := writeControlFile(a.opts.DataDir, want); err != nil {
 		log.Printf("mixmusic: control: keeping %s: %v", ControlFileName, err)
 		return err
 	}
@@ -306,8 +310,17 @@ func (h controlHost) dislike(p *player.Player, t media.Track, on bool) {
 			}
 		}()
 	}
-	a.dislikeGoPlayer(p, t, on)
-	p.Tell(player.Notice{Message: controlDisliked(t, on)})
+	// The player hears of it at once, and moves on from the track if it
+	// plays, while the settings skip disliked songs.
+	p.Disliked(t.ID, on)
+	go func() {
+		if err := (&Collection{a}).SetDisliked(context.Background(), t, on); err != nil {
+			log.Printf("mixmusic: control: disliking %s: %v", t.ID, err)
+			p.Disliked(t.ID, !on)
+			return
+		}
+		p.Tell(player.Notice{Message: controlDisliked(t, on)})
+	}()
 }
 
 // controlLiked is what the toast of a track liked, or no longer, says.

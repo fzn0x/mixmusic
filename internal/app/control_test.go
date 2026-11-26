@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -75,8 +76,12 @@ func TestControlFileKept(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := st.Mode().Perm(); got != 0o600 {
-		t.Errorf("control.json is readable as %o, want 600", got)
+	// Windows keeps the permissions of a file as access control lists,
+	// which a mode doesn't tell.
+	if runtime.GOOS != "windows" {
+		if got := st.Mode().Perm(); got != 0o600 {
+			t.Errorf("control.json is readable as %o, want 600", got)
+		}
 	}
 	got, err := readControlFile(dir)
 	if err != nil || got.Port != 8284 || got.Token != token {

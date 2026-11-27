@@ -89,8 +89,12 @@ jobs:
       # llms.txt for AI agents (tools/sitefinish).
       - name: Finish the site
         run: nix develop --command go run ./tools/sitefinish
+      # Named for the attempt: a re-run of this job keeps the artifacts of
+      # the attempts before it in the run, and deploy-pages refuses to pick
+      # one of several of the same name, so every re-run would fail.
       - uses: actions/upload-pages-artifact@v5
         with:
+          name: github-pages-${{ github.run_attempt }}
           path: site/public
       # Main may have moved on while the site built.
       - id: still
@@ -99,3 +103,5 @@ jobs:
       - id: deployment
         if: steps.still.outputs.newest == 'true'
         uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}

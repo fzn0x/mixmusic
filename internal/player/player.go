@@ -724,6 +724,17 @@ func (p *Player) Notices(fn func(Notice)) (cancel func()) {
 }
 
 // do runs fn on the player's goroutine, after what came before it.
+func (p *Player) do(fn func()) {
+	p.mu.Lock()
+	if p.closed {
+		p.mu.Unlock()
+		return
+	}
+	p.tasks = append(p.tasks, fn)
+	p.mu.Unlock()
+	p.poke()
+}
+
 // Await returns once the work queued before it has run: for the commands
 // that answer with the state they leave, as the programs that control
 // MixMusic do.
@@ -741,17 +752,6 @@ func (p *Player) Await() {
 	case <-done:
 	case <-p.ctx.Done():
 	}
-}
-
-func (p *Player) do(fn func()) {
-	p.mu.Lock()
-	if p.closed {
-		p.mu.Unlock()
-		return
-	}
-	p.tasks = append(p.tasks, fn)
-	p.mu.Unlock()
-	p.poke()
 }
 
 func (p *Player) poke() {

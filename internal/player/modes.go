@@ -28,5 +28,6 @@ func (p *Player) SetMuted(muted bool) {
 		}
 		p.s.Muted = muted
 		p.apply()
+		p.emit(StateChange)
 	})
 }

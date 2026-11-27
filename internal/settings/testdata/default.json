@@ -173,6 +173,8 @@
   "volumeCurve": "natural",
   "volume": 0.8,
   "cacheSizeMb": 1024,
+  "cacheFolder": "",
+  "cacheWithDownloads": false,
   "movingCoversMb": 256,
   "lyricsTranslateTo": "",
   "downloadsFolder": "",

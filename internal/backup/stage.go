@@ -357,6 +357,7 @@ func settingsHere(dataDir, files string, withSettings, withAddons bool) (bool, e
 // colour file, the output device and the Spotify device, and the plugins
 // switched on.
 func KeepLocal(s, here settings.Settings) settings.Settings {
+	s.CacheFolder, s.CacheWithDownloads = here.CacheFolder, here.CacheWithDownloads
 	s.DownloadsFolder = here.DownloadsFolder
 	s.MusicFolders = slices.Clone(here.MusicFolders)
 	s.BackupFolder = here.BackupFolder

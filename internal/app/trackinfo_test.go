@@ -102,10 +102,10 @@ func TestTrackInfoOfSurround(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.MkdirAll(a.cache.Dir, 0o755); err != nil {
+	if err := os.MkdirAll(a.cache.Folder(), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(a.cache.Dir, stream.SurroundKey(video)+".m4a"), b, 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(a.cache.Folder(), stream.SurroundKey(video)+".m4a"), b, 0o644); err != nil {
 		t.Fatal(err)
 	}
 	surround := streamURL(video) + stream.SurroundSuffix

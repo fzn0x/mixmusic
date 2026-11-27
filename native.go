@@ -415,6 +415,10 @@ type shell struct {
 	movingDownloads     bool
 	moveDone, moveTotal int64
 
+	// cache is what Settings › Playback › Offline cache keeps between
+	// frames (settings_cache.go).
+	cache cacheView
+
 	// podcasts is what the podcasts' pages keep between frames.
 	podcasts podcastPages
 

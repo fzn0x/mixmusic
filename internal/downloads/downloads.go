@@ -61,6 +61,8 @@ type Options struct {
 	Art func(ctx context.Context, url string) ([]byte, error)
 	// Avoid are folders the downloads never move into, as the cache's.
 	Avoid []string
+	// AvoidFunc returns dynamic folders the downloads never move into.
+	AvoidFunc func() []string
 	// Exists is set for a folder the user chose, which Open doesn't make
 	// when it's missing: it waits for it, as for a drive plugged in again.
 	Exists bool
@@ -357,6 +359,45 @@ func (m *Manager) Folder() string {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	return m.dir
+}
+
+// OwnsAudioFile reports whether name (a file inside the downloads audio
+// directory) belongs to an active or completed download and must be
+// protected when the cache shares the same folder.
+func (m *Manager) OwnsAudioFile(name string) bool {
+	if m == nil || name == "" {
+		return false
+	}
+	vid := audioVideoStem(name)
+	if vid == "" {
+		return false
+	}
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.busy[vid] {
+		return true
+	}
+	f, ok := m.idx.Files[vid]
+	if !ok || f == nil {
+		return false
+	}
+	return sameFileName(filepath.Base(filepath.FromSlash(f.Path)), name)
+}
+
+func audioVideoStem(name string) string {
+	for _, ext := range []string{".webm", ".m4a"} {
+		if stem, ok := strings.CutSuffix(name, ext); ok {
+			return stem
+		}
+	}
+	return ""
+}
+
+func sameFileName(a, b string) bool {
+	if os.PathSeparator == '\\' {
+		return strings.EqualFold(a, b)
+	}
+	return a == b
 }
 
 // Watch has fn told, from any goroutine, when what the downloads hold or

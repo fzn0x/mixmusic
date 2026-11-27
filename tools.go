@@ -182,8 +182,7 @@ func ownYTDLPHelp(flatpak bool) string {
 func init() { addSettings("playback", 70, (*shell).cacheSettings) }
 
 // cacheRows are the rows of Settings › Playback › Offline cache that
-// register from their features' files, between the covers kept and the
-// cache's size.
+// register from their features' files, after the covers kept.
 const cacheRows = "playback › Offline cache"
 
 // cacheSettings show what the offline cache holds, and bound it.
@@ -196,7 +195,11 @@ func (s *shell) cacheSettings(c *ui.Context) {
 		kept := locales.CacheSettingsKept()
 		if s.findable(locales.CacheSettingsTracks(), kept) {
 			use := s.svc.System.CacheUsage()
-			s.row(c, locales.CacheSettingsTracks(), locales.CacheSettingsTracksLine(use.Tracks, byteSize(use.Bytes)), func() {
+			line := locales.CacheSettingsTracksLine(use.Tracks, byteSize(use.Bytes))
+			if s.set.CacheWithDownloads {
+				line = locales.CacheSettingsTracksMergedLine(use.Tracks, byteSize(use.Bytes))
+			}
+			s.row(c, locales.CacheSettingsTracks(), line, func() {
 				if s.button(c, "clear-cache", locales.CacheSettingsClear(), false).Label(locales.CacheSettingsClearTracks()).Disabled(use.Tracks == 0).Clicked() {
 					if err := s.svc.System.ClearCache(); err != nil {
 						s.notes = append(s.notes, noticeOf(err))
@@ -225,39 +228,15 @@ func (s *shell) cacheSettings(c *ui.Context) {
 			}
 		})
 		s.settingsOf(c, cacheRows)
-		// The sizes the web interface offered, and one of the user's own.
-		sizes := cacheSizes
-		if !slices.Contains(sizes, s.set.CacheSizeMB) {
-			sizes = append(slices.Clone(cacheSizes), s.set.CacheSizeMB)
-			slices.Sort(sizes)
-		}
-		labels := make([]string, len(sizes))
-		for i, mb := range sizes {
-			labels[i] = cacheSizeLabel(mb)
-		}
-		chosen := cacheSizeLabel(s.set.CacheSizeMB)
-		what := locales.CacheSettingsOff()
-		if s.set.CacheSizeMB > 0 {
-			what = locales.CacheSettingsLimit(chosen)
-		}
-		s.row(c, locales.CacheSettingsSize(), what, func() {
-			if s.selectOf(c.Key("cache-size"), &chosen, labels).Width(160).Label(locales.CacheSettingsSizeLabel()).Changed() {
-				if i := slices.Index(labels, chosen); i >= 0 {
-					s.set.CacheSizeMB = sizes[i]
-					s.save()
-				}
-			}
-		}, "storage disk")
 	})
 	_ = k
 }
 
-// cacheSizes are the sizes the offline cache takes, in MB: 0 turns it off.
-var cacheSizes = []int{0, 512, 1024, 4096, 16384}
-
 // cacheSizeLabel names a size of the cache.
 func cacheSizeLabel(mb int) string {
 	switch {
+	case mb < 0:
+		return locales.CacheSettingsSizeUnlimited()
 	case mb == 0:
 		return locales.CacheSettingsSizeOff()
 	case mb%1024 == 0:

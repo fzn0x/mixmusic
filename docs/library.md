@@ -280,7 +280,9 @@ Apart from downloads, MixMusic keeps the tracks you played, so that they play ag
 
 - **Tracks kept:** how many tracks the cache holds and their size, with Clear. Clearing the cache leaves your downloads.
 - **Covers kept:** the covers you saw, up to 256 MB, which show again without the network, with Clear.
-- **Size:** Off, 512 MB, 1 GB (the default), 4 GB or 16 GB. Off keeps no tracks.
+- **Size:** Off, 512 MB, 1 GB (the default), 4 GB, 16 GB, Unlimited, or Custom (any size from 1 MB to 1 TB). Off keeps no tracks, and Unlimited keeps every track that plays without removing older ones.
 - **Moving covers kept**, once albums' [moving covers](playing-music.md#moving-covers) come: the clips that played, which loop again without the network, with Clear, in a store of their own, so that they never push covers out. Each album's clip is looked for once, and so is an album found to have none. Their **Size** is Off, 64, 128, 256 (the default) or 512 MB, 1, 2, 4 or 8 GB, or Unlimited; Off keeps only the clip that plays.
+- **Folder:** where cached audio lives (`audio` inside MixMusic's cache folder by default), with open, change and, once you moved it, use the default. Moving the cache asks first when tracks are kept.
+- **Merge with downloads:** keeps cached tracks in your downloads folder's `audio` subfolder instead of a folder of its own. The cache follows your downloads folder if it moves, downloading a cached track promotes it in place without downloading or duplicating it, and clearing, trimming or un-merging the cache leaves your downloads untouched.
 
 The cache keeps how loud YouTube measured each track too, for [Even loudness](playing-music.md#even-loudness-volume-levelling-and-the-volume) offline. Live streams aren't kept in it, and a track's 5.1 surround mix is kept beside its stereo audio. [The audio engine](audio-engine.md#the-offline-cache) tells how it fills and empties.

@@ -81,8 +81,15 @@ func (m *Manager) Move(ctx context.Context, dir string, exact bool, progress fun
 		m.mu.Unlock()
 		return "", ErrIntoTheirs
 	}
-	for _, avoid := range m.opts.Avoid {
-		if same(target, avoid) || inside(target, avoid) || inside(avoid, target) {
+	avoid := slices.Clone(m.opts.Avoid)
+	if m.opts.AvoidFunc != nil {
+		avoid = append(avoid, m.opts.AvoidFunc()...)
+	}
+	for _, a := range avoid {
+		if a == "" {
+			continue
+		}
+		if same(target, a) || inside(target, a) || inside(a, target) {
 			m.mu.Unlock()
 			return "", ErrCacheFolder
 		}

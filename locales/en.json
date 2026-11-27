@@ -1388,6 +1388,132 @@
   "@backupUndone": {
     "description": "The notice as MixMusic starts after the last restore was undone."
   },
+  "cacheFolderDialog": "Choose where MixMusic keeps the offline cache",
+  "@cacheFolderDialog": {
+    "description": "The title of the dialog that chooses the offline cache's folder, from Settings › Playback › Offline cache."
+  },
+  "cacheHoldUnreachable": "The folder of the offline cache can't be reached: {folder}",
+  "@cacheHoldUnreachable": {
+    "description": "Why the offline cache cannot save new tracks, in Settings › Playback. {folder} is the folder's path.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheMergeDownloads": "Merge with downloads",
+  "@cacheMergeDownloads": {
+    "description": "The title of the row, and its switch, in Settings › Playback › Offline cache that keeps the cached tracks in the downloads folder."
+  },
+  "cacheMergeDownloadsDesc": "Keep cached tracks in the downloads folder alongside downloads. Downloading a cached track promotes it without re-downloading, and clearing the cache leaves your downloads.",
+  "@cacheMergeDownloadsDesc": {
+    "description": "What the Merge with downloads switch of Settings › Playback › Offline cache does, under its title. A cached track that is downloaded becomes a download where it is."
+  },
+  "cacheMergeQuestion": "Move {count, plural, one {# cached track} other {# cached tracks}}, {size}, into the downloads folder {folder}?",
+  "@cacheMergeQuestion": {
+    "description": "The question before the offline cache moves into the downloads folder, as Merge with downloads goes on. {size} is a size such as 1.2 GB; {folder} is a path.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      },
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheMergedTo": "The offline cache is kept with your downloads in {folder} now",
+  "@cacheMergedTo": {
+    "description": "The toast once the offline cache moved into the downloads folder. {folder} is a path.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheMove": "move",
+  "@cacheMove": {
+    "description": "Confirm button of moving the offline cache. Lowercase."
+  },
+  "cacheMoveCantWrite": "MixMusic can't write to {folder}: {error}",
+  "@cacheMoveCantWrite": {
+    "description": "Why the offline cache didn't move: it goes in the {error} of cacheMoveFailed. {folder} is a path; {error} is the system's own words, often in English.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheMoveConflict": "the offline cache can't share that folder",
+  "@cacheMoveConflict": {
+    "description": "Why the offline cache didn't move: it goes in the {error} of cacheMoveFailed."
+  },
+  "cacheMoveFailed": "couldn't move the offline cache: {error}",
+  "@cacheMoveFailed": {
+    "description": "The toast when the offline cache couldn't move. {error} is one of the cacheMove reasons, or the system's own words.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheMoveIntoTheirs": "the offline cache can't move into a folder of its own",
+  "@cacheMoveIntoTheirs": {
+    "description": "Why the offline cache didn't move: the folder chosen is inside its own. It goes in the {error} of cacheMoveFailed."
+  },
+  "cacheMoveMovingAlready": "the offline cache is moving already",
+  "@cacheMoveMovingAlready": {
+    "description": "Why the offline cache didn't move: it goes in the {error} of cacheMoveFailed."
+  },
+  "cacheMoveQuestion": "Move {count, plural, one {# cached track} other {# cached tracks}}, {size}, to {folder}?",
+  "@cacheMoveQuestion": {
+    "description": "The question before the offline cache moves to another folder. {size} is a size such as 1.2 GB; {folder} is a path.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      },
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheMoveSameFolder": "the offline cache is in that folder already",
+  "@cacheMoveSameFolder": {
+    "description": "Why the offline cache didn't move: it goes in the {error} of cacheMoveFailed."
+  },
+  "cacheMoveTitle": "move offline cache",
+  "@cacheMoveTitle": {
+    "description": "Title of the question before the offline cache moves. Lowercase."
+  },
+  "cacheMovedTo": "The offline cache is in {folder} now",
+  "@cacheMovedTo": {
+    "description": "The toast once the offline cache moved to another folder. {folder} is a path.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheNoFolder": "MixMusic keeps no offline cache here",
+  "@cacheNoFolder": {
+    "description": "Why the offline cache's folder didn't open, as a toast."
+  },
+  "cacheSettingsChange": "change",
+  "@cacheSettingsChange": {
+    "description": "The button of the Folder row of Settings › Playback › Offline cache that chooses another folder. Lowercase."
+  },
+  "cacheSettingsChangeLabel": "Change the folder of the offline cache",
+  "@cacheSettingsChangeLabel": {
+    "description": "What a screen reader says for the change button of the offline cache's folder."
+  },
   "cacheSettingsClear": "clear",
   "cacheSettingsClearCovers": "Clear covers",
   "cacheSettingsClearTracks": "Clear tracks",
@@ -1405,6 +1531,26 @@
       }
     }
   },
+  "cacheSettingsCustomHint": "Type a size in MB, GB, or TB, such as 2500 MB, 2.5 GB, or 1 TB.",
+  "@cacheSettingsCustomHint": {
+    "description": "Under the title of the Custom cache size row, in Settings › Playback › Offline cache: how to type a size."
+  },
+  "cacheSettingsCustomPlaceholder": "e.g. 2.5 GB or 2500 MB",
+  "@cacheSettingsCustomPlaceholder": {
+    "description": "The example in the empty field of a custom size of the offline cache."
+  },
+  "cacheSettingsCustomRange": "Enter a cache size between 1 MB and 1 TB",
+  "@cacheSettingsCustomRange": {
+    "description": "The toast when a typed size of the offline cache isn't a size, or is out of range."
+  },
+  "cacheSettingsCustomTitle": "Custom cache size",
+  "@cacheSettingsCustomTitle": {
+    "description": "The title of the row, and the label of its field, where a custom size of the offline cache is typed, in Settings › Playback."
+  },
+  "cacheSettingsFolder": "Folder",
+  "@cacheSettingsFolder": {
+    "description": "The row of Settings › Playback › Offline cache that shows the cache's folder."
+  },
   "cacheSettingsGroup": "Offline cache",
   "cacheSettingsKept": "Tracks you played play again without the network. Downloads are kept apart, and clearing the cache leaves them.",
   "cacheSettingsLimit": "{size} at most.",
@@ -1415,10 +1561,43 @@
       }
     }
   },
+  "cacheSettingsMoving": "Moving the offline cache",
+  "@cacheSettingsMoving": {
+    "description": "What a screen reader says for the progress bar while the offline cache moves."
+  },
+  "cacheSettingsMovingNow": "moving…",
+  "@cacheSettingsMovingNow": {
+    "description": "Beside the progress bar while the offline cache moves. Lowercase."
+  },
   "cacheSettingsOff": "Off: MixMusic keeps no tracks.",
+  "cacheSettingsOpen": "open",
+  "@cacheSettingsOpen": {
+    "description": "The button of the Folder row of Settings › Playback › Offline cache that opens the folder. Lowercase."
+  },
+  "cacheSettingsOpenLabel": "Open the folder of the offline cache",
+  "@cacheSettingsOpenLabel": {
+    "description": "What a screen reader says for the open button of the offline cache's folder."
+  },
+  "cacheSettingsProblem": ". {problem}",
+  "@cacheSettingsProblem": {
+    "description": "Follows the offline cache's folder in its row when MixMusic can't reach it: the path, then this. {problem} is cacheHoldUnreachable, or why the downloads folder can't be reached.",
+    "placeholders": {
+      "problem": {
+        "type": "String"
+      }
+    }
+  },
   "cacheSettingsSize": "Size",
+  "cacheSettingsSizeCustom": "Custom",
+  "@cacheSettingsSizeCustom": {
+    "description": "In the menu of the offline cache's size: a size the user types."
+  },
   "cacheSettingsSizeLabel": "Cache size",
   "cacheSettingsSizeOff": "Off",
+  "cacheSettingsSizeUnlimited": "Unlimited",
+  "@cacheSettingsSizeUnlimited": {
+    "description": "In the menu of the offline cache's size: no limit."
+  },
   "cacheSettingsTracks": "Tracks kept",
   "cacheSettingsTracksLine": "{count, plural, one {# track} other {# tracks}} in {size}. Tracks you played play again without the network. Downloads are kept apart, and clearing the cache leaves them.",
   "@cacheSettingsTracksLine": {
@@ -1430,6 +1609,26 @@
         "type": "String"
       }
     }
+  },
+  "cacheSettingsTracksMergedLine": "{count, plural, one {# track} other {# tracks}} in {size}. Kept in the downloads folder; clearing the cache leaves your downloads.",
+  "@cacheSettingsTracksMergedLine": {
+    "description": "Under Tracks kept in Settings › Playback › Offline cache, while the cache is kept with the downloads. {size} is a size such as 1.2 GB.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheSettingsUnlimited": "Unlimited: every track that played stays.",
+  "@cacheSettingsUnlimited": {
+    "description": "Under Size in Settings › Playback › Offline cache, while the size is Unlimited."
+  },
+  "cacheSettingsUseDefault": "use the default",
+  "@cacheSettingsUseDefault": {
+    "description": "The link of the Folder row of Settings › Playback › Offline cache that moves the cache back to its first folder. Lowercase."
   },
   "cacheSizeGB": "{gb, number, ::group-off} GB",
   "@cacheSizeGB": {
@@ -1444,6 +1643,30 @@
     "placeholders": {
       "mb": {
         "type": "int"
+      }
+    }
+  },
+  "cacheUnmergeQuestion": "Move {count, plural, one {# cached track} other {# cached tracks}}, {size}, out of the downloads folder to {folder}?",
+  "@cacheUnmergeQuestion": {
+    "description": "The question before the offline cache moves out of the downloads folder, as Merge with downloads goes off. {size} is a size such as 1.2 GB; {folder} is a path.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      },
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "cacheUnmergedTo": "The offline cache is in {folder} now",
+  "@cacheUnmergedTo": {
+    "description": "The toast once the offline cache moved out of the downloads folder. {folder} is a path.",
+    "placeholders": {
+      "folder": {
+        "type": "String"
       }
     }
   },

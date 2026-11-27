@@ -68,6 +68,7 @@ func TestFullFile(t *testing.T) {
 		}
 	}
 	// Every value of it is one Clean keeps.
+	s.CacheFolder = t.TempDir()     // the file's is absolute on Unix only
 	s.DownloadsFolder = t.TempDir() // the file's is absolute on Unix only
 	s.MusicFolders = []string{t.TempDir(), t.TempDir()}
 	s.BackupFolder = t.TempDir()

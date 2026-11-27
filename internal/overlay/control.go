@@ -322,6 +322,9 @@ func writeControlError(w http.ResponseWriter, err error) {
 // each change of what plays, of the volume, of the queue and of the rest.
 func (s *Server) controlEvents(w http.ResponseWriter, r *http.Request) {
 	rc := http.NewResponseController(w)
+	// A program that connects asks the server to follow the player again: a
+	// restart with control on starts the server before its player exists.
+	s.Rewatch()
 	s.mu.Lock()
 	done, cdone := s.done, s.ctlDone
 	sub := &subscriber{wake: make(chan struct{}, 1)}

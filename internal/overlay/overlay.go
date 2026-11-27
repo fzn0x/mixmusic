@@ -183,8 +183,12 @@ func (s *Server) Apply(serve, control bool, port int) error {
 // as control comes and goes. s.mu is held.
 func (s *Server) watchLocked() {
 	if s.controlling {
-		s.ctlDone = make(chan struct{})
-		s.pace = pace{}
+		// One channel until control goes off: the streams that outlive a
+		// switch of the reads still end with it.
+		if s.ctlDone == nil {
+			s.ctlDone = make(chan struct{})
+			s.pace = pace{}
+		}
 		if s.watchStop == nil && s.Control != nil {
 			s.watchStop = s.Control.Watch(s.wake)
 		}
@@ -197,6 +201,20 @@ func (s *Server) watchLocked() {
 	if s.watchStop != nil {
 		s.watchStop()
 		s.watchStop = nil
+	}
+}
+
+// Rewatch has the server watch the player again: for the app that made
+// its server before its player, which the programs' events then hear of.
+func (s *Server) Rewatch() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.watchStop != nil {
+		s.watchStop()
+		s.watchStop = nil
+	}
+	if s.controlling && s.Control != nil {
+		s.watchStop = s.Control.Watch(s.wake)
 	}
 }
 

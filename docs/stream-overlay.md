@@ -18,7 +18,9 @@ Open Settings › Desktop, and turn on **Serve what plays to overlays**, under
 
 MixMusic listens on `127.0.0.1`, this computer's own address, so that no
 other computer can reach it, and nothing leaves your computer. It takes no
-commands: it only tells what plays.
+commands: it only tells what plays. [Another switch](control-api.md) lets
+the programs on this computer send commands over the same port, each with
+a token.
 
 ## Show it in OBS
 

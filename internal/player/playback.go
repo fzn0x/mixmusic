@@ -186,6 +186,7 @@ func (p *Player) ToggleMute() {
 	p.do(func() {
 		p.s.Muted = !p.s.Muted
 		p.apply()
+		p.emit(StateChange)
 	})
 }
 
@@ -1054,6 +1055,7 @@ func (p *Player) setVolume(v float64) {
 	p.s.Volume = v
 	p.s.Muted = false
 	p.apply()
+	p.emit(StateChange)
 	if p.out.Stream != nil {
 		return // the device's own, which the settings don't keep
 	}

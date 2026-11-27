@@ -8776,6 +8776,100 @@ func (msgs Messages) ComputerUnwatched(folder string, reason string) string {
 	return Catalog.Format(msgs.locale, "computerUnwatched", map[string]any{"folder": folder, "reason": reason})
 }
 
+// ControlAbout says "Lets the programs on this computer control what plays: a script, a Stream Deck key, or an overlay of your own. They s…"
+// in the language the app shows.
+//
+// What the switch of Settings › Desktop › Programs on this computer
+// does, under its title.
+func ControlAbout() string { return In(i18n.Locale()).ControlAbout() }
+
+// ControlAbout says "Lets the programs on this computer control what plays: a script, a Stream Deck key, or an overlay of your own. They s…"
+// in the language of msgs.
+//
+// What the switch of Settings › Desktop › Programs on this computer
+// does, under its title.
+func (msgs Messages) ControlAbout() string {
+	return Catalog.Format(msgs.locale, "controlAbout", nil)
+}
+
+// ControlAddressNote says ". A program sends its token here: /control/state reads what plays, and /control/events streams each change."
+// in the language the app shows.
+//
+// What follows the control address of Settings › Desktop, which the
+// programs send their token to.
+func ControlAddressNote() string { return In(i18n.Locale()).ControlAddressNote() }
+
+// ControlAddressNote says ". A program sends its token here: /control/state reads what plays, and /control/events streams each change."
+// in the language of msgs.
+//
+// What follows the control address of Settings › Desktop, which the
+// programs send their token to.
+func (msgs Messages) ControlAddressNote() string {
+	return Catalog.Format(msgs.locale, "controlAddressNote", nil)
+}
+
+// ControlAddressTitle says "Control address"
+// in the language the app shows.
+//
+// The address and the routes of the programs' control, in Settings ›
+// Desktop.
+func ControlAddressTitle() string { return In(i18n.Locale()).ControlAddressTitle() }
+
+// ControlAddressTitle says "Control address"
+// in the language of msgs.
+//
+// The address and the routes of the programs' control, in Settings ›
+// Desktop.
+func (msgs Messages) ControlAddressTitle() string {
+	return Catalog.Format(msgs.locale, "controlAddressTitle", nil)
+}
+
+// ControlCopyCurl says "Copy a curl example"
+// in the language the app shows.
+//
+// The button that copies a curl command that sends a token to MixMusic.
+func ControlCopyCurl() string { return In(i18n.Locale()).ControlCopyCurl() }
+
+// ControlCopyCurl says "Copy a curl example"
+// in the language of msgs.
+//
+// The button that copies a curl command that sends a token to MixMusic.
+func (msgs Messages) ControlCopyCurl() string {
+	return Catalog.Format(msgs.locale, "controlCopyCurl", nil)
+}
+
+// ControlCopyPowerShell says "Copy a PowerShell example"
+// in the language the app shows.
+//
+// The button that copies a PowerShell command that sends a token to
+// MixMusic.
+func ControlCopyPowerShell() string { return In(i18n.Locale()).ControlCopyPowerShell() }
+
+// ControlCopyPowerShell says "Copy a PowerShell example"
+// in the language of msgs.
+//
+// The button that copies a PowerShell command that sends a token to
+// MixMusic.
+func (msgs Messages) ControlCopyPowerShell() string {
+	return Catalog.Format(msgs.locale, "controlCopyPowerShell", nil)
+}
+
+// ControlLabel says "Let programs on this computer control MixMusic"
+// in the language the app shows.
+//
+// The switch of Settings › Desktop that lets the programs on this
+// computer control what plays.
+func ControlLabel() string { return In(i18n.Locale()).ControlLabel() }
+
+// ControlLabel says "Let programs on this computer control MixMusic"
+// in the language of msgs.
+//
+// The switch of Settings › Desktop that lets the programs on this
+// computer control what plays.
+func (msgs Messages) ControlLabel() string {
+	return Catalog.Format(msgs.locale, "controlLabel", nil)
+}
+
 // ControlNotRunning says "MixMusic isn't running"
 // in the language the app shows.
 func ControlNotRunning() string { return In(i18n.Locale()).ControlNotRunning() }
@@ -8784,6 +8878,130 @@ func ControlNotRunning() string { return In(i18n.Locale()).ControlNotRunning() }
 // in the language of msgs.
 func (msgs Messages) ControlNotRunning() string {
 	return Catalog.Format(msgs.locale, "controlNotRunning", nil)
+}
+
+// ControlTitle says "Programs on this computer"
+// in the language the app shows.
+//
+// The title of Settings › Desktop › Programs on this computer.
+func ControlTitle() string { return In(i18n.Locale()).ControlTitle() }
+
+// ControlTitle says "Programs on this computer"
+// in the language of msgs.
+//
+// The title of Settings › Desktop › Programs on this computer.
+func (msgs Messages) ControlTitle() string {
+	return Catalog.Format(msgs.locale, "controlTitle", nil)
+}
+
+// ControlToastDisliked says "A program on this computer disliked {what}"
+// in the language the app shows.
+//
+// The toast when a program on this computer disliked the track that plays.
+// {what} is the track's title and artists.
+func ControlToastDisliked(what string) string { return In(i18n.Locale()).ControlToastDisliked(what) }
+
+// ControlToastDisliked says "A program on this computer disliked {what}"
+// in the language of msgs.
+//
+// The toast when a program on this computer disliked the track that plays.
+// {what} is the track's title and artists.
+func (msgs Messages) ControlToastDisliked(what string) string {
+	return Catalog.Format(msgs.locale, "controlToastDisliked", map[string]any{"what": what})
+}
+
+// ControlToastLiked says "A program on this computer liked {what}"
+// in the language the app shows.
+//
+// The toast when a program on this computer liked the track that plays.
+// {what} is the track's title and artists.
+func ControlToastLiked(what string) string { return In(i18n.Locale()).ControlToastLiked(what) }
+
+// ControlToastLiked says "A program on this computer liked {what}"
+// in the language of msgs.
+//
+// The toast when a program on this computer liked the track that plays.
+// {what} is the track's title and artists.
+func (msgs Messages) ControlToastLiked(what string) string {
+	return Catalog.Format(msgs.locale, "controlToastLiked", map[string]any{"what": what})
+}
+
+// ControlToastUndisliked says "A program on this computer took back its dislike of {what}"
+// in the language the app shows.
+//
+// The toast when a program on this computer took back its dislike of the
+// track that plays. {what} is the track's title and artists.
+func ControlToastUndisliked(what string) string {
+	return In(i18n.Locale()).ControlToastUndisliked(what)
+}
+
+// ControlToastUndisliked says "A program on this computer took back its dislike of {what}"
+// in the language of msgs.
+//
+// The toast when a program on this computer took back its dislike of the
+// track that plays. {what} is the track's title and artists.
+func (msgs Messages) ControlToastUndisliked(what string) string {
+	return Catalog.Format(msgs.locale, "controlToastUndisliked", map[string]any{"what": what})
+}
+
+// ControlToastUnliked says "A program on this computer took back its like of {what}"
+// in the language the app shows.
+//
+// The toast when a program on this computer took back its like of the track
+// that plays. {what} is the track's title and artists.
+func ControlToastUnliked(what string) string { return In(i18n.Locale()).ControlToastUnliked(what) }
+
+// ControlToastUnliked says "A program on this computer took back its like of {what}"
+// in the language of msgs.
+//
+// The toast when a program on this computer took back its like of the track
+// that plays. {what} is the track's title and artists.
+func (msgs Messages) ControlToastUnliked(what string) string {
+	return Catalog.Format(msgs.locale, "controlToastUnliked", map[string]any{"what": what})
+}
+
+// ControlTokenDescription says "A script sends it as the Authorization header, as Bearer followed by the token. A new token cuts off the programs tha…"
+// in the language the app shows.
+//
+// What the token of the programs' control is, and what a new one does.
+func ControlTokenDescription() string { return In(i18n.Locale()).ControlTokenDescription() }
+
+// ControlTokenDescription says "A script sends it as the Authorization header, as Bearer followed by the token. A new token cuts off the programs tha…"
+// in the language of msgs.
+//
+// What the token of the programs' control is, and what a new one does.
+func (msgs Messages) ControlTokenDescription() string {
+	return Catalog.Format(msgs.locale, "controlTokenDescription", nil)
+}
+
+// ControlTokenNew says "new token"
+// in the language the app shows.
+//
+// The button that makes another token for the programs' control.
+func ControlTokenNew() string { return In(i18n.Locale()).ControlTokenNew() }
+
+// ControlTokenNew says "new token"
+// in the language of msgs.
+//
+// The button that makes another token for the programs' control.
+func (msgs Messages) ControlTokenNew() string {
+	return Catalog.Format(msgs.locale, "controlTokenNew", nil)
+}
+
+// ControlTokenTitle says "Token"
+// in the language the app shows.
+//
+// The row of Settings › Desktop that shows the token of the programs'
+// control.
+func ControlTokenTitle() string { return In(i18n.Locale()).ControlTokenTitle() }
+
+// ControlTokenTitle says "Token"
+// in the language of msgs.
+//
+// The row of Settings › Desktop that shows the token of the programs'
+// control.
+func (msgs Messages) ControlTokenTitle() string {
+	return Catalog.Format(msgs.locale, "controlTokenTitle", nil)
 }
 
 // CopiesAbout says "Copies of one song show once, and play the best: lossless before lossy, then the higher bitrate and sample rate. What…"

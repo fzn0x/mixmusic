@@ -6,10 +6,14 @@ const DefaultOverlayPort = 8284
 
 // Overlay is Settings › On the desktop › Now playing for overlays (#344):
 // a server on this computer that tells what plays to the overlays of
-// streams.
+// streams, and, once it is let, takes commands from the programs the user
+// chooses (#591).
 type Overlay struct {
 	// OverlayServer turns the server on. It is off at first.
 	OverlayServer bool `json:"overlayServer"`
+	// ControlServer lets the programs on this computer control MixMusic,
+	// over the same port. It is off at first.
+	ControlServer bool `json:"controlServer"`
 	// OverlayPort is the port the server listens on, on 127.0.0.1 only.
 	OverlayPort int `json:"overlayPort"`
 }

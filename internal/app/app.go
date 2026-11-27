@@ -228,8 +228,11 @@ type App struct {
 	mixes mixMemo
 
 	presence presence
-	// overlay serves what plays to the overlays of streams (overlay.go).
+	// overlay serves what plays to the overlays of streams, and takes the
+	// programs' commands (overlay.go, control.go).
 	overlay overlayHost
+	// control keeps the token those programs carry (control.go).
+	control controlHold
 	// imports is the import of playlists under way (playlistimport.go).
 	imports importState
 	// assistants serves the AI assistants of this computer (assistant.go).

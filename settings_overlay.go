@@ -27,7 +27,7 @@ func (s *shell) overlayRows(c *ui.Context) {
 			s.save()
 		}
 	}, overlayWords)
-	if !s.set.OverlayServer {
+	if !s.set.OverlayServer && !s.set.Overlay.ControlServer {
 		return
 	}
 	k := &s.lk
@@ -58,7 +58,7 @@ func (s *shell) overlayRows(c *ui.Context) {
 		}, func() {}, overlayWords)
 		return
 	}
-	if !st.On {
+	if !st.On || !s.set.OverlayServer {
 		return
 	}
 	base := "http://" + st.Addr

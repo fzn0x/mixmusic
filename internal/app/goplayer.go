@@ -46,6 +46,11 @@ func (a *App) startGoPlayer() (*player.Player, error) {
 	a.listen.Store(l)
 	p.Subscribe(func(player.Event) { l.follow(p.State()) })
 	a.goPlayer.Store(p)
+	// The programs that control MixMusic hear of the player from now on: the
+	// server may have started before it, as a restart with control on does.
+	if srv := a.overlay.server.Load(); srv != nil {
+		srv.Rewatch()
+	}
 	a.applyEngine(a.settings.Get().Clean())
 	return p, nil
 }

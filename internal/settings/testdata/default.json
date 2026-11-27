@@ -220,6 +220,7 @@
   "backupFolder": "",
   "backupKeep": 5,
   "overlayServer": false,
+  "controlServer": false,
   "overlayPort": 8284,
   "ytdlpPath": "",
   "jsRuntime": "",

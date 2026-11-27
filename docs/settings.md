@@ -86,6 +86,7 @@ The **On the desktop** group:
 | [Player around the notch](desktop.md#the-player-around-the-notch) | The player around a MacBook's notch. On at first, and shown only on Macs with a notch. |
 | [Keep on top](desktop.md#keep-the-window-on-top) | MixMusic's window stays above your other windows. Off at first. |
 | [Now playing for overlays](stream-overlay.md) | A server on this computer, on `127.0.0.1` only, that tells what plays to the overlay of a stream: with **Overlay port** and the addresses to copy. Off at first. |
+| [Programs on this computer](control-api.md) | Lets a Stream Deck plugin, a macro or a script play, pause, skip, seek, set the volume, shuffle, repeat, and like what plays, over HTTP on the same port, each request with a token kept in `control.json`. Under it, **Token**, with **new token** and an example to copy of each of a `curl` and a PowerShell command. Off at first. |
 | [Start at login](desktop.md#start-at-login) | Starts MixMusic, hidden, when you sign in to your computer. |
 | Settings file | **open** opens `settings.json`, **show in folder** shows it in its folder. |
 | Reset settings | Puts back the settings of a new install, after asking. Your accounts, library and add-ons stay. |

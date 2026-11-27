@@ -320,6 +320,7 @@
   "backupFolder": "/home/me/Backups",
   "backupKeep": 10,
   "overlayServer": true,
+  "controlServer": true,
   "overlayPort": 9000,
   "ytdlpPath": "/usr/local/bin/yt-dlp",
   "jsRuntime": "deno",

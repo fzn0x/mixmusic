@@ -6,6 +6,7 @@ package app
 // where the system's media controls and Discord do: the player's report.
 
 import (
+	"log"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -25,20 +26,32 @@ func (a *App) overlayServer() *overlay.Server {
 	a.overlay.once.Do(func() {
 		s := overlay.New()
 		s.Cover = a.coverBytes
+		s.Control = controlHost{a}
 		s.Listen = a.opts.OverlayListen
 		a.overlay.server.Store(s)
 	})
 	return a.overlay.server.Load()
 }
 
-// applyOverlay has the server listen as the settings say, or stop. A port
-// that another program holds shows in the settings page, from its status.
+// applyOverlay has the server listen as the settings say, or stop: for
+// the overlays of streams, and for the programs that control MixMusic. A
+// port that another program holds shows in the settings page, from its
+// status.
 func (a *App) applyOverlay(s settings.Settings) {
-	if !s.OverlayServer && a.overlay.server.Load() == nil {
+	if !s.OverlayServer && !s.Overlay.ControlServer && a.overlay.server.Load() == nil {
 		return
 	}
 	srv := a.overlayServer()
-	if err := srv.Apply(s.OverlayServer, s.OverlayPort); err == nil && s.OverlayServer {
+	if s.Overlay.ControlServer {
+		// A script finds the token and the port in control.json.
+		token, err := a.controlToken()
+		if err != nil {
+			log.Printf("mixmusic: control: making a token: %v", err)
+		}
+		srv.SetToken(token)
+		a.keepControlFile(s)
+	}
+	if err := srv.Apply(s.OverlayServer, s.Overlay.ControlServer, s.Overlay.OverlayPort); err == nil && s.OverlayServer {
 		// What plays now, for the clients that connect first.
 		a.mu.Lock()
 		np := a.nowPlaying

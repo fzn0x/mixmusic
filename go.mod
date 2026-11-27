@@ -4,7 +4,7 @@ go 1.27.3
 
 require (
 	github.com/ebitengine/purego v0.11.1
-	github.com/egoist/mygo v0.8.1
+	github.com/egoist/mygo v0.10.0
 	github.com/go-text/typesetting v0.3.5
 	github.com/grafana/sobek v0.0.0-20261020081906-048a54a9653b
 	github.com/hajimehoshi/go-mp3 v0.3.4

@@ -218,6 +218,10 @@ func (s *Accounts) YouTubeImportCookies(ctx context.Context, browser, profile st
 // every cookie of the browser: it is a file of the user's alone, which
 // goes as soon as it is read.
 func (a *App) browserCookies(ctx context.Context, browser string) ([]*http.Cookie, bool, error) {
+	return a.browserCookiesFor(ctx, browser, youtubeCookies)
+}
+
+func (a *App) browserCookiesFor(ctx context.Context, browser string, parse func([]byte, time.Time) []*http.Cookie) ([]*http.Cookie, bool, error) {
 	f, err := os.CreateTemp("", cookieExportPrefix+"*.txt") // readable by the user alone
 	if err != nil {
 		return nil, false, err
@@ -241,7 +245,7 @@ func (a *App) browserCookies(ctx context.Context, browser string) ([]*http.Cooki
 	if err != nil {
 		return nil, false, errors.Join(problem, err)
 	}
-	cookies := youtubeCookies(data, time.Now())
+	cookies := parse(data, time.Now())
 	clear(data)
 	return cookies, undecrypted, problem
 }
@@ -312,6 +316,10 @@ func pastedCookies(text string, now time.Time) []*http.Cookie {
 // sends, as the sign-in window keeps them: those of youtube.com for every
 // path, that have not expired. The others are not made into strings.
 func youtubeCookies(data []byte, now time.Time) []*http.Cookie {
+	return netscapeCookies(data, now, youtubeDomain)
+}
+
+func netscapeCookies(data []byte, now time.Time, allowDomain func(domain []byte, sub bool) bool) []*http.Cookie {
 	var cookies []*http.Cookie
 	seen := map[string]bool{}
 	for line := range bytes.SplitSeq(data, []byte("\n")) {
@@ -323,7 +331,7 @@ func youtubeCookies(data []byte, now time.Time) []*http.Cookie {
 			continue
 		}
 		f := bytes.SplitN(line, []byte("\t"), 7)
-		if len(f) != 7 || !youtubeDomain(f[0], bytes.EqualFold(f[1], []byte("TRUE"))) || string(f[2]) != "/" {
+		if len(f) != 7 || !allowDomain(f[0], bytes.EqualFold(f[1], []byte("TRUE"))) || string(f[2]) != "/" {
 			continue
 		}
 		// yt-dlp writes 0, or nothing, for a cookie that ends with the

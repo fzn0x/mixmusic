@@ -92,15 +92,16 @@ func WordsOf(err error) (string, bool) {
 
 // What needs a webview, which needWebView names.
 const (
-	webViewSignIn  = "signing in to YouTube Music"
-	webViewSpotify = "playing Spotify in MixMusic"
-	webViewVideos  = "Showing music videos"
+	webViewSignIn        = "signing in to YouTube Music"
+	webViewSpotifySignIn = "signing in to Spotify"
+	webViewSpotify       = "playing Spotify in MixMusic"
+	webViewVideos        = "Showing music videos"
 )
 
 // webViewMissing tells that what needs the webview of the system goos,
 // which this computer doesn't have.
 func webViewMissing(what, goos string) error {
-	feature := map[string]string{webViewSignIn: "signIn", webViewSpotify: "spotify", webViewVideos: "videos"}[what]
+	feature := map[string]string{webViewSignIn: "signIn", webViewSpotifySignIn: "spotifySignIn", webViewSpotify: "spotify", webViewVideos: "videos"}[what]
 	switch goos {
 	case "windows":
 		return worded(what+" needs Microsoft's WebView2 Runtime, which this computer doesn't have: get it from https://go.microsoft.com/fwlink/p/?LinkId=2124703",

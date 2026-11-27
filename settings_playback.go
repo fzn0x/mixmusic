@@ -50,6 +50,12 @@ func (s *shell) spotifyTrackSettings(c *ui.Context) {
 				})
 			})
 		case s.set.SpotifyPlayback == settings.SpotifyPlaybackHere && spotifyPlaysHere && !sp.Streaming:
+			if sp.WebSession {
+				s.found(c, "", locales.PlaybackSpotifyWebSessionHint(), func() {
+					s.hint(c, locales.PlaybackSpotifyWebSessionHint())
+				})
+				break
+			}
 			busy := s.signingIn == "spotify"
 			label := locales.PlaybackSignInAgain()
 			if busy {

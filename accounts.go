@@ -25,18 +25,40 @@ func (s *shell) accountSettings(c *ui.Context) {
 	s.lastfmAccount(c, st.Lastfm)
 }
 
+type cookieSignInForm struct {
+	browsers         []app.YouTubeBrowser
+	names            []string
+	words            string
+	browser, profile string
+	pasted, problem  string
+}
+
 func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
+	k := &s.lk
 	s.group(c, "Spotify", func() {
 		if sp.SignedIn && sp.Error == "" {
 			who := locales.AccountSettingsSignedIn()
 			if sp.Profile != nil {
 				who = locales.AccountSettingsSignedInAs(sp.Profile.Name)
 			}
-			s.row(c, who, locales.AccountSettingsSpotifyDesc(), func() {
+			desc := locales.AccountSettingsSpotifyDesc()
+			if sp.WebSession {
+				desc = locales.AccountSettingsSpotifyWebSignedInDesc()
+			}
+			s.row(c, who, desc, func() {
 				if s.button(c, "spotify-out", locales.AccountSettingsSignOut(), false).Clicked() {
 					s.signOutOfSpotify()
 				}
 			}, "sign out, log out")
+			method, methodDesc := locales.AccountSettingsSpotifyMethodClientID(), locales.AccountSettingsSpotifyMethodClientIDDesc()
+			if sp.WebSession {
+				method, methodDesc = locales.AccountSettingsSpotifyMethodWeb(), locales.AccountSettingsSpotifyMethodWebDesc()
+			}
+			s.row(c, locales.AccountSettingsSpotifyMethodTitle(), methodDesc, func() {
+				ui.Row(c).Background(k.surface2).Radius(k.round(24)).Padding(4, 12).Children(func() {
+					ui.Text(c, method).FontSize(k.smallSize()).TextColor(k.text).NoWrap()
+				})
+			}, locales.AccountSettingsSpotifyMethodWords())
 			return
 		}
 		if sp.Error != "" {
@@ -45,76 +67,214 @@ func (s *shell) spotifyAccount(c *ui.Context, sp app.SpotifyAccount) {
 				s.alert(c, locales.AccountSettingsSpotifyRefused(), why, nil).Margin(12, 0)
 			})
 		}
-		// The form shows whole, as its button needs its field.
-		s.found(c, locales.AccountSettingsSpotifySignIn(), locales.AccountSettingsSpotifyForm(), func() {
-			if sp.RedirectURI == "" {
-				sp.RedirectURI = s.svc.System.Info().RedirectURI
+		if !s.spotifyMethodPicked {
+			if (sp.Error != "" && !sp.WebSession) || s.set.SpotifyClientID != "" {
+				s.spotifyMethod = 1
+			} else {
+				s.spotifyMethod = 0
 			}
-			s.steps(c,
-				func() {
-					inlineMessage(c, locales.AccountSettingsSpotifyStep1(mark(0, locales.AccountSettingsSpotifyDashboard())), func(text string) {
-						s.linkOf(c, text, "https://developer.spotify.com/dashboard")
-					})
-				},
-				func() {
-					inlineMessage(c, locales.AccountSettingsSpotifyRedirect(mark(0, sp.RedirectURI), mark(1, locales.AccountSettingsCopy())),
-						func(text string) { ui.Text(c, text).Font(monospace()) },
-						func(text string) {
-							if s.linkOf(c, text, "").Clicked() {
-								c.WriteClipboard(sp.RedirectURI)
-								s.notes = append(s.notes, notice(locales.AccountSettingsCopiedRedirect()))
-							}
+		}
+		methodDesc := locales.AccountSettingsSpotifyMethodWebDesc()
+		if s.spotifyMethod == 1 {
+			methodDesc = locales.AccountSettingsSpotifyMethodClientIDDesc()
+		}
+		s.row(c, locales.AccountSettingsSpotifyMethodTitle(), methodDesc, func() {
+			if s.segmented(c, "spotify-method", locales.AccountSettingsSpotifyMethodTitle(), &s.spotifyMethod,
+				locales.AccountSettingsSpotifyMethodWeb(), locales.AccountSettingsSpotifyMethodClientID()) {
+				s.spotifyMethodPicked = true
+			}
+		}, locales.AccountSettingsSpotifyMethodWords())
+		busy := strings.HasPrefix(s.signingIn, "spotify")
+		if s.spotifyMethod == 0 || s.find.on() {
+			s.found(c, locales.AccountSettingsSpotifyWebSignInTitle(), locales.AccountSettingsSpotifyWebForm()+" "+s.spotifyWebProblem, func() {
+				if s.spotifyWebProblem != "" {
+					s.alert(c, locales.AccountSettingsSpotifyDidntSignIn(), s.spotifyWebProblem, nil).Margin(12, 0)
+				}
+				s.rowOf(c, locales.AccountSettingsSpotifyWebSignInTitle(), locales.AccountSettingsSpotifyWebHint(), func() {
+					label := locales.AccountSettingsSpotifyWebButton()
+					if s.signingIn == "spotify-web" {
+						label = locales.AccountSettingsWaitingWindow()
+					}
+					if s.button(c, "spotify-web-in", label, true).Disabled(busy).Clicked() {
+						s.spotifyCookies.problem, s.spotifyWebProblem = "", ""
+						s.spotifySignIn("spotify-web", &s.spotifyWebProblem, func(ctx context.Context) error {
+							_, err := s.svc.Accounts.SpotifyWebLogin(ctx)
+							return err
 						})
-				},
-				func() {
-					ui.Text(c, locales.AccountSettingsSpotifyUsers())
-				},
-				func() { ui.Text(c, locales.AccountSettingsSpotifyPaste()) },
-			)
-			var clientID *draft
-			s.row(c, locales.AccountsClientID(), "", func() {
-				var in ui.Element
-				in, clientID = s.settingInput(c, "client-id", s.set.SpotifyClientID, func(id string) {
-					s.set.SpotifyClientID = id
-					s.save()
+					}
+					if sp.SignedIn && s.button(c, "spotify-web-out", locales.AccountSettingsSignOut(), false).Disabled(busy).Clicked() {
+						s.signOutOfSpotify()
+					}
 				})
-				in.Placeholder(locales.AccountSettingsCharsPlaceholder()).Width(260).Label(locales.AccountsClientID())
 			})
-			busy := s.signingIn == "spotify"
-			label := locales.AccountSettingsSignInSpotify()
-			if busy {
-				label = locales.AccountSettingsWaitingBrowser()
-			}
-			ui.Row(c).Gap(8).Padding(12, 0).Children(func() {
-				// The Client ID's draft, which its row's control made, unless
-				// the search of the settings left the row out.
-				id := s.set.SpotifyClientID
-				if clientID == nil {
-					clientID = s.drafts["client-id"]
+			s.spotifyBrowserSignIn(c, busy)
+			s.spotifyCookieSignIn(c, busy)
+		}
+		if s.spotifyMethod == 1 || s.find.on() {
+			// The form shows whole, as its button needs its field.
+			s.found(c, locales.AccountSettingsSpotifySignIn(), locales.AccountSettingsSpotifyForm(), func() {
+				if sp.RedirectURI == "" {
+					sp.RedirectURI = s.svc.System.Info().RedirectURI
 				}
-				if clientID != nil {
-					id = strings.TrimSpace(clientID.text)
-				}
-				if s.button(c, "spotify-in", label, true).Disabled(busy || id == "").Clicked() {
-					if id != s.set.SpotifyClientID {
+				s.steps(c,
+					func() {
+						inlineMessage(c, locales.AccountSettingsSpotifyStep1(mark(0, locales.AccountSettingsSpotifyDashboard())), func(text string) {
+							s.linkOf(c, text, "https://developer.spotify.com/dashboard")
+						})
+					},
+					func() {
+						inlineMessage(c, locales.AccountSettingsSpotifyRedirect(mark(0, sp.RedirectURI), mark(1, locales.AccountSettingsCopy())),
+							func(text string) { ui.Text(c, text).Font(monospace()) },
+							func(text string) {
+								if s.linkOf(c, text, "").Clicked() {
+									c.WriteClipboard(sp.RedirectURI)
+									s.notes = append(s.notes, notice(locales.AccountSettingsCopiedRedirect()))
+								}
+							})
+					},
+					func() {
+						ui.Text(c, locales.AccountSettingsSpotifyUsers())
+					},
+					func() { ui.Text(c, locales.AccountSettingsSpotifyPaste()) },
+				)
+				var clientID *draft
+				s.row(c, locales.AccountsClientID(), "", func() {
+					var in ui.Element
+					in, clientID = s.settingInput(c, "client-id", s.set.SpotifyClientID, func(id string) {
 						s.set.SpotifyClientID = id
 						s.save()
+					})
+					in.Placeholder(locales.AccountSettingsCharsPlaceholder()).Width(260).Label(locales.AccountsClientID())
+				})
+				label := locales.AccountSettingsSignInSpotify()
+				if s.signingIn == "spotify" {
+					label = locales.AccountSettingsWaitingBrowser()
+				}
+				ui.Row(c).Gap(8).Padding(12, 0).Children(func() {
+					// The Client ID's draft, which its row's control made, unless
+					// the search of the settings left the row out.
+					id := s.set.SpotifyClientID
+					if clientID == nil {
+						clientID = s.drafts["client-id"]
 					}
-					s.notes = append(s.notes, notice(locales.AccountSettingsFinishSpotify()))
-					s.account("spotify", locales.AccountSettingsSignedInSpotify(), func(ctx context.Context) error {
-						_, err := s.svc.Accounts.SpotifyLogin(ctx)
+					if clientID != nil {
+						id = strings.TrimSpace(clientID.text)
+					}
+					if s.button(c, "spotify-in", label, true).Disabled(busy || id == "").Clicked() {
+						if id != s.set.SpotifyClientID {
+							s.set.SpotifyClientID = id
+							s.save()
+						}
+						s.notes = append(s.notes, notice(locales.AccountSettingsFinishSpotify()))
+						s.account("spotify", locales.AccountSettingsSignedInSpotify(), func(ctx context.Context) error {
+							_, err := s.svc.Accounts.SpotifyLogin(ctx)
+							return err
+						})
+					}
+					// A sign-in Spotify refused stays until the user drops it: every
+					// request of Spotify fails meanwhile.
+					if sp.SignedIn && s.button(c, "spotify-out", locales.AccountSettingsSignOut(), false).Disabled(busy).Clicked() {
+						s.signOutOfSpotify()
+					}
+				})
+				s.hint(c, locales.AccountSettingsSpotifyHint())
+			})
+		}
+	})
+}
+
+func (s *shell) spotifyCookieSignIn(c *ui.Context, busy bool) {
+	k, sc := &s.lk, &s.spotifyCookies
+	if sc.browsers == nil {
+		sc.browsers = s.svc.Accounts.YouTubeBrowsers()
+		for _, b := range sc.browsers {
+			sc.names = append(sc.names, b.Name)
+		}
+		if len(sc.names) > 0 {
+			sc.browser = sc.names[0]
+		}
+		sc.words = strings.Join(sc.names, " ")
+	}
+	if !s.findable(locales.AccountSettingsSpotifyCookieTitle(), locales.AccountSettingsSpotifyCookieForm(), sc.words, sc.problem) {
+		return
+	}
+	s.show(c, func() {
+		if sc.problem != "" {
+			s.alert(c, locales.AccountSettingsSpotifyDidntSignIn(), sc.problem, nil).Margin(12, 0)
+		}
+		if len(sc.names) > 0 {
+			s.row(c, locales.AccountSettingsSpotifyImportTitle(), locales.AccountSettingsSpotifyImportDesc(), func() {
+				s.selectOf(c.Key("spotify-browser"), &sc.browser, sc.names).Width(200).Label(locales.AccountSettingsYouTubeBrowser())
+			})
+			s.row(c, locales.AccountSettingsYouTubeProfileTitle(), locales.AccountSettingsYouTubeProfileDesc(), func() {
+				ui.TextInput(c.Key("spotify-profile"), &sc.profile).Placeholder(k.sentence(locales.AccountSettingsYouTubeProfilePlaceholder())).Width(260).Label(locales.AccountSettingsYouTubeProfileTitle())
+			})
+			ui.Row(c).Padding(12, 0).Children(func() {
+				label := locales.AccountSettingsSpotifyImportButton()
+				if s.signingIn == "spotify-import" {
+					label = locales.AccountSettingsYouTubeImporting()
+				}
+				if s.button(c, "spotify-import", label, false).Disabled(busy).Clicked() {
+					browserID, profile := "", sc.profile
+					if i := slices.Index(sc.names, sc.browser); i >= 0 {
+						browserID = sc.browsers[i].ID
+					}
+					s.spotifySignIn("spotify-import", &sc.problem, func(ctx context.Context) error {
+						_, err := s.svc.Accounts.SpotifyImportCookies(ctx, browserID, profile)
 						return err
 					})
 				}
-				// A sign-in Spotify refused stays until the user drops it: every
-				// request of Spotify fails meanwhile.
-				if sp.SignedIn && s.button(c, "spotify-out", locales.AccountSettingsSignOut(), false).Disabled(busy).Clicked() {
-					s.signOutOfSpotify()
-				}
 			})
-			s.hint(c, locales.AccountSettingsSpotifyHint())
+			s.hint(c, locales.AccountSettingsSpotifyImportHint())
+		}
+		ui.Column(c).Gap(8).Padding(14, 0).Children(func() {
+			ui.Text(c, locales.AccountSettingsSpotifyPasteSPDCTitle()).FontSize(k.bodySize())
+			ui.Text(c, locales.AccountSettingsSpotifyPasteSPDCDesc()).FontSize(k.smallSize()).TextColor(k.muted).MaxWidth(720)
+			ui.TextArea(c.Key("spotify-spdc"), &sc.pasted).Placeholder("sp_dc=…").Height(88).MaxWidth(720).Label(locales.AccountSettingsSpotifyPasteSPDCLabel()).
+				HandleInput(s.scrollsInside)
+			label := locales.AccountSettingsSpotifyPasteSPDCButton()
+			if s.signingIn == "spotify-spdc" {
+				label = locales.AccountSettingsYouTubeSigningIn()
+			}
+			if s.button(c, "spotify-spdc-in", label, false).Disabled(busy || strings.TrimSpace(sc.pasted) == "").Clicked() {
+				pasted := sc.pasted
+				sc.pasted = ""
+				s.spotifySignIn("spotify-spdc", &sc.problem, func(ctx context.Context) error {
+					_, err := s.svc.Accounts.SpotifyPasteSPDC(ctx, pasted)
+					return err
+				})
+			}
 		})
 	})
+}
+
+func (s *shell) spotifySignIn(kind string, problem *string, do func(ctx context.Context) error) {
+	s.signingIn = kind
+	*problem = ""
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+		defer cancel()
+		err := do(ctx)
+		s.update(func() {
+			if s.signingIn == kind {
+				s.signingIn = ""
+			}
+			if err != nil {
+				msg := app.ErrorWords(err)
+				if msg != "" && !strings.HasPrefix(msg, "yt-dlp") {
+					msg = strings.ToUpper(msg[:1]) + msg[1:]
+				}
+				*problem = msg
+				s.forget("accounts")
+				return
+			}
+			s.spotifyWebProblem = ""
+			s.spotifyCookies.problem = ""
+			s.spotifyBrowser.problem = ""
+			s.notes = append(s.notes, notice(locales.AccountSettingsSignedInSpotify()))
+			clear(s.loads)
+		})
+	}()
 }
 
 // signOutOfSpotify asks, then has MixMusic forget the Spotify sign-in.

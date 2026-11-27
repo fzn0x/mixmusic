@@ -93,6 +93,8 @@ func serviceErrorText(err error) (string, bool) {
 	switch {
 	case err == spotify.ErrNoClientID:
 		return locales.ErrorSpotifyNoClientID(), true
+	case err == spotify.ErrInvalidSPDC:
+		return locales.ErrorSpotifyInvalidSPDC(), true
 	case err == spotify.ErrSignInExpired:
 		return locales.ErrorSpotifySignInAgain(), true
 	case err == spotify.ErrNotSignedIn:

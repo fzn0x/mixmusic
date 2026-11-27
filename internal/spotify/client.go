@@ -91,18 +91,24 @@ func (e *APIError) Is(target error) bool {
 	return false
 }
 
-// Client calls the Web API on behalf of the signed-in user, refreshing the
-// access token as it expires. Its methods are safe for concurrent use.
+// Client calls the Web API or Pathfinder GraphQL API on behalf of the
+// signed-in user, refreshing the access token as it expires. Its methods
+// are safe for concurrent use.
 type Client struct {
 	Auth *Auth
 	HTTP *http.Client
-	// BaseURL is the API's address, replaced in tests.
+	// BaseURL is the REST API's address, replaced in tests.
 	BaseURL string
+	// GQLURL is Spotify's internal Pathfinder GraphQL endpoint, replaced in tests.
+	GQLURL string
+	// HashesURL is the remote persisted-query hash registry, replaced or cleared in tests.
+	HashesURL string
 	// OnToken is called with every new token, to keep it for the next run.
 	OnToken func(Token)
 
-	mu    sync.Mutex
-	token Token
+	mu     sync.Mutex
+	token  Token
+	hashes *gqlHashStore
 	// refreshing is held while a request gets its token, so that one
 	// refreshes it and the others wait for the new one; mu is not held
 	// meanwhile, so that SignedIn and Granted never wait for Spotify.
@@ -111,7 +117,14 @@ type Client struct {
 
 // NewClient returns a client that refreshes tokens with auth.
 func NewClient(auth *Auth) *Client {
-	return &Client{Auth: auth, HTTP: &http.Client{Timeout: 20 * time.Second}, BaseURL: apiURL}
+	return &Client{
+		Auth:      auth,
+		HTTP:      &http.Client{Timeout: 20 * time.Second},
+		BaseURL:   apiURL,
+		GQLURL:    gqlURL,
+		HashesURL: remoteHashesURL,
+		hashes:    newGQLHashStore(),
+	}
 }
 
 // SetToken sets the token of the signed-in user, or signs them out with
@@ -126,7 +139,21 @@ func (c *Client) SetToken(t Token) {
 func (c *Client) SignedIn() bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	return c.token.RefreshToken != "" || c.token.AccessToken != ""
+	return c.token.SPDC != "" || c.token.RefreshToken != "" || c.token.AccessToken != ""
+}
+
+// IsWebSession reports whether the client is signed in with a Spotify web
+// session (sp_dc cookie).
+func (c *Client) IsWebSession() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.token.IsWebSession()
+}
+
+func (c *Client) spT() string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.token.SPT
 }
 
 // Granted reports whether the user's sign-in grants scope. Sign-ins made
@@ -151,11 +178,30 @@ func (c *Client) accessToken(ctx context.Context, force bool) (string, error) {
 	c.mu.Lock()
 	old := c.token
 	c.mu.Unlock()
-	if old.AccessToken == "" && old.RefreshToken == "" {
+	if old.AccessToken == "" && old.RefreshToken == "" && old.SPDC == "" {
 		return "", ErrNotSignedIn
 	}
 	if old.Valid() && !force {
 		return old.AccessToken, nil
+	}
+	if old.IsWebSession() {
+		t, err := c.Auth.ExchangeSPDC(ctx, old.SPDC, old.SPKey, old.SPT)
+		if err != nil {
+			return "", err
+		}
+		c.mu.Lock()
+		defer c.mu.Unlock()
+		if c.token.SPDC != old.SPDC {
+			if c.token.AccessToken == "" && c.token.SPDC == "" {
+				return "", ErrNotSignedIn
+			}
+			return c.token.AccessToken, nil
+		}
+		c.token = t
+		if c.OnToken != nil {
+			go c.OnToken(t)
+		}
+		return t.AccessToken, nil
 	}
 	if old.RefreshToken == "" {
 		return "", ErrSignInExpired
@@ -221,6 +267,12 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 			return err
 		}
 		req.Header.Set("Authorization", "Bearer "+token)
+		if c.IsWebSession() {
+			req.Header.Set("User-Agent", webPlayerUserAgent)
+			req.Header.Set("app-platform", "WebPlayer")
+			req.Header.Set("Origin", "https://open.spotify.com")
+			req.Header.Set("Referer", "https://open.spotify.com/")
+		}
 		if payload != nil {
 			req.Header.Set("Content-Type", "application/json")
 		}

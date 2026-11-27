@@ -20,6 +20,9 @@ type episodeDetails struct {
 // length, and its description, plain text whose web addresses and times,
 // as 12:34, become links and times. Spotify tells no plays.
 func (c *Client) EpisodeDetails(ctx context.Context, id string) (media.EpisodeDetails, error) {
+	if c.IsWebSession() {
+		return c.gqlEpisodeDetails(ctx, id)
+	}
 	var e episodeDetails
 	if err := c.get(ctx, "/episodes/"+url.PathEscape(id), nil, &e); err != nil {
 		return media.EpisodeDetails{}, err

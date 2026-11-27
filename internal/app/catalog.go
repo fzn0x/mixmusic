@@ -228,8 +228,9 @@ func (a *App) playlist(ctx context.Context, id string) (media.Playlist, error) {
 		p, err := a.spotify.Playlist(ctx, native, a.spotifyUserID(ctx))
 		// One of others, whose tracks Spotify doesn't show apps, or one of
 		// Spotify's own, which it shows nothing of, keeps the rest of its
-		// page, Save among it.
-		if (err == nil || errors.Is(err, spotify.ErrPlaylistUnavailable) || errors.Is(err, spotify.ErrPlaylistNotShown)) && !p.Editable {
+		// page, Save among it. Web sessions already include `following` on
+		// readable playlists.
+		if (errors.Is(err, spotify.ErrPlaylistUnavailable) || errors.Is(err, spotify.ErrPlaylistNotShown) || (err == nil && !a.spotify.IsWebSession())) && !p.Editable {
 			p.Saved = a.spotifyHas(ctx, spotify.URI("playlist", native))
 		}
 		return p, err

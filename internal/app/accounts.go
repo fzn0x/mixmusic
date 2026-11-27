@@ -38,6 +38,8 @@ type SpotifyAccount struct {
 	// Streaming is set when the sign-in lets Spotify play in MixMusic;
 	// sign-ins of MixMusic 0.4.0 and before do not.
 	Streaming bool `json:"streaming"`
+	// WebSession is set when signed in via a Spotify web session (sp_dc).
+	WebSession bool `json:"webSession,omitempty"`
 }
 
 // AccountsStatus is the state of the user's accounts.
@@ -140,6 +142,7 @@ func (a *App) spotifyAccount() SpotifyAccount {
 		SignedIn:    a.spotify.SignedIn(),
 		RedirectURI: spotify.RedirectURI,
 		Streaming:   a.spotify.Granted("streaming"),
+		WebSession:  a.spotify.IsWebSession(),
 	}
 }
 
@@ -241,12 +244,16 @@ func (s *Accounts) SpotifyLogout() error {
 }
 
 func (a *App) signOutSpotify() error {
+	wasWeb := a.spotify.IsWebSession()
 	a.spotify.SetToken(spotify.Token{})
 	a.here.close()
 	a.mu.Lock()
 	a.spotifyMe, a.profileErrs.spotify = nil, nil
 	a.mu.Unlock()
 	err := a.tokens.Clear()
+	if wasWeb {
+		clearSpotifyWindowCookies()
+	}
 	notify()
 	return err
 }

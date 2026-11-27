@@ -269,14 +269,138 @@
     }
   },
   "accountSettingsSignedInSpotify": "Signed in to Spotify",
+  "accountSettingsSpotifyBadSPDC": "That isn't a Spotify sp_dc cookie: paste the sp_dc value or a Cookie header from open.spotify.com.",
+  "@accountSettingsSpotifyBadSPDC": {
+    "description": "Why signing in with a pasted sp_dc cookie failed, in Settings › Accounts › Spotify."
+  },
+  "accountSettingsSpotifyBrowserAbout": "MixMusic opens the browser with a new, empty profile of its own, at Spotify's sign-in. Sign in there as in any browser: MixMusic then takes the sp_dc session cookie, closes the browser and deletes the profile. Your own profiles stay as they are.",
+  "@accountSettingsSpotifyBrowserAbout": {
+    "description": "What Sign in in a browser does under Settings › Accounts › Spotify when a supported browser is found."
+  },
+  "accountSettingsSpotifyBrowserClosed": "{browser} closed before you signed in to Spotify.",
+  "@accountSettingsSpotifyBrowserClosed": {
+    "description": "Why signing in to Spotify in a browser failed, in Settings › Accounts. {browser} is the browser's name, as Firefox.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsSpotifyBrowserForm": "Sign in to Spotify in a browser with a profile of its own. sp_dc cookie web session.",
+  "@accountSettingsSpotifyBrowserForm": {
+    "description": "Never shown: what Settings' search finds the browser sign-in to Spotify by, its steps and labels, then words people search for. Translate it, and give the words and synonyms people search for in your language."
+  },
+  "accountSettingsSpotifyBrowserNotice": "Finish signing in to Spotify in {browser}",
+  "@accountSettingsSpotifyBrowserNotice": {
+    "description": "Toast shown when a browser opens for the user to finish signing in to Spotify. {browser} is the browser's name.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsSpotifyBrowserTitle": "Sign in in a browser",
+  "@accountSettingsSpotifyBrowserTitle": {
+    "description": "Row title for signing in to Spotify in an isolated browser profile under Settings › Accounts › Spotify."
+  },
+  "accountSettingsSpotifyBrowserWith": "sign in to Spotify with {browser}",
+  "@accountSettingsSpotifyBrowserWith": {
+    "description": "Button label to launch a browser for Spotify sign-in under Settings › Accounts. {browser} is the browser's name.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsSpotifyCookieForm": "Import a Spotify session from a browser, or paste an sp_dc cookie. sp_dc web session.",
+  "@accountSettingsSpotifyCookieForm": {
+    "description": "Never shown: what Settings' search finds the Spotify cookie import and paste form by. Translate it, and give the words and synonyms people search for in your language."
+  },
+  "accountSettingsSpotifyCookieTitle": "Import or paste sp_dc cookie",
+  "@accountSettingsSpotifyCookieTitle": {
+    "description": "Search title for importing or pasting a Spotify sp_dc cookie under Settings › Accounts › Spotify."
+  },
   "accountSettingsSpotifyDashboard": "Spotify developer dashboard",
   "accountSettingsSpotifyDesc": "Search, your library and playback of Spotify.",
+  "accountSettingsSpotifyDidntSignIn": "MixMusic didn't sign in to Spotify",
+  "@accountSettingsSpotifyDidntSignIn": {
+    "description": "Alert title when signing in to Spotify with a web session or cookie fails, in Settings › Accounts."
+  },
   "accountSettingsSpotifyForm": "Create an app in the Spotify developer dashboard, with the Web API, signed in with a Spotify account that has Premium. Add this redirect URI to it. In its settings, under Users Management, add your name and the email of the Spotify account you sign in with. Paste the app's Client ID here, and sign in to Spotify. Log in. Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.",
   "@accountSettingsSpotifyForm": {
     "description": "Never shown: what Settings' search finds the Spotify sign-in form by, its steps and labels, then words people search for, as \"Sign in, log in.\". Translate it, and give the words and synonyms people search for in your language."
   },
   "accountSettingsSpotifyHint": "Spotify lets an app in development mode serve up to five accounts added under Users Management, while its owner has Premium. Search shows ten results of each kind, and the tracks of playlists you do not own stay hidden to apps.",
+  "accountSettingsSpotifyImportButton": "import Spotify session",
+  "@accountSettingsSpotifyImportButton": {
+    "description": "Button label to import a Spotify sp_dc session cookie from a browser under Settings › Accounts."
+  },
+  "accountSettingsSpotifyImportDesc": "Read your signed-in Spotify session (sp_dc) from a browser.",
+  "@accountSettingsSpotifyImportDesc": {
+    "description": "Description under Import from a browser in Settings › Accounts › Spotify."
+  },
+  "accountSettingsSpotifyImportHint": "Sign in to open.spotify.com in your browser first. Some browsers lock their cookies while open: close the browser before importing.",
+  "@accountSettingsSpotifyImportHint": {
+    "description": "Hint below the Import from a browser button in Settings › Accounts › Spotify."
+  },
+  "accountSettingsSpotifyImportTitle": "Import from a browser",
+  "@accountSettingsSpotifyImportTitle": {
+    "description": "Row title for importing a Spotify session from an installed browser in Settings › Accounts › Spotify."
+  },
+  "accountSettingsSpotifyInvalidSPDC": "Spotify rejected that sp_dc token: sign in to open.spotify.com again and copy a fresh sp_dc cookie.",
+  "@accountSettingsSpotifyInvalidSPDC": {
+    "description": "Why signing in to Spotify with a pasted or imported sp_dc cookie failed when Spotify rejected the cookie, in Settings › Accounts."
+  },
+  "accountSettingsSpotifyMethodClientID": "Client ID (Developer API)",
+  "@accountSettingsSpotifyMethodClientID": {
+    "description": "Option label in Settings › Accounts › Spotify for signing in with a Spotify Developer app Client ID."
+  },
+  "accountSettingsSpotifyMethodClientIDDesc": "Uses your own Spotify Developer app Client ID (requires Premium owner, up to 5 users). Supports direct Spotify playback and Spotify Connect.",
+  "@accountSettingsSpotifyMethodClientIDDesc": {
+    "description": "Description shown for the Client ID (Developer API) sign-in method in Settings › Accounts › Spotify."
+  },
+  "accountSettingsSpotifyMethodTitle": "Sign-in method",
+  "@accountSettingsSpotifyMethodTitle": {
+    "description": "Row title for choosing between Web session (sp_dc) and Client ID (Developer API) in Settings › Accounts › Spotify."
+  },
+  "accountSettingsSpotifyMethodWeb": "Web session (sp_dc)",
+  "@accountSettingsSpotifyMethodWeb": {
+    "description": "Option label in Settings › Accounts › Spotify for signing in with a web session (sp_dc)."
+  },
+  "accountSettingsSpotifyMethodWebDesc": "No developer app or Premium needed. Full search, Spotify Home shelves and all playlists; audio plays through YouTube Music.",
+  "@accountSettingsSpotifyMethodWebDesc": {
+    "description": "Description shown for the Web session (sp_dc) sign-in method in Settings › Accounts › Spotify."
+  },
+  "accountSettingsSpotifyMethodWords": "sp_dc web session cookie client id developer api oauth",
+  "@accountSettingsSpotifyMethodWords": {
+    "description": "Never shown: words Settings' search uses to find the Spotify Sign-in method row. Translate and add synonyms users search for in your language."
+  },
+  "accountSettingsSpotifyNoBrowserSession": "{browser} has no signed-in Spotify session: sign in to open.spotify.com in it, close it, then import again.",
+  "@accountSettingsSpotifyNoBrowserSession": {
+    "description": "Why importing a Spotify session from a browser failed when no sp_dc cookie was found. {browser} is the browser's name.",
+    "placeholders": {
+      "browser": {
+        "type": "String"
+      }
+    }
+  },
   "accountSettingsSpotifyPaste": "Paste the app's Client ID here, and sign in.",
+  "accountSettingsSpotifyPasteSPDCButton": "use sp_dc cookie",
+  "@accountSettingsSpotifyPasteSPDCButton": {
+    "description": "Button label to sign in with the pasted sp_dc cookie under Settings › Accounts › Spotify."
+  },
+  "accountSettingsSpotifyPasteSPDCDesc": "In your browser's developer tools on open.spotify.com, copy your sp_dc cookie value (or a Cookie header containing sp_dc=…) and paste it here.",
+  "@accountSettingsSpotifyPasteSPDCDesc": {
+    "description": "Instructions above the text area for pasting a Spotify sp_dc cookie under Settings › Accounts › Spotify."
+  },
+  "accountSettingsSpotifyPasteSPDCLabel": "Spotify sp_dc cookie",
+  "@accountSettingsSpotifyPasteSPDCLabel": {
+    "description": "Accessibility label for the sp_dc cookie text area under Settings › Accounts › Spotify."
+  },
+  "accountSettingsSpotifyPasteSPDCTitle": "Paste your sp_dc cookie",
+  "@accountSettingsSpotifyPasteSPDCTitle": {
+    "description": "Heading for pasting an sp_dc cookie under Settings › Accounts › Spotify."
+  },
   "accountSettingsSpotifyRedirect": "Add this redirect URI to it: {uri} {copy}",
   "@accountSettingsSpotifyRedirect": {
     "description": "The second step of signing in to Spotify. {uri} is the address, in a monospace face, and {copy} accountSettingsCopy, a link that copies it.",
@@ -305,7 +429,48 @@
       }
     }
   },
+  "accountSettingsSpotifyTooLong": "Signing in to Spotify took too long; try again.",
+  "@accountSettingsSpotifyTooLong": {
+    "description": "Why signing in to Spotify in the in-app window or browser failed after timing out, in Settings › Accounts."
+  },
   "accountSettingsSpotifyUsers": "In its settings, under Users Management, add your name and the email of the Spotify account you sign in with.",
+  "accountSettingsSpotifyWebButton": "open Spotify sign-in",
+  "@accountSettingsSpotifyWebButton": {
+    "description": "Primary button label to open the in-app Spotify sign-in window under Settings › Accounts › Spotify."
+  },
+  "accountSettingsSpotifyWebForm": "Sign in with your Spotify web session (sp_dc). No developer app, Client ID, or Premium subscription required. Full catalog search, home shelves, and all playlists, played through YouTube Music.",
+  "@accountSettingsSpotifyWebForm": {
+    "description": "Never shown: what Settings' search finds the in-app Spotify web-session sign-in block by."
+  },
+  "accountSettingsSpotifyWebHint": "Opens Spotify's sign-in page inside MixMusic and captures your sp_dc cookie automatically.",
+  "@accountSettingsSpotifyWebHint": {
+    "description": "Description under Sign in in a window in Settings › Accounts › Spotify."
+  },
+  "accountSettingsSpotifyWebNotAccepted": "Spotify could not verify the web session: {error}",
+  "@accountSettingsSpotifyWebNotAccepted": {
+    "description": "Why verifying or exchanging the captured Spotify web session failed, in Settings › Accounts. {error} is the underlying error message.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSettingsSpotifyWebSignInTitle": "Sign in in a window",
+  "@accountSettingsSpotifyWebSignInTitle": {
+    "description": "Row title for signing in to Spotify inside MixMusic's window under Settings › Accounts › Spotify."
+  },
+  "accountSettingsSpotifyWebSignedInDesc": "Web session (sp_dc): full search, Spotify Home shelves and playlists, played via YouTube Music.",
+  "@accountSettingsSpotifyWebSignedInDesc": {
+    "description": "Description shown under Signed in as <name> when signed in to Spotify with a web session (sp_dc) in Settings › Accounts."
+  },
+  "accountSettingsSpotifyWindowClosed": "The Spotify sign-in window closed before signing in.",
+  "@accountSettingsSpotifyWindowClosed": {
+    "description": "Why signing in to Spotify in MixMusic's window failed when the user closed the window early, in Settings › Accounts."
+  },
+  "accountSettingsSpotifyWindowTitle": "Sign in to Spotify",
+  "@accountSettingsSpotifyWindowTitle": {
+    "description": "The title of the window in which the user signs in to Spotify."
+  },
   "accountSettingsWaitingBrowser": "waiting for the browser…",
   "accountSettingsWaitingLastfm": "waiting for Last.fm…",
   "accountSettingsWaitingListens": "{count, plural, one {# listen waits} other {# listens wait}} to be sent, and will go once {service} answers.",
@@ -4464,6 +4629,10 @@
   "@errorLocalFilesWatchLimit": {
     "description": "Why a folder of music isn't watched for changes, inside a message that leads it."
   },
+  "errorSpotifyInvalidSPDC": "invalid or expired Spotify sp_dc session cookie",
+  "@errorSpotifyInvalidSPDC": {
+    "description": "An error of Spotify, as a toast or inside a message that leads it: the sp_dc web cookie is missing, invalid or expired."
+  },
   "errorSpotifyNoClientID": "Set your Client ID in Settings › Accounts first",
   "@errorSpotifyNoClientID": {
     "description": "An error of Spotify, as a toast or inside a message that leads it: MixMusic needs the Client ID of the user's Spotify app."
@@ -8159,6 +8328,10 @@
   "playbackSpotifyHere": "MixMusic plays them itself, at Spotify's own quality, and shows among your Spotify devices. Needs Spotify Premium, and no Spotify app.",
   "playbackSpotifyNoWebKit": "This computer's webview, WebKitGTK, can't play Spotify's protected audio, so MixMusic can't play Spotify itself.",
   "playbackSpotifyTracks": "Spotify tracks",
+  "playbackSpotifyWebSessionHint": "Signed in with a Spotify web session (sp_dc): Spotify tracks play from YouTube Music.",
+  "@playbackSpotifyWebSessionHint": {
+    "description": "Hint in Settings › Playback › Spotify tracks when signed in with a Spotify web session (sp_dc) and direct playback is selected."
+  },
   "playbackWaitingBrowser": "waiting for the browser…",
   "playerAllDisliked": "You dislike every song here",
   "@playerAllDisliked": {
@@ -12895,27 +13068,27 @@
   "volumeUnmute": "Unmute",
   "wavyProgressDescription": "The played part of the seek bar is a gentle wave that moves while music plays and lies flat while it's paused. It holds still while your system asks for less motion.",
   "wavyProgressTitle": "Wavy progress bar",
-  "webViewMissing": "{feature, select, signIn {Signing in to YouTube Music} spotify {Playing Spotify in MixMusic} videos {Showing music videos} other {This}} needs the system's webview, which this computer doesn't have",
+  "webViewMissing": "{feature, select, signIn {Signing in to YouTube Music} spotifySignIn {Signing in to Spotify} spotify {Playing Spotify in MixMusic} videos {Showing music videos} other {This}} needs the system's webview, which this computer doesn't have",
   "@webViewMissing": {
-    "description": "Why a feature can't work. {feature} picks the sentence's start by the feature: signIn, spotify or videos.",
+    "description": "Why a feature can't work. {feature} picks the sentence's start by the feature: signIn, spotifySignIn, spotify or videos.",
     "placeholders": {
       "feature": {
         "type": "String"
       }
     }
   },
-  "webViewMissingLinux": "{feature, select, signIn {Signing in to YouTube Music} spotify {Playing Spotify in MixMusic} videos {Showing music videos} other {This}} needs WebKitGTK, which this computer doesn't have: install libwebkit2gtk-4.1-0 on Debian and Ubuntu, webkit2gtk4.1 on Fedora",
+  "webViewMissingLinux": "{feature, select, signIn {Signing in to YouTube Music} spotifySignIn {Signing in to Spotify} spotify {Playing Spotify in MixMusic} videos {Showing music videos} other {This}} needs WebKitGTK, which this computer doesn't have: install libwebkit2gtk-4.1-0 on Debian and Ubuntu, webkit2gtk4.1 on Fedora",
   "@webViewMissingLinux": {
-    "description": "Why a feature can't work on Linux. {feature} picks the sentence's start by the feature: signIn, spotify or videos. Keep the packages' names as they are.",
+    "description": "Why a feature can't work on Linux. {feature} picks the sentence's start by the feature: signIn, spotifySignIn, spotify or videos. Keep the packages' names as they are.",
     "placeholders": {
       "feature": {
         "type": "String"
       }
     }
   },
-  "webViewMissingWindows": "{feature, select, signIn {Signing in to YouTube Music} spotify {Playing Spotify in MixMusic} videos {Showing music videos} other {This}} needs Microsoft's WebView2 Runtime, which this computer doesn't have: get it from https://go.microsoft.com/fwlink/p/?LinkId=2124703",
+  "webViewMissingWindows": "{feature, select, signIn {Signing in to YouTube Music} spotifySignIn {Signing in to Spotify} spotify {Playing Spotify in MixMusic} videos {Showing music videos} other {This}} needs Microsoft's WebView2 Runtime, which this computer doesn't have: get it from https://go.microsoft.com/fwlink/p/?LinkId=2124703",
   "@webViewMissingWindows": {
-    "description": "Why a feature can't work on Windows. {feature} picks the sentence's start by the feature: signIn, spotify or videos. Keep the address as it is.",
+    "description": "Why a feature can't work on Windows. {feature} picks the sentence's start by the feature: signIn, spotifySignIn, spotify or videos. Keep the address as it is.",
     "placeholders": {
       "feature": {
         "type": "String"

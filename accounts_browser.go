@@ -119,3 +119,85 @@ func (s *shell) signInWithBrowser() {
 		})
 	}()
 }
+
+// spotifyBrowserSignIn offers to sign in to Spotify in a browser of the user's
+// with an isolated profile to capture the sp_dc web session cookie.
+func (s *shell) spotifyBrowserSignIn(c *ui.Context, busy bool) {
+	sb := &s.spotifyBrowser
+	if !sb.looked {
+		sb.looked = true
+		sb.browsers = s.svc.Accounts.YouTubeSignInBrowsers()
+		for _, b := range sb.browsers {
+			sb.names = append(sb.names, b.Name)
+		}
+		if len(sb.names) > 0 {
+			sb.chosen = sb.names[0]
+		}
+	}
+	if !s.findable(locales.AccountSettingsSpotifyBrowserTitle(), locales.AccountSettingsSpotifyBrowserForm(), sb.problem) {
+		return
+	}
+	s.show(c, func() {
+		if sb.problem != "" {
+			s.alert(c, locales.AccountSettingsSpotifyDidntSignIn(), sb.problem, nil).Margin(12, 0)
+		}
+		if len(sb.names) == 0 {
+			s.row(c, locales.AccountSettingsSpotifyBrowserTitle(), locales.YoutubeBrowserNone(), func() {})
+			return
+		}
+		s.row(c, locales.AccountSettingsSpotifyBrowserTitle(), locales.AccountSettingsSpotifyBrowserAbout(), func() {
+			s.selectOf(c.Key("spotify-sign-in-browser"), &sb.chosen, sb.names).Width(200).Label(locales.YoutubeBrowserChoose())
+		})
+		ui.Row(c).Gap(8).Padding(12, 0).Children(func() {
+			waiting := s.signingIn == "spotify-browser"
+			label := locales.AccountSettingsSpotifyBrowserWith(sb.chosen)
+			if waiting {
+				label = locales.YoutubeBrowserWaiting(sb.waiting)
+			}
+			if s.button(c, "spotify-browser-in", label, false).Disabled(busy).Clicked() {
+				s.signInSpotifyWithBrowser()
+			}
+			if waiting && sb.cancel != nil && s.button(c, "spotify-browser-cancel", locales.LibraryCancel(), false).Clicked() {
+				sb.cancel()
+			}
+		})
+		s.hint(c, locales.YoutubeBrowserHint())
+	})
+}
+
+func (s *shell) signInSpotifyWithBrowser() {
+	sb := &s.spotifyBrowser
+	i := slices.Index(sb.names, sb.chosen)
+	if i < 0 {
+		return
+	}
+	b := sb.browsers[i]
+	ctx, cancel := context.WithCancel(context.Background())
+	s.signingIn = "spotify-browser"
+	sb.waiting, sb.cancel, sb.problem = b.Name, cancel, ""
+	s.spotifyCookies.problem, s.spotifyWebProblem = "", ""
+	s.notes = append(s.notes, notice(locales.AccountSettingsSpotifyBrowserNotice(b.Name)))
+	go func() {
+		defer cancel()
+		_, err := s.svc.Accounts.SpotifyBrowserLogin(ctx, b.ID)
+		s.update(func() {
+			if s.signingIn == "spotify-browser" {
+				s.signingIn = ""
+			}
+			sb.cancel = nil
+			switch {
+			case errors.Is(err, context.Canceled):
+			case err != nil:
+				msg := app.ErrorWords(err)
+				if msg != "" {
+					msg = strings.ToUpper(msg[:1]) + msg[1:]
+				}
+				sb.problem = msg
+				s.forget("accounts")
+			default:
+				s.notes = append(s.notes, notice(locales.AccountSettingsSignedInSpotify()))
+				clear(s.loads)
+			}
+		})
+	}()
+}

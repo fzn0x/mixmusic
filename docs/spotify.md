@@ -1,15 +1,26 @@
 # Spotify
 <!-- docs: group=start order=30 -->
 
-MixMusic reads your Spotify library and searches Spotify through the Spotify
-Web API, and plays Spotify tracks itself, on Spotify Connect, or from their
-recording on YouTube Music.
+MixMusic reads your Spotify library, personalized Home shelves, and catalog, and plays Spotify tracks from their recording on YouTube Music, or (with a Developer API sign-in and Premium) itself or on Spotify Connect.
 
 ## Sign in
 
-Spotify lets each app it does not review serve only up to five accounts its
-owner adds, and only while the owner has Spotify Premium, so you sign in with
-an app of your own. It takes two minutes:
+### Web session (`sp_dc`), recommended
+
+Signing in with your Spotify web session (`sp_dc`) requires **no Spotify Developer app, no Client ID, and no Premium subscription**, and bypasses the 2026 Developer Mode restrictions (giving you full search results, personalized Spotify Home shelves, artist top tracks and related artists, and the tracks of playlists made by Spotify or other users). Audio plays automatically from the matching recording on YouTube Music.
+
+A web session uses the web player's private API, which Spotify can change at any time. Signing in and refreshing tokens also depend on two external files hosted outside Spotify (the current TOTP secret on GitHub Gist and the persisted-query hashes on GitHub Pages, listed in [Your data and privacy](data-and-privacy.md#what-each-feature-sends-where)): if Spotify rotates the secret or query hashes and those files do not follow right away, web sessions stop working until they do, or until a MixMusic release bakes in new values.
+
+In [Settings › Accounts](accounts.md#spotify), choose **Web session (`sp_dc`)** under **Sign-in method**, then sign in any of four ways:
+
+1. **Open Spotify sign-in**: opens Spotify's sign-in page inside MixMusic and captures the `sp_dc` session cookie automatically.
+2. **Sign in in a browser**: opens Firefox or Zen with a temporary isolated profile so you can sign in cleanly without touching your own browser profiles.
+3. **Import from a browser**: imports your existing signed-in `sp_dc` session from an installed browser.
+4. **Paste your `sp_dc` cookie**: paste a raw `sp_dc` value, `sp_dc=...`, a `Cookie` header from `open.spotify.com`, or a Netscape `cookies.txt` export.
+
+### Developer API (optional)
+
+If you want to stream Spotify's own audio directly (via the Web Playback SDK or Spotify Connect), choose **Client ID (Developer API)** under **Sign-in method** and sign in with a Spotify Developer app of your own. Spotify lets each app it does not review serve only up to five accounts its owner adds, and only while the owner has Spotify Premium:
 
 1. Open the [Spotify developer dashboard](https://developer.spotify.com/dashboard),
    signed in with a Spotify account that has Premium, and create an app. Any

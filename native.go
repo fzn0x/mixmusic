@@ -314,22 +314,19 @@ type shell struct {
 	signingIn               string
 	// librefm is the Libre.fm form's choices.
 	librefm librefmForm
-	// youtubeCookies is the YouTube Music sign-in with a browser's cookies:
-	// the browsers to import from, their names, which the search of the
-	// settings finds the sign-in by too, the one chosen and its profile, the
-	// header pasted, and why the last try failed; youtubePick asks for the
-	// account and channel of the session it signed in with.
-	youtubeCookies struct {
-		browsers         []app.YouTubeBrowser
-		names            []string
-		words            string
-		browser, profile string
-		pasted, problem  string
-	}
-	// youtubeBrowser is the YouTube Music sign-in through a browser of the
-	// user's, with a profile of its own (accounts_browser.go).
-	youtubeBrowser youtubeBrowserSignIn
-	youtubePick    bool
+	// youtubeCookies and spotifyCookies are the sign-ins with a browser's
+	// cookies: the browsers to import from, their names, which the search of
+	// the settings finds the sign-in by too, the one chosen and its profile,
+	// the value pasted, and why the last try failed; youtubePick asks for the
+	// account and channel of the YouTube session it signed in with.
+	youtubeCookies, spotifyCookies cookieSignInForm
+	// youtubeBrowser and spotifyBrowser are the sign-ins through a browser of
+	// the user's, with a profile of its own (accounts_browser.go).
+	youtubeBrowser, spotifyBrowser youtubeBrowserSignIn
+	spotifyWebProblem              string
+	spotifyMethod                  int  // 0 = Web session (sp_dc), 1 = Client ID (Developer API)
+	spotifyMethodPicked            bool // set once the user explicitly toggles the method switcher
+	youtubePick                    bool
 	// wells are the colour wells' colours, by key; tools are how the user
 	// sorted and searched the lists of tracks, by key.
 	wells map[string]*colorWell

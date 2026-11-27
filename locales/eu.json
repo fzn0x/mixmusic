@@ -2193,6 +2193,7 @@
   "playerLooking": "Gailuak bilatzen…",
   "playerMiniPlayer": "Ireki erreproduzitzaile txikia",
   "playerNext": "Hurrengoa",
+  "playerNextEpisodeUnread": "Erreprodukzio automatikoa gelditu da: ezin izan da podcastaren hurrengo atala irakurri. {error}",
   "playerNoDevices": "Ireki Spotify gailu batean hemen ikusteko",
   "playerNoEngine": "MixMusic-en audio-motorra ez dago erabilgarri sistema honetan",
   "playerNoHighlight": "Pista honek ez du nabarmendutakorik",

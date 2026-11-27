@@ -2193,6 +2193,7 @@
   "playerLooking": "در حال جستجوی دستگاه‌ها…",
   "playerMiniPlayer": "باز کردن پخش‌کنندهٔ کوچک",
   "playerNext": "بعدی",
+  "playerNextEpisodeUnread": "پخش خودکار متوقف شد: قسمت بعدی پادکست خوانده نشد. {error}",
   "playerNoDevices": "برای دیدن آن اینجا، Spotify را روی یک دستگاه باز کنید",
   "playerNoEngine": "موتور صدای MixMusic روی این سیستم در دسترس نیست",
   "playerNoHighlight": "این آهنگ بخش برجسته ندارد",

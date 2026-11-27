@@ -2193,6 +2193,7 @@
   "playerLooking": "Etsitään laitteita…",
   "playerMiniPlayer": "Avaa minisoitin",
   "playerNext": "Seuraava",
+  "playerNextEpisodeUnread": "Automaattinen toisto pysähtyi: podcastin seuraavaa jaksoa ei voitu lukea. {error}",
   "playerNoDevices": "Avaa Spotify laitteella, niin se näkyy täällä",
   "playerNoEngine": "MixMusicin äänimoottori ei ole käytettävissä tässä järjestelmässä",
   "playerNoHighlight": "Tällä kappaleella ei ole kohokohtaa",

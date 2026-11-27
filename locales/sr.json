@@ -2193,6 +2193,7 @@
   "playerLooking": "Тражење уређаја…",
   "playerMiniPlayer": "Отвори мини плејер",
   "playerNext": "Следећа",
+  "playerNextEpisodeUnread": "Аутоматско пуштање је заустављено: следећу епизоду подкаста није било могуће прочитати. {error}",
   "playerNoDevices": "Отворите Spotify на уређају да бисте га видели овде",
   "playerNoEngine": "MixMusic-ов звучни механизам није доступан на овом систему",
   "playerNoHighlight": "Ова нумера нема истакнути део",

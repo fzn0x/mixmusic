@@ -2193,6 +2193,7 @@
   "playerLooking": "Qurilmalar qidirilmoqda…",
   "playerMiniPlayer": "Mini pleyerni ochish",
   "playerNext": "Keyingi",
+  "playerNextEpisodeUnread": "Avtoijro toʻxtadi: podkastning keyingi epizodini oʻqib boʻlmadi. {error}",
   "playerNoDevices": "Shu yerda koʻrinishi uchun Spotify-ni qurilmada oching",
   "playerNoEngine": "MixMusic audio dvigateli bu tizimda mavjud emas",
   "playerNoHighlight": "Bu trekda ajratilgan joy yoʻq",

@@ -2193,6 +2193,7 @@
   "playerLooking": "Recherche des appareils…",
   "playerMiniPlayer": "Ouvrir le mini-lecteur",
   "playerNext": "Suivant",
+  "playerNextEpisodeUnread": "Lecture automatique arrêtée : impossible de lire l’épisode suivant du podcast. {error}",
   "playerNoDevices": "Ouvrez Spotify sur un appareil pour le voir ici",
   "playerNoEngine": "le moteur audio de MixMusic n’est pas disponible sur ce système",
   "playerNoHighlight": "Ce titre n’a pas de passage mis en avant",

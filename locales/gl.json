@@ -2193,6 +2193,7 @@
   "playerLooking": "Buscando dispositivos…",
   "playerMiniPlayer": "Abrir o minirreprodutor",
   "playerNext": "Seguinte",
+  "playerNextEpisodeUnread": "A reprodución automática detívose: non se puido ler o seguinte episodio do podcast. {error}",
   "playerNoDevices": "Abre Spotify nun dispositivo para velo aquí",
   "playerNoEngine": "O motor de audio de MixMusic non está dispoñible neste sistema",
   "playerNoHighlight": "Esta canción non ten momento destacado",

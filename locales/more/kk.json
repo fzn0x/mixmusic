@@ -2192,6 +2192,7 @@
   "playerLooking": "Құрылғылар ізделуде…",
   "playerMiniPlayer": "Шағын плеерді ашу",
   "playerNext": "Келесі",
+  "playerNextEpisodeUnread": "Автоойнату тоқтады: подкасттың келесі эпизодын оқу мүмкін болмады. {error}",
   "playerNoDevices": "Осында көру үшін құрылғыда Spotify ашыңыз",
   "playerNoEngine": "MixMusic дыбыс қозғалтқышы бұл жүйеде қолжетімсіз",
   "playerNoHighlight": "Бұл тректе басты сәт жоқ",

@@ -2193,6 +2193,7 @@
   "playerLooking": "Търсят се устройства…",
   "playerMiniPlayer": "Отваряне на мини плейъра",
   "playerNext": "Напред",
+  "playerNextEpisodeUnread": "Автоматичното пускане спря: следващият епизод на подкаста не можа да бъде прочетен. {error}",
   "playerNoDevices": "Отворете Spotify на устройство, за да го видите тук",
   "playerNoEngine": "Аудиодвигателят на MixMusic не е наличен в тази система",
   "playerNoHighlight": "Тази песен няма най-интересно място",

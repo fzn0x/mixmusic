@@ -2192,6 +2192,7 @@
   "playerLooking": "ڈیوائسز ڈھونڈی جا رہی ہیں…",
   "playerMiniPlayer": "منی پلیئر کھولیں",
   "playerNext": "اگلا",
+  "playerNextEpisodeUnread": "خودکار پلے رک گیا: پوڈ کاسٹ کی اگلی قسط پڑھی نہ جا سکی۔ {error}",
   "playerNoDevices": "کسی ڈیوائس کو یہاں دیکھنے کے لیے اس پر Spotify کھولیں",
   "playerNoEngine": "MixMusic کا آڈیو انجن اس سسٹم پر دستیاب نہیں",
   "playerNoHighlight": "اس ٹریک کا کوئی نمایاں حصہ نہیں",

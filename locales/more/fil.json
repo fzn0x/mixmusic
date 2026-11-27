@@ -2192,6 +2192,7 @@
   "playerLooking": "Naghahanap ng mga device…",
   "playerMiniPlayer": "Buksan ang mini player",
   "playerNext": "Susunod",
+  "playerNextEpisodeUnread": "Huminto ang autoplay: hindi mabasa ang susunod na episode ng podcast. {error}",
   "playerNoDevices": "Buksan ang Spotify sa isang device para makita ito rito",
   "playerNoEngine": "Hindi available sa system na ito ang audio engine ng MixMusic",
   "playerNoHighlight": "Walang highlight ang track na ito",

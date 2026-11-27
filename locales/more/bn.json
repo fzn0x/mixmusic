@@ -2192,6 +2192,7 @@
   "playerLooking": "ডিভাইস খোঁজা হচ্ছে…",
   "playerMiniPlayer": "মিনি প্লেয়ার খুলুন",
   "playerNext": "পরের",
+  "playerNextEpisodeUnread": "অটোপ্লে থেমেছে: পডকাস্টের পরের এপিসোডটি পড়া যায়নি। {error}",
   "playerNoDevices": "এখানে দেখতে কোনো ডিভাইসে Spotify খুলুন",
   "playerNoEngine": "এই সিস্টেমে MixMusic-এর অডিও ইঞ্জিন নেই",
   "playerNoHighlight": "এই গানে কোনো হাইলাইট নেই",

@@ -2193,6 +2193,7 @@
   "playerLooking": "Traženje uređaja…",
   "playerMiniPlayer": "Otvori mini player",
   "playerNext": "Sljedeće",
+  "playerNextEpisodeUnread": "Automatska reprodukcija zaustavljena: sljedeću epizodu podcasta nije bilo moguće pročitati. {error}",
   "playerNoDevices": "Otvorite Spotify na uređaju da se prikaže ovdje",
   "playerNoEngine": "Audio pogon MixMusica nije dostupan na ovom sustavu",
   "playerNoHighlight": "Ova skladba nema istaknuti dio",

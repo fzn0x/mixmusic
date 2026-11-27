@@ -2193,6 +2193,7 @@
   "playerLooking": "Eszközök keresése…",
   "playerMiniPlayer": "A minilejátszó megnyitása",
   "playerNext": "Következő",
+  "playerNextEpisodeUnread": "Az automatikus lejátszás leállt: nem sikerült beolvasni a podcast következő epizódját. {error}",
   "playerNoDevices": "Nyissa meg a Spotify-t egy eszközön, hogy itt lássa",
   "playerNoEngine": "A MixMusic hangmotorja nem érhető el ezen a rendszeren",
   "playerNoHighlight": "Ennek a számnak nincs csúcspontja",

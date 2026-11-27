@@ -2192,6 +2192,7 @@
   "playerLooking": "ഉപകരണങ്ങൾക്കായി തിരയുന്നു…",
   "playerMiniPlayer": "മിനി പ്ലെയർ തുറക്കുക",
   "playerNext": "അടുത്തത്",
+  "playerNextEpisodeUnread": "ഓട്ടോപ്ലേ നിന്നു: പോഡ്‌കാസ്റ്റിന്റെ അടുത്ത എപ്പിസോഡ് വായിക്കാനായില്ല. {error}",
   "playerNoDevices": "ഇവിടെ കാണാൻ ഒരു ഉപകരണത്തിൽ Spotify തുറക്കുക",
   "playerNoEngine": "MixMusic-ന്റെ ഓഡിയോ എഞ്ചിൻ ഈ സിസ്റ്റത്തിൽ ലഭ്യമല്ല",
   "playerNoHighlight": "ഈ പാട്ടിന് ഹൈലൈറ്റില്ല",

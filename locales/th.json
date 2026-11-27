@@ -2193,6 +2193,7 @@
   "playerLooking": "กำลังค้นหาอุปกรณ์…",
   "playerMiniPlayer": "เปิดมินิเพลเยอร์",
   "playerNext": "ถัดไป",
+  "playerNextEpisodeUnread": "หยุดเล่นอัตโนมัติแล้ว: อ่านตอนถัดไปของพอดแคสต์ไม่ได้ {error}",
   "playerNoDevices": "เปิด Spotify บนอุปกรณ์เพื่อให้แสดงที่นี่",
   "playerNoEngine": "เอนจินเสียงของ MixMusic ใช้งานไม่ได้ในระบบนี้",
   "playerNoHighlight": "เพลงนี้ไม่มีช่วงเด่น",

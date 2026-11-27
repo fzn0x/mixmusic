@@ -2193,6 +2193,7 @@
   "playerLooking": "Đang tìm thiết bị…",
   "playerMiniPlayer": "Mở trình phát mini",
   "playerNext": "Tiếp theo",
+  "playerNextEpisodeUnread": "Đã dừng tự động phát: không đọc được tập tiếp theo của podcast. {error}",
   "playerNoDevices": "Hãy mở Spotify trên một thiết bị để thấy nó ở đây",
   "playerNoEngine": "Công cụ âm thanh của MixMusic không dùng được trên hệ thống này",
   "playerNoHighlight": "Bài hát này không có đoạn nổi bật",

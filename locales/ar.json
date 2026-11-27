@@ -2193,6 +2193,7 @@
   "playerLooking": "جارٍ البحث عن الأجهزة…",
   "playerMiniPlayer": "فتح المشغّل المصغّر",
   "playerNext": "التالي",
+  "playerNextEpisodeUnread": "توقف التشغيل التلقائي: تعذّرت قراءة الحلقة التالية من البودكاست. {error}",
   "playerNoDevices": "افتح Spotify على جهاز ليظهر هنا",
   "playerNoEngine": "محرك الصوت في MixMusic غير متاح على هذا النظام",
   "playerNoHighlight": "لا مقطع مميزًا في هذه الأغنية",

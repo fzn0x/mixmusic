@@ -2192,6 +2192,7 @@
   "playerLooking": "Inatafuta vifaa…",
   "playerMiniPlayer": "Fungua kicheza kidogo",
   "playerNext": "Unaofuata",
+  "playerNextEpisodeUnread": "Kucheza kiotomatiki kumesimama: kipindi kinachofuata cha podikasti hakikuweza kusomwa. {error}",
   "playerNoDevices": "Fungua Spotify kwenye kifaa ili ukione hapa",
   "playerNoEngine": "Injini ya sauti ya MixMusic haipatikani kwenye mfumo huu",
   "playerNoHighlight": "Wimbo huu hauna sehemu bora",

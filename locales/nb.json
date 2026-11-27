@@ -2193,6 +2193,7 @@
   "playerLooking": "Leter etter enheter …",
   "playerMiniPlayer": "Åpne minispilleren",
   "playerNext": "Neste",
+  "playerNextEpisodeUnread": "Automatisk avspilling stoppet: podkastens neste episode kunne ikke leses inn. {error}",
   "playerNoDevices": "Åpne Spotify på en enhet for å se den her",
   "playerNoEngine": "Lydmotoren til MixMusic er ikke tilgjengelig på dette systemet",
   "playerNoHighlight": "Denne låten har ikke noe høydepunkt",

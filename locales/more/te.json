@@ -2192,6 +2192,7 @@
   "playerLooking": "పరికరాల కోసం చూస్తోంది…",
   "playerMiniPlayer": "మినీ ప్లేయర్‌ను తెరవండి",
   "playerNext": "తర్వాతిది",
+  "playerNextEpisodeUnread": "ఆటోప్లే ఆగిపోయింది: పాడ్‌కాస్ట్ తదుపరి ఎపిసోడ్‌ను చదవలేకపోయింది. {error}",
   "playerNoDevices": "పరికరాన్ని ఇక్కడ చూడటానికి దానిలో Spotifyని తెరవండి",
   "playerNoEngine": "MixMusic ఆడియో ఇంజిన్ ఈ సిస్టమ్‌లో అందుబాటులో లేదు",
   "playerNoHighlight": "ఈ ట్రాక్‌కు హైలైట్ లేదు",

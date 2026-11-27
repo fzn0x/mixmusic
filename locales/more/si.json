@@ -2192,6 +2192,7 @@
   "playerLooking": "උපාංග සොයමින්…",
   "playerMiniPlayer": "කුඩා වාදකය විවෘත කරන්න",
   "playerNext": "ඊළඟ",
+  "playerNextEpisodeUnread": "ස්වයං වාදනය නතර විය: පොඩ්කාස්ට් එකේ ඊළඟ කථාංගය කියවිය නොහැකි විය. {error}",
   "playerNoDevices": "උපාංගයක් මෙහි බැලීමට එහි Spotify විවෘත කරන්න",
   "playerNoEngine": "MixMusic හි ශ්‍රව්‍ය එන්ජිම මෙම පද්ධතියේ ලබා ගත නොහැක",
   "playerNoHighlight": "මෙම ගීතයට විශේෂ කොටසක් නැත",

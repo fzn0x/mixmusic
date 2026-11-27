@@ -2193,6 +2193,7 @@
   "playerLooking": "Mencari perangkat…",
   "playerMiniPlayer": "Buka pemutar mini",
   "playerNext": "Berikutnya",
+  "playerNextEpisodeUnread": "Putar otomatis berhenti: episode berikutnya dari podcast ini tidak bisa dibaca. {error}",
   "playerNoDevices": "Buka Spotify di sebuah perangkat agar tampil di sini",
   "playerNoEngine": "Mesin audio MixMusic tidak tersedia di sistem ini",
   "playerNoHighlight": "Lagu ini tidak punya bagian sorotan",

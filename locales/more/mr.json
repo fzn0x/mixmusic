@@ -2192,6 +2192,7 @@
   "playerLooking": "डिव्हाइस शोधत आहे…",
   "playerMiniPlayer": "मिनी प्लेयर उघडा",
   "playerNext": "पुढील",
+  "playerNextEpisodeUnread": "ऑटोप्ले थांबले: पॉडकास्टचा पुढचा एपिसोड वाचता आला नाही. {error}",
   "playerNoDevices": "डिव्हाइस येथे पाहण्यासाठी त्यावर Spotify उघडा",
   "playerNoEngine": "MixMusic चे ऑडिओ इंजिन या सिस्टमवर उपलब्ध नाही",
   "playerNoHighlight": "या ट्रॅकला हायलाइट नाही",

@@ -279,16 +279,13 @@ func (h controlHost) Do(c overlay.Command) error {
 }
 
 // like likes the track that plays, or takes the like back, as the media
-// keys do: a like takes a dislike back.
+// keys do: the player hears of a dislike taken back at once, and the
+// library's own like takes it back there too, in one call: two would race
+// on the service.
 func (h controlHost) like(p *player.Player, t media.Track, on bool) {
 	a := h.a
 	if on && a.IsDisliked(t.ID) {
 		p.Disliked(t.ID, false)
-		go func() {
-			if err := (&Collection{a}).SetDisliked(context.Background(), t, false); err != nil {
-				log.Printf("mixmusic: control: taking back the dislike of %s: %v", t.ID, err)
-			}
-		}()
 	}
 	go func() {
 		if err := (&Collection{a}).SetLiked(context.Background(), t, on); err != nil {
@@ -300,18 +297,12 @@ func (h controlHost) like(p *player.Player, t media.Track, on bool) {
 }
 
 // dislike dislikes the track that plays, or takes the dislike back, as the
-// media keys do: a dislike takes a like back.
+// media keys do: the player hears of it at once, and moves on from the
+// track if it plays, while the settings skip disliked songs. The library's
+// own dislike unlikes there too, in one call: two would race on the
+// service.
 func (h controlHost) dislike(p *player.Player, t media.Track, on bool) {
 	a := h.a
-	if on && a.IsLiked(t.ID) {
-		go func() {
-			if err := (&Collection{a}).SetLiked(context.Background(), t, false); err != nil {
-				log.Printf("mixmusic: control: unliking %s: %v", t.ID, err)
-			}
-		}()
-	}
-	// The player hears of it at once, and moves on from the track if it
-	// plays, while the settings skip disliked songs.
 	p.Disliked(t.ID, on)
 	go func() {
 		if err := (&Collection{a}).SetDisliked(context.Background(), t, on); err != nil {

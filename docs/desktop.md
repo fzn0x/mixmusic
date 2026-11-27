@@ -340,10 +340,10 @@ The program is in a place of its own on each system:
 - **Linux**: `mixmusic --next` with the `.deb` or the `.rpm`, or the
   AppImage itself with `--next` after it.
 
-For what these flags can't do — seek, like, play a track of the queue, set
-the volume to a percentage, read the state, and hear of each change — [a
-program on this computer controls MixMusic over HTTP](control-api.md),
-with a token.
+For what these flags can't do, as seeking, liking, playing a track of the
+queue, setting the volume to a percentage, reading the state or hearing of
+each change, [a program on this computer controls MixMusic over
+HTTP](control-api.md), with a token.
 
 With no MixMusic running, a flag prints `MixMusic isn't running` and ends
 with status 1, without starting MixMusic. A link starts it, as any link

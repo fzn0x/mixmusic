@@ -24,6 +24,8 @@ on:
   workflow_dispatch:
 
 permissions:
+  # To list the run's artifacts before deploying.
+  actions: read
   contents: read
   pages: write
   id-token: write
@@ -89,13 +91,35 @@ jobs:
       # llms.txt for AI agents (tools/sitefinish).
       - name: Finish the site
         run: nix develop --command go run ./tools/sitefinish
+      # Named for the attempt: a re-run of this job keeps the artifacts of
+      # the attempts before it in the run, and deploy-pages refuses to pick
+      # one of several of the same name, so every re-run would fail.
       - uses: actions/upload-pages-artifact@v5
         with:
+          name: github-pages-${{ github.run_attempt }}
           path: site/public
       # Main may have moved on while the site built.
       - id: still
         name: Still main's newest commit
         run: bash .github/scripts/newest.sh
+      # An artifact finalized a moment ago may not be listed yet: on
+      # 2026-11-27 deploy-pages found none a second after the upload.
+      - name: The artifact, listed
+        if: steps.still.outputs.newest == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NAME: github-pages-${{ github.run_attempt }}
+        run: |
+          for try in $(seq 1 24); do
+            count="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts?name=$NAME" --jq '.total_count')" || count=0
+            if [ "${count:-0}" -ge 1 ]; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::warning::$NAME wasn't listed after 2 minutes: deploying anyway"
       - id: deployment
         if: steps.still.outputs.newest == 'true'
         uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}

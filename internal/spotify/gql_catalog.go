@@ -146,18 +146,21 @@ type gqlPlaylistOwner struct {
 }
 
 type gqlPlaylistData struct {
-	TypeName    string            `json:"__typename"`
-	URI         string            `json:"uri"`
-	ID          string            `json:"id"`
-	Name        string            `json:"name"`
-	Description string            `json:"description"`
-	Images      gqlPlaylistImages `json:"images"`
-	OwnerV2     gqlPlaylistOwner  `json:"ownerV2"`
-	Following   bool              `json:"following"`
-	Members     struct {
+	TypeName       string            `json:"__typename"`
+	URI            string            `json:"uri"`
+	ID             string            `json:"id"`
+	Name           string            `json:"name"`
+	Description    string            `json:"description"`
+	Images         gqlPlaylistImages `json:"images"`
+	OwnerV2        gqlPlaylistOwner  `json:"ownerV2"`
+	Following      bool              `json:"following"`
+	Collaborative  bool              `json:"collaborative"`
+	BasePermission string            `json:"basePermission"`
+	Members        struct {
 		TotalCount int `json:"totalCount"`
 		Items      []struct {
-			IsOwner bool `json:"isOwner"`
+			IsOwner         bool   `json:"isOwner"`
+			PermissionLevel string `json:"permissionLevel"`
 		} `json:"items"`
 	} `json:"members"`
 	CurrentUserCapabilities struct {
@@ -403,6 +406,18 @@ func gqlPlaylistOwnerID(o gqlPlaylistOwner) string {
 	return o.Data.Username
 }
 
+func gqlPlaylistCollaborative(p *gqlPlaylistData) bool {
+	if p.Collaborative || strings.EqualFold(p.BasePermission, "CONTRIBUTOR") {
+		return true
+	}
+	for _, m := range p.Members.Items {
+		if !m.IsOwner && strings.EqualFold(m.PermissionLevel, "CONTRIBUTOR") {
+			return true
+		}
+	}
+	return false
+}
+
 func gqlPlaylistToMedia(p *gqlPlaylistData, fallbackID, userID string) media.Playlist {
 	id := p.ID
 	if id == "" {
@@ -416,9 +431,9 @@ func gqlPlaylistToMedia(p *gqlPlaylistData, fallbackID, userID string) media.Pla
 	if ownerName == "" {
 		ownerName = ownerID
 	}
-	collab := p.Members.TotalCount > 1 || len(p.Members.Items) > 1
+	collab := gqlPlaylistCollaborative(p)
 	mine := userID != "" && ownerID == userID
-	editable := p.CurrentUserCapabilities.CanEditItems || mine || (userID != "" && collab)
+	editable := p.CurrentUserCapabilities.CanEditItems || mine
 	out := media.Playlist{
 		ID:            media.ID(media.SourceSpotify, id),
 		Source:        media.SourceSpotify,

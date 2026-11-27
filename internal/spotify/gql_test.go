@@ -348,3 +348,52 @@ func TestGQLHashSyncAndAuthRetry(t *testing.T) {
 		t.Error("status=not_in_bundle overwrote verified hash")
 	}
 }
+
+func TestGQLPlaylistEditableAndCollaborative(t *testing.T) {
+	// Playlist with two other members (alice & bob), user me cannot edit.
+	var twoOther gqlPlaylistData
+	rawTwoOther := `{"uri":"spotify:playlist:abc","name":"Theirs","ownerV2":{"data":{"uri":"spotify:user:alice","name":"Alice"}},"members":{"totalCount":2},"currentUserCapabilities":{"canEditItems":false}}`
+	if err := json.Unmarshal([]byte(rawTwoOther), &twoOther); err != nil {
+		t.Fatal(err)
+	}
+	got := gqlPlaylistToMedia(&twoOther, "abc", "me")
+	if got.Editable {
+		t.Errorf("Editable = true for a playlist of alice and bob, user me, canEditItems false")
+	}
+	if got.Collaborative {
+		t.Errorf("Collaborative = true when playlist has multiple members but collaborative/contributor permission is absent")
+	}
+
+	// Collaborative playlist owned by alice: Collaborative is true, Editable follows canEditItems.
+	var collabViewOnly gqlPlaylistData
+	rawCollabViewOnly := `{"uri":"spotify:playlist:def","name":"Shared","collaborative":true,"basePermission":"VIEWER","ownerV2":{"data":{"uri":"spotify:user:alice","name":"Alice"}},"members":{"totalCount":2,"items":[{"isOwner":true,"permissionLevel":"OWNER"},{"isOwner":false,"permissionLevel":"CONTRIBUTOR"}]},"currentUserCapabilities":{"canEditItems":false}}`
+	if err := json.Unmarshal([]byte(rawCollabViewOnly), &collabViewOnly); err != nil {
+		t.Fatal(err)
+	}
+	gotCollabView := gqlPlaylistToMedia(&collabViewOnly, "def", "me")
+	if !gotCollabView.Collaborative || gotCollabView.Editable || gotCollabView.Mine {
+		t.Errorf("got Collaborative=%v Editable=%v Mine=%v, want true/false/false", gotCollabView.Collaborative, gotCollabView.Editable, gotCollabView.Mine)
+	}
+
+	// Collaborator with edit capability.
+	var collabEdit gqlPlaylistData
+	rawCollabEdit := `{"uri":"spotify:playlist:ghi","name":"Collab","collaborative":true,"ownerV2":{"data":{"uri":"spotify:user:alice","name":"Alice"}},"currentUserCapabilities":{"canEditItems":true}}`
+	if err := json.Unmarshal([]byte(rawCollabEdit), &collabEdit); err != nil {
+		t.Fatal(err)
+	}
+	gotCollabEdit := gqlPlaylistToMedia(&collabEdit, "ghi", "me")
+	if !gotCollabEdit.Collaborative || !gotCollabEdit.Editable || gotCollabEdit.Mine {
+		t.Errorf("got Collaborative=%v Editable=%v Mine=%v, want true/true/false", gotCollabEdit.Collaborative, gotCollabEdit.Editable, gotCollabEdit.Mine)
+	}
+
+	// Playlist owned by the signed-in user is editable even if canEditItems is omitted.
+	var owned gqlPlaylistData
+	rawOwned := `{"uri":"spotify:playlist:mine1","name":"Mine","ownerV2":{"data":{"uri":"spotify:user:me","name":"Me"}},"currentUserCapabilities":{"canEditItems":false}}`
+	if err := json.Unmarshal([]byte(rawOwned), &owned); err != nil {
+		t.Fatal(err)
+	}
+	gotOwned := gqlPlaylistToMedia(&owned, "mine1", "me")
+	if !gotOwned.Mine || !gotOwned.Editable {
+		t.Errorf("owned playlist Mine=%v Editable=%v, want true/true", gotOwned.Mine, gotOwned.Editable)
+	}
+}

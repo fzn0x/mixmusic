@@ -136,7 +136,7 @@ func (a *App) spotifySignInSPDC(ctx context.Context, spDC, spKey, spT string) (A
 	if err := a.tokens.Save(tok); err != nil {
 		return AccountsStatus{}, err
 	}
-	if a.settings != nil && a.settings.Get().SpotifyPlayback != settings.SpotifyPlaybackMatch {
+	if a.settings != nil && a.settings.Get().SpotifyPlayback == settings.SpotifyPlaybackHere {
 		if err := a.settings.Update(func(set *settings.Settings) error {
 			set.SpotifyPlayback = settings.SpotifyPlaybackMatch
 			return nil

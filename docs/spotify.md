@@ -5,9 +5,11 @@ MixMusic reads your Spotify library, personalized Home shelves, and catalog, and
 
 ## Sign in
 
-### Web session (`sp_dc`) — recommended
+### Web session (`sp_dc`), recommended
 
 Signing in with your Spotify web session (`sp_dc`) requires **no Spotify Developer app, no Client ID, and no Premium subscription**, and bypasses the 2026 Developer Mode restrictions (giving you full search results, personalized Spotify Home shelves, artist top tracks and related artists, and the tracks of playlists made by Spotify or other users). Audio plays automatically from the matching recording on YouTube Music.
+
+A web session uses the web player's private API, which Spotify can change at any time. Signing in and refreshing tokens also depend on two external files hosted outside Spotify (the current TOTP secret on GitHub Gist and the persisted-query hashes on GitHub Pages, listed in [Your data and privacy](data-and-privacy.md#what-each-feature-sends-where)): if Spotify rotates the secret or query hashes and those files do not follow right away, web sessions stop working until they do, or until a MixMusic release bakes in new values.
 
 In [Settings › Accounts](accounts.md#spotify), choose **Web session (`sp_dc`)** under **Sign-in method**, then sign in any of four ways:
 

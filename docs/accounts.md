@@ -183,12 +183,12 @@ the sign-in: sign out there, then sign in again.
 Settings › Accounts › Spotify has a **Sign-in method** switcher with two
 ways to connect:
 
-- **Web session (`sp_dc`)** — recommended. Needs no Spotify Developer app,
+- **Web session (`sp_dc`)**, recommended. Needs no Spotify Developer app,
   Client ID, or Premium subscription, and gives you full catalog search,
   Spotify Home shelves, and all playlists (including those made by Spotify
   or other users). Audio plays automatically from the matching recording
   on YouTube Music.
-- **Client ID (Developer API)** — optional, for direct Spotify playback in
+- **Client ID (Developer API)**, optional: for direct Spotify playback in
   MixMusic (Premium, on Windows and macOS) or on Spotify Connect. Spotify
   lets an app in development mode serve up to five accounts, and only
   while the app's owner has Spotify Premium:

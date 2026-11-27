@@ -208,3 +208,29 @@ func TestSpotifyBrowserLogin(t *testing.T) {
 		t.Fatalf("expected signed-in web session, got %+v", st.Spotify)
 	}
 }
+
+func TestSpotifySPDCPreservesConnectPlayback(t *testing.T) {
+	a, accts := spdcTestApp(t)
+	if err := a.settings.Update(func(s *settings.Settings) error {
+		s.SpotifyPlayback = settings.SpotifyPlaybackConnect
+		return nil
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := accts.SpotifyPasteSPDC(context.Background(), "valid-spdc-token"); err != nil {
+		t.Fatal(err)
+	}
+	if got := a.settings.Get().SpotifyPlayback; got != settings.SpotifyPlaybackConnect {
+		t.Errorf("SpotifyPlayback = %q, want %q preserved on sp_dc sign-in", got, settings.SpotifyPlaybackConnect)
+	}
+}
+
+func TestWebViewMissingSpotifySignIn(t *testing.T) {
+	for _, goos := range []string{"windows", "linux", "darwin"} {
+		err := webViewMissing(webViewSpotifySignIn, goos)
+		msg := ErrorWords(err)
+		if !strings.HasPrefix(msg, "Signing in to Spotify needs ") {
+			t.Errorf("%s: ErrorWords(webViewMissing(webViewSpotifySignIn)) = %q", goos, msg)
+		}
+	}
+}

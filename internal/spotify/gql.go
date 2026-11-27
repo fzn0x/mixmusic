@@ -126,7 +126,7 @@ func (s *gqlHashStore) hash(op string) (primary, prev string) {
 	return e.Hash, e.PreviousHash
 }
 
-// syncRemote refreshes persisted-query hashes from Meld's registry, ignoring
+// syncRemote refreshes persisted-query hashes from the remote registry, ignoring
 // entries whose status is not "verified" (e.g. "not_in_bundle").
 func (s *gqlHashStore) syncRemote(ctx context.Context, httpClient *http.Client, hashesURL string) bool {
 	if hashesURL == "" {

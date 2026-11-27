@@ -207,8 +207,10 @@ Where the credential store can't keep a secret:
 | Skip songs made with AI, while it's on | YouTube (`www.youtube.com`), signed out | the video's ID, once a video |
 | Skip the parts SponsorBlock marks, while it's on | SponsorBlock (`sponsor.ajay.app`), or the mirror you name | only the first 4 characters of the SHA-256 hash of the video's ID, once a video, never the ID: SponsorBlock answers with the parts of all the videos whose hash starts so, some 65,000 of them, and MixMusic keeps the video's. Nothing is sent of what you skip |
 | Covers | the image servers of YouTube, Google and Spotify | the image asked for |
-| Spotify, once you sign in | Spotify (`accounts.spotify.com`, `api.spotify.com`) | what you search and open, your library's changes, and the commands of what plays |
+| Spotify, once you sign in | Spotify (`accounts.spotify.com`, `api.spotify.com`, and with a web session `open.spotify.com` for the token and server time and `api-partner.spotify.com`) | what you search and open, your library's changes, and the commands of what plays |
 | Spotify in MixMusic | Spotify's player, loaded from `sdk.scdn.co` | what Spotify's own player sends |
+| Spotify web session (`sp_dc`), for the TOTP secret | GitHub Gist (`gist.githubusercontent.com`, with `api.github.com` as fallback) | a request for the current TOTP secret, at most every 6 hours, or once more if Spotify rejects a cached secret. Nothing else is sent |
+| Spotify web session (`sp_dc`), when Spotify rotates a query hash | GitHub Pages (`francescograzioso.github.io`) | a request for the persisted-query hash list after Spotify answers `PersistedQueryNotFound`, at most every 5 minutes. Nothing else is sent |
 | Lyrics, from the [sources](lyrics.md#choose-and-order-the-sources) on in Settings › Playback › Lyrics, one at a time in their order, until one has synced lyrics | Better Lyrics (`api.betterlyrics.org`) | the title, first artist, album and length of the track that plays, once it has an album and a length |
 | Lyrics, the same way | Unison (`unison.betterlyrics.org`) | the video ID of the track that plays, or, without one, its title, artists, album and length |
 | Lyrics, the same way | LRCLIB (`lrclib.net`) | the title, artists, album and length of the track that plays; of a music video, its song's |

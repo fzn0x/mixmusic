@@ -60,7 +60,7 @@ func (c *Client) Search(ctx context.Context, query string, filter Filter) ([]med
 // none of the answer's.
 func (c *Client) SearchWeb(ctx context.Context, query string) (media.SearchResults, error) {
 	n, err := c.callWith(ctx, webClient, "search", map[string]any{"query": query}, nil, callOptions{
-		baseURL:   webBaseURL,
+		baseURL:   c.webOrigin(),
 		anonymous: true,
 	})
 	if err != nil {

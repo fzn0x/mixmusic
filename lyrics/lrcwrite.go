@@ -8,7 +8,9 @@ import (
 // LRC writes the lyrics as text to edit (#598), which FromText reads back:
 // synced lyrics as LRC, each line after its time, "[mm:ss.xx]", and the
 // words of a line timed word by word after theirs, "<mm:ss.xx>", as
-// enhanced LRC has them; plain lyrics a line each, without times.
+// enhanced LRC has them; plain lyrics a line each, without times. Embedded
+// romanization or translation, when present, follows in "--- Romanized ---"
+// and "--- Translation (<code>) ---" blocks.
 func (l Lyrics) LRC() string {
 	var b strings.Builder
 	for _, line := range l.Lines {
@@ -19,6 +21,36 @@ func (l Lyrics) LRC() string {
 			b.WriteString(line.Text)
 		}
 		b.WriteByte('\n')
+	}
+	if l.Translation != nil && len(l.Translation.Lines) == len(l.Lines) {
+		hasRoman := false
+		hasTrans := false
+		for _, tl := range l.Translation.Lines {
+			if tl.Romanized != "" {
+				hasRoman = true
+			}
+			if tl.Text != "" {
+				hasTrans = true
+			}
+		}
+		if hasRoman {
+			b.WriteString("\n--- Romanized ---\n")
+			for _, tl := range l.Translation.Lines {
+				b.WriteString(tl.Romanized)
+				b.WriteByte('\n')
+			}
+		}
+		if hasTrans {
+			if l.Translation.To != "" {
+				b.WriteString("\n--- Translation (" + l.Translation.To + ") ---\n")
+			} else {
+				b.WriteString("\n--- Translation ---\n")
+			}
+			for _, tl := range l.Translation.Lines {
+				b.WriteString(tl.Text)
+				b.WriteByte('\n')
+			}
+		}
 	}
 	return b.String()
 }

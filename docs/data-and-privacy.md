@@ -217,11 +217,15 @@ Where the credential store can't keep a secret:
 | Spotify web session (`sp_dc`), when Spotify rotates a query hash | GitHub Pages (`francescograzioso.github.io`) | a request for the persisted-query hash list after Spotify answers `PersistedQueryNotFound`, at most every 5 minutes. Nothing else is sent |
 | Lyrics, from the [sources](lyrics.md#choose-and-order-the-sources) on in Settings › Playback › Lyrics, one at a time in their order, until one has synced lyrics | Better Lyrics (`api.betterlyrics.org`) | the title, first artist, album and length of the track that plays, once it has an album and a length |
 | Lyrics, the same way | Unison (`unison.betterlyrics.org`) | the video ID of the track that plays, or, without one, its title, artists, album and length |
+| Lyrics, the same way | lrc.red (`lrc.red`) | the track's ISRC when known, or its title and first artist |
+| Lyrics, the same way | Spotify (`spclient.wg.spotify.com`) | the Spotify track ID, only while signed in with a Spotify web session (`sp_dc`) |
 | Lyrics, the same way | LRCLIB (`lrclib.net`) | the title, artists, album and length of the track that plays; of a music video, its song's |
+| Lyrics, the same way | QQ Music (`c.y.qq.com`) | the title and first artist of the track that plays |
 | [Lyrics timed to a music video](lyrics.md#music-videos), while "Time lyrics to music videos" is on | YouTube's player API (`www.youtube.com`) and media servers, signed out | the video IDs of the music video and of its song, once a video, for stretches of their audio: of the song, only those compared. No play is reported |
 | Lyrics, the same way | YouTube Music | the video ID of the track that plays, or of its recording there |
 | Lyrics, the same way, and the transcript of a podcast episode | YouTube (`www.youtube.com`), signed out | the video ID of the track that plays, or of its recording there, for its captions |
-| [Search by title and artist…](lyrics.md#pick-another-source), when you search | every source on, at once | the title and artist you give, with the album and length of the track that plays; YouTube Music and YouTube captions get the track's video ID, as above |
+| Lyrics, the same way | YouTube (`www.youtube.com`), signed out | the video ID of the track (for its description and pinned creator comments), or the title and first artist (signed out, to find matching video uploads) |
+| [Search by title and artist…](lyrics.md#pick-another-source), when you search | every source on, at once | the title and artist you give, with the album and length of the track that plays; Spotify, YouTube Music and YouTube captions get the track's own Spotify ID or video ID, as above |
 | Lyrics of a track on this computer | the sources on, but YouTube captions | its title, artists, album and length, as its tags tell, unless they name no artist or [its file holds synced lyrics](lyrics.md#songs-on-this-computer); never its file, nor the lyrics it holds |
 | Translate, or romanized Arabic, while it's on beside the lyrics | Unison, which has Google translate them | the lyrics of the track that plays, with its video ID |
 | Romaji, the first time you turn it on | GitHub | a download of the dictionary of kanji readings; the lyrics stay on your computer |

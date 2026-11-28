@@ -26,6 +26,7 @@
   "lyricsBall": true,
   "lyricsBallMotion": "mix",
   "lyricsTranslate": [],
+  "lyricsTranslateMode": "under",
   "lyricsRomanize": {},
   "skippedYtdlp": "",
   "homeShelves": [],

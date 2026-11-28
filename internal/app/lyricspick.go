@@ -51,6 +51,11 @@ type LyricsPick struct {
 	// them (SearchLyrics); "" asks for the track as the lookup does.
 	Title  string `json:"title,omitempty"`
 	Artist string `json:"artist,omitempty"`
+	// CandidateID identifies a specific version within a multi-result
+	// source (e.g. lrc.red ISRC, LRCLIB record ID, QQ Music songmid, YouTube video ID).
+	CandidateID string `json:"candidateId,omitempty"`
+	// Candidate names the chosen candidate (e.g. its title) for display.
+	Candidate string `json:"candidate,omitempty"`
 	// Edited are the lyrics the listener edited, with the credit of the
 	// lyrics they started from: they show before every source, and before
 	// the lyrics of a file.
@@ -60,14 +65,19 @@ type LyricsPick struct {
 // IsZero reports whether p is Automatic.
 func (p LyricsPick) IsZero() bool { return p.Source == "" && p.Edited == nil }
 
-// Searched reports whether p is a result of a search by title and artist.
-func (p LyricsPick) Searched() bool { return p.Edited == nil && (p.Title != "" || p.Artist != "") }
+// Searched reports whether p is a result of a search by title and artist
+// or a specific candidate picked from a provider's search results.
+func (p LyricsPick) Searched() bool {
+	return p.Edited == nil && (p.Title != "" || p.Artist != "" || p.CandidateID != "")
+}
 
 // answerKey is the key the answer of p's source is kept under: its
-// source's, of a caption track its language's, of a search its title's
-// and artist's too.
+// source's, of a caption track its language's, of a specific candidate
+// its ID's, or of a search its title's and artist's.
 func (p LyricsPick) answerKey() string {
 	switch {
+	case p.CandidateID != "":
+		return p.Source + "\x00id:" + p.CandidateID
 	case p.Searched():
 		return p.Source + "\x00" + p.Title + "\x00" + p.Artist
 	case p.Caption != "":
@@ -102,6 +112,18 @@ type LyricsChoice struct {
 	// found some.
 	State  LyricsState
 	Lyrics lyrics.Lyrics
+	// TrackTitle, TrackArtist, Album, and Duration describe a specific
+	// candidate returned by a multi-result provider.
+	TrackTitle  string
+	TrackArtist string
+	Album       string
+	Duration    time.Duration
+	// Loaded reports whether Lyrics is already populated (false for
+	// lazy-loaded candidates until PreviewLyricsCandidate is called).
+	Loaded bool
+	// SyncHint hints the expected timing ("words", "lines", "plain")
+	// before Loaded becomes true.
+	SyncHint string
 	// On is set for the choice picked, and Showing for the one whose
 	// lyrics show.
 	On, Showing bool
@@ -128,7 +150,14 @@ var ErrLyricsEmpty = errors.New("lyrics: the edit holds no words")
 // lyricsByTitle are the sources that look lyrics up by a title and an
 // artist, which a search asks for those given; the others look up the
 // track's recording on YouTube.
-var lyricsByTitle = map[string]bool{settings.LyricsBetterLyrics: true, settings.LyricsUnison: true, settings.LyricsLRCLIB: true}
+var lyricsByTitle = map[string]bool{
+	settings.LyricsBetterLyrics: true,
+	settings.LyricsUnison:       true,
+	settings.LyricsLrcRed:       true,
+	settings.LyricsLRCLIB:       true,
+	settings.LyricsQQMusic:      true,
+	settings.LyricsYouTubePage:  true,
+}
 
 // lyricsAnswer is what a source answered for a track's lyrics, and the
 // version of the timing of music videos' lyrics it saw (lyricsStay).
@@ -265,9 +294,7 @@ func (c *Catalog) pickedLyrics(ctx context.Context, track media.Track) (l lyrics
 	}
 	if pick.Edited != nil {
 		l = *pick.Edited
-		if l.Language == "" {
-			l.Language = lyrics.GuessLanguage(l.Lines)
-		}
+		ensureLyricsLanguage(&l)
 		return l, true, nil
 	}
 	set := c.a.settings.Get().Lyrics
@@ -293,9 +320,7 @@ func (c *Catalog) pickedLyrics(ctx context.Context, track media.Track) (l lyrics
 		return lyrics.Lyrics{}, true, lyricsError{locales.LyricsCantLoad(), ans.err}
 	}
 	l = ans.l
-	if l.Language == "" {
-		l.Language = lyrics.GuessLanguage(l.Lines)
-	}
+	ensureLyricsLanguage(&l)
 	return l, true, nil
 }
 
@@ -313,13 +338,19 @@ func (c *Catalog) answerOf(asked *lyricsAsked, track media.Track, set settings.L
 	return lyricsAnswer{}, false
 }
 
-// askPick asks pick's source for the lyrics of a track: for its title and
-// artist, when a search picked them, else as the lookup asks it.
+// askPick asks pick's source for the lyrics of a track: for a specific
+// candidate ID when set, for its title and artist when a search picked
+// them, else as the lookup asks it.
 func (c *Catalog) askPick(ctx context.Context, track media.Track, pick LyricsPick, set settings.Lyrics) (lyrics.Lyrics, error) {
 	q := lyricsQuery(track)
 	q.VideoID = c.videoID(track)
 	if pick.Searched() {
 		q = searchQuery(track, pick.Title, pick.Artist)
+	}
+	if pick.CandidateID != "" {
+		if byID := lyricsByIDLookups[pick.Source]; byID != nil {
+			return byID(c, ctx, track, q, pick.CandidateID)
+		}
 	}
 	if pick.Source == settings.LyricsCaptions && pick.Caption != "" {
 		return c.captionLyricsIn(ctx, track, pick.Caption)
@@ -328,11 +359,11 @@ func (c *Catalog) askPick(ctx context.Context, track media.Track, pick LyricsPic
 }
 
 // searchQuery asks for a track by the title and artist given: its album
-// and length stay, which Better Lyrics needs, and its video ID goes, which
-// Unison would look it up by in their place.
+// and length stay, which Better Lyrics needs, and its video ID, Spotify ID
+// and ISRC go, so manual searches look up what the user typed.
 func searchQuery(track media.Track, title, artist string) lyrics.Query {
 	q := lyricsQuery(track)
-	q.Title, q.Artist, q.VideoID = title, artist, ""
+	q.Title, q.Artist, q.VideoID, q.SpotifyID, q.ISRC = title, artist, "", "", ""
 	return q
 }
 
@@ -415,41 +446,124 @@ func (c *Catalog) LyricsChoices(track media.Track) LyricsChoices {
 }
 
 // SearchLyrics asks every source that is on for the lyrics of a track by
-// the title and artist given, at once, and returns their answers in the
-// user's order of the sources, those that failed too. The sources that
-// look up the track's recording on YouTube, not a title, are asked for
-// the track itself.
+// the title and artist given, at once, and returns their candidates in the
+// user's order of the sources, those that failed too. Multi-result
+// providers return every matching candidate so the listener can browse
+// and pick an exact version.
 func (c *Catalog) SearchLyrics(ctx context.Context, track media.Track, title, artist string) []LyricsChoice {
 	set := c.a.settings.Get().Lyrics
 	title, artist = strings.TrimSpace(title), strings.TrimSpace(artist)
-	var found []LyricsChoice
+	var keys []string
 	for _, src := range set.SourceOrder() {
 		if !src.Off && lyricsLookups[src.Key] != nil {
-			found = append(found, LyricsChoice{Pick: LyricsPick{Source: src.Key}})
+			keys = append(keys, src.Key)
 		}
 	}
+	perSource := make([][]LyricsChoice, len(keys))
 	var wg sync.WaitGroup
-	for i := range found {
-		key := found[i].Pick.Source
+	for i, key := range keys {
 		wg.Go(func() {
 			q := lyricsQuery(track)
 			q.VideoID = c.videoID(track)
 			if lyricsByTitle[key] {
-				found[i].Pick.Title, found[i].Pick.Artist = title, artist
 				q = searchQuery(track, title, artist)
 			}
-			l, err := lyricsLookups[key](c, ctx, track, q)
-			if err == nil && l.Language == "" {
-				l.Language = lyrics.GuessLanguage(l.Lines)
+			if searchFn := lyricsSearchLookups[key]; searchFn != nil {
+				cands, err := searchFn(c, ctx, track, q)
+				if err != nil || len(cands) == 0 {
+					if err == nil {
+						err = lyrics.ErrNotFound
+					}
+					ch := LyricsChoice{Pick: LyricsPick{Source: key}, State: answerState(lyricsAnswer{err: err})}
+					if lyricsByTitle[key] {
+						ch.Pick.Title, ch.Pick.Artist = title, artist
+					}
+					if ch.State == LyricsUnreachable {
+						log.Printf("mixmusic: searching the lyrics of %s on %s: %v", track.ID, key, err)
+					}
+					perSource[i] = []LyricsChoice{ch}
+					return
+				}
+				choices := make([]LyricsChoice, 0, len(cands))
+				for _, cand := range cands {
+					l := cand.Lyrics
+					if cand.Loaded {
+						ensureLyricsLanguage(&l)
+					}
+					pick := LyricsPick{
+						Source:      key,
+						Title:       title,
+						Artist:      artist,
+						CandidateID: cand.ID,
+						Candidate:   cand.Title,
+					}
+					choices = append(choices, LyricsChoice{
+						Pick:        pick,
+						State:       LyricsFound,
+						Lyrics:      l,
+						TrackTitle:  cand.Title,
+						TrackArtist: cand.Artist,
+						Album:       cand.Album,
+						Duration:    cand.Duration,
+						Loaded:      cand.Loaded,
+						SyncHint:    cand.SyncHint,
+					})
+				}
+				perSource[i] = choices
+				return
 			}
-			found[i].State, found[i].Lyrics = answerState(lyricsAnswer{l: l, err: err}), l
-			if found[i].State == LyricsUnreachable {
+			ch := LyricsChoice{Pick: LyricsPick{Source: key}}
+			if lyricsByTitle[key] {
+				ch.Pick.Title, ch.Pick.Artist = title, artist
+			}
+			l, err := lyricsLookups[key](c, ctx, track, q)
+			if err == nil {
+				ensureLyricsLanguage(&l)
+			}
+			ch.State, ch.Lyrics = answerState(lyricsAnswer{l: l, err: err}), l
+			ch.Loaded = err == nil
+			if ch.Loaded {
+				switch {
+				case l.WordTimed():
+					ch.SyncHint = "words"
+				case l.Synced:
+					ch.SyncHint = "lines"
+				default:
+					ch.SyncHint = "plain"
+				}
+			}
+			if ch.State == LyricsUnreachable {
 				log.Printf("mixmusic: searching the lyrics of %s on %s: %v", track.ID, key, err)
 			}
+			perSource[i] = []LyricsChoice{ch}
 		})
 	}
 	wg.Wait()
+	var found []LyricsChoice
+	for _, list := range perSource {
+		found = append(found, list...)
+	}
 	return found
+}
+
+// PreviewLyricsCandidate fetches the lyrics of an unloaded candidate on
+// demand and caches the answer so picking it afterward shows at once.
+func (c *Catalog) PreviewLyricsCandidate(ctx context.Context, track media.Track, pick LyricsPick) (lyrics.Lyrics, error) {
+	set := c.a.settings.Get().Lyrics
+	asked := c.askedOf(track, set)
+	if ans, ok := c.answerOf(asked, track, set, pick); ok && answerState(ans) != LyricsUnreachable {
+		if ans.err != nil {
+			return lyrics.Lyrics{}, ans.err
+		}
+		return ans.l, nil
+	}
+	seen := c.a.lyricsTiming.version.Load()
+	l, err := c.askPick(ctx, track, pick, set)
+	if err == nil {
+		ensureLyricsLanguage(&l)
+	}
+	asked.put(pick.answerKey(), lyricsAnswer{l: l, err: err, seen: seen})
+	return l, err
 }
 
 // PickLyrics keeps pick for the lyrics of a track, the zero pick going
@@ -476,6 +590,15 @@ func (c *Catalog) PickLyrics(track media.Track, pick LyricsPick, found *lyrics.L
 	return err
 }
 
+func ensureLyricsLanguage(l *lyrics.Lyrics) {
+	if l.Language == "" && l.Translation != nil && l.Translation.From != "" {
+		l.Language = l.Translation.From
+	}
+	if l.Language == "" {
+		l.Language = lyrics.DetectLanguage(l.Lines)
+	}
+}
+
 // EditLyrics keeps the lyrics of a track the listener edited, text as
 // LRC or plain text (lyrics.Lyrics.LRC), with the credit of from, those
 // they started from, and returns them; ErrLyricsEmpty for text of no
@@ -486,7 +609,8 @@ func (c *Catalog) EditLyrics(track media.Track, text string, from lyrics.Lyrics)
 		return lyrics.Lyrics{}, ErrLyricsEmpty
 	}
 	l.SourceURL, l.By, l.ByURL = from.SourceURL, from.By, from.ByURL
-	if l.Language = lyrics.GuessLanguage(l.Lines); l.Language == "" {
+	ensureLyricsLanguage(&l)
+	if l.Language == "" {
 		l.Language = from.Language
 	}
 	return l, c.PickLyrics(track, LyricsPick{Edited: &l}, nil)

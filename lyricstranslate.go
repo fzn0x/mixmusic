@@ -4,6 +4,7 @@ import (
 	"context"
 	"maps"
 	"slices"
+	"strings"
 
 	"github.com/egoist/mygo/ui"
 
@@ -82,13 +83,16 @@ type translated struct {
 }
 
 // lyricsExtra is what the lines of lyrics show besides their words, as
-// the user chose for their language: their translation, and their words
-// in Latin letters, under them or in their place.
+// the user chose for their language: their translation (under, above, or
+// on its own), and their words in Latin letters, under them or in their
+// place.
 type lyricsExtra struct {
-	translate bool
-	romanize  string
-	// tr is the translation of the lyrics, once it came, which holds their
-	// words in Latin letters too; nil until then, and while neither shows.
+	translate     bool
+	translateMode string
+	embedded      bool
+	romanize      string
+	// tr is the translation of the lyrics, once it came or embedded in the
+	// lyrics themselves; nil while neither shows.
 	tr *lyrics.Translation
 	// ja is set for lyrics in Japanese, whose words in Latin letters are
 	// their romaji, made on the computer: nil until made.
@@ -100,39 +104,69 @@ type lyricsExtra struct {
 	roman *romanizedLines
 }
 
-// line returns what line i of the lyrics shows: its words, as written or
-// in Latin letters, then those in Latin letters under it, and its
-// translation, "" where there are none.
+// line returns what line i of the lyrics shows: its words (or translation
+// when showing above/only), then those in Latin letters under it, and
+// the secondary line below (translation when under, original when above).
 func (x lyricsExtra) line(i int, words string) (text, roman, meaning string) {
-	text = words
+	orig := words
 	latin := ""
 	switch {
+	case x.embedded && x.tr != nil && i < len(x.tr.Lines) && x.tr.Lines[i].Romanized != "":
+		latin = x.tr.Lines[i].Romanized
 	case x.ja:
 		if x.romaji != nil {
 			latin = x.romaji[i]
 		}
 	case x.local != "":
 		// Unison's, where it is better, once it came.
-		if x.tr != nil && unisonFirst[x.local] {
+		if x.tr != nil && !x.embedded && unisonFirst[x.local] && i < len(x.tr.Lines) {
 			latin = x.tr.Lines[i].Romanized
 		}
 		if latin == "" && x.roman != nil {
 			latin = x.roman.lines[i]
 		}
-	case x.tr != nil:
+	case x.tr != nil && i < len(x.tr.Lines):
 		latin = x.tr.Lines[i].Romanized
 	}
+	subRoman := ""
 	switch {
 	case latin == "":
 	case x.romanize == settings.RomanizeOnly:
-		text = latin
+		orig = latin
 	case x.romanize == settings.RomanizeUnder:
-		roman = latin
+		subRoman = latin
 	}
-	if x.translate && x.tr != nil {
-		meaning = x.tr.Lines[i].Text
+	if x.translate && x.tr != nil && i < len(x.tr.Lines) {
+		if trText := x.tr.Lines[i].Text; trText != "" {
+			switch x.translateMode {
+			case settings.TranslateAbove:
+				return trText, subRoman, orig
+			case settings.TranslateOnly:
+				return trText, "", ""
+			default:
+				return orig, subRoman, trText
+			}
+		}
 	}
-	return text, roman, meaning
+	return orig, subRoman, ""
+}
+
+// embeddedParts reports whether ly already carries a line-aligned embedded
+// translation matching target language to, and/or embedded romanization.
+func embeddedParts(ly lyrics.Lyrics, to string) (hasTrans, hasRoman bool) {
+	if ly.Translation == nil || len(ly.Translation.Lines) != len(ly.Lines) || len(ly.Lines) == 0 {
+		return false, false
+	}
+	matchesTarget := ly.Translation.To == "" || strings.EqualFold(ly.Translation.To, to)
+	for _, tl := range ly.Translation.Lines {
+		if tl.Romanized != "" {
+			hasRoman = true
+		}
+		if matchesTarget && tl.Text != "" {
+			hasTrans = true
+		}
+	}
+	return hasTrans, hasRoman
 }
 
 // lyricsChoices shows how lyrics show, above them: synced or as plain
@@ -155,9 +189,26 @@ type lyricsChoiceOptions struct {
 // lyricsChoicesWith is lyricsChoices for the options o.
 func (s *shell) lyricsChoicesWith(c *ui.Context, t media.Track, ly lyrics.Lyrics, where string, o lyricsChoiceOptions) lyricsExtra {
 	lang, to := ly.Language, s.translateTarget()
+	hasEmbeddedTrans, hasEmbeddedRoman := embeddedParts(ly, to)
 	// Lyrics of a language MixMusic can't tell may be in another.
-	canTranslate := lang != to
-	x := lyricsExtra{translate: canTranslate && slices.Contains(s.set.LyricsTranslate, lang), ja: s.japanese(ly), local: s.romanizeLanguage(ly)}
+	canTranslate := lang != to || hasEmbeddedTrans
+	translateOn := false
+	if hasEmbeddedTrans {
+		translateOn = !s.lyricsView.embeddedOff[t.ID]
+	} else if canTranslate {
+		translateOn = slices.Contains(s.set.LyricsTranslate, lang)
+	}
+	tMode := s.set.LyricsTranslateMode
+	if tMode == "" {
+		tMode = settings.TranslateUnder
+	}
+	x := lyricsExtra{
+		translate:     translateOn,
+		translateMode: tMode,
+		embedded:      hasEmbeddedTrans || hasEmbeddedRoman,
+		ja:            s.japanese(ly),
+		local:         s.romanizeLanguage(ly),
+	}
 	// Lyrics in another script show in Latin letters made on the computer,
 	// which asks Unison for nothing: Japanese in romaji, and the others
 	// as their scripts are romanized, but Arabic, as Unison has it once it
@@ -165,31 +216,37 @@ func (s *shell) lyricsChoicesWith(c *ui.Context, t media.Track, ly lyrics.Lyrics
 	// has them, with their translation, if it brought them so.
 	romanize := ""
 	switch {
-	case x.ja:
+	case x.ja || (hasEmbeddedRoman && lang == "ja"):
 		romanize = s.set.LyricsRomanize["ja"]
 	case x.local != "":
 		romanize = s.set.LyricsRomanize[x.local]
-	case lyrics.Romanizable(lang):
+	case lyrics.Romanizable(lang) || hasEmbeddedRoman:
 		romanize = s.set.LyricsRomanize[lang]
 	}
+	needUnison := (x.translate && !hasEmbeddedTrans) ||
+		(!hasEmbeddedRoman && !x.ja && romanize != "" && (x.local == "" && romanizedFirst[lang] || unisonFirst[x.local] && romanizedFirst[x.local]))
 	var tr *loaded[translated]
-	if x.translate || !x.ja && romanize != "" && (x.local == "" && romanizedFirst[lang] || unisonFirst[x.local] && romanizedFirst[x.local]) {
-		tr = s.translation(t, ly, to, x.translate)
+	if hasEmbeddedTrans || (hasEmbeddedRoman && !needUnison) {
+		x.tr = ly.Translation
+	}
+	if needUnison {
+		tr = s.translation(t, ly, to, x.translate && !hasEmbeddedTrans)
 		if tr.done && tr.err == nil && len(tr.value.Lines) == len(ly.Lines) {
 			x.tr = &tr.value.Translation
+			x.embedded = false
 		}
 	}
-	canRomanize := x.ja || x.local != "" || lyrics.Romanizable(lang) && (romanizedFirst[lang] || x.translate && x.tr != nil && tr.value.romanized)
+	canRomanize := hasEmbeddedRoman || x.ja || x.local != "" || lyrics.Romanizable(lang) && (romanizedFirst[lang] || x.translate && x.tr != nil && tr != nil && tr.value.romanized)
 	if canRomanize {
 		x.romanize = romanize
 	}
 	if !o.quiet {
-		s.lyricsSwitches(c, t, ly, lang, where, canTranslate, canRomanize, &x)
+		s.lyricsSwitches(c, t, ly, lang, where, canTranslate, canRomanize, hasEmbeddedTrans, &x)
 	}
-	if x.ja && x.romanize != "" {
+	if x.ja && !hasEmbeddedRoman && x.romanize != "" {
 		x.romaji = s.lyricsRomaji(c, t, ly, where, o.quiet)
 	}
-	if x.local != "" && x.romanize != "" {
+	if x.local != "" && !hasEmbeddedRoman && x.romanize != "" {
 		x.roman = s.lyricsRomanized(t, ly, x.local)
 	}
 	if tr == nil || o.quiet {
@@ -248,7 +305,7 @@ func translationKey(t media.Track, into string) string {
 // source (lyricspick.go); translated, when they can be; and in Latin
 // letters, under each line or in its place, when they can be. It changes
 // x as the user chooses.
-func (s *shell) lyricsSwitches(c *ui.Context, t media.Track, ly lyrics.Lyrics, lang, where string, canTranslate, canRomanize bool, x *lyricsExtra) {
+func (s *shell) lyricsSwitches(c *ui.Context, t media.Track, ly lyrics.Lyrics, lang, where string, canTranslate, canRomanize, hasEmbeddedTrans bool, x *lyricsExtra) {
 	ui.Row(c).Padding(0, 24, 8).GapX(16).GapY(8).Wrap().AlignItems(ui.Center).Shrink(0).Children(func() {
 		if ly.Synced {
 			mode := 0
@@ -263,15 +320,55 @@ func (s *shell) lyricsSwitches(c *ui.Context, t media.Track, ly lyrics.Lyrics, l
 		}
 		s.lyricsSourceButton(c, t, &ly, where)
 		if canTranslate {
-			on := x.translate
-			if s.lyricsSwitch(c, "lyrics-translate-"+where, locales.LyricsTranslate(), locales.LyricsTranslateLyrics(), locales.LyricsTranslateTip(), &on) {
-				x.translate = on
-				s.set.LyricsTranslate = slices.DeleteFunc(slices.Clone(s.set.LyricsTranslate), func(l string) bool { return l == lang })
-				if on {
-					s.set.LyricsTranslate = append(s.set.LyricsTranslate, lang)
-				}
-				s.save()
+			tip := locales.LyricsTranslateTip()
+			if hasEmbeddedTrans {
+				tip = locales.LyricsTranslateEmbeddedTip()
 			}
+			ui.Row(c).Gap(12).AlignItems(ui.Center).Shrink(0).Children(func() {
+				on := x.translate
+				if s.lyricsSwitch(c, "lyrics-translate-"+where, locales.LyricsTranslate(), locales.LyricsTranslateLyrics(), tip, &on) {
+					x.translate = on
+					if hasEmbeddedTrans {
+						if s.lyricsView.embeddedOff == nil {
+							s.lyricsView.embeddedOff = map[string]bool{}
+						}
+						if on {
+							delete(s.lyricsView.embeddedOff, t.ID)
+						} else {
+							s.lyricsView.embeddedOff[t.ID] = true
+						}
+					} else {
+						s.set.LyricsTranslate = slices.DeleteFunc(slices.Clone(s.set.LyricsTranslate), func(l string) bool { return l == lang })
+						if on {
+							s.set.LyricsTranslate = append(s.set.LyricsTranslate, lang)
+						}
+						s.save()
+					}
+				}
+				if !x.translate {
+					return
+				}
+				tMode := 0
+				switch x.translateMode {
+				case settings.TranslateAbove:
+					tMode = 1
+				case settings.TranslateOnly:
+					tMode = 2
+				}
+				if s.segmented(c, "lyrics-translate-mode-"+where, locales.LyricsTranslateHow(), &tMode,
+					locales.LyricsTranslateUnder(), locales.LyricsTranslateAbove(), locales.LyricsTranslateOnly()) {
+					switch tMode {
+					case 1:
+						x.translateMode = settings.TranslateAbove
+					case 2:
+						x.translateMode = settings.TranslateOnly
+					default:
+						x.translateMode = settings.TranslateUnder
+					}
+					s.set.LyricsTranslateMode = x.translateMode
+					s.save()
+				}
+			})
 		}
 		if !canRomanize {
 			return

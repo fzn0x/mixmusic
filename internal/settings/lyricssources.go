@@ -8,18 +8,37 @@ const (
 	LyricsBetterLyrics = "betterlyrics"
 	// LyricsUnison is Unison, the crowdsourced database of lyrics.
 	LyricsUnison = "unison"
+	// LyricsLrcRed is lrc.red, serving word- and line-synced TTML lyrics by ISRC.
+	LyricsLrcRed = "lrcred"
+	// LyricsSpotify is Spotify's own lyrics via a Spotify web session (sp_dc).
+	LyricsSpotify = "spotify"
 	// LyricsLRCLIB is LRCLIB, the open database of synced lyrics.
 	LyricsLRCLIB = "lrclib"
+	// LyricsQQMusic is QQ Music, serving synced lyrics and embedded translations.
+	LyricsQQMusic = "qqmusic"
 	// LyricsYouTubeMusic is YouTube Music's own lyrics.
 	LyricsYouTubeMusic = "youtube"
 	// LyricsCaptions is the captions of the video that plays, on YouTube.
 	LyricsCaptions = "captions"
+	// LyricsYouTubePage is plain lyrics found in YouTube video
+	// descriptions and pinned creator comments.
+	LyricsYouTubePage = "youtubepage"
 )
 
 // LyricsSourceKeys are the sources of lyrics in their own order, which a
 // new install asks them in, every one on. A source a later version adds
 // goes after the one it follows here.
-var LyricsSourceKeys = []string{LyricsBetterLyrics, LyricsUnison, LyricsLRCLIB, LyricsYouTubeMusic, LyricsCaptions}
+var LyricsSourceKeys = []string{
+	LyricsBetterLyrics,
+	LyricsUnison,
+	LyricsLrcRed,
+	LyricsSpotify,
+	LyricsLRCLIB,
+	LyricsQQMusic,
+	LyricsYouTubeMusic,
+	LyricsCaptions,
+	LyricsYouTubePage,
+}
 
 // LyricsSource is a source of lyrics, where the user put it.
 type LyricsSource struct {

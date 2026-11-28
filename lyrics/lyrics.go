@@ -77,6 +77,10 @@ type Lyrics struct {
 	// Language is the language of the lyrics, a code of ISO 639-1 as "ja",
 	// when their source tells it or GuessLanguage could; "" when unknown.
 	Language string `json:"language,omitempty"`
+	// Translation holds an embedded translation and/or romanization paired
+	// line-for-line with Lines when the lyrics source itself includes two
+	// languages (for example a bilingual YouTube comment or saved LRC).
+	Translation *Translation `json:"translation,omitempty"`
 	// Note says why the lyrics don't show as their source has them, as
 	// synchronized lyrics shown without their times; "" when they do.
 	Note string `json:"note,omitempty"`
@@ -146,8 +150,10 @@ func New(userAgent string) *Client {
 
 // record is a track of LRCLIB.
 type record struct {
+	ID           int     `json:"id"`
 	TrackName    string  `json:"trackName"`
 	ArtistName   string  `json:"artistName"`
+	AlbumName    string  `json:"albumName"`
 	Duration     float64 `json:"duration"`
 	Instrumental bool    `json:"instrumental"`
 	PlainLyrics  string  `json:"plainLyrics"`
@@ -171,6 +177,11 @@ type Query struct {
 	// unknown. Unison looks lyrics up by it when given; LRCLIB doesn't
 	// use it.
 	VideoID string
+	// SpotifyID is the track's Spotify ID, "" when unknown.
+	SpotifyID string
+	// ISRC is the recording's International Standard Recording Code, "" when
+	// unknown.
+	ISRC string
 }
 
 // Get returns the lyrics of a track: the exact track when LRCLIB has it,
@@ -213,6 +224,104 @@ func (c *Client) Get(ctx context.Context, t Query) (Lyrics, error) {
 		}
 		rec = best
 	} else if err != nil {
+		return Lyrics{}, err
+	}
+	return rec.lyrics()
+}
+
+// Search returns all matching lyric candidates from LRCLIB for t, ordered
+// with word-synced, then line-synced, then plain lyrics, breaking ties by
+// closest duration to t.Duration.
+func (c *Client) Search(ctx context.Context, t Query) ([]Candidate, error) {
+	if c == nil || c.BaseURL == "" || strings.TrimSpace(t.Title) == "" {
+		return nil, ErrNotFound
+	}
+	q := url.Values{}
+	if strings.TrimSpace(t.Artist) != "" {
+		q.Set("track_name", t.Title)
+		q.Set("artist_name", t.Artist)
+	} else {
+		q.Set("q", t.Title)
+	}
+	var found []record
+	if err := c.get(ctx, "/search", q, &found); err != nil {
+		return nil, err
+	}
+	if len(found) == 0 && strings.TrimSpace(t.Artist) != "" {
+		q2 := url.Values{"q": {strings.TrimSpace(t.Title + " " + t.Artist)}}
+		if err := c.get(ctx, "/search", q2, &found); err != nil {
+			return nil, err
+		}
+	}
+	out := make([]Candidate, 0, len(found))
+	for _, r := range found {
+		l, err := r.lyrics()
+		if err != nil {
+			continue
+		}
+		var id string
+		if r.ID > 0 {
+			id = strconv.Itoa(r.ID)
+		}
+		out = append(out, Candidate{
+			ID:       id,
+			Title:    r.TrackName,
+			Artist:   r.ArtistName,
+			Album:    r.AlbumName,
+			Duration: time.Duration(math.Round(r.Duration*1000)) * time.Millisecond,
+			Lyrics:   l,
+			Loaded:   true,
+			SyncHint: syncHintOf(l),
+		})
+	}
+	if len(out) == 0 {
+		return nil, ErrNotFound
+	}
+	rank := func(c Candidate) int {
+		switch {
+		case c.Lyrics.Instrumental:
+			return 0
+		case c.Lyrics.WordTimed():
+			return 3
+		case c.Lyrics.Synced:
+			return 2
+		default:
+			return 1
+		}
+	}
+	slices.SortStableFunc(out, func(a, b Candidate) int {
+		if ra, rb := rank(a), rank(b); ra != rb {
+			return rb - ra
+		}
+		if t.Duration > 0 && a.Duration > 0 && b.Duration > 0 {
+			da := (a.Duration - t.Duration).Abs()
+			db := (b.Duration - t.Duration).Abs()
+			if da != db {
+				if da < db {
+					return -1
+				}
+				return 1
+			}
+		}
+		return 0
+	})
+	if len(out) > 30 {
+		out = out[:30]
+	}
+	return out, nil
+}
+
+// GetByID fetches a specific LRCLIB record by its numeric ID.
+func (c *Client) GetByID(ctx context.Context, id string) (Lyrics, error) {
+	if c == nil || c.BaseURL == "" {
+		return Lyrics{}, ErrNotFound
+	}
+	n, err := strconv.Atoi(strings.TrimSpace(id))
+	if err != nil || n <= 0 {
+		return Lyrics{}, ErrNotFound
+	}
+	var rec record
+	if err := c.get(ctx, "/get/"+strconv.Itoa(n), nil, &rec); err != nil {
 		return Lyrics{}, err
 	}
 	return rec.lyrics()
@@ -269,7 +378,11 @@ func (c *Client) get(ctx context.Context, path string, q url.Values, out any) er
 	if c.wait.active() {
 		return errTooManyRequests
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BaseURL+path+"?"+q.Encode(), nil)
+	target := c.BaseURL + path
+	if len(q) > 0 {
+		target += "?" + q.Encode()
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, target, nil)
 	if err != nil {
 		return err
 	}

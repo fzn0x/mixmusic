@@ -83,9 +83,7 @@ func (c *Catalog) localLyrics(track media.Track) (lyrics.Lyrics, bool) {
 	if !found {
 		return lyrics.Lyrics{}, false
 	}
-	if best.Language == "" {
-		best.Language = lyrics.GuessLanguage(best.Lines)
-	}
+	ensureLyricsLanguage(&best)
 	return best, true
 }
 

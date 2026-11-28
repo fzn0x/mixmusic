@@ -96,6 +96,13 @@ var musicClient = innerClient{name: clientName, id: clientNameID, major: "1"}
 // webClient, the website's client, is declared in channels.go.
 const webBaseURL = "https://www.youtube.com"
 
+func (c *Client) webOrigin() string {
+	if c.BaseURL != "" && c.BaseURL != defaultBaseURL {
+		return c.BaseURL
+	}
+	return webBaseURL
+}
+
 // version returns a version of the client that YouTube accepts: its build
 // of a few days ago.
 func (ic innerClient) version(now time.Time) string {

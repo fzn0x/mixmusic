@@ -15,6 +15,8 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
+	"math"
 	"strings"
 	"time"
 
@@ -32,6 +34,13 @@ type lyricsPickView struct {
 	edit   lyricsEdit
 }
 
+type candidatePreview struct {
+	loading bool
+	done    bool
+	lyrics  lyrics.Lyrics
+	err     error
+}
+
 // lyricsSearch is the dialog of Search by title and artist…: of which
 // track, the title and artist to ask for, and what the sources found,
 // once they answered the latest search, seq.
@@ -42,6 +51,9 @@ type lyricsSearch struct {
 	seq           int
 	searching     bool
 	found         []app.LyricsChoice
+	filter        string
+	expanded      map[string]bool
+	previews      map[string]*candidatePreview
 }
 
 // lyricsEdit is the dialog of Edit lyrics…: of which track, the lyrics it
@@ -75,13 +87,21 @@ func lyricsSourceItems(ch app.LyricsChoices) []lyricsSourceItem {
 	}
 	if f := ch.Search; f != nil {
 		items = append(items, lyricsSourceItem{id: "searched", on: true, pick: f.Pick, detail: lyricsStateText(*f),
-			label: locales.LyricsSourceSearched(lyricsChoiceName(*f), f.Pick.Title, f.Pick.Artist)})
+			label: searchedChoiceLabel(*f)})
 	}
 	for _, f := range ch.Sources {
 		items = append(items, lyricsSourceItem{id: "source-" + f.Pick.Source + "-" + f.Pick.Caption, label: lyricsChoiceName(f),
 			detail: lyricsStateText(f), on: f.On, pick: f.Pick})
 	}
 	return items
+}
+
+func searchedChoiceLabel(f app.LyricsChoice) string {
+	name := lyricsChoiceName(f)
+	if f.Pick.Candidate != "" {
+		return locales.LyricsSourceSearchedCandidate(name, f.Pick.Candidate)
+	}
+	return locales.LyricsSourceSearched(name, f.Pick.Title, f.Pick.Artist)
 }
 
 // lyricsChoiceName names the source of a choice: a caption track by its
@@ -153,10 +173,19 @@ func wordedLines(l lyrics.Lyrics) int {
 }
 
 // lyricsPickedName names what the lyrics of a track show from, as ch
-// tells: Automatic, the edit, or the source picked.
-func lyricsPickedName(ch app.LyricsChoices) string {
+// tells: Automatic (naming the active source when one is showing), the
+// edit, or the source picked.
+func lyricsPickedName(ch app.LyricsChoices, ly *lyrics.Lyrics) string {
 	switch {
 	case ch.Picked.IsZero():
+		for _, f := range ch.Sources {
+			if f.Showing {
+				return locales.LyricsSourceAutomaticFrom(lyricsChoiceName(f))
+			}
+		}
+		if ly != nil && ly.Source != "" {
+			return locales.LyricsSourceAutomaticFrom(ly.Source)
+		}
 		return locales.LyricsSourceAutomatic()
 	case ch.Picked.Edited != nil:
 		return locales.LyricsSourceEdited()
@@ -177,7 +206,7 @@ func lyricsPickedName(ch app.LyricsChoices) string {
 // show, nil for none, which Edit lyrics… starts from.
 func (s *shell) lyricsSourceButton(c *ui.Context, t media.Track, ly *lyrics.Lyrics, where string) {
 	k := &s.lk
-	name := lyricsPickedName(s.svc.Catalog.LyricsChoices(t))
+	name := lyricsPickedName(s.svc.Catalog.LyricsChoices(t), ly)
 	ui.Row(c).Gap(8).AlignItems(ui.Center).Shrink(0).Children(func() {
 		ui.Text(c, k.sentence(locales.LyricsSource())).FontSize(k.smallSize())
 		b := s.buttonBase(c.Key("lyrics-pick-" + where)).Height(34).PaddingStart(14).PaddingEnd(10).Gap(4).Radius(k.round(34)).
@@ -285,7 +314,8 @@ func (s *shell) searchLyrics() {
 	}
 	v.seq++
 	seq, t, title, artist := v.seq, v.track, v.title, v.artist
-	v.searching, v.found = true, nil
+	v.searching, v.found, v.filter = true, nil, ""
+	v.expanded, v.previews = map[string]bool{}, map[string]*candidatePreview{}
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
@@ -298,6 +328,31 @@ func (s *shell) searchLyrics() {
 	}()
 }
 
+// previewCandidate fetches an unloaded candidate's lyrics on demand.
+func (s *shell) previewCandidate(candKey string, pick app.LyricsPick) {
+	v := &s.lyricsView.pick.search
+	if v.previews == nil {
+		v.previews = map[string]*candidatePreview{}
+	}
+	if p := v.previews[candKey]; p != nil && (p.loading || (p.done && (p.err == nil || errors.Is(p.err, lyrics.ErrNotFound)))) {
+		return
+	}
+	seq, t := v.seq, v.track
+	v.previews[candKey] = &candidatePreview{loading: true}
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		l, err := s.svc.Catalog.PreviewLyricsCandidate(ctx, t, pick)
+		s.update(func() {
+			v := &s.lyricsView.pick.search
+			if v.seq != seq {
+				return
+			}
+			v.previews[candKey] = &candidatePreview{done: true, lyrics: l, err: err}
+		})
+	}()
+}
+
 // lyricsPickDialogs shows Search by title and artist… and Edit lyrics…
 // while they are open.
 func (s *shell) lyricsPickDialogs(c *ui.Context) {
@@ -306,16 +361,18 @@ func (s *shell) lyricsPickDialogs(c *ui.Context) {
 }
 
 // lyricsSearchDialog shows Search by title and artist…: the title and
-// artist to ask for, and every source's answer, each found with its
-// credit, how it is timed, its lines and its first lines.
+// artist to ask for, source filter pills, and every candidate returned.
 func (s *shell) lyricsSearchDialog(c *ui.Context) {
 	v := &s.lyricsView.pick.search
 	if !v.open {
+		if v.found != nil || v.previews != nil || v.expanded != nil {
+			v.found, v.previews, v.expanded = nil, nil, nil
+		}
 		return
 	}
 	k := &s.lk
 	submitted := false
-	s.dialog(c, &v.open, dialogOptions{key: "lyrics-search", title: locales.LyricsSearchTitle(), width: 600}, func() {
+	s.dialog(c, &v.open, dialogOptions{key: "lyrics-search", title: locales.LyricsSearchTitle(), width: 680}, func() {
 		ui.Text(c, locales.LyricsSearchAbout()).FontSize(k.bodySize()).TextColor(k.muted)
 		ui.Column(c).Gap(12).Children(func() {
 			field := func(key, label string, value *string, focus bool) {
@@ -335,9 +392,15 @@ func (s *shell) lyricsSearchDialog(c *ui.Context) {
 			ui.Text(c, locales.LyricsSearchLooking()).FontSize(k.smallSize()).TextColor(k.muted)
 			return
 		}
+		if len(v.found) > 0 {
+			s.lyricsSearchFilterPills(c, v)
+		}
 		ui.Column(c).Gap(8).Children(func() {
-			for _, f := range v.found {
-				s.lyricsFoundRow(c, f)
+			for idx, f := range v.found {
+				if v.filter != "" && f.Pick.Source != v.filter {
+					continue
+				}
+				s.lyricsFoundRow(c, idx, f)
 			}
 		})
 	}, func() {
@@ -354,39 +417,174 @@ func (s *shell) lyricsSearchDialog(c *ui.Context) {
 	}
 }
 
-// lyricsFoundRow is a source's answer to a search: its credit, as the
-// lyrics panel writes it, how its lyrics are timed and their lines, and
-// their first lines, with a button that shows them; or its name, and why
-// it found none.
-func (s *shell) lyricsFoundRow(c *ui.Context, f app.LyricsChoice) {
+func (s *shell) lyricsSearchFilterPills(c *ui.Context, v *lyricsSearch) {
 	k := &s.lk
+	type srcCount struct {
+		key   string
+		name  string
+		found int
+	}
+	var sources []srcCount
+	seen := map[string]int{}
+	totalFound := 0
+	for _, f := range v.found {
+		idx, ok := seen[f.Pick.Source]
+		if !ok {
+			idx = len(sources)
+			seen[f.Pick.Source] = idx
+			sources = append(sources, srcCount{key: f.Pick.Source, name: lyricsChoiceName(f)})
+		}
+		if f.State == app.LyricsFound {
+			sources[idx].found++
+			totalFound++
+		}
+	}
+	pill := func(key, label string, active bool) {
+		b := s.buttonBase(c.Key("lyrics-filter-" + key)).Height(28).PaddingX(12).Radius(k.round(28)).
+			Label(label).Cursor(ui.CursorPointer)
+		ink := k.text
+		switch {
+		case active:
+			b.Background(k.accent)
+			ink = k.accentText
+		case b.Hovered():
+			b.Background(k.hover)
+		default:
+			b.Background(k.surface2)
+		}
+		b.Children(func() {
+			ui.Text(c, label).FontSize(k.smallSize()).TextColor(ink).SingleLine()
+		})
+		if b.Clicked() {
+			if key == "all" {
+				v.filter = ""
+			} else {
+				v.filter = key
+			}
+		}
+	}
+	ui.Row(c).Gap(6).Wrap().Children(func() {
+		pill("all", locales.LyricsSearchFilterAll(totalFound), v.filter == "")
+		for _, sc := range sources {
+			label := sc.name
+			if sc.found > 0 {
+				label = locales.LyricsSearchFilterSource(sc.name, sc.found)
+			}
+			pill(sc.key, label, v.filter == sc.key)
+		}
+	})
+}
+
+// lyricsFoundRow is a source's answer or candidate in the search dialog:
+// its credit, candidate metadata, timing/preview, and action buttons.
+func (s *shell) lyricsFoundRow(c *ui.Context, idx int, f app.LyricsChoice) {
+	k := &s.lk
+	v := &s.lyricsView.pick.search
 	found := f.State == app.LyricsFound
-	ui.Column(c.Key("lyrics-found-"+f.Pick.Source)).Gap(4).Padding(12, 16).Radius(k.radiusSm).Background(k.surface2).Children(func() {
+	candKey := fmt.Sprintf("%s\x00%s", f.Pick.Source, f.Pick.CandidateID)
+
+	ly := f.Lyrics
+	loaded := f.Loaded
+	var previewErr error
+	loadingPreview := false
+	if found && !loaded && v.previews != nil {
+		if p := v.previews[candKey]; p != nil {
+			loadingPreview = p.loading
+			if p.done {
+				previewErr = p.err
+				if p.err == nil {
+					ly = p.lyrics
+					loaded = true
+				}
+			}
+		}
+	}
+	display := f
+	display.Lyrics = ly
+
+	rowKey := fmt.Sprintf("lyrics-found-%d-%s-%s", idx, f.Pick.Source, f.Pick.CandidateID)
+	ui.Column(c.Key(rowKey)).Gap(4).Padding(12, 16).Radius(k.radiusSm).Background(k.surface2).Children(func() {
 		ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
 			ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
-				if found && f.Lyrics.Source != "" {
-					ui.RichText(c).FontSize(k.bodySize()).Children(func() { s.creditParts(c, f.Lyrics) })
+				if found && loaded && ly.Source != "" {
+					ui.RichText(c).FontSize(k.bodySize()).Children(func() { s.creditParts(c, ly) })
 				} else {
 					ui.Text(c, lyricsChoiceName(f)).FontSize(k.bodySize())
 				}
-				ui.Text(c, lyricsStateText(f)).FontSize(k.smallSize()).TextColor(k.muted)
-			})
-			if found && !f.Lyrics.Instrumental {
-				use := s.dialogButton(c, "lyrics-found-use-"+f.Pick.Source, locales.LyricsSearchUse(), false).
-					Label(locales.LyricsSearchUseFrom(lyricsChoiceName(f)))
-				if use.Clicked() {
-					s.lyricsView.pick.search.open = false
-					l := f.Lyrics
-					s.pickLyrics(s.lyricsView.pick.search.track, f.Pick, &l)
+				if f.TrackTitle != "" {
+					meta := locales.LyricsSearchCandidate(f.TrackTitle, f.TrackArtist)
+					if f.Album != "" {
+						meta = locales.LyricsSearchCandidateAlbum(f.TrackTitle, f.TrackArtist, f.Album)
+					}
+					if f.Duration > 0 {
+						meta += " · " + formatCandDuration(f.Duration, v.track.DurationMs)
+					}
+					ui.Text(c, meta).FontSize(k.smallSize()).SingleLine().MinWidth(0)
 				}
+				notFoundPreview := previewErr != nil && errors.Is(previewErr, lyrics.ErrNotFound)
+				statusText := lyricsStateText(display)
+				switch {
+				case !found:
+				case loadingPreview:
+					statusText = locales.LyricsSearchPreviewLoading()
+				case notFoundPreview:
+					statusText = locales.LyricsSourceNotFound()
+				case previewErr != nil:
+					statusText = locales.LyricsSearchPreviewFailed()
+				case !loaded:
+					statusText = lyricsHintText(f.SyncHint)
+				}
+				ui.Text(c, statusText).FontSize(k.smallSize()).TextColor(k.muted)
+			})
+			if found && !(previewErr != nil && errors.Is(previewErr, lyrics.ErrNotFound)) && !(loaded && ly.Instrumental) {
+				ui.Row(c).Shrink(0).Gap(8).AlignItems(ui.Center).Children(func() {
+					if !loaded {
+						prev := s.dialogButton(c, fmt.Sprintf("lyrics-found-preview-%d", idx), locales.LyricsSearchPreview(), false).
+							Disabled(loadingPreview)
+						if prev.Clicked() && !loadingPreview {
+							s.previewCandidate(candKey, f.Pick)
+						}
+					} else if wordedLines(ly) > 3 {
+						expanded := v.expanded != nil && v.expanded[candKey]
+						lbl := locales.LyricsSearchPreview()
+						if expanded {
+							lbl = locales.LyricsSearchPreviewLess()
+						}
+						if s.dialogButton(c, fmt.Sprintf("lyrics-found-expand-%d", idx), lbl, false).Clicked() {
+							if v.expanded == nil {
+								v.expanded = map[string]bool{}
+							}
+							v.expanded[candKey] = !expanded
+						}
+					}
+					useTarget := lyricsChoiceName(f)
+					if f.TrackTitle != "" {
+						useTarget += " — " + f.TrackTitle
+					}
+					use := s.dialogButton(c, fmt.Sprintf("lyrics-found-use-%d", idx), locales.LyricsSearchUse(), false).
+						Label(locales.LyricsSearchUseFrom(useTarget))
+					if use.Clicked() {
+						v.open = false
+						if loaded {
+							l := ly
+							s.pickLyrics(v.track, f.Pick, &l)
+						} else {
+							s.pickLyrics(v.track, f.Pick, nil)
+						}
+					}
+				})
 			}
 		})
-		if !found {
+		if !found || !loaded {
 			return
 		}
+		limit := 3
+		if v.expanded != nil && v.expanded[candKey] {
+			limit = 12
+		}
 		n := 0
-		for _, line := range f.Lyrics.Lines {
-			if n == 3 {
+		for _, line := range ly.Lines {
+			if n == limit {
 				break
 			}
 			if text := strings.TrimSpace(line.Text); text != "" {
@@ -397,11 +595,40 @@ func (s *shell) lyricsFoundRow(c *ui.Context, f app.LyricsChoice) {
 	})
 }
 
+func lyricsHintText(hint string) string {
+	switch hint {
+	case "words":
+		return locales.LyricsSearchHintWords()
+	case "lines":
+		return locales.LyricsSearchHintLines()
+	case "plain":
+		return locales.LyricsSearchHintPlain()
+	default:
+		return locales.LyricsSearchHintUnknown()
+	}
+}
+
+func formatCandDuration(d time.Duration, trackMs int) string {
+	sec := int(math.Round(d.Seconds()))
+	base := fmt.Sprintf("%d:%02d", sec/60, sec%60)
+	if trackMs <= 0 {
+		return base
+	}
+	delta := int(math.Round((d - time.Duration(trackMs)*time.Millisecond).Seconds()))
+	if delta == 0 {
+		return base
+	}
+	return fmt.Sprintf("%s (%+ds)", base, delta)
+}
+
 // lyricsEditDialog shows Edit lyrics…: the lyrics as LRC, in a box to
 // correct them, kept for the track with Save.
 func (s *shell) lyricsEditDialog(c *ui.Context) {
 	e := &s.lyricsView.pick.edit
 	if !e.open {
+		if e.text != "" || e.problem != "" || len(e.from.Lines) > 0 {
+			*e = lyricsEdit{}
+		}
 		return
 	}
 	k := &s.lk

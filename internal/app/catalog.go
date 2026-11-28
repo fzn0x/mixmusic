@@ -478,9 +478,7 @@ func (c *Catalog) onlineLyrics(ctx context.Context, track media.Track, asked *ly
 		log.Printf("mixmusic: the lyrics of %s: %v", track.ID, err)
 		return lyrics.Lyrics{}, lyricsError{locales.LyricsCantLoad(), err}
 	}
-	if l.Language == "" {
-		l.Language = lyrics.GuessLanguage(l.Lines)
-	}
+	ensureLyricsLanguage(&l)
 	// A music video's lyrics change once timed to it (lyricsvideo.go).
 	if c.a.lyricsStay(track.ID, seen) {
 		c.a.lyricsMemo.put(kept, l)
@@ -505,6 +503,68 @@ func (c *Catalog) lrclibLyrics(ctx context.Context, track media.Track, q lyrics.
 	return l, err
 }
 
+// lrclibSearch searches LRCLIB for all lyric candidates of track, shifting
+// synced candidates to a music video when matched to its song.
+func (c *Catalog) lrclibSearch(ctx context.Context, track media.Track, q lyrics.Query) ([]lyrics.Candidate, error) {
+	cands, err := c.a.lyrics.Search(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+	if track.Video {
+		if song, ok := c.videoSong(ctx, track); ok {
+			for i := range cands {
+				if cands[i].Lyrics.Synced {
+					cands[i].Lyrics = c.videoLyrics(ctx, track, song, cands[i].Lyrics)
+				}
+			}
+		}
+	}
+	return cands, nil
+}
+
+// lrclibByID fetches a specific LRCLIB record by ID, shifting synced
+// lyrics to a music video when matched to its song.
+func (c *Catalog) lrclibByID(ctx context.Context, track media.Track, id string) (lyrics.Lyrics, error) {
+	l, err := c.a.lyrics.GetByID(ctx, id)
+	if err == nil && l.Synced && track.Video {
+		if song, ok := c.videoSong(ctx, track); ok {
+			l = c.videoLyrics(ctx, track, song, l)
+		}
+	}
+	return l, err
+}
+
+// spotifyLyrics returns Spotify's own lyrics for a Spotify track when the
+// user is signed in via a Spotify web session (sp_dc).
+func (c *Catalog) spotifyLyrics(ctx context.Context, _ media.Track, q lyrics.Query) (lyrics.Lyrics, error) {
+	if c.a.spotify == nil || !c.a.spotify.IsWebSession() || q.SpotifyID == "" {
+		return lyrics.Lyrics{}, errNotAsked
+	}
+	got, err := c.a.spotify.TrackLyrics(ctx, q.SpotifyID)
+	if err != nil {
+		switch {
+		case errors.Is(err, spotify.ErrNotSignedIn):
+			return lyrics.Lyrics{}, errNotAsked
+		case errors.Is(err, spotify.ErrLyricsNotFound):
+			return lyrics.Lyrics{}, lyrics.ErrNotFound
+		case errors.Is(err, spotify.ErrLyricsRateLimited):
+			return lyrics.Lyrics{}, fmt.Errorf("%w: HTTP 429, asking too fast", lyrics.ErrUnavailable)
+		default:
+			return lyrics.Lyrics{}, fmt.Errorf("%w: %v", lyrics.ErrUnavailable, err)
+		}
+	}
+	lines := make([]lyrics.Line, len(got.Lines))
+	for i, ln := range got.Lines {
+		lines[i] = lyrics.Line{TimeMs: ln.StartMs, Text: ln.Words}
+	}
+	return lyrics.Lyrics{
+		Synced:   got.Synced,
+		Lines:    lines,
+		Source:   "Spotify",
+		Language: got.Language,
+	}, nil
+}
+
 // videoID returns the ID of a track's recording on YouTube, to look its
 // lyrics up by: its own, or that of the YouTube Music recording matched
 // to it before; "" when there is none yet.
@@ -525,12 +585,21 @@ func (c *Catalog) videoID(t media.Track) string {
 // lyricsQuery asks for a track: its title without what YouTube adds, as
 // "(Official Video)", and its first artist.
 func lyricsQuery(t media.Track) lyrics.Query {
-	q := lyrics.Query{Title: match.CleanTitle(t.Title), Duration: time.Duration(t.DurationMs) * time.Millisecond}
+	q := lyrics.Query{
+		Title:    match.CleanTitle(t.Title),
+		Duration: time.Duration(t.DurationMs) * time.Millisecond,
+		ISRC:     t.ISRC,
+	}
 	if len(t.Artists) > 0 {
 		q.Artist = t.Artists[0].Name
 	}
 	if t.Album != nil {
 		q.Album = t.Album.Name
+	}
+	if t.Source == media.SourceSpotify {
+		if _, native, err := media.ParseID(t.ID); err == nil {
+			q.SpotifyID = native
+		}
 	}
 	return q
 }

@@ -65,6 +65,8 @@ func lyricsPickShell(t *testing.T, none bool) (*shell, *ui.Tester, *lyricsServer
 			http.NotFound(w, r)
 		case r.URL.Query().Get("track_name") == "Other Song":
 			w.WriteHeader(http.StatusBadGateway)
+		case r.URL.Path == "/lrclib/search":
+			w.Write([]byte(`[{"id":1,"trackName":"Midnight City","artistName":"M83","syncedLyrics":"[00:01.00]From LRCLIB\n[00:04.00]Again"}]`))
 		default:
 			w.Write([]byte(`{"syncedLyrics":"[00:01.00]From LRCLIB\n[00:04.00]Again"}`))
 		}
@@ -76,7 +78,12 @@ func lyricsPickShell(t *testing.T, none bool) (*shell, *ui.Tester, *lyricsServer
 	t.Cleanup(srv.Close)
 	s := newTestShellOf(t, func(o *app.Options) {
 		o.LyricsURLs = &app.LyricsURLs{LRCLIB: srv.URL + "/lrclib", Unison: srv.URL + "/unison", BetterLyrics: srv.URL + "/betterlyrics"}
-		set := `{"layout": "tiles", "lyricsSources": [{"key": "youtube", "off": true}, {"key": "captions", "off": true}]}`
+		set := `{"layout": "tiles", "lyricsSources": [
+			{"key": "betterlyrics"}, {"key": "unison"}, {"key": "lrclib"},
+			{"key": "lrcred", "off": true}, {"key": "spotify", "off": true}, {"key": "qqmusic", "off": true},
+			{"key": "youtube", "off": true}, {"key": "captions", "off": true},
+			{"key": "youtubepage", "off": true}
+		]}`
 		if err := os.WriteFile(filepath.Join(o.DataDir, "settings.json"), []byte(set), 0o644); err != nil {
 			t.Fatal(err)
 		}
@@ -145,7 +152,7 @@ func TestLyricsSourceMenu(t *testing.T) {
 	if !tt.HasText("source") {
 		t.Errorf("no source above the lyrics: %q", tt.Texts())
 	}
-	items := openSourceMenu(t, s, tt, "Automatic")
+	items := openSourceMenu(t, s, tt, "Automatic (Unison)")
 	want := []string{"Automatic", "Better Lyrics", "Unison", "LRCLIB", "-", "Search by title and artist…", "Edit lyrics…"}
 	if !slices.Equal(items, want) {
 		t.Errorf("menu %q, want %q", items, want)
@@ -172,8 +179,8 @@ func TestLyricsSourceMenu(t *testing.T) {
 	openSourceMenu(t, s, tt, "Unison")
 	chooseSource(t, s, tt, "Automatic")
 	waitText(t, s, tt, "From Unison")
-	if _, ok := tt.Find(locales.LyricsSourceLabel("Automatic")); !ok {
-		t.Errorf("the button doesn't say Automatic: %q", tt.Texts())
+	if _, ok := tt.Find(locales.LyricsSourceLabel("Automatic (Unison)")); !ok {
+		t.Errorf("the button doesn't say Automatic (Unison): %q", tt.Texts())
 	}
 	if n := ls.unisonAsks.Load(); n != asks {
 		t.Errorf("Unison asked %d more times for lyrics it had found", n-asks)
@@ -199,7 +206,7 @@ func TestLyricsSourceUnderNone(t *testing.T) {
 func TestLyricsSearchDialog(t *testing.T) {
 	s, tt, _ := lyricsPickShell(t, false)
 	waitText(t, s, tt, "From Unison")
-	openSourceMenu(t, s, tt, "Automatic")
+	openSourceMenu(t, s, tt, "Automatic (Unison)")
 	chooseSource(t, s, tt, "Search by title and artist…")
 	v := &s.lyricsView.pick.search
 	if !v.open || v.title != "Midnight City" || v.artist != "M83" {
@@ -235,7 +242,7 @@ func TestLyricsSearchDialog(t *testing.T) {
 func TestLyricsEditDialog(t *testing.T) {
 	s, tt, _ := lyricsPickShell(t, false)
 	waitText(t, s, tt, "From Unison")
-	openSourceMenu(t, s, tt, "Automatic")
+	openSourceMenu(t, s, tt, "Automatic (Unison)")
 	chooseSource(t, s, tt, "Edit lyrics…")
 	e := &s.lyricsView.pick.edit
 	if !e.open || e.text != "[00:01.00]From Unison\n[00:04.00]Second line\n" {
@@ -289,9 +296,9 @@ func TestPseudoLocaleLyricsPick(t *testing.T) {
 	xa := locales.In("en-XA")
 	waitText(t, s, tt, "From Unison")
 	names := []string{"From Unison", "Second line", "Midnight City", "midnight city", "M83", "Massive Attack", "Teardrop",
-		"Plain from Unison", "Another verse", "A third", "Hurry Up, We're Dreaming"}
+		"Plain from Unison", "Another verse", "A third", "Hurry Up, We're Dreaming", "Unison"}
 	checkPseudo(t, "The lyrics panel", tt.Texts(), names...)
-	items := openSourceMenu(t, s, tt, xa.LyricsSourceAutomatic())
+	items := openSourceMenu(t, s, tt, xa.LyricsSourceAutomaticFrom("Unison"))
 	checkPseudo(t, "The menu of the lyrics' sources", items, names...)
 	var details []string
 	for _, it := range lyricsSourceItems(s.svc.Catalog.LyricsChoices(testTracks[0])) {
@@ -306,13 +313,108 @@ func TestPseudoLocaleLyricsPick(t *testing.T) {
 	checkPseudo(t, "The search dialog", tt.Texts(), append(names, "Other Song", "Other Artist")...)
 	v.open = false
 	tt.Frame()
-	openSourceMenu(t, s, tt, xa.LyricsSourceAutomatic())
+	openSourceMenu(t, s, tt, xa.LyricsSourceAutomaticFrom("Unison"))
 	chooseSource(t, s, tt, xa.LyricsSourceEdit())
 	checkPseudo(t, "The edit dialog", tt.Texts(), names...)
 	s.lyricsView.pick.edit.open = false
 	show(s, tt, "/now-playing")
 	checkPseudo(t, "The now playing page", tt.Texts(), names...)
-	if _, ok := tt.Find(xa.LyricsSourceLabel(xa.LyricsSourceAutomatic())); !ok {
+	if _, ok := tt.Find(xa.LyricsSourceLabel(xa.LyricsSourceAutomaticFrom("Unison"))); !ok {
 		t.Errorf("the now playing page has no choice of the lyrics' source: %q", tt.Texts())
+	}
+}
+
+// TestLyricsSearchMultipleCandidatesAndFilter verifies scrollable multi-candidate
+// browsing, per-source filter pills, lazy previewing, and picking a specific CandidateID.
+func TestLyricsSearchMultipleCandidatesAndFilter(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/betterlyrics/getLyrics", http.NotFound)
+	mux.HandleFunc("/unison/lyrics", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(`{"success":false,"code":"NOT_FOUND"}`))
+	})
+	mux.HandleFunc("/lrclib/search", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`[
+			{"id":201,"trackName":"Midnight City","artistName":"M83","albumName":"Hurry Up","duration":211,"syncedLyrics":"[00:01.00]LRCLIB One\n[00:04.00]End"},
+			{"id":202,"trackName":"Midnight City (Live)","artistName":"M83","albumName":"Live","duration":250,"syncedLyrics":"[00:01.00]LRCLIB Two\n[00:04.00]End"},
+			{"id":203,"trackName":"Midnight City (Acoustic)","artistName":"M83","albumName":"Acoustic","duration":210,"plainLyrics":"LRCLIB Three\nPlain"}
+		]`))
+	})
+	mux.HandleFunc("/lrclib/get", http.NotFound)
+	mux.HandleFunc("/lrclib/get-cached", http.NotFound)
+	mux.HandleFunc("/qqmusic/soso/fcgi-bin/client_search_cp", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{"data":{"song":{"list":[
+			{"songmid":"qq4","songname":"Midnight City","albumname":"Hurry Up","interval":211,"singer":[{"name":"M83"}]},
+			{"songmid":"qq3","songname":"Midnight City","albumname":"Deluxe","interval":211,"singer":[{"name":"M83"}]},
+			{"songmid":"qq2","songname":"Midnight City","albumname":"Remastered","interval":211,"singer":[{"name":"M83"}]},
+			{"songmid":"qq1","songname":"Midnight City Acoustic","albumname":"Sessions","interval":210,"singer":[{"name":"M83"}]}
+		]}}}`))
+	})
+	mux.HandleFunc("/qqmusic/lyric/fcgi-bin/fcg_query_lyric_new.fcg", func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Query().Get("songmid") {
+		case "qq4":
+			w.Write([]byte(`{"retcode":0,"lyric":"[00:01.00]QQ4\n[00:04.00]Second line"}`))
+		case "qq3":
+			w.Write([]byte(`{"retcode":0,"lyric":"[00:01.00]QQ3\n[00:04.00]Second line"}`))
+		case "qq2":
+			w.Write([]byte(`{"retcode":0,"lyric":"[00:01.00]QQ2\n[00:04.00]Second line"}`))
+		case "qq1":
+			w.Write([]byte(`{"retcode":0,"lyric":"[00:01.00]QQ Lazy Preview\n[00:04.00]Second line"}`))
+		default:
+			w.Write([]byte(`{"retcode":-1}`))
+		}
+	})
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+
+	s := newTestShellOf(t, func(o *app.Options) {
+		o.LyricsURLs = &app.LyricsURLs{
+			LRCLIB:       srv.URL + "/lrclib",
+			Unison:       srv.URL + "/unison",
+			BetterLyrics: srv.URL + "/betterlyrics",
+			QQMusic:      srv.URL + "/qqmusic",
+		}
+		set := `{"layout": "tiles", "lyricsSources": [
+			{"key": "lrclib"}, {"key": "qqmusic"},
+			{"key": "betterlyrics", "off": true}, {"key": "unison", "off": true},
+			{"key": "lrcred", "off": true}, {"key": "spotify", "off": true},
+			{"key": "youtube", "off": true}, {"key": "captions", "off": true},
+			{"key": "youtubepage", "off": true}
+		]}`
+		if err := os.WriteFile(filepath.Join(o.DataDir, "settings.json"), []byte(set), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	})
+	t.Cleanup(s.followLyricsPicks())
+	s.p.PlayTracks(testTracks, 0)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	tt := testerOf(t, s, 1280, 1300)
+	s.open("/lyrics")
+	tt.Frame()
+	waitText(t, s, tt, "LRCLIB One")
+
+	openSourceMenu(t, s, tt, "Automatic (LRCLIB)")
+	chooseSource(t, s, tt, "Search by title and artist…")
+	v := &s.lyricsView.pick.search
+	until(t, s, tt, "all candidates", func() bool { return !v.searching && len(v.found) == 7 })
+
+	if !tt.HasText("All (7)") || !tt.HasText("LRCLIB (3)") || !tt.HasText("QQ Music (4)") {
+		t.Fatalf("filter pills missing: %q", tt.Texts())
+	}
+
+	// Filter to QQ Music only and lazy-preview candidate #4 ("Midnight City Acoustic").
+	click(t, s, tt, "QQ Music (4)")
+	if tt.HasText("LRCLIB Two") || !tt.HasText("Midnight City Acoustic") {
+		t.Errorf("filter to QQ Music failed: %q", tt.Texts())
+	}
+
+	pressButton(t, s, tt, "preview")
+	until(t, s, tt, "lazy preview text", func() bool { return tt.HasText("QQ Lazy Preview") })
+
+	// Pick the lazy-previewed QQ Music candidate.
+	pressButton(t, s, tt, "Show the lyrics from QQ Music — Midnight City Acoustic")
+	waitText(t, s, tt, "QQ Lazy Preview")
+	if v.open {
+		t.Error("search dialog stayed open after picking candidate")
 	}
 }

@@ -56,20 +56,21 @@ type lyricsFind struct {
 // lyrics and what they show are kept as they came: the same lyrics are the
 // same lines.
 type lyricsFindKey struct {
-	query, track string
-	lines        *lyrics.Line
-	n            int
-	translate    bool
-	romanize     string
-	tr           *lyrics.Translation
-	romaji       *string
-	roman        *romanizedLines
+	query, track  string
+	lines         *lyrics.Line
+	n             int
+	translate     bool
+	translateMode string
+	romanize      string
+	tr            *lyrics.Translation
+	romaji        *string
+	roman         *romanizedLines
 }
 
 // findKeyOf is the key of the lines found of the lyrics ly of track, which
 // show what x says besides their words, for the text query.
 func findKeyOf(query, track string, ly lyrics.Lyrics, x lyricsExtra) lyricsFindKey {
-	k := lyricsFindKey{query: query, track: track, n: len(ly.Lines), translate: x.translate, romanize: x.romanize, tr: x.tr, roman: x.roman}
+	k := lyricsFindKey{query: query, track: track, n: len(ly.Lines), translate: x.translate, translateMode: x.translateMode, romanize: x.romanize, tr: x.tr, roman: x.roman}
 	if len(ly.Lines) > 0 {
 		k.lines = &ly.Lines[0]
 	}

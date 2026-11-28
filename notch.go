@@ -12,6 +12,7 @@ import (
 
 	"github.com/fzn0x/mixmusic/internal/app"
 	"github.com/fzn0x/mixmusic/internal/media"
+	"github.com/fzn0x/mixmusic/internal/settings"
 	"github.com/fzn0x/mixmusic/locales"
 	"github.com/fzn0x/mixmusic/lyrics"
 )
@@ -546,14 +547,40 @@ func (n *notch) lyrics(c *ui.Context, t media.Track) {
 	pos := s.lyricsAt(t, l.value)
 	at := sort.Search(len(lines), func(i int) bool { return ms(lines[i].TimeMs) > pos }) - 1
 	// In Latin letters, as the user shows the lyrics of their language
-	// (lyricsromanize.go).
+	// (lyricsromanize.go), or an embedded translation alongside them.
 	latin, how := s.latinLines(t, l.value)
-	line := func(i int) string { return notchLine(lines, latin, how, i) }
+	hasTrans, _ := embeddedParts(l.value, s.translateTarget())
+	showTrans := hasTrans && !s.lyricsView.embeddedOff[t.ID]
+	tMode := s.set.LyricsTranslateMode
+	line := func(i int) string {
+		orig := notchLine(lines, latin, how, i)
+		if showTrans && i >= 0 && i < len(l.value.Translation.Lines) {
+			if trText := l.value.Translation.Lines[i].Text; trText != "" && (tMode == settings.TranslateAbove || tMode == settings.TranslateOnly) {
+				return trText
+			}
+		}
+		return orig
+	}
+	underLine := func() string {
+		if showTrans && at >= 0 && at < len(l.value.Translation.Lines) {
+			if trText := l.value.Translation.Lines[at].Text; trText != "" {
+				switch tMode {
+				case settings.TranslateAbove:
+					return notchLine(lines, latin, how, at)
+				case settings.TranslateOnly:
+					return ""
+				default:
+					return trText
+				}
+			}
+		}
+		return notchUnder(latin, how, at)
+	}
 	if at > 0 {
 		ui.Text(c, line(at-1)).FontSize(12).TextColor(notchMuted).SingleLine().MinWidth(0)
 	}
 	ui.Text(c, line(at)).FontSize(15).FontWeight(600).TextColor(notchWhite).MaxLines(2).MinWidth(0)
-	if under := notchUnder(latin, how, at); under != "" {
+	if under := underLine(); under != "" {
 		ui.Text(c, under).FontSize(12).TextColor(notchMuted).SingleLine().MinWidth(0)
 	}
 	if at+1 < len(lines) {

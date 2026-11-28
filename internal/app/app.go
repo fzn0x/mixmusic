@@ -153,7 +153,11 @@ type Options struct {
 
 // LyricsURLs are the addresses of the APIs of the sources of lyrics, as
 // lyrics.Client's BaseURL and its likes have them.
-type LyricsURLs struct{ LRCLIB, Unison, BetterLyrics string }
+type LyricsURLs struct {
+	LRCLIB, Unison, BetterLyrics string
+	LrcRed, QQMusic              string
+	Spotify                      string
+}
 
 // App is MixMusic.
 type App struct {
@@ -192,6 +196,8 @@ type App struct {
 	lyrics       *lyrics.Client
 	unison       *lyrics.Unison
 	betterLyrics *lyrics.BetterLyrics
+	lrcred       *lyrics.LrcRed
+	qqmusic      *lyrics.QQMusic
 	// captions reads the captions of videos, which lyrics come from too.
 	captions     *stream.Direct
 	translations *translations
@@ -204,10 +210,11 @@ type App struct {
 	// lyricsAsked what the sources answered for them, captionLists the
 	// caption tracks of their videos, and lyricsTold who is told of a pick
 	// (lyricspick.go).
-	lyricsPicks  *lyricsPicks
-	lyricsAsked  *memo[*lyricsAsked]
-	captionLists *memo[[]stream.CaptionTrack]
-	lyricsTold   lyricsTold
+	lyricsPicks     *lyricsPicks
+	lyricsAsked     *memo[*lyricsAsked]
+	captionLists    *memo[[]stream.CaptionTrack]
+	youtubePageMemo *memo[[]lyrics.Candidate]
+	lyricsTold      lyricsTold
 	// lyricsTiming times music videos' lyrics to them (lyricsvideo.go).
 	lyricsTiming lyricsTiming
 	// lyricsOffset keeps how far the listener moved tracks' lyrics
@@ -434,6 +441,8 @@ func New(opts Options) (*App, error) {
 	a.lyrics = lyrics.New(userAgent)
 	a.unison = lyrics.NewUnison(userAgent)
 	a.betterLyrics = lyrics.NewBetterLyrics(userAgent)
+	a.lrcred = lyrics.NewLrcRed(userAgent)
+	a.qqmusic = lyrics.NewQQMusic(userAgent)
 	a.captions = direct
 	a.translations = newTranslations(filepath.Join(opts.CacheDir, "lyrics-translations"))
 	a.romaji = newRomaji(opts, userAgent)
@@ -442,8 +451,25 @@ func New(opts Options) (*App, error) {
 	a.lyricsPicks = newLyricsPicks(filepath.Join(opts.DataDir, "lyrics-picks"))
 	a.lyricsAsked = newMemo[*lyricsAsked](200)
 	a.captionLists = newMemo[[]stream.CaptionTrack](200)
+	a.youtubePageMemo = newMemo[[]lyrics.Candidate](12)
 	if u := opts.LyricsURLs; u != nil {
 		a.lyrics.BaseURL, a.unison.BaseURL, a.betterLyrics.BaseURL = u.LRCLIB, u.Unison, u.BetterLyrics
+		setURL := func(base *string, url string) bool {
+			if url == "" {
+				return false
+			}
+			*base = url
+			return true
+		}
+		if !setURL(&a.lrcred.BaseURL, u.LrcRed) {
+			a.lrcred = nil
+		}
+		if !setURL(&a.qqmusic.BaseURL, u.QQMusic) {
+			a.qqmusic = nil
+		}
+		if u.Spotify != "" && a.spotify != nil {
+			a.spotify.LyricsURL = u.Spotify
+		}
 	}
 	a.related = newMemo[[]media.Shelf](100)
 	a.episodeDetails = newMemo[media.EpisodeDetails](100)

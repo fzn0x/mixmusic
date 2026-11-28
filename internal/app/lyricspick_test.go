@@ -247,18 +247,18 @@ func TestLyricsSearch(t *testing.T) {
 	for _, f := range found {
 		keys = append(keys, f.Pick.Source)
 	}
-	if strings.Join(keys, " ") != "betterlyrics unison lrclib youtube captions" {
+	if strings.Join(keys, " ") != "betterlyrics unison lrcred spotify lrclib qqmusic youtube captions youtubepage" {
 		t.Fatalf("results of %q", keys)
 	}
 	u := found[1]
 	if u.State != LyricsFound || u.Lyrics.Source != "Unison" || len(u.Lyrics.Lines) != 3 || u.Pick.Title != "Other Song" || u.Pick.Artist != "Other Artist" {
 		t.Errorf("Unison's: %+v", u)
 	}
-	if found[2].State != LyricsUnreachable || found[2].Pick.Title != "Other Song" {
-		t.Errorf("LRCLIB's, down: %+v", found[2])
+	if found[4].State != LyricsUnreachable || found[4].Pick.Title != "Other Song" {
+		t.Errorf("LRCLIB's, down: %+v", found[4])
 	}
-	if found[3].Pick.Title != "" {
-		t.Errorf("YouTube Music, which looks up the track, is asked for a title: %+v", found[3])
+	if found[6].Pick.Title != "" {
+		t.Errorf("YouTube Music, which looks up the track, is asked for a title: %+v", found[6])
 	}
 	asks := ls.unisonAsks.Load()
 	if err := ls.c.PickLyrics(aSong, u.Pick, &u.Lyrics); err != nil {
@@ -328,8 +328,8 @@ func TestLyricsPickCaptionTrack(t *testing.T) {
 	if en.State != LyricsFound || !en.Showing || de.State != LyricsNotAsked || de.Showing || de.CaptionName != "German (Germany)" {
 		t.Errorf("caption tracks: %+v, %+v", en, de)
 	}
-	if n := len(ch.Sources); n != 6 {
-		t.Errorf("%d choices, want the 4 sources before captions and 2 caption tracks", n)
+	if n := len(ch.Sources); n != 10 {
+		t.Errorf("%d choices, want the 8 sources besides captions and 2 caption tracks", n)
 	}
 	asks := cs.asks.Load()
 	ls.c.PickLyrics(captionedVideo, de.Pick, nil)

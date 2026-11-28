@@ -205,6 +205,52 @@ func TestTimedLyrics(t *testing.T) {
 	}
 }
 
+func TestSearchAndGetByID(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/search":
+			w.Write([]byte(`[
+				{"id":10,"trackName":"Song","artistName":"Artist","albumName":"Live","duration":210,"plainLyrics":"Plain\nLine"},
+				{"id":11,"trackName":"Song","artistName":"Artist","albumName":"Studio","duration":201,"syncedLyrics":"[00:01.00]Synced\n[00:04.00]Two"},
+				{"id":12,"trackName":"Song","artistName":"Artist","albumName":"Deluxe","duration":200,"hasWordSync":true,"lyricsfile":"lines:\n- text: Word synced\n  start_ms: 100\n  end_ms: 900\n  words:\n  - text: 'Word '\n    start_ms: 100\n    end_ms: 400\n  - text: synced\n    start_ms: 400\n    end_ms: 900\n- text: Next\n  start_ms: 1000\n  end_ms: 1500\n  words:\n  - text: Next\n    start_ms: 1000\n    end_ms: 1500\n"}
+			]`))
+		case "/get/11":
+			w.Write([]byte(`{"id":11,"trackName":"Song","artistName":"Artist","syncedLyrics":"[00:01.00]Synced\n[00:04.00]Two"}`))
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer srv.Close()
+	c := New("test")
+	c.BaseURL = srv.URL
+
+	cands, err := c.Search(context.Background(), song)
+	if err != nil {
+		t.Fatalf("Search: %v", err)
+	}
+	if len(cands) != 3 {
+		t.Fatalf("len(cands) = %d, want 3", len(cands))
+	}
+	// Word-synced first, then line-synced, then plain.
+	if cands[0].ID != "12" || cands[0].SyncHint != "words" || !cands[0].Loaded || cands[0].Album != "Deluxe" {
+		t.Errorf("cand[0] = %+v", cands[0])
+	}
+	if cands[1].ID != "11" || cands[1].SyncHint != "lines" {
+		t.Errorf("cand[1] = %+v", cands[1])
+	}
+	if cands[2].ID != "10" || cands[2].SyncHint != "plain" {
+		t.Errorf("cand[2] = %+v", cands[2])
+	}
+
+	l, err := c.GetByID(context.Background(), "11")
+	if err != nil || !l.Synced || l.Lines[0].Text != "Synced" {
+		t.Errorf("GetByID = %+v, %v", l, err)
+	}
+	if _, err := c.GetByID(context.Background(), "bad"); !errors.Is(err, ErrNotFound) {
+		t.Errorf("GetByID bad = %v, want ErrNotFound", err)
+	}
+}
+
 // TestGetJunkSynced takes LRCLIB's plain lyrics where its synced ones
 // can't be followed in time, and the synced ones as plain where it has no
 // others (#277).

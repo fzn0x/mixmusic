@@ -23024,6 +23024,70 @@ func (msgs Messages) LyricsSearchArtist() string {
 	return Catalog.Format(msgs.locale, "lyricsSearchArtist", nil)
 }
 
+// LyricsSearchCandidate says "{title} · {artist}"
+// in the language the app shows.
+//
+// In lyricsSearchTitle: the track title and artist of a candidate result.
+func LyricsSearchCandidate(title string, artist string) string {
+	return In(i18n.Locale()).LyricsSearchCandidate(title, artist)
+}
+
+// LyricsSearchCandidate says "{title} · {artist}"
+// in the language of msgs.
+//
+// In lyricsSearchTitle: the track title and artist of a candidate result.
+func (msgs Messages) LyricsSearchCandidate(title string, artist string) string {
+	return Catalog.Format(msgs.locale, "lyricsSearchCandidate", map[string]any{"title": title, "artist": artist})
+}
+
+// LyricsSearchCandidateAlbum says "{title} · {artist} · {album}"
+// in the language the app shows.
+//
+// In lyricsSearchTitle: the track title, artist and album of a candidate
+// result.
+func LyricsSearchCandidateAlbum(title string, artist string, album string) string {
+	return In(i18n.Locale()).LyricsSearchCandidateAlbum(title, artist, album)
+}
+
+// LyricsSearchCandidateAlbum says "{title} · {artist} · {album}"
+// in the language of msgs.
+//
+// In lyricsSearchTitle: the track title, artist and album of a candidate
+// result.
+func (msgs Messages) LyricsSearchCandidateAlbum(title string, artist string, album string) string {
+	return Catalog.Format(msgs.locale, "lyricsSearchCandidateAlbum", map[string]any{"title": title, "artist": artist, "album": album})
+}
+
+// LyricsSearchFilterAll says "All ({count})"
+// in the language the app shows.
+//
+// In lyricsSearchTitle: filter chip showing results from every source.
+func LyricsSearchFilterAll(count int) string { return In(i18n.Locale()).LyricsSearchFilterAll(count) }
+
+// LyricsSearchFilterAll says "All ({count})"
+// in the language of msgs.
+//
+// In lyricsSearchTitle: filter chip showing results from every source.
+func (msgs Messages) LyricsSearchFilterAll(count int) string {
+	return Catalog.Format(msgs.locale, "lyricsSearchFilterAll", map[string]any{"count": count})
+}
+
+// LyricsSearchFilterSource says "{source} ({count})"
+// in the language the app shows.
+//
+// In lyricsSearchTitle: filter chip showing results from one lyrics source.
+func LyricsSearchFilterSource(source string, count int) string {
+	return In(i18n.Locale()).LyricsSearchFilterSource(source, count)
+}
+
+// LyricsSearchFilterSource says "{source} ({count})"
+// in the language of msgs.
+//
+// In lyricsSearchTitle: filter chip showing results from one lyrics source.
+func (msgs Messages) LyricsSearchFilterSource(source string, count int) string {
+	return Catalog.Format(msgs.locale, "lyricsSearchFilterSource", map[string]any{"source": source, "count": count})
+}
+
 // LyricsSearchGo says "search"
 // in the language the app shows.
 //
@@ -23040,6 +23104,70 @@ func (msgs Messages) LyricsSearchGo() string {
 	return Catalog.Format(msgs.locale, "lyricsSearchGo", nil)
 }
 
+// LyricsSearchHintLines says "Timed by line"
+// in the language the app shows.
+//
+// In lyricsSearchTitle: status badge on a search result whose lyrics have
+// line timestamps.
+func LyricsSearchHintLines() string { return In(i18n.Locale()).LyricsSearchHintLines() }
+
+// LyricsSearchHintLines says "Timed by line"
+// in the language of msgs.
+//
+// In lyricsSearchTitle: status badge on a search result whose lyrics have
+// line timestamps.
+func (msgs Messages) LyricsSearchHintLines() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchHintLines", nil)
+}
+
+// LyricsSearchHintPlain says "Not timed"
+// in the language the app shows.
+//
+// In lyricsSearchTitle: status badge on a search result whose lyrics have
+// no timestamps.
+func LyricsSearchHintPlain() string { return In(i18n.Locale()).LyricsSearchHintPlain() }
+
+// LyricsSearchHintPlain says "Not timed"
+// in the language of msgs.
+//
+// In lyricsSearchTitle: status badge on a search result whose lyrics have
+// no timestamps.
+func (msgs Messages) LyricsSearchHintPlain() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchHintPlain", nil)
+}
+
+// LyricsSearchHintUnknown says "Ready to preview"
+// in the language the app shows.
+//
+// In lyricsSearchTitle: status badge on a multi-result candidate before its
+// lyrics body is fetched.
+func LyricsSearchHintUnknown() string { return In(i18n.Locale()).LyricsSearchHintUnknown() }
+
+// LyricsSearchHintUnknown says "Ready to preview"
+// in the language of msgs.
+//
+// In lyricsSearchTitle: status badge on a multi-result candidate before its
+// lyrics body is fetched.
+func (msgs Messages) LyricsSearchHintUnknown() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchHintUnknown", nil)
+}
+
+// LyricsSearchHintWords says "Timed word by word"
+// in the language the app shows.
+//
+// In lyricsSearchTitle: status badge on a search result whose lyrics have
+// word-by-word timestamps.
+func LyricsSearchHintWords() string { return In(i18n.Locale()).LyricsSearchHintWords() }
+
+// LyricsSearchHintWords says "Timed word by word"
+// in the language of msgs.
+//
+// In lyricsSearchTitle: status badge on a search result whose lyrics have
+// word-by-word timestamps.
+func (msgs Messages) LyricsSearchHintWords() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchHintWords", nil)
+}
+
 // LyricsSearchLooking says "Asking the lyrics sources…"
 // in the language the app shows.
 //
@@ -23054,6 +23182,68 @@ func LyricsSearchLooking() string { return In(i18n.Locale()).LyricsSearchLooking
 // artist.
 func (msgs Messages) LyricsSearchLooking() string {
 	return Catalog.Format(msgs.locale, "lyricsSearchLooking", nil)
+}
+
+// LyricsSearchPreview says "preview"
+// in the language the app shows.
+//
+// In lyricsSearchTitle: button on a result that expands a preview of its
+// lyrics. Lowercase, as the labels of buttons are.
+func LyricsSearchPreview() string { return In(i18n.Locale()).LyricsSearchPreview() }
+
+// LyricsSearchPreview says "preview"
+// in the language of msgs.
+//
+// In lyricsSearchTitle: button on a result that expands a preview of its
+// lyrics. Lowercase, as the labels of buttons are.
+func (msgs Messages) LyricsSearchPreview() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchPreview", nil)
+}
+
+// LyricsSearchPreviewFailed says "Preview couldn't be loaded."
+// in the language the app shows.
+//
+// In lyricsSearchTitle: message shown when a candidate preview fails to
+// load.
+func LyricsSearchPreviewFailed() string { return In(i18n.Locale()).LyricsSearchPreviewFailed() }
+
+// LyricsSearchPreviewFailed says "Preview couldn't be loaded."
+// in the language of msgs.
+//
+// In lyricsSearchTitle: message shown when a candidate preview fails to
+// load.
+func (msgs Messages) LyricsSearchPreviewFailed() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchPreviewFailed", nil)
+}
+
+// LyricsSearchPreviewLess says "less"
+// in the language the app shows.
+//
+// In lyricsSearchTitle: button on an expanded preview that collapses it.
+// Lowercase, as the labels of buttons are.
+func LyricsSearchPreviewLess() string { return In(i18n.Locale()).LyricsSearchPreviewLess() }
+
+// LyricsSearchPreviewLess says "less"
+// in the language of msgs.
+//
+// In lyricsSearchTitle: button on an expanded preview that collapses it.
+// Lowercase, as the labels of buttons are.
+func (msgs Messages) LyricsSearchPreviewLess() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchPreviewLess", nil)
+}
+
+// LyricsSearchPreviewLoading says "Loading preview…"
+// in the language the app shows.
+//
+// In lyricsSearchTitle: shown while a candidate preview is being fetched.
+func LyricsSearchPreviewLoading() string { return In(i18n.Locale()).LyricsSearchPreviewLoading() }
+
+// LyricsSearchPreviewLoading says "Loading preview…"
+// in the language of msgs.
+//
+// In lyricsSearchTitle: shown while a candidate preview is being fetched.
+func (msgs Messages) LyricsSearchPreviewLoading() string {
+	return Catalog.Format(msgs.locale, "lyricsSearchPreviewLoading", nil)
 }
 
 // LyricsSearchSongTitle says "Title"
@@ -23306,6 +23496,26 @@ func (msgs Messages) LyricsSourceAutomatic() string {
 	return Catalog.Format(msgs.locale, "lyricsSourceAutomatic", nil)
 }
 
+// LyricsSourceAutomaticFrom says "Automatic ({source})"
+// in the language the app shows.
+//
+// On the button of the lyrics sources while Automatic is chosen and a
+// source's lyrics are showing. {source} is the name of that source, as
+// LRCLIB or Unison.
+func LyricsSourceAutomaticFrom(source string) string {
+	return In(i18n.Locale()).LyricsSourceAutomaticFrom(source)
+}
+
+// LyricsSourceAutomaticFrom says "Automatic ({source})"
+// in the language of msgs.
+//
+// On the button of the lyrics sources while Automatic is chosen and a
+// source's lyrics are showing. {source} is the name of that source, as
+// LRCLIB or Unison.
+func (msgs Messages) LyricsSourceAutomaticFrom(source string) string {
+	return Catalog.Format(msgs.locale, "lyricsSourceAutomaticFrom", map[string]any{"source": source})
+}
+
 // LyricsSourceBetterLyricsSent says "Lyrics timed word by word. Gets the title, first artist, album and length of tracks that have an album."
 // in the language the app shows.
 func LyricsSourceBetterLyricsSent() string { return In(i18n.Locale()).LyricsSourceBetterLyricsSent() }
@@ -23472,6 +23682,22 @@ func (msgs Messages) LyricsSourceLastOn(name string) string {
 	return Catalog.Format(msgs.locale, "lyricsSourceLastOn", map[string]any{"name": name})
 }
 
+// LyricsSourceLrcRedSent says "Lyrics timed word by word or by line from lrc.red. Gets the track's ISRC, or its title and first artist."
+// in the language the app shows.
+//
+// Under lrc.red in Settings › Playback › Lyrics sources: describes what
+// the source provides and sends.
+func LyricsSourceLrcRedSent() string { return In(i18n.Locale()).LyricsSourceLrcRedSent() }
+
+// LyricsSourceLrcRedSent says "Lyrics timed word by word or by line from lrc.red. Gets the track's ISRC, or its title and first artist."
+// in the language of msgs.
+//
+// Under lrc.red in Settings › Playback › Lyrics sources: describes what
+// the source provides and sends.
+func (msgs Messages) LyricsSourceLrcRedSent() string {
+	return Catalog.Format(msgs.locale, "lyricsSourceLrcRedSent", nil)
+}
+
 // LyricsSourceNotAsked says "Not asked yet"
 // in the language the app shows.
 //
@@ -23526,6 +23752,22 @@ func (msgs Messages) LyricsSourceOn() string {
 	return Catalog.Format(msgs.locale, "lyricsSourceOn", nil)
 }
 
+// LyricsSourceQQMusicSent says "Synced lyrics from QQ Music. Gets the title and first artist."
+// in the language the app shows.
+//
+// Under QQ Music in Settings › Playback › Lyrics sources: describes
+// what the source provides and sends.
+func LyricsSourceQQMusicSent() string { return In(i18n.Locale()).LyricsSourceQQMusicSent() }
+
+// LyricsSourceQQMusicSent says "Synced lyrics from QQ Music. Gets the title and first artist."
+// in the language of msgs.
+//
+// Under QQ Music in Settings › Playback › Lyrics sources: describes
+// what the source provides and sends.
+func (msgs Messages) LyricsSourceQQMusicSent() string {
+	return Catalog.Format(msgs.locale, "lyricsSourceQQMusicSent", nil)
+}
+
 // LyricsSourceRowLabel says "{name}, {state}"
 // in the language the app shows.
 func LyricsSourceRowLabel(name string, state string) string {
@@ -23574,6 +23816,40 @@ func (msgs Messages) LyricsSourceSearched(source string, title string, artist st
 	return Catalog.Format(msgs.locale, "lyricsSourceSearched", map[string]any{"source": source, "title": title, "artist": artist})
 }
 
+// LyricsSourceSearchedCandidate says "{source}: {candidate}"
+// in the language the app shows.
+//
+// In the menu of the lyrics sources, and on its button: a specific
+// candidate version picked from a multi-result source.
+func LyricsSourceSearchedCandidate(source string, candidate string) string {
+	return In(i18n.Locale()).LyricsSourceSearchedCandidate(source, candidate)
+}
+
+// LyricsSourceSearchedCandidate says "{source}: {candidate}"
+// in the language of msgs.
+//
+// In the menu of the lyrics sources, and on its button: a specific
+// candidate version picked from a multi-result source.
+func (msgs Messages) LyricsSourceSearchedCandidate(source string, candidate string) string {
+	return Catalog.Format(msgs.locale, "lyricsSourceSearchedCandidate", map[string]any{"source": source, "candidate": candidate})
+}
+
+// LyricsSourceSpotifySent says "Spotify's own lyrics when signed in with a Spotify web session. Gets the Spotify track ID."
+// in the language the app shows.
+//
+// Under Spotify in Settings › Playback › Lyrics sources: describes what
+// the source provides and sends.
+func LyricsSourceSpotifySent() string { return In(i18n.Locale()).LyricsSourceSpotifySent() }
+
+// LyricsSourceSpotifySent says "Spotify's own lyrics when signed in with a Spotify web session. Gets the Spotify track ID."
+// in the language of msgs.
+//
+// Under Spotify in Settings › Playback › Lyrics sources: describes what
+// the source provides and sends.
+func (msgs Messages) LyricsSourceSpotifySent() string {
+	return Catalog.Format(msgs.locale, "lyricsSourceSpotifySent", nil)
+}
+
 // LyricsSourceUnisonSent says "Gets the video ID, or the title, artists, album and length."
 // in the language the app shows.
 func LyricsSourceUnisonSent() string { return In(i18n.Locale()).LyricsSourceUnisonSent() }
@@ -23610,6 +23886,38 @@ func LyricsSourceYouTubeMusicSent() string { return In(i18n.Locale()).LyricsSour
 // in the language of msgs.
 func (msgs Messages) LyricsSourceYouTubeMusicSent() string {
 	return Catalog.Format(msgs.locale, "lyricsSourceYouTubeMusicSent", nil)
+}
+
+// LyricsSourceYouTubePageName says "YouTube video & comments"
+// in the language the app shows.
+//
+// The name of the lyrics source that reads plain lyrics from YouTube video
+// descriptions and pinned comments.
+func LyricsSourceYouTubePageName() string { return In(i18n.Locale()).LyricsSourceYouTubePageName() }
+
+// LyricsSourceYouTubePageName says "YouTube video & comments"
+// in the language of msgs.
+//
+// The name of the lyrics source that reads plain lyrics from YouTube video
+// descriptions and pinned comments.
+func (msgs Messages) LyricsSourceYouTubePageName() string {
+	return Catalog.Format(msgs.locale, "lyricsSourceYouTubePageName", nil)
+}
+
+// LyricsSourceYouTubePageSent says "Plain lyrics from matching YouTube video descriptions and pinned creator comments. Gets the video ID, or the title an…"
+// in the language the app shows.
+//
+// Under YouTube video & comments in Settings › Playback › Lyrics
+// sources: describes what the source provides and sends.
+func LyricsSourceYouTubePageSent() string { return In(i18n.Locale()).LyricsSourceYouTubePageSent() }
+
+// LyricsSourceYouTubePageSent says "Plain lyrics from matching YouTube video descriptions and pinned creator comments. Gets the video ID, or the title an…"
+// in the language of msgs.
+//
+// Under YouTube video & comments in Settings › Playback › Lyrics
+// sources: describes what the source provides and sends.
+func (msgs Messages) LyricsSourceYouTubePageSent() string {
+	return Catalog.Format(msgs.locale, "lyricsSourceYouTubePageSent", nil)
 }
 
 // LyricsSourcesAbout says "MixMusic asks the sources that are on, one at a time, from the top, until one has synced lyrics. Drag a source onto a…"
@@ -24144,6 +24452,56 @@ func (msgs Messages) LyricsTranslate() string {
 	return Catalog.Format(msgs.locale, "lyricsTranslate", nil)
 }
 
+// LyricsTranslateAbove says "above"
+// in the language the app shows.
+//
+// Segmented option next to the embedded translation switch: shows each
+// translated line above the original line. Lowercase, as the segmented
+// labels there.
+func LyricsTranslateAbove() string { return In(i18n.Locale()).LyricsTranslateAbove() }
+
+// LyricsTranslateAbove says "above"
+// in the language of msgs.
+//
+// Segmented option next to the embedded translation switch: shows each
+// translated line above the original line. Lowercase, as the segmented
+// labels there.
+func (msgs Messages) LyricsTranslateAbove() string {
+	return Catalog.Format(msgs.locale, "lyricsTranslateAbove", nil)
+}
+
+// LyricsTranslateEmbeddedTip says "Shows the translation included with these lyrics, under or above each line, or on its own."
+// in the language the app shows.
+//
+// Tooltip on the translate switch when the lyrics already carry an embedded
+// line-by-line translation.
+func LyricsTranslateEmbeddedTip() string { return In(i18n.Locale()).LyricsTranslateEmbeddedTip() }
+
+// LyricsTranslateEmbeddedTip says "Shows the translation included with these lyrics, under or above each line, or on its own."
+// in the language of msgs.
+//
+// Tooltip on the translate switch when the lyrics already carry an embedded
+// line-by-line translation.
+func (msgs Messages) LyricsTranslateEmbeddedTip() string {
+	return Catalog.Format(msgs.locale, "lyricsTranslateEmbeddedTip", nil)
+}
+
+// LyricsTranslateHow says "Show translation"
+// in the language the app shows.
+//
+// In Settings › Playback › Lyrics and accessible label: chooses whether
+// embedded translations appear under, above, or instead of original lines.
+func LyricsTranslateHow() string { return In(i18n.Locale()).LyricsTranslateHow() }
+
+// LyricsTranslateHow says "Show translation"
+// in the language of msgs.
+//
+// In Settings › Playback › Lyrics and accessible label: chooses whether
+// embedded translations appear under, above, or instead of original lines.
+func (msgs Messages) LyricsTranslateHow() string {
+	return Catalog.Format(msgs.locale, "lyricsTranslateHow", nil)
+}
+
 // LyricsTranslateLyrics says "Translate lyrics"
 // in the language the app shows.
 func LyricsTranslateLyrics() string { return In(i18n.Locale()).LyricsTranslateLyrics() }
@@ -24154,6 +24512,24 @@ func (msgs Messages) LyricsTranslateLyrics() string {
 	return Catalog.Format(msgs.locale, "lyricsTranslateLyrics", nil)
 }
 
+// LyricsTranslateOnly says "only"
+// in the language the app shows.
+//
+// Segmented option next to the embedded translation switch: replaces
+// original lines with the translation. Lowercase, as the segmented labels
+// there.
+func LyricsTranslateOnly() string { return In(i18n.Locale()).LyricsTranslateOnly() }
+
+// LyricsTranslateOnly says "only"
+// in the language of msgs.
+//
+// Segmented option next to the embedded translation switch: replaces
+// original lines with the translation. Lowercase, as the segmented labels
+// there.
+func (msgs Messages) LyricsTranslateOnly() string {
+	return Catalog.Format(msgs.locale, "lyricsTranslateOnly", nil)
+}
+
 // LyricsTranslateTip says "Shows each line's translation under it. While it's on, the lyrics of the track playing and its video ID go to Unison,…"
 // in the language the app shows.
 func LyricsTranslateTip() string { return In(i18n.Locale()).LyricsTranslateTip() }
@@ -24162,6 +24538,24 @@ func LyricsTranslateTip() string { return In(i18n.Locale()).LyricsTranslateTip()
 // in the language of msgs.
 func (msgs Messages) LyricsTranslateTip() string {
 	return Catalog.Format(msgs.locale, "lyricsTranslateTip", nil)
+}
+
+// LyricsTranslateUnder says "under"
+// in the language the app shows.
+//
+// Segmented option next to the embedded translation switch: shows each
+// translated line under the original line. Lowercase, as the segmented
+// labels there.
+func LyricsTranslateUnder() string { return In(i18n.Locale()).LyricsTranslateUnder() }
+
+// LyricsTranslateUnder says "under"
+// in the language of msgs.
+//
+// Segmented option next to the embedded translation switch: shows each
+// translated line under the original line. Lowercase, as the segmented
+// labels there.
+func (msgs Messages) LyricsTranslateUnder() string {
+	return Catalog.Format(msgs.locale, "lyricsTranslateUnder", nil)
 }
 
 // LyricsTranslationFailed says "Translation isn't available right now."

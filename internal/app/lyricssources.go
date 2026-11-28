@@ -37,11 +37,67 @@ var lyricsLookups = map[string]lyricsLookup{
 	settings.LyricsUnison: func(c *Catalog, ctx context.Context, _ media.Track, q lyrics.Query) (lyrics.Lyrics, error) {
 		return c.a.unison.Get(ctx, q)
 	},
-	settings.LyricsLRCLIB: (*Catalog).lrclibLyrics,
+	settings.LyricsLrcRed: func(c *Catalog, ctx context.Context, _ media.Track, q lyrics.Query) (lyrics.Lyrics, error) {
+		if !c.a.lrcred.Asks(q) {
+			return lyrics.Lyrics{}, errNotAsked
+		}
+		return c.a.lrcred.Get(ctx, q)
+	},
+	settings.LyricsSpotify: (*Catalog).spotifyLyrics,
+	settings.LyricsLRCLIB:  (*Catalog).lrclibLyrics,
+	settings.LyricsQQMusic: func(c *Catalog, ctx context.Context, _ media.Track, q lyrics.Query) (lyrics.Lyrics, error) {
+		if !c.a.qqmusic.Asks(q) {
+			return lyrics.Lyrics{}, errNotAsked
+		}
+		return c.a.qqmusic.Get(ctx, q)
+	},
 	settings.LyricsYouTubeMusic: func(c *Catalog, ctx context.Context, track media.Track, _ lyrics.Query) (lyrics.Lyrics, error) {
 		return c.youtubeLyrics(ctx, track)
 	},
-	settings.LyricsCaptions: (*Catalog).captionLyrics,
+	settings.LyricsCaptions:    (*Catalog).captionLyrics,
+	settings.LyricsYouTubePage: (*Catalog).youtubePageLyrics,
+}
+
+// lyricsSearchLookup searches a provider for multiple lyric candidates.
+type lyricsSearchLookup func(c *Catalog, ctx context.Context, track media.Track, q lyrics.Query) ([]lyrics.Candidate, error)
+
+var lyricsSearchLookups = map[string]lyricsSearchLookup{
+	settings.LyricsLrcRed: func(c *Catalog, ctx context.Context, _ media.Track, q lyrics.Query) ([]lyrics.Candidate, error) {
+		if !c.a.lrcred.Asks(q) {
+			return nil, errNotAsked
+		}
+		return c.a.lrcred.Search(ctx, q)
+	},
+	settings.LyricsLRCLIB: (*Catalog).lrclibSearch,
+	settings.LyricsQQMusic: func(c *Catalog, ctx context.Context, _ media.Track, q lyrics.Query) ([]lyrics.Candidate, error) {
+		if !c.a.qqmusic.Asks(q) {
+			return nil, errNotAsked
+		}
+		return c.a.qqmusic.Search(ctx, q)
+	},
+	settings.LyricsYouTubePage: (*Catalog).youtubePageSearch,
+}
+
+// lyricsByIDLookup fetches a specific candidate by ID from a provider.
+type lyricsByIDLookup func(c *Catalog, ctx context.Context, track media.Track, q lyrics.Query, id string) (lyrics.Lyrics, error)
+
+var lyricsByIDLookups = map[string]lyricsByIDLookup{
+	settings.LyricsLrcRed: func(c *Catalog, ctx context.Context, _ media.Track, _ lyrics.Query, id string) (lyrics.Lyrics, error) {
+		if c.a.lrcred == nil || c.a.lrcred.BaseURL == "" {
+			return lyrics.Lyrics{}, errNotAsked
+		}
+		return c.a.lrcred.GetByID(ctx, id)
+	},
+	settings.LyricsLRCLIB: func(c *Catalog, ctx context.Context, track media.Track, _ lyrics.Query, id string) (lyrics.Lyrics, error) {
+		return c.lrclibByID(ctx, track, id)
+	},
+	settings.LyricsQQMusic: func(c *Catalog, ctx context.Context, _ media.Track, _ lyrics.Query, id string) (lyrics.Lyrics, error) {
+		if c.a.qqmusic == nil || c.a.qqmusic.BaseURL == "" {
+			return lyrics.Lyrics{}, errNotAsked
+		}
+		return c.a.qqmusic.GetByID(ctx, id)
+	},
+	settings.LyricsYouTubePage: (*Catalog).youtubePageByID,
 }
 
 // errNotAsked is a source of lyrics a track isn't looked up on, as Better

@@ -11,11 +11,18 @@ import (
 func TestLyricsTranslation(t *testing.T) {
 	s := Settings{
 		Lyrics: Lyrics{
-			LyricsTranslate: []string{"ja", "", "ja", "zh-Hant", "Japanese", "x"},
-			LyricsRomanize:  map[string]string{"ja": RomanizeOnly, "ko": RomanizeUnder, "ru": "sideways", "<b>": RomanizeOnly},
+			LyricsTranslate:     []string{"ja", "", "ja", "zh-Hant", "Japanese", "x"},
+			LyricsTranslateMode: TranslateAbove,
+			LyricsRomanize:      map[string]string{"ja": RomanizeOnly, "ko": RomanizeUnder, "ru": "sideways", "<b>": RomanizeOnly},
 		},
 		Translation: Translation{LyricsTranslateTo: "zh-Hant"},
 	}.Clean()
+	if s.LyricsTranslateMode != TranslateAbove {
+		t.Errorf("translateMode = %q", s.LyricsTranslateMode)
+	}
+	if got := (Settings{Lyrics: Lyrics{LyricsTranslateMode: "sideways"}}).Clean().LyricsTranslateMode; got != TranslateUnder {
+		t.Errorf("invalid translateMode kept as %q", got)
+	}
 	if strings.Join(s.LyricsTranslate, ",") != "ja,,zh-Hant" {
 		t.Errorf("translate = %q", s.LyricsTranslate)
 	}

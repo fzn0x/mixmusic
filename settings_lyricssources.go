@@ -18,14 +18,18 @@ import (
 )
 
 // lyricsSourceText tells the user of a source of lyrics, by its key: its
-// name, and what MixMusic sends it.
+// name and what MixMusic sends it.
 func lyricsSourceText() map[string]struct{ name, sent string } {
 	return map[string]struct{ name, sent string }{
 		settings.LyricsBetterLyrics: {"Better Lyrics", locales.LyricsSourceBetterLyricsSent()},
 		settings.LyricsUnison:       {"Unison", locales.LyricsSourceUnisonSent()},
+		settings.LyricsLrcRed:       {"lrc.red", locales.LyricsSourceLrcRedSent()},
+		settings.LyricsSpotify:      {"Spotify", locales.LyricsSourceSpotifySent()},
 		settings.LyricsLRCLIB:       {"LRCLIB", locales.LyricsSourceLRCLIBSent()},
+		settings.LyricsQQMusic:      {"QQ Music", locales.LyricsSourceQQMusicSent()},
 		settings.LyricsYouTubeMusic: {"YouTube Music", locales.LyricsSourceYouTubeMusicSent()},
 		settings.LyricsCaptions:     {locales.LyricsSourceCaptionsName(), locales.LyricsSourceCaptionsSent()},
+		settings.LyricsYouTubePage:  {locales.LyricsSourceYouTubePageName(), locales.LyricsSourceYouTubePageSent()},
 	}
 }
 

@@ -158,6 +158,12 @@ export interface Lyrics {
   byUrl?: string;
   /** The language of the lyrics, as "ja", when known. */
   language?: string;
+  /** Embedded line-aligned translation and/or romanization carried by the lyrics source. */
+  translation?: {
+    from?: string;
+    to?: string;
+    lines: { text?: string; romanized?: string }[];
+  };
   /**
    * Why the lyrics don't show as their source has them, as synced lyrics
    * of a song shown without their times with a longer music video of it.

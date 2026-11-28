@@ -312,3 +312,99 @@ func TestLyricsSettingsEdited(t *testing.T) {
 		t.Errorf("saved %q, %q, %v", got.LyricsTranslateTo, got.LyricsTranslate, got.LyricsRomanize)
 	}
 }
+
+// TestEmbeddedBilingualDisplayModes verifies embedded bilingual lyrics default
+// on without asking Unison and switch cleanly between under, above, translation
+// only, and original only across panel and stage.
+func TestEmbeddedBilingualDisplayModes(t *testing.T) {
+	refused := httptest.NewServer(http.NotFoundHandler())
+	t.Cleanup(refused.Close)
+	s := newTestShellOf(t, func(o *app.Options) { o.RomajiURL = refused.URL })
+	ly := lyrics.Lyrics{
+		Synced:   true,
+		Source:   app.YouTubePageSource,
+		Language: "ja",
+		Lines: []lyrics.Line{
+			{TimeMs: 0, Text: "Jimen ni hizamazuki, namida ni nureru,"},
+			{TimeMs: 60000, Text: "Awaremi motome, jibun no kachi wo inoru,"},
+		},
+		Translation: &lyrics.Translation{
+			From: "ja",
+			To:   "en",
+			Lines: []lyrics.TranslatedLine{
+				{Text: "Kneeling on the ground, drenched in tears,"},
+				{Text: "Seeking compassion, praying for my worth,"},
+			},
+		},
+	}
+	s.loads["lyrics:"+testTracks[0].ID] = &loaded[lyrics.Lyrics]{done: true, value: ly}
+	s.p.PlayTracks(testTracks, 0)
+	s.settle(t, func(st player.State) bool { return st.Playing })
+	tt := testerOf(t, s, 1280, 900)
+	s.open("/lyrics")
+	tt.Frame()
+	texts := func() []string {
+		s.drain()
+		tt.Frame()
+		return tt.Texts()
+	}
+
+	// Default mode ("under"): original above translation, no Unison call made.
+	got := texts()
+	if i := slices.Index(got, "Jimen ni hizamazuki, namida ni nureru,"); i < 0 || i+1 >= len(got) || got[i+1] != "Kneeling on the ground, drenched in tears," {
+		t.Fatalf("embedded under: %q", got)
+	}
+	if s.loads["lyrics-translation:"+testTracks[0].ID+":en"] != nil {
+		t.Errorf("embedded translation unexpectedly called Unison lookup")
+	}
+
+	// Switch to "above" (English above original).
+	click(t, s, tt, "above")
+	got = texts()
+	if i := slices.Index(got, "Kneeling on the ground, drenched in tears,"); i < 0 || i+1 >= len(got) || got[i+1] != "Jimen ni hizamazuki, namida ni nureru," {
+		t.Fatalf("embedded above: %q", got)
+	}
+	if s.svc.Preferences.Get().LyricsTranslateMode != settings.TranslateAbove {
+		t.Errorf("mode not saved as above: %q", s.svc.Preferences.Get().LyricsTranslateMode)
+	}
+
+	// Switch to "only" (translation only).
+	click(t, s, tt, "only")
+	got = texts()
+	if !slices.Contains(got, "Kneeling on the ground, drenched in tears,") || slices.Contains(got, "Jimen ni hizamazuki, namida ni nureru,") {
+		t.Fatalf("embedded only: %q", got)
+	}
+
+	// Toggle translate off -> original only.
+	click(t, s, tt, "Translate lyrics")
+	got = texts()
+	if !slices.Contains(got, "Jimen ni hizamazuki, namida ni nureru,") || slices.Contains(got, "Kneeling on the ground, drenched in tears,") {
+		t.Fatalf("embedded off (original only): %q", got)
+	}
+
+	// 3-layer Kanji + embedded Romaji + embedded English without Kanji dict download.
+	s.lyricsView.embeddedOff = nil
+	s.set.LyricsTranslateMode = settings.TranslateUnder
+	s.set.LyricsRomanize = map[string]string{"ja": settings.RomanizeUnder}
+	s.loads["lyrics:"+testTracks[0].ID] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{
+		Synced:   true,
+		Source:   app.YouTubePageSource,
+		Language: "ja",
+		Lines: []lyrics.Line{
+			{TimeMs: 0, Text: "地面に跪き"},
+			{TimeMs: 60000, Text: "涙に濡れる"},
+		},
+		Translation: &lyrics.Translation{
+			From: "ja",
+			To:   "en",
+			Lines: []lyrics.TranslatedLine{
+				{Text: "Kneeling on the ground", Romanized: "Jimen ni hizamazuki"},
+				{Text: "Drenched in tears", Romanized: "Namida ni nureru"},
+			},
+		},
+	}}
+	got = texts()
+	if i := slices.Index(got, "地面に跪き"); i < 0 || i+2 >= len(got) || got[i+1] != "Jimen ni hizamazuki" || got[i+2] != "Kneeling on the ground" {
+		t.Fatalf("3-layer embedded lyrics: %q", got)
+	}
+}

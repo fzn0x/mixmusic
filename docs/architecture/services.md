@@ -236,9 +236,13 @@
   keeps the best answer: synced over plain, word by word over line by
   line while `LyricsPreferWords` is on, the longer of two plain answers.
   Each source is a `lyricsLookup` of `lyricsLookups`, by its key in
-  `settings.LyricsSourceKeys`; YouTube captions come through
+  `settings.LyricsSourceKeys` (Better Lyrics, Unison, lrc.red, Spotify, LRCLIB,
+  QQ Music, YouTube Music, YouTube captions, and YouTube video & comments); YouTube captions come through
   `stream.Direct.Captions` (`lyricscaptions.go`), as does an episode's
-  transcript (`Catalog.Transcript`). The lyrics kept of a track are kept
+  transcript (`Catalog.Transcript`). Multi-result providers also expose
+  `Search` (`lyricsSearchLookups`) and `GetByID` (`lyricsByIDLookups`) so
+  the search dialog can list, filter, preview, and persist an exact
+  `CandidateID` in `LyricsPick`. The lyrics kept of a track are kept
   by its sources' setup (`lyricsSetup`), so that a change looks it up
   again. `lyricspick.go` (#598) keeps each source's answer of a track
   (`lyricsAsked`, by the same setup) and the caption tracks of its video,

@@ -26,28 +26,43 @@ var (
 
 // FromText reads lyrics kept as text: LRC, synced by the rule of
 // timedLyrics, their words timed where stamps of enhanced LRC time them
-// (enhancedWords); else TTML; else plain text, a line each. ok is false
-// for text of no words, as LRC of only its metadata.
+// (enhancedWords); else TTML; else plain text, a line each (detecting
+// embedded bilingual sections or explicit "--- Romanized ---" /
+// "--- Translation ---" blocks when present). ok is false for text of no
+// words, as LRC of only its metadata.
 func FromText(text, source string) (l Lyrics, ok bool) {
 	text = strings.TrimSpace(strings.TrimPrefix(text, "\uFEFF"))
-	switch lines := parseLRC(text, true); {
+	primary, roman, trans, transTo, hasMarkers := splitMarkedTranslation(text)
+	parseBody := primary
+	if !hasMarkers {
+		parseBody = text
+	}
+	switch lines := parseLRC(parseBody, true); {
 	case len(lines) > 0:
 		l = timedLyrics(lines, source)
-	case strings.HasPrefix(text, "<") && strings.Contains(text, "<tt"):
+	case strings.HasPrefix(parseBody, "<") && strings.Contains(parseBody, "<tt"):
 		var err error
-		if l, err = ParseTTML(text); err != nil {
+		if l, err = ParseTTML(parseBody); err != nil {
 			return Lyrics{}, false
 		}
 		l.Source = source
 	default:
 		// Lines of LRC's metadata aren't sung.
 		var sung []string
-		for line := range strings.SplitSeq(text, "\n") {
+		for line := range strings.SplitSeq(parseBody, "\n") {
 			if !lrcTagRe.MatchString(strings.TrimSpace(line)) {
 				sung = append(sung, line)
 			}
 		}
-		l = Plain(strings.TrimSpace(strings.Join(sung, "\n")), source)
+		joined := strings.TrimSpace(strings.Join(sung, "\n"))
+		if !hasMarkers {
+			l = PlainBilingual(joined, source)
+		} else {
+			l = Plain(joined, source)
+		}
+	}
+	if hasMarkers {
+		attachMarkedTranslation(&l, roman, trans, transTo)
 	}
 	for _, line := range l.Lines {
 		if line.Text != "" {

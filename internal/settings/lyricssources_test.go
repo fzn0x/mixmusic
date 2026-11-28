@@ -29,21 +29,24 @@ func TestLyricsSourceOrder(t *testing.T) {
 		saved []LyricsSource
 		want  string
 	}{
-		{"a new install", nil, "betterlyrics unison lrclib youtube captions"},
+		{"a new install", nil, "betterlyrics unison lrcred spotify lrclib qqmusic youtube captions youtubepage"},
 		{"moved", []LyricsSource{{Key: "lrclib"}, {Key: "betterlyrics", Off: true}, {Key: "unison"}, {Key: "youtube"}, {Key: "captions"}},
-			"lrclib betterlyrics- unison youtube captions"},
+			"lrclib qqmusic betterlyrics- unison lrcred spotify youtube captions youtubepage"},
 		// Placed before there were captions: they follow YouTube Music.
 		{"a source added since", []LyricsSource{{Key: "youtube"}, {Key: "lrclib"}, {Key: "unison"}, {Key: "betterlyrics"}},
-			"youtube captions lrclib unison betterlyrics"},
+			"youtube captions youtubepage lrclib qqmusic unison lrcred spotify betterlyrics"},
 		// The first by default goes first, and each of the others after the
 		// one it follows.
-		{"some left out", []LyricsSource{{Key: "lrclib"}, {Key: "unison"}}, "betterlyrics lrclib youtube captions unison"},
+		{"some left out", []LyricsSource{{Key: "lrclib"}, {Key: "unison"}}, "betterlyrics lrclib qqmusic youtube captions youtubepage unison lrcred spotify"},
 		// A later version's source, and one named twice, are left out.
 		{"unknown and twice", []LyricsSource{{Key: "someday"}, {Key: "unison", Off: true}, {Key: "unison"}},
-			"betterlyrics unison- lrclib youtube captions"},
+			"betterlyrics unison- lrcred spotify lrclib qqmusic youtube captions youtubepage"},
 		// One is always on.
-		{"every one off", []LyricsSource{{Key: "captions", Off: true}, {Key: "youtube", Off: true}, {Key: "lrclib", Off: true}, {Key: "unison", Off: true}, {Key: "betterlyrics", Off: true}},
-			"captions youtube- lrclib- unison- betterlyrics-"},
+		{"every one off", []LyricsSource{
+			{Key: "youtubepage", Off: true}, {Key: "captions", Off: true}, {Key: "youtube", Off: true},
+			{Key: "qqmusic", Off: true}, {Key: "lrclib", Off: true}, {Key: "spotify", Off: true},
+			{Key: "lrcred", Off: true}, {Key: "unison", Off: true}, {Key: "betterlyrics", Off: true},
+		}, "youtubepage captions- youtube- qqmusic- lrclib- spotify- lrcred- unison- betterlyrics-"},
 	} {
 		var l Lyrics
 		l.LyricsSources = c.saved

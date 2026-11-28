@@ -14,6 +14,16 @@ const (
 	RomanizeOnly = "only"
 )
 
+// The ways of showing a translation alongside lyrics (LyricsTranslateMode).
+const (
+	// TranslateUnder shows the translated line under the original line.
+	TranslateUnder = "under"
+	// TranslateAbove shows the translated line above the original line.
+	TranslateAbove = "above"
+	// TranslateOnly shows the translated line in place of the original line.
+	TranslateOnly = "only"
+)
+
 // languageRe matches the code of a language, as "ja" or "zh-Hant".
 var languageRe = regexp.MustCompile(`^[a-z]{2,3}(-[A-Z][a-z]{3})?$`)
 
@@ -145,6 +155,9 @@ type Lyrics struct {
 	// codes of ISO 639-1 as "ja": their translation shows under each line.
 	// "" stands for lyrics whose language MixMusic can't tell.
 	LyricsTranslate []string `json:"lyricsTranslate"`
+	// LyricsTranslateMode chooses how a translation shows alongside the
+	// lyrics: TranslateUnder (default), TranslateAbove, or TranslateOnly.
+	LyricsTranslateMode string `json:"lyricsTranslateMode"`
 	// LyricsRomanize shows the lyrics of a language in Latin letters,
 	// RomanizeUnder or RomanizeOnly, by the language's code; lyrics of
 	// other languages show as they are written.
@@ -161,6 +174,7 @@ func defaultLyrics() Lyrics {
 	l.LyricsBall = true
 	l.LyricsBallMotion = LyricBallMotions[0]
 	l.LyricsTranslate = []string{}
+	l.LyricsTranslateMode = TranslateUnder
 	l.LyricsRomanize = map[string]string{}
 	return l
 }
@@ -189,6 +203,11 @@ func (l Lyrics) clean() Lyrics {
 		}
 	}
 	l.LyricsTranslate = translate
+	switch l.LyricsTranslateMode {
+	case TranslateUnder, TranslateAbove, TranslateOnly:
+	default:
+		l.LyricsTranslateMode = TranslateUnder
+	}
 	romanize := map[string]string{}
 	for lang, how := range l.LyricsRomanize {
 		if (lang == "" || languageRe.MatchString(lang)) && (how == RomanizeUnder || how == RomanizeOnly) && len(romanize) < 200 {

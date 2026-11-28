@@ -101,6 +101,8 @@ type Client struct {
 	BaseURL string
 	// GQLURL is Spotify's internal Pathfinder GraphQL endpoint, replaced in tests.
 	GQLURL string
+	// LyricsURL is Spotify's internal color-lyrics host, replaced in tests.
+	LyricsURL string
 	// HashesURL is the remote persisted-query hash registry, replaced or cleared in tests.
 	HashesURL string
 	// OnToken is called with every new token, to keep it for the next run.
@@ -109,6 +111,10 @@ type Client struct {
 	mu     sync.Mutex
 	token  Token
 	hashes *gqlHashStore
+	// lyricsWait records when Spotify's color-lyrics endpoint may be asked
+	// again after answering HTTP 429.
+	lyricsWaitMu    sync.Mutex
+	lyricsWaitUntil time.Time
 	// refreshing is held while a request gets its token, so that one
 	// refreshes it and the others wait for the new one; mu is not held
 	// meanwhile, so that SignedIn and Granted never wait for Spotify.
@@ -122,6 +128,7 @@ func NewClient(auth *Auth) *Client {
 		HTTP:      &http.Client{Timeout: 20 * time.Second},
 		BaseURL:   apiURL,
 		GQLURL:    gqlURL,
+		LyricsURL: lyricsURL,
 		HashesURL: remoteHashesURL,
 		hashes:    newGQLHashStore(),
 	}

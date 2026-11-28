@@ -29,7 +29,7 @@ var english = regexp.MustCompile(`[A-Za-z]{2,} [A-Za-z]{2,}`)
 // pseudoWritten are texts that are names in every language: the themes'
 // and services'.
 var pseudoWritten = map[string]bool{"Walnut Light": true, "Material Dark": true, "YouTube Music": true, "youtube music": true,
-	"Better Lyrics": true, "CC BY-NC-SA 4.0": true}
+	"Better Lyrics": true, "QQ Music": true, "CC BY-NC-SA 4.0": true}
 
 // usePseudoLocale has the app say its messages in en-XA until the test
 // ends.

@@ -656,3 +656,73 @@ func TestStageGroundUnderTheLyrics(t *testing.T) {
 	}
 	t.Error("no white pixel where the line sung is: the ground covers the lyrics")
 }
+
+// TestStageBilingualModes renders embedded bilingual lyrics on the full-screen
+// stage in under, above, and only modes (and saves PNGs when MIXMUSIC_RENDER is set).
+func TestStageBilingualModes(t *testing.T) {
+	s := newTestShell(t)
+	track := testTracks[0]
+	track.Title = "BLOODLUST"
+	track.Artwork = []media.Image{{URL: stageCoverURL, Width: 600, Height: 600}}
+	s.art.src = stageCover{}
+	s.loads["lyrics:"+track.ID] = &loaded[lyrics.Lyrics]{done: true, value: lyrics.Lyrics{
+		Synced:   true,
+		Source:   "YouTube video & comments",
+		Language: "ja",
+		Lines: []lyrics.Line{
+			{TimeMs: 0, Text: "Jimen ni hizamazuki, namida ni nureru,"},
+			{TimeMs: 14000, Text: "Awaremi motome, jibun no kachi wo inoru,"},
+			{TimeMs: 24000, Text: "Demo kotae wa shizuka, yabureta sakebi ni,"},
+		},
+		Translation: &lyrics.Translation{
+			From: "ja",
+			To:   "en",
+			Lines: []lyrics.TranslatedLine{
+				{Text: "Kneeling on the ground, drenched in tears,"},
+				{Text: "Seeking compassion, praying for my worth,"},
+				{Text: "But the answer is silent, in a broken cry,"},
+			},
+		},
+	}}
+	s.p.PlayTracks([]media.Track{track}, 0)
+	s.settle(t, func(st player.State) bool { return st.Playing && !st.Loading })
+	tt := testerOf(t, s, 1280, 820)
+	s.toggleStage()
+	s.drain()
+	tt.Frame()
+	coversLoad(t, s, tt)
+
+	dir := os.Getenv("MIXMUSIC_RENDER")
+	s.set.LyricsTranslateMode = settings.TranslateUnder
+	s.drain()
+	tt.Frame()
+	got := tt.Texts()
+	if i := slices.Index(got, "Jimen ni hizamazuki, namida ni nureru,"); i < 0 || i+1 >= len(got) || got[i+1] != "Kneeling on the ground, drenched in tears," {
+		t.Fatalf("stage under: %q", got)
+	}
+	if dir != "" {
+		renderTo(t, s, tt, dir, "bilingual-stage-under")
+	}
+
+	s.set.LyricsTranslateMode = settings.TranslateAbove
+	s.drain()
+	tt.Frame()
+	got = tt.Texts()
+	if i := slices.Index(got, "Kneeling on the ground, drenched in tears,"); i < 0 || i+1 >= len(got) || got[i+1] != "Jimen ni hizamazuki, namida ni nureru," {
+		t.Fatalf("stage above: %q", got)
+	}
+	if dir != "" {
+		renderTo(t, s, tt, dir, "bilingual-stage-above")
+	}
+
+	s.set.LyricsTranslateMode = settings.TranslateOnly
+	s.drain()
+	tt.Frame()
+	got = tt.Texts()
+	if !slices.Contains(got, "Kneeling on the ground, drenched in tears,") || slices.Contains(got, "Jimen ni hizamazuki, namida ni nureru,") {
+		t.Fatalf("stage only: %q", got)
+	}
+	if dir != "" {
+		renderTo(t, s, tt, dir, "bilingual-stage-only")
+	}
+}

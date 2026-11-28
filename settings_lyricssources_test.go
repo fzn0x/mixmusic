@@ -13,7 +13,10 @@ import (
 
 // lyricsSourceNames are the sources of lyrics in their own order, as
 // their rows name them.
-var lyricsSourceNames = []string{"Better Lyrics", "Unison", "LRCLIB", "YouTube Music", "YouTube captions"}
+var lyricsSourceNames = []string{
+	"Better Lyrics", "Unison", "lrc.red", "Spotify", "LRCLIB", "QQ Music",
+	"YouTube Music", "YouTube captions", "YouTube video & comments",
+}
 
 // lyricsSourcesShell shows Settings › Playback with the sources of lyrics
 // in view.
@@ -22,7 +25,7 @@ func lyricsSourcesShell(t *testing.T) (*shell, *ui.Tester) {
 	s := newTestShell(t)
 	tt := testerOf(t, s, 1280, 1400)
 	show(s, tt, "/settings/playback")
-	if !reveal(tt, "Better Lyrics, on") || !reveal(tt, "YouTube captions, on") {
+	if !reveal(tt, "Better Lyrics, on") || !reveal(tt, "YouTube video & comments, on") {
 		t.Fatalf("Settings › Playback lists no sources of lyrics: %q", tt.Texts())
 	}
 	return s, tt
@@ -88,7 +91,10 @@ func clickSwitch(t *testing.T, s *shell, tt *ui.Tester, name string) {
 // keeps the order in settings.json; reset to default puts it back.
 func TestLyricsSourcesRows(t *testing.T) {
 	s, tt := lyricsSourcesShell(t)
-	want := []string{"Better Lyrics, on", "Unison, on", "LRCLIB, on", "YouTube Music, on", "YouTube captions, on"}
+	want := []string{
+		"Better Lyrics, on", "Unison, on", "lrc.red, on", "Spotify, on", "LRCLIB, on", "QQ Music, on",
+		"YouTube Music, on", "YouTube captions, on", "YouTube video & comments, on",
+	}
 	if got := sourceRowOrder(tt); !slices.Equal(got, want) {
 		t.Fatalf("rows %q, want %q", got, want)
 	}
@@ -99,11 +105,14 @@ func TestLyricsSourcesRows(t *testing.T) {
 		t.Errorf("reset to default, of the sources as they come: %+v, %v", info, ok)
 	}
 	dragSourceRow(t, s, tt, "LRCLIB, on", "Better Lyrics, on")
-	want = []string{"LRCLIB, on", "Better Lyrics, on", "Unison, on", "YouTube Music, on", "YouTube captions, on"}
+	want = []string{
+		"LRCLIB, on", "Better Lyrics, on", "Unison, on", "lrc.red, on", "Spotify, on", "QQ Music, on",
+		"YouTube Music, on", "YouTube captions, on", "YouTube video & comments, on",
+	}
 	if got := sourceRowOrder(tt); !slices.Equal(got, want) {
 		t.Errorf("dragged up, rows %q, want %q", got, want)
 	}
-	if got, want := keptSources(s), []string{"lrclib", "betterlyrics", "unison", "youtube", "captions"}; !slices.Equal(got, want) {
+	if got, want := keptSources(s), []string{"lrclib", "betterlyrics", "unison", "lrcred", "spotify", "qqmusic", "youtube", "captions", "youtubepage"}; !slices.Equal(got, want) {
 		t.Errorf("settings.json keeps %q, want %q", got, want)
 	}
 	click(t, s, tt, "reset to default")
@@ -126,14 +135,14 @@ func TestLyricsSourcesKeys(t *testing.T) {
 	}
 	press(ui.KeyDown)
 	press(ui.KeyDown)
-	if got, want := keptSources(s), []string{"betterlyrics", "lrclib", "youtube", "unison", "captions"}; !slices.Equal(got, want) {
+	if got, want := keptSources(s), []string{"betterlyrics", "lrcred", "spotify", "unison", "lrclib", "qqmusic", "youtube", "captions", "youtubepage"}; !slices.Equal(got, want) {
 		t.Errorf("after Alt+Down twice, settings.json keeps %q, want %q", got, want)
 	}
 	if info, _ := tt.Access(row); !info.Focused {
 		t.Error("the focus didn't follow the source down")
 	}
 	press(ui.KeyUp)
-	if got, want := keptSources(s), []string{"betterlyrics", "lrclib", "unison", "youtube", "captions"}; !slices.Equal(got, want) {
+	if got, want := keptSources(s), []string{"betterlyrics", "lrcred", "unison", "spotify", "lrclib", "qqmusic", "youtube", "captions", "youtubepage"}; !slices.Equal(got, want) {
 		t.Errorf("after Alt+Up, settings.json keeps %q, want %q", got, want)
 	}
 }
@@ -145,7 +154,9 @@ func TestLyricsSourcesSwitches(t *testing.T) {
 	for _, name := range lyricsSourceNames[1:] {
 		clickSwitch(t, s, tt, name)
 	}
-	if got, want := keptSources(s), []string{"betterlyrics", "unison off", "lrclib off", "youtube off", "captions off"}; !slices.Equal(got, want) {
+	if got, want := keptSources(s), []string{
+		"betterlyrics", "unison off", "lrcred off", "spotify off", "lrclib off", "qqmusic off", "youtube off", "captions off", "youtubepage off",
+	}; !slices.Equal(got, want) {
 		t.Fatalf("settings.json keeps %q, want %q", got, want)
 	}
 	last := "Better Lyrics, the last source on"
@@ -156,7 +167,7 @@ func TestLyricsSourcesSwitches(t *testing.T) {
 	if got := keptSources(s); got[0] != "betterlyrics" {
 		t.Errorf("the last source on switched off: %q", got)
 	}
-	if got := sourceRowOrder(tt); len(got) != 5 || got[1] != "Unison, off" {
+	if got := sourceRowOrder(tt); len(got) != len(lyricsSourceNames) || got[1] != "Unison, off" {
 		t.Errorf("rows %q", got)
 	}
 }

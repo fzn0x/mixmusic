@@ -7289,13 +7289,101 @@
   "@lyricsSearchArtist": {
     "description": "In lyricsSearchTitle: the label of the field of the artist to search for."
   },
+  "lyricsSearchCandidate": "{title} · {artist}",
+  "@lyricsSearchCandidate": {
+    "description": "In lyricsSearchTitle: the track title and artist of a candidate result.",
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "Yellow"
+      },
+      "artist": {
+        "type": "String",
+        "example": "Coldplay"
+      }
+    }
+  },
+  "lyricsSearchCandidateAlbum": "{title} · {artist} · {album}",
+  "@lyricsSearchCandidateAlbum": {
+    "description": "In lyricsSearchTitle: the track title, artist and album of a candidate result.",
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "Yellow"
+      },
+      "artist": {
+        "type": "String",
+        "example": "Coldplay"
+      },
+      "album": {
+        "type": "String",
+        "example": "Parachutes"
+      }
+    }
+  },
+  "lyricsSearchFilterAll": "All ({count})",
+  "@lyricsSearchFilterAll": {
+    "description": "In lyricsSearchTitle: filter chip showing results from every source.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "lyricsSearchFilterSource": "{source} ({count})",
+  "@lyricsSearchFilterSource": {
+    "description": "In lyricsSearchTitle: filter chip showing results from one lyrics source.",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "LRCLIB"
+      },
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
   "lyricsSearchGo": "search",
   "@lyricsSearchGo": {
     "description": "In lyricsSearchTitle: the button that asks the sources for the title and artist in the fields. Lowercase, as the labels of buttons are."
   },
+  "lyricsSearchHintLines": "Timed by line",
+  "@lyricsSearchHintLines": {
+    "description": "In lyricsSearchTitle: status badge on a search result whose lyrics have line timestamps."
+  },
+  "lyricsSearchHintPlain": "Not timed",
+  "@lyricsSearchHintPlain": {
+    "description": "In lyricsSearchTitle: status badge on a search result whose lyrics have no timestamps."
+  },
+  "lyricsSearchHintUnknown": "Ready to preview",
+  "@lyricsSearchHintUnknown": {
+    "description": "In lyricsSearchTitle: status badge on a multi-result candidate before its lyrics body is fetched."
+  },
+  "lyricsSearchHintWords": "Timed word by word",
+  "@lyricsSearchHintWords": {
+    "description": "In lyricsSearchTitle: status badge on a search result whose lyrics have word-by-word timestamps."
+  },
   "lyricsSearchLooking": "Asking the lyrics sources…",
   "@lyricsSearchLooking": {
     "description": "In lyricsSearchTitle, while the sources are asked for the title and artist."
+  },
+  "lyricsSearchPreview": "preview",
+  "@lyricsSearchPreview": {
+    "description": "In lyricsSearchTitle: button on a result that expands a preview of its lyrics. Lowercase, as the labels of buttons are."
+  },
+  "lyricsSearchPreviewFailed": "Preview couldn't be loaded.",
+  "@lyricsSearchPreviewFailed": {
+    "description": "In lyricsSearchTitle: message shown when a candidate preview fails to load."
+  },
+  "lyricsSearchPreviewLess": "less",
+  "@lyricsSearchPreviewLess": {
+    "description": "In lyricsSearchTitle: button on an expanded preview that collapses it. Lowercase, as the labels of buttons are."
+  },
+  "lyricsSearchPreviewLoading": "Loading preview…",
+  "@lyricsSearchPreviewLoading": {
+    "description": "In lyricsSearchTitle: shown while a candidate preview is being fetched."
   },
   "lyricsSearchSongTitle": "Title",
   "@lyricsSearchSongTitle": {
@@ -7372,6 +7460,16 @@
   "@lyricsSourceAutomatic": {
     "description": "First in the menu of the lyrics sources, and on its button while it is chosen: the lyrics MixMusic finds by itself, asking the sources in the order of Settings › Playback › Lyrics sources."
   },
+  "lyricsSourceAutomaticFrom": "Automatic ({source})",
+  "@lyricsSourceAutomaticFrom": {
+    "description": "On the button of the lyrics sources while Automatic is chosen and a source's lyrics are showing. {source} is the name of that source, as LRCLIB or Unison.",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "LRCLIB"
+      }
+    }
+  },
   "lyricsSourceBetterLyricsSent": "Lyrics timed word by word. Gets the title, first artist, album and length of tracks that have an album.",
   "lyricsSourceCaptionTrack": "{source} ({language})",
   "@lyricsSourceCaptionTrack": {
@@ -7438,6 +7536,10 @@
       }
     }
   },
+  "lyricsSourceLrcRedSent": "Lyrics timed word by word or by line from lrc.red. Gets the track's ISRC, or its title and first artist.",
+  "@lyricsSourceLrcRedSent": {
+    "description": "Under lrc.red in Settings › Playback › Lyrics sources: describes what the source provides and sends."
+  },
   "lyricsSourceNotAsked": "Not asked yet",
   "@lyricsSourceNotAsked": {
     "description": "Under a source in the menu of the lyrics sources: MixMusic didn't send it the track, as an earlier source had lyrics. Picking it asks it then."
@@ -7448,6 +7550,10 @@
   },
   "lyricsSourceOff": "off",
   "lyricsSourceOn": "on",
+  "lyricsSourceQQMusicSent": "Synced lyrics from QQ Music. Gets the title and first artist.",
+  "@lyricsSourceQQMusicSent": {
+    "description": "Under QQ Music in Settings › Playback › Lyrics sources: describes what the source provides and sends."
+  },
   "lyricsSourceRowLabel": "{name}, {state}",
   "@lyricsSourceRowLabel": {
     "placeholders": {
@@ -7481,12 +7587,38 @@
       }
     }
   },
+  "lyricsSourceSearchedCandidate": "{source}: {candidate}",
+  "@lyricsSourceSearchedCandidate": {
+    "description": "In the menu of the lyrics sources, and on its button: a specific candidate version picked from a multi-result source.",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "LRCLIB"
+      },
+      "candidate": {
+        "type": "String",
+        "example": "Yellow (Live)"
+      }
+    }
+  },
+  "lyricsSourceSpotifySent": "Spotify's own lyrics when signed in with a Spotify web session. Gets the Spotify track ID.",
+  "@lyricsSourceSpotifySent": {
+    "description": "Under Spotify in Settings › Playback › Lyrics sources: describes what the source provides and sends."
+  },
   "lyricsSourceUnisonSent": "Gets the video ID, or the title, artists, album and length.",
   "lyricsSourceUnreachable": "Can't be reached",
   "@lyricsSourceUnreachable": {
     "description": "Under a source in the menu of the lyrics sources, and under a result of lyricsSearchTitle: the source couldn't be reached, or answered with an error. Picking it asks it again."
   },
   "lyricsSourceYouTubeMusicSent": "Gets the video ID of the track, or of its recording there.",
+  "lyricsSourceYouTubePageName": "YouTube video & comments",
+  "@lyricsSourceYouTubePageName": {
+    "description": "The name of the lyrics source that reads plain lyrics from YouTube video descriptions and pinned comments."
+  },
+  "lyricsSourceYouTubePageSent": "Plain lyrics from matching YouTube video descriptions and pinned creator comments. Gets the video ID, or the title and first artist, signed out.",
+  "@lyricsSourceYouTubePageSent": {
+    "description": "Under YouTube video & comments in Settings › Playback › Lyrics sources: describes what the source provides and sends."
+  },
   "lyricsSourcesAbout": "MixMusic asks the sources that are on, one at a time, from the top, until one has synced lyrics. Drag a source onto another to move it there, or press Alt+Up or Alt+Down on it.",
   "lyricsSourcesReset": "reset to default",
   "lyricsSourcesTitle": "Lyrics sources",
@@ -7617,8 +7749,28 @@
     "description": "In Settings › Playback › Lyrics: the title of the setting that moves the synced lyrics of every song earlier or later."
   },
   "lyricsTranslate": "translate",
+  "lyricsTranslateAbove": "above",
+  "@lyricsTranslateAbove": {
+    "description": "Segmented option next to the embedded translation switch: shows each translated line above the original line. Lowercase, as the segmented labels there."
+  },
+  "lyricsTranslateEmbeddedTip": "Shows the translation included with these lyrics, under or above each line, or on its own.",
+  "@lyricsTranslateEmbeddedTip": {
+    "description": "Tooltip on the translate switch when the lyrics already carry an embedded line-by-line translation."
+  },
+  "lyricsTranslateHow": "Show translation",
+  "@lyricsTranslateHow": {
+    "description": "In Settings › Playback › Lyrics and accessible label: chooses whether embedded translations appear under, above, or instead of original lines."
+  },
   "lyricsTranslateLyrics": "Translate lyrics",
+  "lyricsTranslateOnly": "only",
+  "@lyricsTranslateOnly": {
+    "description": "Segmented option next to the embedded translation switch: replaces original lines with the translation. Lowercase, as the segmented labels there."
+  },
   "lyricsTranslateTip": "Shows each line's translation under it. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google translate them.",
+  "lyricsTranslateUnder": "under",
+  "@lyricsTranslateUnder": {
+    "description": "Segmented option next to the embedded translation switch: shows each translated line under the original line. Lowercase, as the segmented labels there."
+  },
   "lyricsTranslationFailed": "Translation isn't available right now.",
   "lyricsTranslationWaiting": "Translation is on its way…",
   "lyricsUnisonFirstTip": "Shows the lyrics in Latin letters too. While it's on, the lyrics of the track playing and its video ID go to Unison, which has Google romanize them with the vowels their script leaves out; until they come, or when they can't, they're made on this computer.",

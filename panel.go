@@ -247,6 +247,8 @@ type lyricsState struct {
 	romaji romajiView
 	// local is what they know of the lyrics romanized on the computer.
 	local romanizeView
+	// embeddedOff records tracks whose embedded translation the listener hid.
+	embeddedOff map[string]bool
 	// pick is what the dialogs of the lyrics' sources show (lyricspick.go).
 	pick lyricsPickView
 }
@@ -686,8 +688,11 @@ func (s *shell) startRadio(t media.Track) {
 // says it: the services' own names, and YouTube's captions in its
 // language.
 func lyricsSourceName(source string) string {
-	if source == app.CaptionsSource {
+	switch source {
+	case app.CaptionsSource:
 		return locales.LyricsSourceCaptionsName()
+	case app.YouTubePageSource:
+		return locales.LyricsSourceYouTubePageName()
 	}
 	return source
 }

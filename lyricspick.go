@@ -440,7 +440,7 @@ func (s *shell) lyricsSearchFilterPills(c *ui.Context, v *lyricsSearch) {
 		}
 	}
 	pill := func(key, label string, active bool) {
-		b := ui.ButtonBase(c.Key("lyrics-filter-" + key)).Height(28).PaddingX(12).Radius(k.round(28)).
+		b := s.buttonBase(c.Key("lyrics-filter-" + key)).Height(28).PaddingX(12).Radius(k.round(28)).
 			Label(label).Cursor(ui.CursorPointer)
 		ink := k.text
 		switch {
